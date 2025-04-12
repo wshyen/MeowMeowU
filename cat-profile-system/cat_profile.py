@@ -1,4 +1,10 @@
-from flask import request, jsonify
+from flask import Flask
 
-# Temporary in-memory storage for cat profiles
+app = Flask(__name__) #Initialize Flask
+
+# Temporary storage for cat profiles
 cat_profiles = []
+
+#Homepage route
+@app.route('/')
+def homepage():
