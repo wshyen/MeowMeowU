@@ -3,6 +3,11 @@
 {% block title %}Create Profile{% endblock %}
 
 {% block content %}
+<style>
+    body {
+        background-color: #ffe4c4;
+    }
+</style>
 <h1>Create a New Cat Profile</h1>
 <form action="{{ url_for('create_profile')}}" method="post" enctype="multipart/form-data" style="max-width: 500px; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9;">
     <div style="margin-bottom: 15px;">
