@@ -13,11 +13,27 @@
             color: #94693e;
             text-align: center;
         }
+
+        .search-container {
+            max-width:500px;
+            margin: 0 auto 20px;
+            padding: 30px;
+
+        }
     </style>
     </head>
 
     <body>
         <h1>SEARCH CAT PROFILE</h1>
+        
+        <form action="cat-list.html" method="get">
+            <div class="search-container">
+                <label for="search">Search by name or trait:</label>
+                <input type="text" id="search" placeholder="e.g., Tom, fat" />    
+                <button type="submit">🐾Go🐾</button>    
+            </div>
+        </form>    
+
 
     </body>
 </html>
