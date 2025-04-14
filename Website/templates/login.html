@@ -3,22 +3,26 @@
 
 {% block content %}
 
+<style>
+    body {background-color: #ffebce;}
+</style>
+
 <form method="post">
-    <h2 style="text-align: center;font-family: 'Times New Roman', Times, serif;padding-top: 25px;color: #eba576;">Login</h2>
+    <h2 style="text-align: center;font-family: 'Times New Roman';padding-top: 25px;color: #e38c29;"><b>Login</b></h2>
 
     <div class="form-group">
-        <lable for="email">Email Address</lable>
-        <input type="email" class="form-control" id="email" name="email" placeholder="Enter Email"/>
+        <lable for="email" style="font-family: 'Times New Roman';">Email Address</lable>
+        <input type="email" class="form-control" style="font-family: 'Times New Roman';" id="email" name="email" placeholder="Enter Email"/>
     </div>
 
     <div class="form-group">
-        <lable for="ps">Password</lable>
-        <input type="password" class="form-control" id="ps" name="ps" placeholder="Enter Password"/>
+        <lable for="ps" style="font-family: 'Times New Roman';">Password</lable>
+        <input type="password" class="form-control" style="font-family: 'Times New Roman';" id="ps" name="ps" placeholder="Enter Password"/>
     </div>
 
     <br/>
 
-    <button type="submit" class="btn btn-primary">Login</button>
+    <button type="submit" class="btn btn-primary" style="font-family: 'Times New Roman';">Login</button>
 </form>
 
 {% endblock %}
