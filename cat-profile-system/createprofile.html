@@ -14,12 +14,15 @@
 
         <div style="margin-bottom: 20px; text-align: center;">
             <div style="width: 150px; height: 150px; border-radius: 50%; border: 2px solid #ddd; margin: 0 auto; position: relative; display: flex; justify-content: center; align-items: center; overflow: hidden;">
-        <img class="profile-picture" alt="Profile Picture Preview" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 2px solid #ddd; margin-bottom: 10px;">
+                <p id="profilePictureText" style="margin: 0; font-size: 14px; color: #666; text-align: center; position: absolute; font-weight: bold; ">Profile Picture Preview</p>
+                <img id="profilePicturePreview" alt="Profile Picture Preview" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+            </div>
+            <br>
+        <label for="profile_picture" style="display: block; font-weight: bold; margin-bottom: 5px;">Upload Profile Picture:</label>
+        <input type="file" id="profile_picture" name="profile_picture" accept="image/*" required onchange="previewProfilePicture(event)" style="margin-bottom: 5px;">
         <br>
-        <label for="profile_picture" style="font-weight: bold;">Upload Profile Picture:</label>
-        <input type="file" id="profile_picture" name="profile_picture" accept="image/*" required>
+        <button type="button" id="removePictureButton" onclick="removeProfilePicture()" style="padding: 5px 10px; background-color: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer; display: none;">Remove</button>
     </div>
-
     <div style="margin-bottom: 15px;">
         <label for="name" style="display: inline-block; width: 150px; font-weight: bold;">Name:</label>
         <input type="text" id="name" name="name" required style="width: 300px; padding: 5px; border: 1 px solid #ccc; border-radius: 5px;" pattern="[A-Za-z]+" title="Only letters are allowed">
