@@ -12,11 +12,56 @@
         h1 {
             color: #94693e;
             text-align: center;
+            font-size: 36px;
+            margin-bottom: 10px;
         }
 
         h2{
-            color: #94693e;
-            margin-left: 10%;
+            color: #6b4f2f;
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 30px;
+            font-style: italic;
+            margin-top: 0;
+            margin-bottom: 30px;
+        }
+
+        .cat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .cat-card {
+            background-color: #fffbe9;
+            padding: 15px;
+            height: 250px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            align-items: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            transition: transform 0.3s ease;
+        }
+
+        .cat-card:hover {
+            transform: scale(1.2); 
+        }
+
+        .cat-card img {
+            width: 150px;
+            display: block;
+            
+        }        
+
+        .cat-card p {
+            margin: 10px 0;
+            font-size: larger;
+            text-align:center;
+            flex-grow: 1;
         }
 
     </style>
@@ -26,6 +71,21 @@
         <h1>SEARCH CAT PROFILE</h1>
         <h2>The following matches your search:</h2>
 
+        <div class="cat-grid">
+            <div class="cat-card" onclick="window.location.href='viewprofile.html'">
+                <img src="images/bubble.jpg" alt="Bubble">
+                <p><strong>Name: </strong>Bubble</p>
+                <p><strong>Gender: </strong>Female</p>
+            </div>
+
+
+            <div class="cat-card" onclick="window.location.href='viewprofile.html'">
+                <img src="images/tom.jpg" alt="Tom">
+                <p><strong>Name: </strong>Tom</p>
+                <p><strong>Gender: </strong>Male</p>
+            </div> 
+        </div> 
+        
 
     </body>
 </html>

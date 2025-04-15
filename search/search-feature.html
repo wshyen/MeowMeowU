@@ -13,6 +13,8 @@
         h1 {
             color: #94693e;
             text-align: center;
+            font-size: 36px;
+            margin-bottom: 10px;
         }
 
         .search-bar {
@@ -23,7 +25,7 @@
             border-radius: 5px;
             font-size: medium;
             box-sizing: border-box;
-            box-shadow: 0px 8px 3px #c39f76
+            box-shadow: 0px 8px 3px #c39f76;
         }
 
         .search-bar label {
@@ -48,13 +50,18 @@
             outline: none;
         }
 
+        .search-bar input::placeholder {
+            color: #c2a177;
+            font-style: italic;
+}
+
         .search-bar select {
             background-color: #fffbe9;
             color: #6b4f2f;
             font-size: 16px;
             cursor: pointer;
             appearance: none;
-            background-image: url(images/cat\ paws\ icon.png);
+            background-image: url(images/cat_paws_icon.png);
             background-repeat: no-repeat;
             background-position: right 10px center;
             background-size: 20px;
@@ -70,12 +77,14 @@
             border: none;
             color: #6b4f2f;
             font-size: 16px;
+            font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
+            transition: transform 0.2s ease;
+        }    
+            
         .search-bar button:hover {
-            background-color: #b6a89f;
+            background-color: #d4bfae;
+            transform: scale(1.05);
         }
         
     </style>
@@ -84,7 +93,7 @@
     <body>
         <h1>SEARCH CAT PROFILE</h1>
         
-        <form action="/search" method="get">
+        <form action="cat-list.html" method="get">
             <div class="search-bar">
 
                 <label for="name">Search by name:</label> 
