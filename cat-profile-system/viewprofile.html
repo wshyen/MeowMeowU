@@ -1,14 +1,16 @@
 {% extends 'base.html' %} 
 
-{% block title %}Cat Profiles{% endblock %}
+{% block title %}View Cat Profiles{% endblock %}
 
-{block content %}
+{% block content %}
 <style>
     body {
-        background-color: #ffe4c4;
+        background-color: #EDE0D7;
     }
 </style>
-<h1>Cat Profiles</h1>
+<div style="display: flex; flex-direction: column; align-items: center; padding: 20px;">
+    <h1 style="margin-bottom: 20px;">Cat Profiles</h1>
+
 <div class="profile-list">
     {% for profile in profiles %}
     <div class="profile-card">
