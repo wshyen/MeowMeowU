@@ -29,13 +29,17 @@
             color: #6b4f2f;
         }
         
-        .search-bar input {
+        .search-bar input,
+        .search-bar select {
             width: 200px;
             padding: 5px;
             border-radius: 5px;
+            display:block;
+            margin-bottom: 10px;
         }
 
         .search-bar button {
+            width: 70px;
             padding: 5px;
             background-color: #dccbb7;
             border-radius: 5px;
@@ -43,17 +47,51 @@
             cursor: pointer;
         }
 
+        .search-bar input:focus {
+            border: 2px solid #94693e;
+            outline: none;
+        }
 
+        .search-bar button:hover {
+            background-color: #b6a89f;
+        }
+        
     </style>
     </head>
 
     <body>
         <h1>SEARCH CAT PROFILE</h1>
         
-        <form action="cat-list.html" method="get">
+        <form action="/search" method="get">
             <div class="search-bar">
-                <label for="search">Search by name or trait:</label>
-                <input type="text" id="search" placeholder="e.g., Tom, Bubble" />    
+
+                <label for="name">Search by name:</label> 
+                <input type="text" id="name" name="name" placeholder="e.g., Tom, Bubble" /> 
+                
+                <label for="gender">Filter by gender:</label>
+                <select id="gender" name="gender">
+                    <option value="">Select gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Not sure">Not sure</option>
+                </select>
+
+                <label for="color">Filter by color:</label>
+                <select id="color" name="color">
+                    <option value="">Select color</option>
+                    <option value="Black">Black</option>
+                    <option value="White">White</option>
+                    <option value="Brown">Brown</option>
+                    <option value="Gray(Blue)">Gray (Blue)</option>
+                    <option value="Orange(Ginger)">Orange (Ginger)</option>
+                    <option value="Calico">Calico</option>
+                    <option value="Tortoiseshell">Tortoiseshell</option>
+                    <option value="Tabby">Tabby</option>
+                    <option value="Cream">Cream</option>
+                    <option value="Silver">Silver</option>
+                    <option value="Other">Other</option>
+                </select>
+ 
                 <button type="submit">🐾Go🐾</button>    
             </div>
         </form>    
