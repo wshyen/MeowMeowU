@@ -3,9 +3,6 @@
 
 <style>
     a:hover {background-color: #ea9e47;}
-
-    .flash-message {
-        font-family: 'Times New Roman';}
 </style>
 
     <head>
@@ -37,13 +34,6 @@
 
         {% with messages = get_flashed_messages(with_categories = true) %}
         {% if messages %}
-
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }} flash-message">
-                    {{ message }}
-                </div>
-            {% endfor %}
-
             {% for category, message in messages %}
             {% if category == "error" %}
             
