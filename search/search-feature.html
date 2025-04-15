@@ -7,6 +7,7 @@
             background-color: #f2eadf;
             margin: 0;
             padding: 20px;
+            height: 100vh;
         }
 
         h1 {
@@ -27,29 +28,50 @@
 
         .search-bar label {
             color: #6b4f2f;
+            margin-bottom: 8px;
+            font-weight: bold;
         }
         
         .search-bar input,
         .search-bar select {
-            width: 200px;
-            padding: 5px;
-            border-radius: 5px;
+            width: 100%;
+            padding: 10px;
+            border-radius: 12px;
             display:block;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            transition: border-color 0.3s ease;
         }
 
-        .search-bar button {
-            width: 70px;
-            padding: 5px;
-            background-color: #dccbb7;
-            border-radius: 5px;
-            border: none;
-            cursor: pointer;
-        }
-
-        .search-bar input:focus {
+        .search-bar input:focus,
+         .search-bar select:focus {
             border: 2px solid #94693e;
             outline: none;
+        }
+
+        .search-bar select {
+            background-color: #fffbe9;
+            color: #6b4f2f;
+            font-size: 16px;
+            cursor: pointer;
+            appearance: none;
+            background-image: url(images/cat\ paws\ icon.png);
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 20px;
+            padding-right: 35px;
+        }
+
+
+        .search-bar button {
+            width: 100%;
+            padding: 12px;
+            background-color: #dccbb7;
+            border-radius: 15px;
+            border: none;
+            color: #6b4f2f;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
         }
 
         .search-bar button:hover {
