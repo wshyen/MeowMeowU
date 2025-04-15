@@ -30,6 +30,9 @@ def sign_up():
         elif not re.match(r'^[A-Z][a-zA-Z0-9]{2,14}$', UserName):
             flash("Username must start with a capital letter and be 3 to 15 characters long.", category="error")
 
+        elif len(ps1) < 7:
+            flash('Password must be at least 7 characters.', category='error')
+
         #check ps
         elif ps1 != ps2:
             flash("Passwords do not match.", category="error")
