@@ -8,8 +8,19 @@ auth = Blueprint("auth", __name__)
 
 @auth.route("/login", methods=["GET", "POST"])
 def login():
-    data = request.form
-    print(data)
+    if request.method == "POST":
+        email = request.form.get("email")
+        ps = request.form.get("ps")
+
+        user = User.query.filter_by(email=email).first()
+        if user:
+            if check_password_hash(user.ps, ps):
+                flash("Logged in successfully!", category="success")
+            else:
+                flash("Incorrect password, please try again.", category="error")
+        else:
+            flash("Email does not exist!", category="error")
+
     return render_template("login.html")
 
 @auth.route("/logout")
@@ -25,6 +36,10 @@ def sign_up():
         UserName = request.form.get("UserName")
         ps1 = request.form.get("ps1")
         ps2 = request.form.get("ps2")
+
+        user = User.query.filter_by(email=email).first()
+        if user:
+            flash("Email already exist!", category="error")
 
         #check email address is mmu email onot
         if not re.match(r'^[\w\.-]+@student\.mmu\.edu\.my$', email): #"^" this means starting of the string and "$" this means closing
