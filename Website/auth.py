@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 import re
-from models import User
+from .models import User
 from . import db
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -21,7 +21,7 @@ def sign_up():
 
     if request.method == "POST":
 
-        email = request.form.get("email")
+        email = request.form.get("email").lower()
         UserName = request.form.get("UserName")
         ps1 = request.form.get("ps1")
         ps2 = request.form.get("ps2")
@@ -41,7 +41,7 @@ def sign_up():
             flash("Passwords do not match.", category="error")
 
         else: #if all correct
-            new_user = User(email=email, UserName=UserName, ps=generate_password_hash(ps1, method="sha256"))
+            new_user = User(email=email, UserName=UserName, ps=generate_password_hash(ps1, method="pbkdf2:sha256"))
             db.session.add(new_user) #add new user to database
             db.session.commit()
             flash("Account created successfully!", category="success")
