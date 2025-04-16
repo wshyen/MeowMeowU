@@ -15,7 +15,7 @@ def search():
 def cat_list():
     name = request.args.get("name", "").lower()
     gender = request.args.get("gender", "")
-    color = request.args.get("color", "")
+    color_list = request.args.get("color", "")
 
     filtered_cats = [
     cat for cat in cat_data
