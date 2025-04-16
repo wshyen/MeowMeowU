@@ -26,6 +26,13 @@
             margin-bottom: 30px;
         }
 
+        .not-found {
+            margin: 10px 0;
+            font-size: larger;
+            text-align:center;
+            flex-grow: 1;
+        }
+
         .cat-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -69,19 +76,21 @@
 
     <body>
         <h1>SEARCH CAT PROFILE</h1>
-        <h2>The following matches your search:</h2>
 
-        <div class="cat-grid">
-           {%for cat in cats%}
-            <div class="cat-card" onclick="window.location.href='viewprofile.html'">
-                <img src="{{url_for(filename='images/' ~ cat.image)}}" alt="{{cat.name}}">
-                <p><strong>Name: </strong>{{ cat.name }}</p>
-                <p><strong>Gender: </strong>{{ cat.gender }}</p>
+        {% if cats %}
+            <h2>The following matches your search:</h2>
+            <div class="cat-grid">
+                {% for cat in cats %}
+                    <div class="cat-card" onclick="window.location.href='/viewprofile?name={{ cat.name }}'">
+                        <img src="{{ url_for('static', filename='images/' ~ cat.image) }}" alt="{{ cat.name }}">
+                        <p><strong>Name: </strong>{{ cat.name }}</p>
+                        <p><strong>Gender: </strong>{{ cat.gender }}</p>
+                    </div>
+                {% endfor %}
             </div>
-            {%endfor%}
-
-        </div> 
-        
+        {% elif message %}
+            <div class="not-found">{{ message }}</div>
+        {% endif %}
 
     </body>
 </html>

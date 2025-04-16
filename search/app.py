@@ -17,16 +17,29 @@ def cat_list():
     gender = request.args.get("gender", "")
     color = request.args.get("color", "")
 
-    filtered_cats = []
-    for cat in cat_data:
+    filtered_cats = [
+    cat for cat in cat_data
         if (not name or name in cat["name"].lower()) and \
            (not gender or gender == cat["gender"]) and \
-           (not color or color == cat["color"]):
-            filtered_cats.append(cat)
+           (not color or color == cat["color"])
+    ]
 
-    print(filtered_cats)
+    if filtered_cats:
+        return render_template("cat-list.html", cats=filtered_cats)
+    else:
+        return render_template("cat-list.html", message="No cats found matching your criteria.")
+    
+@app.route('/viewprofile')
+def view_profile():
+    name = request.args.get("name", "").lower()
+    selected_cat = None
+    for cat in cat_data:
+        if cat["name"].lower() == name:
+            selected_cat = cat
+            break
 
-    return render_template("cat-list.html", cats=filtered_cats)
-
+    if selected_cat:
+        return render_template("viewprofile.html", cat=selected_cat)
+    
 if __name__ == '__main__':
     app.run(debug=True)
