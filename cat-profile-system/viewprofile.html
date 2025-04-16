@@ -19,14 +19,18 @@
             <p style="margin: 0 0 5px; font-size: 0.9rem; color: #333"><strong>Gender:</strong> {{ profile.gender }}</p>
             <p style="margin: 0 0 5px; font-size: 0.9rem; color: #333"><strong>Color:</strong> {{ profile.color }}</p>
             <p style="margin: 0 0 10px; font-size: 0.9rem; color: #333;"><strong>Description:</strong> {{ profile.description }}</p>
-        
-        <div class="profile-actions">
-            <a href="{{ url_for('edit_profile', id=profile.id) }}" class="edit-button">Edit</a>
-            <form action="{{ url_for('delete_profile', id=profile.id) }}" method="post" class="delete-form">
-                <button type="submit" class="delete-button">Delete</button>
-            </form>
+                
+            <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+                <a href="{{ url_for('edit_profile', id=profile.id) }}" 
+                   style="padding: 10px 15px; background: #94693e; color: white; text-decoration: none; border-radius: 5px; font-size: 0.9rem; cursor: pointer; font-weight: bold;">Edit</a>
+
+                {% if profile.creator == current_user['username'] %}
+                <a href="{{ url_for('confirm_delete', id=profile.id) }}" 
+                    style="padding: 10px 15px; background: #dc3545; color: white; text-decoration: none; border-radius: 5px; font-size: 0.9; cursor: pointer; font-weight: bold;">Delete</a>
+                {% endif %}
+            </div>
         </div>
+        {% endfor %}
     </div>
-    {% endfor %}
 </div>
 {% endblock %}
