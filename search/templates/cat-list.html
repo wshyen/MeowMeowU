@@ -72,18 +72,14 @@
         <h2>The following matches your search:</h2>
 
         <div class="cat-grid">
+           {%for cat in cats%}
             <div class="cat-card" onclick="window.location.href='viewprofile.html'">
-                <img src="images/bubble.jpg" alt="Bubble">
-                <p><strong>Name: </strong>Bubble</p>
-                <p><strong>Gender: </strong>Female</p>
+                <img src="{{url_for(filename='images/' ~ cat.image)}}" alt="{{cat.name}}">
+                <p><strong>Name: </strong>{{ cat.name }}</p>
+                <p><strong>Gender: </strong>{{ cat.gender }}</p>
             </div>
+            {%endfor%}
 
-
-            <div class="cat-card" onclick="window.location.href='viewprofile.html'">
-                <img src="images/tom.jpg" alt="Tom">
-                <p><strong>Name: </strong>Tom</p>
-                <p><strong>Gender: </strong>Male</p>
-            </div> 
         </div> 
         
 
