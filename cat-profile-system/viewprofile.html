@@ -13,15 +13,12 @@
     <div style="overflow-x: auto; white-space: nowrap; padding: 10px; border: 1px solid #ddd; border-radius: 10px; background-color: #f0f0f0;">
         {% for profile in profiles if not profile.deleted %}
         <div class="profile-card" style="display: inline-block; width: 250px; border: 1px solid #2A1503; border-radius: 12px; background: #fff; overflow: hidden; padding: 18px; text-align: center; margin-right: 15px;">
-
-<div class="profile-list">
-    {% for profile in profiles %}
-    <div class="profile-card">
-        <img class="profile-picture" src="{{ profile.profile_picture }}" alt="{{ profile.name }}'s Profile Picture">
-        
-        <h2 class="profile-name">{{ profile.name }}</h2>
-        
-        <p class="profile-description">{{ profile.description }}</p>
+            <img src="{{ profile.profile_picture }}" alt="{{ profile.name }}" 
+                style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%; margin-bottom: 15px;">
+            <h2 style="margin: 0 0 10px; font-size: 1.5rem; color: #333;">{{ profile.name }}</h2>
+            <p style="margin: 0 0 5px; font-size: 0.9rem; color: #333"><strong>Gender:</strong> {{ profile.gender }}</p>
+            <p style="margin: 0 0 5px; font-size: 0.9rem; color: #333"><strong>Color:</strong> {{ profile.color }}</p>
+            <p style="margin: 0 0 10px; font-size: 0.9rem; color: #333;"><strong>Description:</strong> {{ profile.description }}</p>
         
         <div class="profile-actions">
             <a href="{{ url_for('edit_profile', id=profile.id) }}" class="edit-button">Edit</a>
