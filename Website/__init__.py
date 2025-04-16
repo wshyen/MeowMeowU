@@ -19,10 +19,13 @@ def create_app():
 
     from .models import User, Note #import this to make sure models.py file run before we initialize database
 
+    create_database(app)
+
     return app
 
 def create_database(app):
     if not path.exists("Website/" + DB_NAME):
-        db.create_all(app=app)
+        with app.app_context():               # Use app context for db.create_all()
+            db.create_all() 
         print("Created database!")
 
