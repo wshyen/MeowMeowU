@@ -20,7 +20,7 @@
 
     <body>
         <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #d69449;"> <!--nav bar stuff, style it -->
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar"> <!-- Button used to show or hide navigation options on small screens -->
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbar">
@@ -58,7 +58,6 @@
             {% endfor %}
         {% endif %}
         {% endwith %}
-
 
         <div class="container">{% block content %}{% endblock %}</div>
 

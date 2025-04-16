@@ -1,13 +1,20 @@
 {% extends "base.html" %}
+
+<!-- define the title block and set it to "Login" -->
 {% block title %}Login{% endblock %}
 
 {% block content %}
 
 <style>
     body {background-color: #ffebce;}
+
+    button:hover {
+    background-color: #ff9966;
+    transform: scale(1.1);}
 </style>
 
-<form method="post">
+<!-- create a form for user login -->
+<form method="post"> <!-- the form will send data using the POST method -->
     <h2 style="text-align: center;font-family: 'Times New Roman';padding-top: 25px;color: #e38c29;"><b>Login</b></h2>
 
     <div class="form-group">

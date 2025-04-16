@@ -1,21 +1,22 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, render_template, request, flash, redirect, url_for #Flask is a web framework that allows developers to build web applications
 import re
 from .models import User
 from . import db
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash #for password hashing and verification
 
-auth = Blueprint("auth", __name__)
+auth = Blueprint("auth", __name__) #a Blueprint for authentication routes, Blueprint is like a container for related routes and functions
 
-@auth.route("/login", methods=["GET", "POST"])
+@auth.route("/login", methods=["GET", "POST"]) #POST is a HTTP request methods that send data to the server
+#HTTP request methods are ways for a web browser or app to communicate with a server over the internet
 def login():
     if request.method == "POST":
         email = request.form.get("email")
         ps = request.form.get("ps")
 
         user = User.query.filter_by(email=email).first()
-        if user:
+        if user: #check user exists onot
             if check_password_hash(user.ps, ps):
-                flash("Logged in successfully!", category="success")
+                flash("Logged in successfully!", category="success") #pop a message out
             else:
                 flash("Incorrect password, please try again.", category="error")
         else:
