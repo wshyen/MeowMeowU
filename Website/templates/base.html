@@ -4,22 +4,26 @@
 <style>
     a:hover {background-color: #ea9e47;
     text-transform: uppercase;}
+
+    .button {
+    background-color: #d69449;
+    color: white;}
 </style>
 
     <head>
         <meta charset="utf-8"/>
-        <meta name="viewpoint" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        <meta name="viewpoint" content="width=device-width, initial-scale=1"> <!--makes the webpage responsive based on the device's screen size-->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" 
       integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
-      crossorigin="anonymous"/>
+      crossorigin="anonymous"/> <!--link to bootstrap for css styling-->
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
-        crossorigin="anonymous"/>
+        crossorigin="anonymous"/> 
 
-        <title>{% block title %}Home{% endblock %}</title>
+        <title>{% block title %}Home{% endblock %}</title> <!--title section that can be changed in other templates-->
     </head>
 
     <body>
-        <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #d69449;">
+        <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #d69449;"> <!--nav bar stuff, style it -->
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar">
                 <span class="navbar-toggler-icon"></span>
             </button>
