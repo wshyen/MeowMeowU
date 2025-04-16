@@ -15,14 +15,14 @@ def search():
 def cat_list():
     name = request.args.get("name", "").lower()
     gender = request.args.get("gender", "")
-    color_list = request.args.getlist("color")
+    color = request.args.get("color", "")
 
     filtered_cats = [
-    cat for cat in cat_data
+        cat for cat in cat_data
         if (not name or name in cat["name"].lower()) and
-           (not gender or gender == cat["gender"]) and 
-           (not color_list or cat["color"] in color_list)
-    ]
+        (not gender or gender == cat["gender"]) and 
+        (not color or color == cat["color"])
+        ]
 
     if filtered_cats:
         return render_template("cat-list.html", cats=filtered_cats)

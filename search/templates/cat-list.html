@@ -82,7 +82,7 @@
             <div class="cat-grid">
                 {% for cat in cats %}
                     <div class="cat-card" onclick="window.location.href='/viewprofile?name={{ cat.name }}'">
-                        <img src="{{ url_for('static', filename='images/' ~ cat.image) }}" alt="{{ cat.name }}">
+                        <img src="{{ url_for('static', filename='images/' + cat.image) }}" alt="{{ cat.name }}">
                         <p><strong>Name: </strong>{{ cat.name }}</p>
                         <p><strong>Gender: </strong>{{ cat.gender }}</p>
                     </div>
