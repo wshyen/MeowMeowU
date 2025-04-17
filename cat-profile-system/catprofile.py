@@ -39,7 +39,7 @@ def create_profile():
         if 'profile_picture' in request.files:
             file = request.files['profile_picture']
             if file and allowed_file(file.filename): #Checks if the file was uploaded in the correct format (png,jpg,jpeg)
-            filename = f"{name.lower()}_{len(cat_profiles) + 1}.{file.filename.rsplit('.', 1)[1].lower()}" #len(cat_profiles) + 1 assigns an auto-incremented ID based on the number of existing profiles
+                filename = f"{name.lower()}_{len(cat_profiles) + 1}.{file.filename.rsplit('.', 1)[1].lower()}" #len(cat_profiles) + 1 assigns an auto-incremented ID based on the number of existing profiles
                 photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 file.save(photo_path) #Stores the uploaded file in a specific folder
                 photo = photo_path
@@ -87,7 +87,7 @@ def edit_profile(id):
                 profile['photo'] = photo_path #This stores image path inside the profile dictionary
 
     flash('Profile updated successfully!', 'success') #Notify user profile updated successfully
-        return redirect(url_for('view_profiles')) #Sends user back to the profile list page
+    return redirect(url_for('view_profiles')) #Sends user back to the profile list page
 
     return render_template('editprofiles.html', profile=profile)
 
