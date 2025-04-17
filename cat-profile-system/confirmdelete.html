@@ -1,3 +1,10 @@
 {% extends 'base.html' %}
 
 {% block title %}Confirm Delete Cat Profile{% endblock %}
+
+{% block content %}
+<div style="text-align: center; margin-top: 50px;">
+    <h1>Are you sure you want to delete the profile for "{{ profile.name }}"?</h1>
+    <p style="color: red; font-weight: bold;">This action cannot be undone.</p>
+</div>
+{% endblock %}
