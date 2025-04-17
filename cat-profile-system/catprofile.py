@@ -39,6 +39,25 @@ def create_profile():
                 file.save(photo_path) #Stores the uploaded file in a specific folder
                 photo = photo_path
 
+        #Validate required fields
+        if not name or not gender or not color:
+            flash('Name, gender and color are required!', 'error')
+            return redirect(url_for('create_profile'))
+
+        #Create a new profile dictionary
+        new_profile = {
+            'id': len(cat_profiles) + 1,
+            'name': name,
+            'gender': gender,
+            'color': color,
+            'description': description,
+            'photo': photo
+        }
+        cat_profiles.append(new_profile) #Add profile to the list
+
+        flash('Cat Profile created successfully!', 'success') #Notify user profile created successfully return
+        return redirect(url_for('view_profiles'))
+
     return render_template('createprofile.html')
 
 if __name__ == '__main__':
