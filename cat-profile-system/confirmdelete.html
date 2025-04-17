@@ -6,7 +6,7 @@
 <style>
     body {
         background-color: #EDE0D7;
-    }
+        }
 </style>
 <div style="text-align: center; margin-top: 50px; font-family: 'Times New Roman', Times, serif;">
     <h1>Are you sure you want to delete the profile for "{{ profile.name }}"?</h1>
@@ -32,7 +32,6 @@
            style="padding: 10px 0; width: 150px; height: 40px; background-color: gray; color: white; text-decoration: none; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; font-family: 'Times New Roman', Times, serif; box-sizing: border-box;">
             Cancel
         </a>
-
         <form action="{{ url_for('delete_profile', id=profile.id) }}" method="POST" style="margin: 0;">
             <button type="submit" 
                     style="padding: 10px 0; width: 150px; height: 40px; background-color: red; color: white; border: none; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; font-family: 'Times New Roman', Times, serif; box-sizing: border-box; outline: none; cursor: pointer;">
