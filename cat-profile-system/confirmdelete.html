@@ -6,5 +6,18 @@
 <div style="text-align: center; margin-top: 50px;">
     <h1>Are you sure you want to delete the profile for "{{ profile.name }}"?</h1>
     <p style="color: red; font-weight: bold;">This action cannot be undone.</p>
+    
+    <div style="border: 1px solid #ddd; padding: 20px; margin: 0 auto 20px; width: 400px; text-align: center; border-radius: 10px; background-color: #f9f9f9; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+        {% if profile.profile_picture %}
+        <div style="text-align: center; margin-bottom: 15px;">
+            <img src="{{ profile.profile_picture }}" alt="Profile Picture" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+        </div>
+        {% endif %}
+        <p><strong>Name:</strong> {{ profile.name }}</p>
+        <p><strong>Gender:</strong> {{ profile.gender }}</p>
+        <p><strong>Color:</strong> {{ profile.color }}</p>
+        <p><strong>Description:</strong> {{ profile.description }}</p>
+    </div>
+
 </div>
 {% endblock %}
