@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template
+from flask import Flask, render_template, flash
 
 app = Flask(__name__) 
 app.auth_key = 'auth_key'
@@ -24,6 +24,21 @@ def create_profile():
         color = request.form['color']
         description = request.form.get('description', '')  #Optional description
         photo = None
+
+        #Validate name length
+        if len(name) < 3 or len(name) > 15:
+            flash('Name must be between 3 and 15 characters long.', 'error') #Display warning message to user 
+            return redirect(url_for('create_profile'))
+
+        #Handle file upload for profile pictures
+        if 'profile_picture' in request.files:
+            file = request.files['profile_picture']
+            if file and allowed_file(file.filename): #Checks if the file was uploaded in the correct format (png,jpg,jpeg)
+            filename = f"{name.lower()}_{len(cat_profiles) + 1}.{file.filename.rsplit('.', 1)[1].lower()}" #len(cat_profiles) + 1 assigns an auto-incremented ID based on the number of existing profiles
+                photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file.save(photo_path) #Stores the uploaded file in a specific folder
+                photo = photo_path
+
     return render_template('createprofile.html')
 
 if __name__ == '__main__':
