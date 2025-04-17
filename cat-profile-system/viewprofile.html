@@ -32,5 +32,8 @@
         </div>
         {% endfor %}
     </div>
+    {% if profiles|length == 0 %}
+    <p style="margin-top: 20px; font-size: 1.2rem; color: #555; text-align: center;">No profiles found. Create one by clicking <a href="{{ url_for('create_profile') }}" style="color: #007bff; text-decoration: none;">here</a>.</p>
+    {% endif %}
 </div>
 {% endblock %}
