@@ -25,6 +25,11 @@ def create_profile():
         description = request.form.get('description', '')  #Optional description
         photo = None
 
+        for profile in cat_profiles:
+            if profile['name'].lower() == name.lower():
+                flash(f'The name "{name}" is already in use. Please choose a different one.', 'error') #Display error message to user that name is taken
+                return redirect(url_for('create_profile')) #Sends user back to the create profile page
+
         #Validate name length
         if len(name) < 3 or len(name) > 15:
             flash('Name must be between 3 and 15 characters long.', 'error') #Display error message to user if name format not correct
