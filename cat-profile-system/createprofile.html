@@ -24,7 +24,7 @@
     </div>
     <div style="margin-bottom: 15px;">
         <label for="name" style="display: inline-block; width: 150px; font-weight: bold;">Name:</label>
-        <input type="text" id="name" name="name" required style="width: 300px; padding: 5px; border: 1 px solid #ccc; border-radius: 5px;" pattern="[A-Za-z]+" title="Only letters are allowed">
+        <input type="text" id="name" name="name" required style="width: 300px; padding: 5px; border: 1px solid #ccc; border-radius: 5px;" minlength="3" maxlength="15" pattern="[A-Za-z]+" title="Only letters (A-Z or a-z) are allowed. Name must be 3-15 characters long.">
     </div>
     <div style="margin-bottom: 15px;">
         <label for="gender" style="display: inline-block; width: 150px; font-weight: bold;">Gender:</label>
