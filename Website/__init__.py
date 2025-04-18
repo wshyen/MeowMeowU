@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy #SQLAlchemy is used for database operations
 from os import path #path is used for file system checks
+from flask_login import LoginManager
 
 db = SQLAlchemy() #initialize SQLAlchemy instance for database handling
 DB_NAME = "datebase.db" #name the file
@@ -21,6 +22,14 @@ def create_app(): #a function to create and configure the Flask app
     from .models import User, Note #import this to make sure models.py file run before we initialize database
 
     create_database(app) #create the database if it doesn't already exist
+
+    login_manager = LoginManager()
+    login_manager.login_view = "auth.login"
+    login_manager.init_app(app)
+
+    @login_manager.user_loader
+    def load_user(id):
+        return User.query.get(int(id))
 
     return app
 

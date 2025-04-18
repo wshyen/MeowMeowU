@@ -3,6 +3,7 @@ import re
 from .models import User
 from . import db
 from werkzeug.security import generate_password_hash, check_password_hash #for password hashing and verification
+from flask_login import login_user, login_required, logout_user, current_user
 
 auth = Blueprint("auth", __name__) #a Blueprint for authentication routes, Blueprint is like a container for related routes and functions
 
@@ -17,6 +18,8 @@ def login():
         if user: #check user exists onot
             if check_password_hash(user.ps, ps):
                 flash("Logged in successfully!", category="success") #pop a message out
+                login_user(user, remember=True)
+                return redirect(url_for("views.home"))
             else:
                 flash("Incorrect password, please try again.", category="error")
         else:
@@ -25,8 +28,10 @@ def login():
     return render_template("login.html")
 
 @auth.route("/logout")
+@login_required
 def logout():
-    return "<p>Logout</p>"
+    logout_user()
+    return redirect(url_for("auth.login"))
 
 @auth.route("/sign-up", methods=["GET", "POST"])
 def sign_up():
@@ -60,6 +65,7 @@ def sign_up():
             new_user = User(email=email, UserName=UserName, ps=generate_password_hash(ps1, method="pbkdf2:sha256"))
             db.session.add(new_user) #add new user to database
             db.session.commit()
+            login_user(user, remember=True)
             flash("Account created successfully!", category="success")
             return redirect(url_for("auth.login"))
     
