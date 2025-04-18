@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirm Delete Cat Profile{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #EDE0D7;
+        }
+</style>
+<div style="text-align: center; margin-top: 50px; font-family: 'Times New Roman', Times, serif;">
+    <h1>Are you sure you want to delete the profile for "{{ profile.name }}"?</h1>
+    <p style="color: red; font-size: 15px; font-weight: bold; margin-bottom: 20px;">This action cannot be undone.</p>
+    
+    <div style="border: 1px solid #ddd; padding: 20px; margin: 0 auto 20px; width: 400px; text-align: center; border-radius: 10px; background-color: #f9f9f9; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+        {% if profile.profile_picture %}
+        <div style="text-align: center; margin-bottom: 15px;">
+            <img src="{{ profile.profile_picture }}" alt="Profile Picture" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+        </div>
+        {% else %}
+        <div style="width: 120px; height: 120px; border-radius: 50%; background-color: #e0e0e0; display: flex; align-items: center; justify-content: center; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); margin: 0 auto 15px;">
+            <span style="color: #888; font-size: 14px;">Profile Picture</span>
+        </div>
+        {% endif %}
+        <p><strong>Name:</strong> {{ profile.name }}</p>
+        <p><strong>Gender:</strong> {{ profile.gender }}</p>
+        <p><strong>Color:</strong> {{ profile.color }}</p>
+        <p><strong>Description:</strong> {{ profile.description }}</p>
+    </div>
+    <div style="display: flex; justify-content: center; gap: 20px; margin-top: 20px;">
+        <a href="{{ url_for('view_profiles') }}" 
+           style="padding: 10px 0; width: 150px; height: 40px; background-color: gray; color: white; text-decoration: none; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; font-family: 'Times New Roman', Times, serif; box-sizing: border-box;">
+            Cancel
+        </a>
+        <form action="{{ url_for('delete_profile', id=profile.id) }}" method="POST" style="margin: 0;">
+            <button type="submit" 
+                    style="padding: 10px 0; width: 150px; height: 40px; background-color: red; color: white; border: none; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; font-family: 'Times New Roman', Times, serif; box-sizing: border-box; outline: none; cursor: pointer;">
+                Confirm
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
