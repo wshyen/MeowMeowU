@@ -1,0 +1,43 @@
+{% extends 'base.html' %} 
+
+{% block title %}View Cat Profiles{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #EDE0D7;
+    }
+</style>
+<div style="padding: 20px;">
+    <h1 style="text-align: center; margin-bottom: 20px;">Cat Profiles</h1>
+    <div style="overflow-x: auto; white-space: nowrap; padding: 10px; border: 1px solid #ddd; border-radius: 10px; background-color: #f0f0f0;">
+        {% for profile in profiles if not profile.deleted %}
+        <div class="profile-card" style="display: inline-block; width: 250px; border-radius: 12px; background: #fff; overflow: hidden; padding: 18px; text-align: center; margin-right: 15px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+        {% if profile.photo %}
+            <img src="{{ profile.profile_picture }}" alt="{{ profile.name }}" 
+                style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%; margin-bottom: 15px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+        {% else %}
+            <p style="margin: 0; font-size: 14px; color: #666; text-align: center;">No profile picture available</p>
+        {% endif %}
+                <h2 style="margin: 0 0 10px; font-size: 1.5rem; color: #333;">{{ profile.name }}</h2>
+            <p style="margin: 0 0 5px; font-size: 0.9rem; color: #333"><strong>Gender:</strong> {{ profile.gender }}</p>
+            <p style="margin: 0 0 5px; font-size: 0.9rem; color: #333"><strong>Color:</strong> {{ profile.color }}</p>
+            <p style="margin: 0 0 10px; font-size: 0.9rem; color: #333;"><strong>Description:</strong> {{ profile.description }}</p>
+                
+            <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+                <a href="{{ url_for('edit_profile', id=profile.id) }}" 
+                   style="padding: 10px 15px; background: #94693e; color: white; text-decoration: none; border-radius: 5px; font-size: 0.9rem; cursor: pointer; font-weight: bold;">Edit</a>
+
+                {% if profile.creator == current_user['username'] %}
+                <a href="{{ url_for('confirm_delete', id=profile.id) }}" 
+                    style="padding: 10px 15px; background: #dc3545; color: white; text-decoration: none; border-radius: 5px; font-size: 0.9; cursor: pointer; font-weight: bold;">Delete</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% if profiles|length == 0 %}
+    <p style="margin-top: 20px; font-size: 1.2rem; color: #555; text-align: center;">No profiles found. Create one by clicking <a href="{{ url_for('create_profile') }}" style="color: #007bff; text-decoration: none;">here</a>.</p>
+    {% endif %}
+</div>
+{% endblock %}
