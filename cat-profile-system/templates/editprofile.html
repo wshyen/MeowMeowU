@@ -7,6 +7,13 @@
     body {
         background-color: #EDE0D7;
     }
+    select {
+        appearance: none;
+        background-image: url('{{ url_for("static", filename="cat_paws_icon.png") }}');
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 20px;
+    }
 </style>
 <div style="display: flex; justify-content: center; align-items: center; height: calc(100vh - 40px);">
     <form action="{{ url_for('remove_profile_picture', id=profile.id) }}" method="post" enctype="multipart/form-data" style="width: 500px; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9;">
