@@ -1,9 +1,9 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__) 
-app.auth_key = 'auth_key'
+app.secret_key = 'your_secret_key'
 
 UPLOAD_FOLDER = 'static/uploads'
 ALLOWED_EXTENSIONS = {'png','jpg','jpeg'}
@@ -12,12 +12,19 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 #Temporary storage for cat profiles
 cat_profiles = []
 
+#Create a dummy user
+CURRENT_USER = 'test_user'  #Replace with actual user identification system
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+@app.before_request
+def set_current_user():
+    session['user'] = CURRENT_USER #Stores the dummy user in the session for tracking
+
 @app.route('/profiles')
 def view_profiles(): #View all cat profiles
-    return render_template('viewprofile.html', profiles=cat_profiles)
+    return render_template('viewprofile.html', profiles=cat_profiles, current_user=session.get('user'))
 
 @app.route('/profiles/create', methods=['GET', 'POST'])
 def create_profile():
@@ -28,6 +35,7 @@ def create_profile():
         if name.lower() in existing_names:
             flash(f'The name "{name}" is already in use. Please choose a different one.', 'error') #Display error message to user that name is taken
             return redirect(url_for('create_profile')) #Sends user back to the create profile page
+
         gender = request.form['gender']
         color = request.form['color']
         description = request.form.get('description', '')  #Optional description
@@ -65,7 +73,8 @@ def create_profile():
             'gender': gender,
             'color': color,
             'description': description,
-            'photo': photo
+            'photo': photo,
+            'creator': session['user'], #Stores the identity of the user who created the profile in the 'creator' field
         }
         cat_profiles.append(new_profile) #Add profile to the list
         flash('Cat Profile created successfully!', 'success') #Notify user profile created successfully 
@@ -92,14 +101,14 @@ def edit_profile(id):
 
             if file.content_length > 2 * 1024 * 1024:  
                 flash("File size is too large. Please upload an image under 2MB.", "error") #Display error message to user if file size too big
-                return redirect(url_for('create_profile'))
+                return redirect(url_for('create_profile')) #Sends user back to the create profile page
 
             if file and allowed_file(file.filename):
                 secure_file = secure_filename(file.filename)
                 filename = f"{profile['name'].lower()}_{profile['id']}.{file.filename.rsplit('.', 1)[1].lower()}"
                 photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 file.save(photo_path)
-                profile['photo'] = f"static/uploads/{filename}" #This stores image path inside the profile dictionary !!
+                profile['photo'] = f"static/uploads/{filename}" #This stores image path inside the profile dictionary 
 
     flash('Profile updated successfully!', 'success') #Notify user profile updated successfully
     return redirect(url_for('view_profiles')) #Sends user back to the profile list page
@@ -118,8 +127,45 @@ def remove_profile_picture(id):
         os.remove(profile['photo'])  #Delete image from storage
         profile['photo'] = None  #Reset profile image
 
-    flash('Profile picture removed successfully!', 'success')
+    flash('Profile picture removed successfully!', 'success') #Notify user profile picture removed successfully
     return redirect(url_for('view_profiles'))  #Sends user back to the profile list page
+
+@app.route('/profiles/<int:id>/delete', methods=['POST'])
+def delete_profile(id):
+    #Delete a cat profile
+    global cat_profiles
+    profile = next((p for p in cat_profiles if p['id'] == id), None)
+    if not profile:
+        flash('Profile not found.', 'error')
+        return redirect(url_for('view_profiles'))
+
+    #Check if the current user is the creator of the profile
+    if profile['creator'] != session['user']:
+        flash('You are not authorized to delete this profile.', 'error')
+        return redirect(url_for('view_profiles'))
+
+    cat_profiles = [p for p in cat_profiles if p['id'] != id] #Remove profile from the list
+
+    if profile['photo'] and os.path.exists(profile['photo']): #Delete the photo from the filesystem if it exists
+        os.remove(profile['photo'])
+
+    flash(f'Profile for "{profile["name"]}" has been deleted.', 'success')
+    return redirect(url_for('view_profiles'))
+
+@app.route('/profiles/<int:id>/confirm_delete')
+def confirm_delete(id):
+    #Confirm delete cat profile
+    profile = next((p for p in cat_profiles if p['id'] == id), None)
+    if not profile:
+        flash('Profile not found.', 'error') 
+        return redirect(url_for('view_profiles')) #Sends user back to the profile list page
+
+    #Check if the current user is the creator of the profile
+    if profile['creator'] != session['user']:
+        flash('You are not authorized to delete this profile.', 'error')
+        return redirect(url_for('view_profiles'))
+
+    return render_template('confirmdelete.html', profile=profile)
 
 if __name__ == '__main__':
     #Ensure the upload folder exists
