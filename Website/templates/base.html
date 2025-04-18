@@ -5,6 +5,8 @@
     a:hover {background-color: #f2eadf;border-radius: 5px;}
 
     .nav-link:hover {color: rgb(176, 148, 119) !important;font-family: Courier !important;}
+
+    .flash-container {font-family: 'Times New Roman';}
 </style>
 
     <head>
@@ -37,34 +39,45 @@
                 </div>
             </div>
         </nav>
-
-        {% with messages = get_flashed_messages(with_categories = true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-            {% if category == "error" %}
+        
+        <div class="flash-container">
+            {% with messages = get_flashed_messages(with_categories = true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                {% if category == "error" %}
             
-            <div class="alert alert-danger alert-dismissable fade show" role="alert">
-                {{ message }}
-                <button type="button" class="close" date-dismiss="alert">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
+                <div class="alert alert-danger alert-dismissable fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
 
-            {% else %}
+                {% else %}
 
-            <div class="alert alert-success alert-dismissable fade show" role="alert">
-                {{ message }}
-                <button type="button" class="close" date-dismiss="alert">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
+                <div class="alert alert-success alert-dismissable fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" date-dismiss="alert">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
 
+                {% endif %}
+                {% endfor %}
             {% endif %}
-            {% endfor %}
-        {% endif %}
-        {% endwith %}
+            {% endwith %}
+        </div>
 
         <div class="container">{% block content %}{% endblock %}</div>
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+
+        <script>
+            ssetTimeout(() => {
+            $(".alert").alert("close");
+            }, 5000);
+        </script>
 
     </body>
 
