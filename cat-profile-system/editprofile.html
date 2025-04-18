@@ -21,9 +21,11 @@
             </div>
             <br>
             <label for="profile_picture" style="display: block; font-weight: bold; margin-bottom: 5px;">Upload Profile Picture:</label>
-            <input type="file" id="profile_picture" name="profile_picture" accept="image/*">
+            <input type="file" id="profile_picture" name="profile_picture" accept="image/*" style="margin-bottom: 10px;">
             <br>
+            {% if profile.profile_picture %}
             <button type="submit" style="padding: 5px 10px; background-color: #dc3545; color: white; border: none; border-radius: 5px;">Remove Picture</button>
+            {% endif %}
         </div>
         <div style="margin-bottom: 15px;">
             <label for="name" style="display: inline-block; width: 150px; font-weight: bold;">Name:</label>
