@@ -8,25 +8,38 @@
 
     .flash-container {font-family: 'Times New Roman';}
 
-    .dropdown {position: relative;display: inline-block;margin-left: 15px;}
+    .dropdown {position: relative;display: inline-block;margin-left: auto;}
 
-        .dropbtn {background-color: transparent;border: none;
-            cursor: pointer;padding: 6px;}
+    .dropbtn {background-color: transparent;border: none;
+        cursor: pointer;padding: 6px;margin-left: -90px;}
 
-        .dropbtn i {color: white;font-size: 20px;
-            background-color: #ffffff22;padding: 8px;border-radius: 50%;}
+    .dropbtn i {color: white;font-size: 20px;
+        background-color: #ffffff22;padding: 8px;border-radius: 50%;
+        transition: background-color 0.3s ease;}
 
-        .dropdown-content {display: none;position: absolute;
-            background-color: white;min-width: 160px;
-            box-shadow: 0px 8px 16px rgba(0,0,0,0.2);z-index: 1;
-            text-align: left;border-radius: 4px;}
+    .dropbtn i:hover {background-color: transparent;}
 
-        .dropdown-content a {color: black;padding: 10px 15px;text-decoration: none;
-            display: block;font-family: 'Times New Roman';}
+    .dropdown-content {display: none;position: absolute;margin-left: -150px;
+        background-color: white !important;min-width: 160px;
+        box-shadow: 0px 8px 16px rgba(0,0,0,0.2);z-index: 1;
+        text-align: center;border-radius: 4px;left: 0;right: auto;}
 
-        .dropdown-content a:hover {background-color: #f2eadf;}
+    .dropdown-content a {color: rgb(176, 148, 119);padding: 10px 15px;
+        text-decoration: none;display: block;font-family: 'Times New Roman';}
 
-        .dropdown:hover .dropdown-content {display: block;}
+    .dropdown-content a:hover {background-color: #f2f2f2;text-decoration: none;
+        color: rgb(78, 68, 57);font-family: Courier !important;}
+
+    .dropdown:hover .dropdown-content {display: block;}
+
+    .navbar {display: flex;justify-content: space-between;align-items: center;}
+
+    .ml-auto {margin-left: auto !important;}
+
+    body {background-color: #f9f4ef;}
+
+    button:hover { background-color: rgb(158, 134, 106);transform: scale(1.1);border-radius: 5px;}
+
 </style>
 
     <head>
@@ -42,27 +55,22 @@
     </head>
 
     <body>
-        <nav class="navbar navbar-expand-lg navbar-dark" style="background-color:rgb(176, 148, 119);">
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbar">
-                <div class="navbar-nav">
-                    <a class="nav-item nav-link" style="font-family: 'Times New Roman'; color: white; font-size: 19px;" href="/">Home</a>
-    
-                    <div class="dropdown">
-                        <button class="dropbtn">
-                            <i class="fa fa-user" aria-hidden="true"></i>
-                        </button>
-                        <div class="dropdown-content">
-                            <a href="/login">User Profile</a>
-                            {% if user.is_authenticated %}
-                                <a href="/logout">Logout</a>
-                            {% else %}
-                                <a href="/sign-up">Sign Up</a>
-                                <a href="/login">Login</a>
-                            {% endif %}
-                        </div>
+        <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgb(176, 148, 119);">
+            <a class="nav-item nav-link" style="font-family: 'Times New Roman'; color: white; font-size: 19px;" href="/">Home</a>
+        
+            <div class="ml-auto d-flex align-items-center">
+                <div class="dropdown">
+                    <button class="dropbtn">
+                        <i class="fa fa-user" aria-hidden="true"></i>
+                    </button>
+                    <div class="dropdown-content">
+                        <a href="/login">User Profile</a>
+                        {% if user.is_authenticated %}
+                            <a href="/logout">Logout</a>
+                        {% else %}
+                            <a href="/sign-up">Sign Up</a>
+                            <a href="/login">Login</a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
