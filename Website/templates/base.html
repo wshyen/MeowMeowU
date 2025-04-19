@@ -7,6 +7,26 @@
     .nav-link:hover {color: rgb(176, 148, 119) !important;font-family: Courier !important;}
 
     .flash-container {font-family: 'Times New Roman';}
+
+    .dropdown {position: relative;display: inline-block;margin-left: 15px;}
+
+        .dropbtn {background-color: transparent;border: none;
+            cursor: pointer;padding: 6px;}
+
+        .dropbtn i {color: white;font-size: 20px;
+            background-color: #ffffff22;padding: 8px;border-radius: 50%;}
+
+        .dropdown-content {display: none;position: absolute;
+            background-color: white;min-width: 160px;
+            box-shadow: 0px 8px 16px rgba(0,0,0,0.2);z-index: 1;
+            text-align: left;border-radius: 4px;}
+
+        .dropdown-content a {color: black;padding: 10px 15px;text-decoration: none;
+            display: block;font-family: 'Times New Roman';}
+
+        .dropdown-content a:hover {background-color: #f2eadf;}
+
+        .dropdown:hover .dropdown-content {display: block;}
 </style>
 
     <head>
@@ -22,20 +42,28 @@
     </head>
 
     <body>
-        <nav class="navbar navbar-expand-lg navbar-dark" style="background-color:rgb(176, 148, 119);"> <!--nav bar stuff, style it -->
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar"> <!-- Button used to show or hide navigation options on small screens -->
+        <nav class="navbar navbar-expand-lg navbar-dark" style="background-color:rgb(176, 148, 119);">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbar">
                 <div class="navbar-nav">
-                    {% if user.is_authenticated %}
-                        <a class="nav-item nav-link" style="font-family: 'Times New Roman';color: white;font-size: 19px;" id="home" href="/">Home</a>
-                        <a class="nav-item nav-link" style="font-family: 'Times New Roman';color: white;font-size: 19px;" id="logout" href="/logout">Logout</a>
-                    {% else %}
-                        <a class="nav-item nav-link" style="font-family: 'Times New Roman';color: white;font-size: 19px;" id="home" href="/">Home</a>
-                        <a class="nav-item nav-link" style="font-family: 'Times New Roman';color: white;font-size: 19px;" id="signUp" href="/sign-up">Sign Up</a>
-                        <a class="nav-item nav-link" style="font-family: 'Times New Roman';color: white;font-size: 19px;" id="login" href="/login">Login</a>
-                    {% endif %}
+                    <a class="nav-item nav-link" style="font-family: 'Times New Roman'; color: white; font-size: 19px;" href="/">Home</a>
+    
+                    <div class="dropdown">
+                        <button class="dropbtn">
+                            <i class="fa fa-user" aria-hidden="true"></i>
+                        </button>
+                        <div class="dropdown-content">
+                            <a href="/login">User Profile</a>
+                            {% if user.is_authenticated %}
+                                <a href="/logout">Logout</a>
+                            {% else %}
+                                <a href="/sign-up">Sign Up</a>
+                                <a href="/login">Login</a>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
             </div>
         </nav>
