@@ -27,13 +27,13 @@ def login():
 
     return render_template("login.html", user=current_user)
 
-@auth.route("/logout")
+@auth.route("/logout", methods=["GET", "POST"])
 @login_required
 def logout():
     if request.method == "POST":
         logout_user()
         flash("You have been logged out successfully.", category="success")
-        return redirect(url_for("auth.login"))
+        return redirect(url_for("views.home"))
     
     return render_template("logout.html", user=current_user)
 
@@ -48,6 +48,7 @@ def sign_up():
         ps2 = request.form.get("ps2")
 
         user = User.query.filter_by(email=email).first()
+        
         if user:
             flash("Email already exist!", category="error")
 
