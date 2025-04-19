@@ -1,6 +1,8 @@
 import os
+import sqlite3 #Connect to SQLite database to store and retrieve cat profile infromation
 from flask import Flask, render_template, request, redirect, url_for, flash, session
-from werkzeug.utils import secure_filename
+from werkzeug.utils import secure_filename #Helps secure file uploads, preventing unsafe filenames that can cause errors or security issues
+from flask_login import current_user
 
 app = Flask(__name__) 
 app.secret_key = 'your_secret_key'
@@ -9,22 +11,27 @@ UPLOAD_FOLDER = 'static/uploads'
 ALLOWED_EXTENSIONS = {'png','jpg','jpeg'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-#Temporary storage for cat profiles
-cat_profiles = []
-
-#Create a dummy user
-CURRENT_USER = 'test_user'  #Replace with actual user identification system
+def get_db_connection():
+    conn = sqlite3.connect('cat_profiles.db')  #Creates a connection to the database cat_profiles.db
+    conn.row_factory = sqlite3.Row  #Access rows as dictionaries
+    return conn
 
 def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS #Verify if the file is in the allowed list
 
 @app.before_request
 def set_current_user():
-    session['user'] = CURRENT_USER #Stores the dummy user in the session for tracking
+    if current_user.is_authenticated:  #Check if a user is logged in
+        session['user'] = current_user.get_id()  #Store the logged-in user's ID in the session
+    else:
+        session['user'] = None  #No user is logged in
 
 @app.route('/profiles')
 def view_profiles(): #View all cat profiles
-    return render_template('viewprofile.html', profiles=cat_profiles, current_user=session.get('user'))
+    conn = get_db_connection() #Connect to the database to fetch cat profiles
+    profiles = conn.execute('SELECT * FROM profiles').fetchall() #Get all cat profiles from the database
+    conn.close() 
+    return render_template('viewprofile.html', profiles=profiles, current_user=session.get('user'))
 
 @app.route('/profiles/create', methods=['GET', 'POST'])
 def create_profile():
@@ -35,7 +42,6 @@ def create_profile():
         if name.lower() in existing_names:
             flash(f'The name "{name}" is already in use. Please choose a different one.', 'error') #Display error message to user that name is taken
             return redirect(url_for('create_profile')) #Sends user back to the create profile page
-
         gender = request.form['gender']
         color = request.form['color']
         description = request.form.get('description', '')  #Optional description
@@ -46,7 +52,7 @@ def create_profile():
             flash('Name must be between 3 and 15 characters long.', 'error') #Display error message to user if name format not correct
             return redirect(url_for('create_profile')) #Sends user back to the create profile page
 
-        #Handle file upload for profile pictures
+        #Handle file upload 
         if 'profile_picture' in request.files:
             file = request.files['profile_picture']
 
@@ -66,19 +72,17 @@ def create_profile():
             flash('Name, gender and color are required!', 'error')
             return redirect(url_for('create_profile')) #Sends user back to the create profile page
 
-        #Create a new profile dictionary
-        new_profile = {
-            'id': len(cat_profiles) + 1,
-            'name': name,
-            'gender': gender,
-            'color': color,
-            'description': description,
-            'photo': photo,
-            'creator': session['user'], #Stores the identity of the user who created the profile in the 'creator' field
-        }
-        cat_profiles.append(new_profile) #Add profile to the list
-        flash('Cat Profile created successfully!', 'success') #Notify user profile created successfully 
-        return redirect(url_for('view_profiles'))
+        # Insert the new profile into the database
+        conn = get_db_connection() #Connects to database
+        conn.execute( 
+            'INSERT INTO profiles (name, gender, color, description, photo, creator) VALUES (?, ?, ?, ?, ?, ?)',
+            (name, gender, color, description, photo, session['user']) #Use user session to track the profile creator
+        )
+        conn.commit() #Save changes to the database
+        conn.close()
+
+        flash('Cat Profile created successfully!', 'success')
+        return redirect(url_for('view_profiles')) #Sends user back to the view profile page
 
     return render_template('createprofile.html')
 
