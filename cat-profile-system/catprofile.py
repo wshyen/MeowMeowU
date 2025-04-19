@@ -82,14 +82,15 @@ def create_profile():
         conn.close()
 
         flash('Cat Profile created successfully!', 'success')
-        return redirect(url_for('view_profiles')) #Sends user back to the view profile page
+        return redirect(url_for('view_profiles')) #Sends user back to the profile list page
 
     return render_template('createprofile.html')
 
 @app.route('/profiles/<int:id>/edit', methods=['GET', 'POST'])
 def edit_profile(id):
-    #Edit existing cat profile
-    profile = next((p for p in cat_profiles if p['id'] == id), None) #Finds the profile in the cat profiles list that matches the given ID and if no profile is found, it returns to None
+    conn = get_db_connection() #Connect to the database to retrieve the profile information
+    profile = conn.execute('SELECT * FROM profiles WHERE id = ?', (id,)).fetchone() #Get the cat profile with the matching ID
+
     if not profile:
         flash('Cat Profile not found.', 'error') #Display error message to user if no profile is found
         return redirect(url_for('view_profiles')) #Sends user back to the profile list page
@@ -114,31 +115,42 @@ def edit_profile(id):
                 file.save(photo_path)
                 profile['photo'] = f"static/uploads/{filename}" #This stores image path inside the profile dictionary 
 
-    flash('Profile updated successfully!', 'success') #Notify user profile updated successfully
-    return redirect(url_for('view_profiles')) #Sends user back to the profile list page
+            #Update profile in database
+            conn.execute(
+            'UPDATE profiles SET gender = ?, color = ?, description = ?, photo = ? WHERE id = ?',
+            (gender, color, description, photo, id)
+        )
+        conn.commit()
+        conn.close()
+
+        flash('Profile updated successfully!', 'success') #Notify user profile updated successfully
+        return redirect(url_for('view_profiles')) #Sends user back to the profile list page
 
     return render_template('editprofiles.html', profile=profile)
 
 @app.route('/profiles/remove_picture/<int:id>', methods=['POST'])
 def remove_profile_picture(id):
-    #Remove profile picture
-    profile = next((p for p in cat_profiles if p['id'] == id), None)
+    conn = get_db_connection()
+    profile = conm.execute('SELECT * FROM profiles WHERE id = ?', (id,)).fetchone()
+
     if not profile:
         flash('Profile not found.', 'error')
         return redirect(url_for('view_profiles'))  #Sends user back to the profile list page
 
     if profile['photo'] and os.path.exists(profile['photo']):
         os.remove(profile['photo'])  #Delete image from storage
-        profile['photo'] = None  #Reset profile image
+        conn.execute('UPDATE profiles SET photo = NULL WHERE id = ?', (id,)) #Remove the photo link from the database for this profile
+        conn.commit()
 
+    conn.close()
     flash('Profile picture removed successfully!', 'success') #Notify user profile picture removed successfully
     return redirect(url_for('view_profiles'))  #Sends user back to the profile list page
 
 @app.route('/profiles/<int:id>/delete', methods=['POST'])
 def delete_profile(id):
-    #Delete a cat profile
-    global cat_profiles
-    profile = next((p for p in cat_profiles if p['id'] == id), None)
+    conn = get_db_connection()
+    profile = conn.execute('SELECT * FROM profiles WHERE id = ?', (id,)).fetchone()
+
     if not profile:
         flash('Profile not found.', 'error')
         return redirect(url_for('view_profiles'))
@@ -146,15 +158,17 @@ def delete_profile(id):
     #Check if the current user is the creator of the profile
     if profile['creator'] != session['user']:
         flash('You are not authorized to delete this profile.', 'error')
-        return redirect(url_for('view_profiles'))
-
-    cat_profiles = [p for p in cat_profiles if p['id'] != id] #Remove profile from the list
+        return redirect(url_for('view_profiles')) #Sends user back to the profile list page
 
     if profile['photo'] and os.path.exists(profile['photo']): #Delete the photo from the filesystem if it exists
         os.remove(profile['photo'])
 
+    conn.execute('DELETE FROM profiles WHERE id = ?' (id,))
+    conn.commit
+    conn.close()
+
     flash(f'Profile for "{profile["name"]}" has been deleted.', 'success')
-    return redirect(url_for('view_profiles'))
+    return redirect(url_for('view_profiles')) #Sends user back to the profile list page
 
 @app.route('/profiles/<int:id>/confirm_delete')
 def confirm_delete(id):
