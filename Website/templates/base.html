@@ -28,11 +28,10 @@
             </button>
             <div class="collapse navbar-collapse" id="navbar">
                 <div class="navbar-nav">
+                    <a class="nav-item nav-link" style="font-family: 'Times New Roman';color: white;font-size: 19px;" id="home" href="/">Home</a>
                     {% if user.is_authenticated %}
-                        <a class="nav-item nav-link" style="font-family: 'Times New Roman';color: white;font-size: 19px;" id="home" href="/">Home</a>
                         <a class="nav-item nav-link" style="font-family: 'Times New Roman';color: white;font-size: 19px;" id="logout" href="/logout">Logout</a>
                     {% else %}
-                        <a class="nav-item nav-link" style="font-family: 'Times New Roman';color: white;font-size: 19px;" id="home" href="/">Home</a>
                         <a class="nav-item nav-link" style="font-family: 'Times New Roman';color: white;font-size: 19px;" id="signUp" href="/sign-up">Sign Up</a>
                     <a class="nav-item nav-link" style="font-family: 'Times New Roman';color: white;font-size: 19px;" id="login" href="/login">Login</a>
                     {% endif %}
