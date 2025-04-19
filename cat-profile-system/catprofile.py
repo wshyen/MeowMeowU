@@ -35,6 +35,17 @@ def create_profile():
         flash("You must be logged in to create a profile.", "error")
         return redirect(url_for('view_profiles')) #Sends user back to profile list page
 
+    #Handle removing the temporary profile picture during creation
+    if request.method == 'POST' and 'remove_picture' in request.form:
+        temp_picture = session.get('temp_profile_picture')
+        if temp_picture:
+            temp_picture_path = os.path.join(app.config['UPLOAD_FOLDER'], temp_picture)
+            if os.path.exists(temp_picture_path):
+                os.remove(temp_picture_path)  #Delete the temporary picture from the filesystem
+            session.pop('temp_profile_picture', None)  #Remove the reference from the session
+        flash('Temporary profile picture removed.', 'success')
+        return redirect(url_for('create_profile')) #Sends user back to create profile page
+
     #Create a new cat profile
     if request.method == 'POST':
         name = request.form['name'].strip().capitalize()
@@ -106,6 +117,14 @@ def edit_profile(id):
         return redirect(url_for('view_profiles')) #Sends user back to the profile list page
 
     if request.method == 'POST':
+        if 'remove_picture' in request.form:
+            if profile['photo'] and os.path.exists(profile['photo']):
+                os.remove(profile['photo'])  #Delete image from storage
+                conn.execute('UPDATE profiles SET photo = NULL WHERE id = ?', (id,))  #Remove the photo link from the database
+                conn.commit()
+                flash('Profile picture removed successfully!', 'success')
+            return redirect(url_for('edit_profile', id=id)) #Send user bck to edit profile page
+
         gender = request.form['gender']
         color = request.form['color']
         description = request.form.get('description', '')
@@ -173,7 +192,7 @@ def delete_profile(id):
     if profile['creator'] != session['user']:
         flash("You are not authorized to delete this profile.", "error")
         return redirect(url_for('view_profiles'))  # Sends user back to the profile list page
-        
+
     if profile['photo'] and os.path.exists(profile['photo']): #Delete the photo from the filesystem if it exists
         os.remove(profile['photo'])
 
