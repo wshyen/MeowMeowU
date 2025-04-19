@@ -2,7 +2,6 @@ import os
 import sqlite3 #Connect to SQLite database to store and retrieve cat profile infromation
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from werkzeug.utils import secure_filename #Helps secure file uploads, preventing unsafe filenames that can cause errors or security issues
-from flask_login import current_user
 
 app = Flask(__name__) 
 app.secret_key = 'your_secret_key'
@@ -21,10 +20,7 @@ def allowed_file(filename):
 
 @app.before_request
 def set_current_user():
-    if current_user.is_authenticated:  #Check if a user is logged in
-        session['user'] = current_user.get_id()  #Store the logged-in user's ID in the session
-    else:
-        session['user'] = None  #No user is logged in
+    session['user'] = session.get('user', None) #Default to None if no user is logged in
 
 @app.route('/profiles')
 def view_profiles(): #View all cat profiles
@@ -35,6 +31,10 @@ def view_profiles(): #View all cat profiles
 
 @app.route('/profiles/create', methods=['GET', 'POST'])
 def create_profile():
+    if not session.get('user'): #Ensure only logged in users can create profile
+        flash("You must be logged in to create a profile.", "error")
+        return redirect(url_for('view_profiles')) #Sends user back to profile list page
+
     #Create a new cat profile
     if request.method == 'POST':
         name = request.form['name'].strip().capitalize()
@@ -94,6 +94,10 @@ def create_profile():
 
 @app.route('/profiles/<int:id>/edit', methods=['GET', 'POST'])
 def edit_profile(id):
+    if not session.get('user'): #Ensure only logged in users can create profile
+        flash("You must be logged in to create a profile.", "error")
+        return redirect(url_for('view_profiles')) #Sends user back to profile list page
+
     conn = get_db_connection() #Connect to the database to retrieve the profile information
     profile = conn.execute('SELECT * FROM profiles WHERE id = ?', (id,)).fetchone() #Get the cat profile with the matching ID
 
@@ -154,6 +158,10 @@ def remove_profile_picture(id):
 
 @app.route('/profiles/<int:id>/delete', methods=['POST'])
 def delete_profile(id):
+    if not session.get('user'): #Ensure only logged in users can create profile
+        flash("You must be logged in to create a profile.", "error")
+        return redirect(url_for('view_profiles')) #Sends user back to profile list page
+
     conn = get_db_connection()
     profile = conn.execute('SELECT * FROM profiles WHERE id = ?', (id,)).fetchone()
 
@@ -162,10 +170,10 @@ def delete_profile(id):
         return redirect(url_for('view_profiles')) #Sends user back to the profile list page
 
     #Check if the current user is the creator of the profile
-    if session.get('user') is None or profile['creator'] != session['user']:
-        flash('You are not authorized to delete this profile.', 'error')
-        return redirect(url_for('view_profiles')) #Sends user back to the profile list page
-
+    if profile['creator'] != session['user']:
+        flash("You are not authorized to delete this profile.", "error")
+        return redirect(url_for('view_profiles'))  # Sends user back to the profile list page
+        
     if profile['photo'] and os.path.exists(profile['photo']): #Delete the photo from the filesystem if it exists
         os.remove(profile['photo'])
 
