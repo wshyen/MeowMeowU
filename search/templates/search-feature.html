@@ -23,14 +23,12 @@
             margin: 40px auto;
             padding: 30px;
             border-radius: 5px;
-            font-size: medium;
             box-sizing: border-box;
             box-shadow: 0px 8px 3px #c39f76;
         }
 
         .search-bar label {
             color: #6b4f2f;
-            margin-bottom: 8px;
             font-weight: bold;
         }
         
@@ -38,14 +36,14 @@
         .search-bar select {
             width: 100%;
             padding: 10px;
+            background-color: #fffbe9;
             border-radius: 12px;
-            display:block;
             margin-bottom: 15px;
             transition: border-color 0.3s ease;
         }
 
         .search-bar input:focus,
-         .search-bar select:focus {
+        .search-bar select:focus {
             border: 2px solid #94693e;
             outline: none;
         }
@@ -56,16 +54,14 @@
 }
 
         .search-bar select {
-            background-color: #fffbe9;
-            color: #6b4f2f;
-            font-size: 16px;
+            font-size: 14px;
+            color: #000000;
             cursor: pointer;
             appearance: none;
             background-image: url('{{ url_for("static", filename="cat_paws_icon.png") }}');
             background-repeat: no-repeat;
             background-position: right 10px center;
             background-size: 20px;
-            padding-right: 35px;
         }
 
 

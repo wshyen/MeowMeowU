@@ -19,18 +19,9 @@
         h2{
             color: #6b4f2f;
             text-align: center;
-            margin-top: 20px;
-            margin-bottom: 30px;
             font-style: italic;
             margin-top: 0;
             margin-bottom: 30px;
-        }
-
-        .not-found {
-            margin: 10px 0;
-            font-size: larger;
-            text-align:center;
-            flex-grow: 1;
         }
 
         .cat-grid {
@@ -68,7 +59,6 @@
             margin: 10px 0;
             font-size: larger;
             text-align:center;
-            flex-grow: 1;
         }
 
     </style>
@@ -82,14 +72,14 @@
             <div class="cat-grid">
                 {% for cat in cats %}
                     <div class="cat-card" onclick="window.location.href='/viewprofile?name={{ cat.name }}'">
-                        <img src="{{ url_for('static', filename='images/' + cat.image) }}" alt="{{ cat.name }}">
+                        <img src="{{ url_for('static', filename=cat.image) }}" alt="{{ cat.name }}">
                         <p><strong>Name: </strong>{{ cat.name }}</p>
                         <p><strong>Gender: </strong>{{ cat.gender }}</p>
                     </div>
                 {% endfor %}
             </div>
         {% elif message %}
-            <div class="not-found">{{ message }}</div>
+            <h2>{{ message }}</h2>
         {% endif %}
 
     </body>

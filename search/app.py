@@ -21,7 +21,7 @@ def cat_list():
         cat for cat in cat_data
         if (not name or name in cat["name"].lower()) and
         (not gender or gender == cat["gender"]) and 
-        (not color or color == cat["color"])
+        (not color or color in cat["color"])
         ]
 
     if filtered_cats:
