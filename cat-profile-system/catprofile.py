@@ -38,45 +38,51 @@ def create_profile():
     #Create a new cat profile
     if request.method == 'POST':
         name = request.form['name'].strip().capitalize()
-        existing_names = [profile['name'].lower() for profile in cat_profiles] #Creates a list of all profile names to check duplicates
-        if name.lower() in existing_names:
-            flash(f'The name "{name}" is already in use. Please choose a different one.', 'error') #Display error message to user that name is taken
-            return redirect(url_for('create_profile')) #Sends user back to the create profile page
         gender = request.form['gender']
         color = request.form['color']
         description = request.form.get('description', '')  #Optional description
         photo = None
 
-        #Validate name length
-        if len(name) < 3 or len(name) > 15:
-            flash('Name must be between 3 and 15 characters long.', 'error') #Display error message to user if name format not correct
-            return redirect(url_for('create_profile')) #Sends user back to the create profile page
+        #Check for duplicate names
+        conn = get_db_connection()
+        existing_names = conn.execute('SELECT name FROM profiles').fetchall()
+        existing_names = [profile['name'].lower() for profile in existing_names]
+        if name.lower() in existing_names:
+            flash(f'The name "{name}" is already in use. Please choose a different one.', 'error')
+            conn.close()
+            return redirect(url_for('create_profile')) #Sends user back to the create profile page   
+
+        #Validate that a profile picture is uploaded
+        if 'profile_picture' not in request.files or request.files['profile_picture'].filename == '':
+            flash('A profile picture is required!', 'error')
+            return redirect(url_for('create_profile')) #Sendss user back to the create profile page
 
         #Handle file upload 
-        if 'profile_picture' in request.files:
-            file = request.files['profile_picture']
+        file = request.files['profile_picture']
+        if file.content_length is None or file.content_length > 2 * 1024 * 1024:
+            flash("File size is too large. Please upload an image under 2MB.", "error") #Display error message to user if file size too big
+            return redirect(url_for('create_profile')) #Sends user back to the create profile page
 
-            if file.content_length > 2 * 1024 * 1024:  
-                flash("File size is too large. Please upload an image under 2MB.", "error") #Display error message to user if file size too big
-                return redirect(url_for('create_profile'))
-
-            if file and allowed_file(file.filename): #Checks if the file was uploaded in the correct format (png,jpg,jpeg)
-                secure_file = secure_filename(file.filename)
-                filename = f"{name.lower()}_{len(cat_profiles) + 1}.{file.filename.rsplit('.', 1)[1].lower()}" #len(cat_profiles) + 1 assigns an auto-incremented ID based on the number of existing profiles
-                photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                file.save(photo_path) #Stores the uploaded file in a specific folder
-                photo = f"static/uploads/{filename}"
+        if file and allowed_file(file.filename): #Checks if the file was uploaded in the correct format (png,jpg,jpeg)
+            secure_file = secure_filename(file.filename)
+            filename = f"{name.lower()}_{secure_file}" 
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(filepath) 
+            photo = filepath
+        else:
+            flash('Invalid file format. Please upload a PNG, JPG, or JPEG image.', 'error')
+            return redirect(url_for('create_profile')) #Sends user back to the create profile page
 
         #Validate required fields
-        if not name or not gender or not color:
-            flash('Name, gender and color are required!', 'error')
+        if not photo or not name or not gender or not color:
+            flash('Profile picture, name, gender and color are required!', 'error')
             return redirect(url_for('create_profile')) #Sends user back to the create profile page
 
         # Insert the new profile into the database
         conn = get_db_connection() #Connects to database
         conn.execute( 
             'INSERT INTO profiles (name, gender, color, description, photo, creator) VALUES (?, ?, ?, ?, ?, ?)',
-            (name, gender, color, description, photo, session['user']) #Use user session to track the profile creator
+            (name, gender, color, description, photo, session['user']) #Automatically assign the logged in user as the creator
         )
         conn.commit() #Save changes to the database
         conn.close()
@@ -96,27 +102,27 @@ def edit_profile(id):
         return redirect(url_for('view_profiles')) #Sends user back to the profile list page
 
     if request.method == 'POST':
-        profile['gender'] = request.form['gender']
-        profile['color'] = request.form['color']
-        profile['description'] = request.form.get('description', '')
+        gender = request.form['gender']
+        color = request.form['color']
+        description = request.form.get('description', '')
+        photo = profile['photo']
 
-        #Handle file upload for profile picture
+        #Handle file upload 
         if 'profile_picture' in request.files:
             file = request.files['profile_picture']
-
-            if file.content_length > 2 * 1024 * 1024:  
+            if file.content_length is None or file.content_length > 2 * 1024 * 1024: 
                 flash("File size is too large. Please upload an image under 2MB.", "error") #Display error message to user if file size too big
-                return redirect(url_for('create_profile')) #Sends user back to the create profile page
+                return redirect(url_for('edit_profile', id=id)) #Sends user back to the edit profile page
 
             if file and allowed_file(file.filename):
                 secure_file = secure_filename(file.filename)
                 filename = f"{profile['name'].lower()}_{profile['id']}.{file.filename.rsplit('.', 1)[1].lower()}"
-                photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                file.save(photo_path)
-                profile['photo'] = f"static/uploads/{filename}" #This stores image path inside the profile dictionary 
+                filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file.save(filepath)
+                photo = filepath
 
-            #Update profile in database
-            conn.execute(
+        #Update profile in database
+        conn.execute(
             'UPDATE profiles SET gender = ?, color = ?, description = ?, photo = ? WHERE id = ?',
             (gender, color, description, photo, id)
         )
@@ -131,7 +137,7 @@ def edit_profile(id):
 @app.route('/profiles/remove_picture/<int:id>', methods=['POST'])
 def remove_profile_picture(id):
     conn = get_db_connection()
-    profile = conm.execute('SELECT * FROM profiles WHERE id = ?', (id,)).fetchone()
+    profile = conn.execute('SELECT * FROM profiles WHERE id = ?', (id,)).fetchone()
 
     if not profile:
         flash('Profile not found.', 'error')
@@ -153,18 +159,18 @@ def delete_profile(id):
 
     if not profile:
         flash('Profile not found.', 'error')
-        return redirect(url_for('view_profiles'))
+        return redirect(url_for('view_profiles')) #Sends user back to the profile list page
 
     #Check if the current user is the creator of the profile
-    if profile['creator'] != session['user']:
+    if session.get('user') is None or profile['creator'] != session['user']:
         flash('You are not authorized to delete this profile.', 'error')
         return redirect(url_for('view_profiles')) #Sends user back to the profile list page
 
     if profile['photo'] and os.path.exists(profile['photo']): #Delete the photo from the filesystem if it exists
         os.remove(profile['photo'])
 
-    conn.execute('DELETE FROM profiles WHERE id = ?' (id,))
-    conn.commit
+    conn.execute('DELETE FROM profiles WHERE id = ?', (id,))
+    conn.commit()
     conn.close()
 
     flash(f'Profile for "{profile["name"]}" has been deleted.', 'success')
@@ -172,16 +178,17 @@ def delete_profile(id):
 
 @app.route('/profiles/<int:id>/confirm_delete')
 def confirm_delete(id):
-    #Confirm delete cat profile
-    profile = next((p for p in cat_profiles if p['id'] == id), None)
+    conn = get_db_connection()
+    profile = conn.execute('SELECT * FROM profiles WHERE id = ?', (id,)).fetchone()
+
     if not profile:
         flash('Profile not found.', 'error') 
         return redirect(url_for('view_profiles')) #Sends user back to the profile list page
 
     #Check if the current user is the creator of the profile
-    if profile['creator'] != session['user']:
+    if session.get('user') is None or profile['creator'] != session['user']:
         flash('You are not authorized to delete this profile.', 'error')
-        return redirect(url_for('view_profiles'))
+        return redirect(url_for('view_profiles')) #Sends user back to the profile list page
 
     return render_template('confirmdelete.html', profile=profile)
 
@@ -189,4 +196,26 @@ if __name__ == '__main__':
     #Ensure the upload folder exists
     if not os.path.exists(UPLOAD_FOLDER):
         os.makedirs(UPLOAD_FOLDER)
+
+    #Creates database table if it doesn't exist
+    conn = get_db_connection()
+    conn.execute('''
+        CREATE TABLE IF NOT EXISTS profiles ( 
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            gender TEXT NOT NULL,
+            color TEXT NOT NULL,
+            description TEXT,
+            photo TEXT NOT NULL,
+            creator TEXT NOT NULL
+        )
+    ''')
+    #Create the table if it doesn't exists
+    #Name of the table is profiles
+    #id INTEGER PRIMARY KEY AUTOINFREMENT Adds a unique id for each entry
+    #TEXT NOT NULL Adds a column for the name, gender ,color and profile picture which is a must to fill im
+    #TEXT Adds a column for description which is not a must to fill in
+    #creator TEXT NOT NULL Adds a column for creator which will be automatically filled in by the system 
+    conn.close()
+
     app.run(debug=True)
