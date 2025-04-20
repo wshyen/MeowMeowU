@@ -59,6 +59,19 @@ def set_current_user():
 def view_profiles(): #View all cat profiles
     with get_db_connection() as conn: #Connect to the database to fetch data
         profiles = conn.execute('SELECT * FROM profiles').fetchall() #Get all cat profiles from the database
+
+    profiles = [dict(profile) for profile in profiles] #Convert sqlite3.Row to dictionary
+
+    for profile in profiles:
+        if profile['photo']:
+            profile['photo'] = f"{profile['photo']}"  # Use relative path for profile picture
+            full_path = os.path.join(app.config['UPLOAD_FOLDER'], profile['photo'])
+        if not os.path.exists(full_path):  # Check if the file exists
+            print(f"DEBUG: Missing file for profile {profile['name']} at {full_path}")
+    else:
+        profile['photo'] = "default.png"  # Use a default placeholder image
+    
+    print(f"DEBUG: Profile photo paths = {[profile['photo'] for profile in profiles]}")  #Debugging log
     return render_template('viewprofile.html', profiles=profiles, current_user=session.get('user'))
 
 @app.route('/profiles/create', methods=['GET', 'POST'])
@@ -113,7 +126,7 @@ def create_profile():
             filename = f"{name.lower()}_{secure_file}" 
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(filepath) 
-            photo = filepath
+            photo = f"uploads/{filename}"
         except Exception as e:
             flash(f"An error occurred while saving the file: {str(e)}", "error")
             return redirect(url_for('create_profile'))
@@ -158,13 +171,18 @@ def edit_profile(id):
         flash('Cat Profile not found.', 'error') #Display error message to user if no profile is found
         return redirect(url_for('view_profiles')) #Sends user back to the profile list page
 
+    profile = dict(profile) #Convert sqlite3.Row to dictionary
+    if not profile['photo']:  # Provide a fallback if photo is missing
+        profile['photo'] = "default.png"  # Use a default placeholder image
+    print(f"DEBUG: Profile photo path = {profile['photo']}")  #Debugging log
+
     if request.method == 'POST':
         if 'remove_picture' in request.form:
-            if profile['photo'] and os.path.exists(profile['photo']):
-                os.remove(profile['photo'])  #Delete image from storage
-                conn.execute('UPDATE profiles SET photo = NULL WHERE id = ?', (id,))  #Remove the photo link from the database
-                conn.commit()
-                flash('Profile picture removed successfully!', 'success')
+            if profile['photo'] and profile['photo'] != "default.png":
+                full_path = os.path.join(app.config['UPLOAD_FOLDER'], profile['photo'])
+                if os.path.exists(full_path):
+                    os.remove(full_path)
+                
             return redirect(url_for('edit_profile', id=id)) #Send user bck to edit profile page
 
         gender = request.form['gender']
@@ -184,7 +202,7 @@ def edit_profile(id):
                 filename = f"{profile['name'].lower()}_{profile['id']}.{file.filename.rsplit('.', 1)[1].lower()}"
                 filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 file.save(filepath)
-                photo = filepath
+                photo = f"uploads/{filename}"
 
         #Update profile in database
         conn.execute(
@@ -201,20 +219,23 @@ def edit_profile(id):
 
 @app.route('/profiles/remove_picture/<int:id>', methods=['POST'])
 def remove_profile_picture(id):
-    conn = get_db_connection()
-    profile = conn.execute('SELECT * FROM profiles WHERE id = ?', (id,)).fetchone()
+    with get_db_connection() as conn:
+        profile = conn.execute('SELECT * FROM profiles WHERE id = ?', (id,)).fetchone()
 
     if not profile:
         flash('Profile not found.', 'error')
         return redirect(url_for('view_profiles'))  #Sends user back to the profile list page
 
-    if profile['photo'] and os.path.exists(profile['photo']):
-        os.remove(profile['photo'])  #Delete image from storage
-        conn.execute('UPDATE profiles SET photo = NULL WHERE id = ?', (id,)) #Remove the photo link from the database for this profile
+    if profile['photo'] and profile['photo'] != "default.png":
+        full_path = os.path.join(app.config['UPLOAD_FOLDER'], profile['photo'])
+        if os.path.exists(full_path):
+            os.remove(full_path)  #Delete the file from storage
+
+    with get_db_connection() as conn:
+        conn.execute('UPDATE profiles SET photo = NULL WHERE id = ?', (id,))
         conn.commit()
 
-    conn.close()
-    flash('Profile picture removed successfully!', 'success') #Notify user profile picture removed successfully
+    flash('Profile picture removed successfully!', 'success')
     return redirect(url_for('view_profiles'))  #Sends user back to the profile list page
 
 @app.route('/profiles/<int:id>/delete', methods=['POST'])
