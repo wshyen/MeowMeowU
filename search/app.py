@@ -52,7 +52,7 @@ def view_profile():
 
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM profiles WHERE name = ?", (name,))
+    cursor.execute("SELECT * FROM profiles WHERE LOWER(name) = ?", (name.lower(),))
     selected_cat = cursor.fetchone()
     conn.close()
 
