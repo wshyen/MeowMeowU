@@ -4,6 +4,7 @@ from .models import User
 from . import db
 from werkzeug.security import generate_password_hash, check_password_hash #for password hashing and verification
 from flask_login import login_user, login_required, logout_user, current_user
+from sqlalchemy.exc import IntegrityError
 
 auth = Blueprint("auth", __name__) #a Blueprint for authentication routes, Blueprint is like a container for related routes and functions
 
@@ -68,9 +69,18 @@ def sign_up():
         else: #if all correct
             new_user = User(email=email, UserName=UserName, ps=generate_password_hash(ps1, method="pbkdf2:sha256"))
             db.session.add(new_user) #add new user to database
-            db.session.commit()
-            login_user(new_user, remember=True)
-            flash("Account created successfully!", category="success")
-            return redirect(url_for("auth.login"))
+            try:
+                db.session.commit()
+                login_user(new_user, remember=True)
+                flash("Account created successfully!", category="success")
+                return redirect(url_for("auth.login"))
+            except IntegrityError:
+                db.session.rollback()
+                flash("An error occurred while creating the account. Please try again.", category="error")
             
     return render_template("sign_up.html", user=current_user)
+
+@auth.route("/user-profile", methods=["GET", "POST"])
+@login_required
+def user_profile():
+    return render_template("user_profile.html", user=current_user)
