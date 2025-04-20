@@ -7,6 +7,13 @@
     body {
         background-color: #EDE0D7;
     }
+    .profile-picture {
+    width: 100px; 
+    height: 100px;
+    border-radius: 50%; 
+    object-fit: cover;
+    display: block;
+    }
 </style>
 <div style="padding: 20px;">
     <h1 style="text-align: center; margin-bottom: 20px;">Cat Profiles</h1>
@@ -14,10 +21,9 @@
         {% for profile in profiles if not profile.deleted %}
         <div class="profile-card" style="display: inline-block; width: 250px; border-radius: 12px; background: #fff; overflow: hidden; padding: 18px; text-align: center; margin-right: 15px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
         {% if profile.photo %}
-            <img src="{{ profile.photo }}" alt="{{ profile.name }}" 
-                style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%; margin-bottom: 15px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+            <img class="profile-picture" src="{{ url_for('static', filename=profile.photo) }}" alt="{{ profile.name }}" style="width: 150px; height: 150px; border-radius: 50%; border: 2px solid #ddd; margin: 0 auto; position: relative; display: flex; justify-content: center; align-items: center; overflow: hidden;">
         {% else %}
-            <p style="margin: 0; font-size: 14px; color: #666; text-align: center;">No profile picture available</p>
+            <img class="profile-picture" src="{{ url_for('static', filename='default.png') }}" alt="Default Placeholder">
         {% endif %}
                 <h2 style="margin: 0 0 10px; font-size: 1.5rem; color: #333;">{{ profile.name }}</h2>
             <p style="margin: 0 0 5px; font-size: 0.9rem; color: #333"><strong>Gender:</strong> {{ profile.gender }}</p>
@@ -36,10 +42,8 @@
         </div>
         {% endfor %}
     </div>
-    {% if not profiles %}
-    <p style="margin-top: 20px; font-size: 1.2rem; color: #555; text-align: center;">
-        No profiles found. Create one by clicking <a href="{{ url_for('create_profile') }}" style="color: #007bff; text-decoration: none;">here</a>.
-    </p>
+    {% if profiles|length == 0 %}
+    <p style="margin-top: 20px; font-size: 1.2rem; color: #555; text-align: center;">No profiles found. Create one by clicking <a href="{{ url_for('create_profile') }}" style="color: #007bff; text-decoration: none;">here</a>.</p>
     {% endif %}
 </div>
 {% endblock %}
