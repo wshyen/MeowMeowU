@@ -67,10 +67,10 @@
     <body>
         <h1>SEARCH CAT PROFILE</h1>
 
-        {% if cats %}
+        {% if profiles %}
             <h2>The following matches your search:</h2>
             <div class="cat-grid">
-                {% for cat in cats %}
+                {% for cat in profiles %}
                     <div class="cat-card" onclick="window.location.href='/viewprofile?name={{ cat.name }}'">
                         <img src="{{ url_for('static', filename=cat.image) }}" alt="{{ cat.name }}">
                         <p><strong>Name: </strong>{{ cat.name }}</p>
