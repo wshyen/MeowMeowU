@@ -23,12 +23,12 @@
         {% if profile.photo %}
             <img class="profile-picture" src="{{ url_for('static', filename=profile.photo) }}" alt="{{ profile.name }}" style="width: 150px; height: 150px; border-radius: 50%; border: 2px solid #ddd; margin: 0 auto; position: relative; display: flex; justify-content: center; align-items: center; overflow: hidden;">
         {% else %}
-            <img class="profile-picture" src="{{ url_for('static', filename='default.png') }}" alt="Default Placeholder">
+            <img class="profile-picture" src="{{ url_for('static', filename='uploads/default.png') }}" alt="Default Placeholder">
         {% endif %}
                 <h2 style="margin: 0 0 10px; font-size: 1.5rem; color: #333;">{{ profile.name }}</h2>
             <p style="margin: 0 0 5px; font-size: 0.9rem; color: #333"><strong>Gender:</strong> {{ profile.gender }}</p>
             <p style="margin: 0 0 5px; font-size: 0.9rem; color: #333"><strong>Color:</strong> {{ profile.color }}</p>
-            <p style="margin: 0 0 10px; font-size: 0.9rem; color: #333;"><strong>Description:</strong> {{ profile.description }}</p>
+            <p style="margin: 0 0 10px; font-size: 0.9rem; color: #333;"><strong>Description:</strong> {{ profile.description or 'No description available.' }}</p>
                 
             <div style="display: flex; justify-content: space-between; margin-top: 10px;">
                 <a href="{{ url_for('edit_profile', id=profile.id) }}" 
