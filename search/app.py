@@ -20,22 +20,26 @@ def cat_list():
 
     conn = get_db_connection()
     cursor = conn.cursor()
-    query = "SELECT * FROM cats WHERE 1=1"
+    query = "SELECT * FROM profiles WHERE 1=1"
+
+    cat_filters = [] 
 
     if name:
-        query += " AND name LIKE ?"
+        query += " AND LOWER(name) LIKE ?"
+        cat_filters.append(f"%{name}%")  #to find names containing the input 'name' anywhere in the text
     if gender:
         query += " AND gender = ?"
+        cat_filters.append(gender)
     if color:
-        query += " AND color LIKE ?"
+        query += " AND color = ?"
+        cat_filters.append(color)
     
-    cursor.execute(query, 
-                   (f"%{name}%", gender, f"%{color}%"))
-    cats = cursor.fetchall()
+    cursor.execute(query, cat_filters)
+    profiles = cursor.fetchall()
     conn.close()
 
-    if cats:
-        return render_template("cat-list.html", cats=cats)
+    if profiles:
+        return render_template("cat-list.html", profiles=profiles)
     else:
         return render_template("cat-list.html", message="No cats found matching your criteria.")
 
@@ -48,7 +52,7 @@ def view_profile():
 
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM cats WHERE name = ?", (name,))
+    cursor.execute("SELECT * FROM profiles WHERE name = ?", (name,))
     selected_cat = cursor.fetchone()
     conn.close()
 
