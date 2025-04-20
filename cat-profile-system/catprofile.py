@@ -14,12 +14,31 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 def homepage():
     return render_template('homepage.html')
 
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST'])
 def login():  
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        
+        #Validate username and password from the database
+        with get_db_connection() as conn:
+            user = conn.execute('SELECT * FROM users WHERE username = ? AND password = ?', 
+                            (username, password)).fetchone()
+
+        if user:
+            session['user'] = username  #Set the session to the logged-in username
+            print(f"DEBUG: User {username} logged in.")  #Debugging log
+            flash("Login successful!", "success")
+            return redirect(url_for('view_profiles'))
+        else:
+            flash("Invalid username or password.", "error")
+            return redirect(url_for('login'))
+
     return render_template('login.html')
 
 def get_db_connection():
     conn = sqlite3.connect('cat_profiles.db')  #Creates a connection to the database cat_profiles.db
+    conn.execute('PRAGMA journal_mode=WAL;')  #Activates Write-Ahead Logging (WAL) in SQLite, enabling simultaneous database reads while a process is writing, improving efficiency and synchronization
     conn.row_factory = sqlite3.Row  #Access rows as dictionaries
     return conn
 
@@ -32,9 +51,8 @@ def set_current_user():
 
 @app.route('/profiles')
 def view_profiles(): #View all cat profiles
-    conn = get_db_connection() #Connect to the database to fetch cat profiles
-    profiles = conn.execute('SELECT * FROM profiles').fetchall() #Get all cat profiles from the database
-    conn.close() 
+    with get_db_connection() as conn: #Connect to the database to fetch data
+        profiles = conn.execute('SELECT * FROM profiles').fetchall() #Get all cat profiles from the database
     return render_template('viewprofile.html', profiles=profiles, current_user=session.get('user'))
 
 @app.route('/profiles/create', methods=['GET', 'POST'])
@@ -55,62 +73,80 @@ def create_profile():
         photo = None
 
         #Check for duplicate names
-        conn = get_db_connection()
-        existing_names = conn.execute('SELECT name FROM profiles').fetchall()
-        existing_names = [profile['name'].lower() for profile in existing_names]
-        if name.lower() in existing_names:
+        with get_db_connection() as conn:
+            existing_names = conn.execute(
+                'SELECT name FROM profiles WHERE LOWER(name) = ?',
+                (name.lower(),)
+            ).fetchone()
+
+        if existing_names:
             flash(f'The name "{name}" is already in use. Please choose a different one.', 'error')
-            conn.close()
             return redirect(url_for('create_profile')) #Sends user back to the create profile page   
 
-        #Validate that a profile picture is uploaded
+        #Validate required fields
+        if not name or not gender or not color:
+            flash('Name, gender and color are required!', 'error')
+            return redirect(url_for('create_profile')) #Sends user back to the create profile page
+
+        #Validate and save the file
         if 'profile_picture' not in request.files or request.files['profile_picture'].filename == '':
             flash('A profile picture is required!', 'error')
             return redirect(url_for('create_profile')) #Sends user back to the create profile page
 
-        #Handle file upload 
         file = request.files['profile_picture']
         if file.content_length is None or file.content_length > 2 * 1024 * 1024:
             flash("File size is too large. Please upload an image under 2MB.", "error") #Display error message to user if file size too big
             return redirect(url_for('create_profile')) #Sends user back to the create profile page
 
-        if file and allowed_file(file.filename): #Checks if the file was uploaded in the correct format (png,jpg,jpeg)
+        if not allowed_file(file.filename): #Checks if the file was uploaded in the correct format (png,jpg,jpeg)
+            flash('Invalid file format. Please upload a PNG, JPG, or JPEG image.', 'error')
+            return redirect(url_for('create_profile')) #Sends user back to the create profile page
+            
+        try: 
             secure_file = secure_filename(file.filename)
             filename = f"{name.lower()}_{secure_file}" 
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(filepath) 
             photo = filepath
-        else:
-            flash('Invalid file format. Please upload a PNG, JPG, or JPEG image.', 'error')
-            return redirect(url_for('create_profile')) #Sends user back to the create profile page
+        except Exception as e:
+            flash(f"An error occurred while saving the file: {str(e)}", "error")
+            return redirect(url_for('create_profile'))
 
-        #Validate required fields
-        if not photo or not name or not gender or not color:
-            flash('Profile picture, name, gender and color are required!', 'error')
-            return redirect(url_for('create_profile')) #Sends user back to the create profile page
+        #Insert the new profile into the database
+        try:
+            creator = session.get('user')
+            if not creator:  # Handle missing session key gracefully
+                flash("An error occurred while creating the profile. Please log in again.", "error")
+                return redirect(url_for('login'))
 
-        # Insert the new profile into the database
-        conn = get_db_connection() #Connects to database
-        conn.execute( 
-            'INSERT INTO profiles (name, gender, color, description, photo, creator) VALUES (?, ?, ?, ?, ?, ?)',
-            (name, gender, color, description, photo, session['user']) #Automatically assign the logged in user as the creator
-        )
-        conn.commit() #Save changes to the database
-        conn.close()
+            print(f"DEBUG: session['user'] = {creator}")
+            
+            with get_db_connection() as conn:
+                conn.execute( 
+                    'INSERT INTO profiles (name, gender, color, description, photo, creator) VALUES (?, ?, ?, ?, ?, ?)',
+                    (name, gender, color, description, photo, session['user']) #Automatically assign the logged in user as the creator
+                )
+                conn.commit() #Save changes to the database
+            flash('Cat Profile created successfully!', 'success')
+            return redirect(url_for('view_profiles')) #Sends user back to profile list page
 
-        flash('Cat Profile created successfully!', 'success')
-        return redirect(url_for('view_profiles')) #Sends user back to the profile list page
+        except sqlite3.OperationalError as e:
+            if "database is locked" in str(e):  #Handle database locked error
+                flash("Database is currently busy. Please try again later.", "error")
+            else:
+                flash("An unexpected error occurred while creating the profile.", "error")
+            return redirect(url_for('create_profile')) #Sends user back to the profile list page
 
     return render_template('createprofile.html')
 
 @app.route('/profiles/<int:id>/edit', methods=['GET', 'POST'])
 def edit_profile(id):
     if not session.get('user'): #Ensure only logged in users can create profile
-        flash("You must be logged in to edit a profile. Please log in.", "error")
+        flash("You must be logged in to edit a profile. Please log in", "error")
         return redirect(url_for('login')) #Sends user back to login page
 
-    conn = get_db_connection() #Connect to the database to retrieve the profile information
-    profile = conn.execute('SELECT * FROM profiles WHERE id = ?', (id,)).fetchone() #Get the cat profile with the matching ID
+    with get_db_connection() as conn: #Connect to the database to retrieve the profile information
+        profile = conn.execute('SELECT * FROM profiles WHERE id = ?', (id,)).fetchone() #Get the cat profile with the matching ID
 
     if not profile:
         flash('Cat Profile not found.', 'error') #Display error message to user if no profile is found
@@ -181,8 +217,8 @@ def delete_profile(id):
         flash("You must be logged in to create a profile.", "error")
         return redirect(url_for('view_profiles')) #Sends user back to profile list page
 
-    conn = get_db_connection()
-    profile = conn.execute('SELECT * FROM profiles WHERE id = ?', (id,)).fetchone()
+    with get_db_connection() as conn:
+        profile = conn.execute('SELECT * FROM profiles WHERE id = ?', (id,)).fetchone()
 
     if not profile:
         flash('Profile not found.', 'error')
@@ -196,17 +232,17 @@ def delete_profile(id):
     if profile['photo'] and os.path.exists(profile['photo']): #Delete the photo from the filesystem if it exists
         os.remove(profile['photo'])
 
-    conn.execute('DELETE FROM profiles WHERE id = ?', (id,))
-    conn.commit()
-    conn.close()
+    with get_db_connection() as conn:
+        conn.execute('DELETE FROM profiles WHERE id = ?', (id,))
+        conn.commit()
 
     flash(f'Profile for "{profile["name"]}" has been deleted.', 'success')
     return redirect(url_for('view_profiles')) #Sends user back to the profile list page
 
 @app.route('/profiles/<int:id>/confirm_delete')
 def confirm_delete(id):
-    conn = get_db_connection()
-    profile = conn.execute('SELECT * FROM profiles WHERE id = ?', (id,)).fetchone()
+    with get_db_connection() as conn:
+        profile = conn.execute('SELECT * FROM profiles WHERE id = ?', (id,)).fetchone()
 
     if not profile:
         flash('Profile not found.', 'error') 
@@ -225,21 +261,21 @@ if __name__ == '__main__':
         os.makedirs(UPLOAD_FOLDER)
 
     #Creates database table if it doesn't exist
-    conn = get_db_connection()
-    conn.execute('''
-        CREATE TABLE IF NOT EXISTS profiles ( 
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            gender TEXT NOT NULL,
-            color TEXT NOT NULL,
-            description TEXT,
-            photo TEXT NOT NULL,
-            creator TEXT NOT NULL
-        )
-    ''')
+    with get_db_connection() as conn:
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS profiles ( 
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                gender TEXT NOT NULL,
+                color TEXT NOT NULL,
+                description TEXT,
+                photo TEXT NOT NULL,
+                creator TEXT NOT NULL
+            )
+        ''')
     #Create the table if it doesn't exists
     #Name of the table is profiles
-    #id INTEGER PRIMARY KEY AUTOINFREMENT Adds a unique id for each entry
+    #id INTEGER PRIMARY KEY AUTOINCREMENT Adds a unique id for each entry
     #TEXT NOT NULL Adds a column for the name, gender ,color and profile picture which is a must to fill im
     #TEXT Adds a column for description which is not a must to fill in
     #creator TEXT NOT NULL Adds a column for creator which will be automatically filled in by the system 
