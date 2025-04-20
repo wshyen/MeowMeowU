@@ -63,15 +63,13 @@ def view_profiles(): #View all cat profiles
     profiles = [dict(profile) for profile in profiles] #Convert sqlite3.Row to dictionary
 
     for profile in profiles:
-        if profile['photo']:
-            profile['photo'] = f"uploads{profile['photo']}" if not profile['photo'].startswith('uploads/') else profile['photo']  # Use relative path for profile picture
+        if profile['photo'] and profile['photo'] != '':
+            profile['photo'] = f"uploads/{profile['photo']}" 
             full_path = os.path.join(app.config['UPLOAD_FOLDER'], os.path.basename(profile['photo']))
             if not os.path.exists(full_path):  # Check if the file exists
-                print(f"DEBUG: Missing file for profile {profile['name']} at {full_path}")
                 profile['photo'] = "uploads/default.png"
         else:
             profile['photo'] = "uploads/default.png"  # Use a default placeholder image
-            print(f"DEBUG: Missing photo for profile {profile['name']}, defaulting to {profile['photo']}")
     
     print(f"DEBUG: Profile photo paths = {[profile['photo'] for profile in profiles]}")  #Debugging log
     return render_template('viewprofile.html', profiles=profiles, current_user=session.get('user'))
@@ -128,7 +126,7 @@ def create_profile():
             filename = f"{name.lower()}_{secure_file}" 
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(filepath) 
-            photo = f"uploads/{filename}"
+            photo = filename
         except Exception as e:
             flash(f"An error occurred while saving the file: {str(e)}", "error")
             return redirect(url_for('create_profile'))
@@ -180,39 +178,59 @@ def edit_profile(id):
 
     if request.method == 'POST':
         if 'remove_picture' in request.form:
-            if profile['photo'] and profile['photo'] != "default.png":
-                full_path = os.path.join(app.config['UPLOAD_FOLDER'], profile['photo'])
+            if profile['photo'] and profile['photo'] != "uploads/default.png":
+                full_path = os.path.join(app.config['UPLOAD_FOLDER'], os.path.basename(profile['photo']))
                 if os.path.exists(full_path):
-                    os.remove(full_path)
-                
-            return redirect(url_for('edit_profile', id=id)) #Send user bck to edit profile page
+                    os.remove(full_path)  #Remove the file from the filesystem
+                profile['photo'] = "uploads/default.png"
+            
+            with get_db_connection() as conn:
+                conn.execute(
+                    'UPDATE profiles SET gender = ?, color = ?, description = ?, photo = ? WHERE id = ?',
+                    (gender, color, description, photo, id)  #Ensure all fields are updated
+                )
+                conn.commit()
 
+            flash('Profile picture removed successfully!', 'success')
+            return redirect(url_for('edit_profile', id=id)) #Send user back to edit profile page
+
+        name = request.form.get('name', profile['name']).strip().capitalize()
         gender = request.form['gender']
         color = request.form['color']
         description = request.form.get('description', '')
         photo = profile['photo']
 
+        #Validate required fields
+        if not name or not gender or not color:
+            flash('Name, gender, and color are required!', 'error')
+            return redirect(url_for('edit_profile', id=id))
+
         #Handle file upload 
-        if 'profile_picture' in request.files:
+        if 'profile_picture' in request.files and request.files['profile_picture'].filename != '':
             file = request.files['profile_picture']
             if file.content_length is None or file.content_length > 2 * 1024 * 1024: 
                 flash("File size is too large. Please upload an image under 2MB.", "error") #Display error message to user if file size too big
                 return redirect(url_for('edit_profile', id=id)) #Sends user back to the edit profile page
 
-            if file and allowed_file(file.filename):
+            if allowed_file(file.filename):
                 secure_file = secure_filename(file.filename)
                 filename = f"{profile['name'].lower()}_{profile['id']}.{file.filename.rsplit('.', 1)[1].lower()}"
                 filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                file.save(filepath)
-                photo = f"uploads/{filename}"
+                try:
+                    file.save(filepath)
+                    photo = filename  #Store only the filename
+                except Exception as e:
+                    flash(f"An error occurred while saving the file: {str(e)}", 'error')
+                    return redirect(url_for('edit_profile', id=id))
+        else:
+            photo = profile['photo']
 
-        #Update profile in database
-        conn.execute(
-            'UPDATE profiles SET gender = ?, color = ?, description = ?, photo = ? WHERE id = ?',
-            (gender, color, description, photo, id)
-        )
-        conn.commit()
-        conn.close()
+        with get_db_connection() as conn:
+            conn.execute(
+                'UPDATE profiles SET gender = ?, color = ?, description = ?, photo = ? WHERE id = ?',
+                (gender, color, description, photo, id)  # Ensure all fields are updated
+                )
+            conn.commit()
 
         flash('Profile updated successfully!', 'success') #Notify user profile updated successfully
         return redirect(url_for('view_profiles')) #Sends user back to the profile list page
@@ -234,7 +252,7 @@ def remove_profile_picture(id):
             os.remove(full_path)  #Delete the file from storage
 
     with get_db_connection() as conn:
-        conn.execute('UPDATE profiles SET photo = NULL WHERE id = ?', (id,))
+        conn.execute('UPDATE profiles SET photo = ? WHERE id = ?', ('',id,))
         conn.commit()
 
     flash('Profile picture removed successfully!', 'success')
