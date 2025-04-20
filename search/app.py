@@ -1,11 +1,12 @@
+import sqlite3
 from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
-cat_data = [
-    {"name": "Bubble", "gender": "Female", "color": "Calico", "image": "bubble.jpg"},
-    {"name": "Tom", "gender": "Male", "color": "Gray(Blue)", "image": "tom.jpg"},
-]
+def get_db_connection():
+    conn = sqlite3.connect('cat_profiles.db') 
+    conn.row_factory = sqlite3.Row
+    return conn
 
 @app.route('/')
 def search():
@@ -17,26 +18,39 @@ def cat_list():
     gender = request.args.get("gender", "")
     color = request.args.get("color", "")
 
-    filtered_cats = [
-        cat for cat in cat_data
-        if (not name or name in cat["name"].lower()) and
-        (not gender or gender == cat["gender"]) and 
-        (not color or color in cat["color"])
-        ]
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    query = "SELECT * FROM cats WHERE 1=1"
 
-    if filtered_cats:
-        return render_template("cat-list.html", cats=filtered_cats)
+    if name:
+        query += " AND name LIKE ?"
+    if gender:
+        query += " AND gender = ?"
+    if color:
+        query += " AND color LIKE ?"
+    
+    cursor.execute(query, 
+                   (f"%{name}%", gender, f"%{color}%"))
+    cats = cursor.fetchall()
+    conn.close()
+
+    if cats:
+        return render_template("cat-list.html", cats=cats)
     else:
         return render_template("cat-list.html", message="No cats found matching your criteria.")
-    
+
+
+ 
 @app.route('/viewprofile')
 def view_profile():
     name = request.args.get("name", "").lower()
     selected_cat = None
-    for cat in cat_data:
-        if cat["name"].lower() == name:
-            selected_cat = cat
-            break
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM cats WHERE name = ?", (name,))
+    selected_cat = cursor.fetchone()
+    conn.close()
 
     if selected_cat:
         return render_template("viewprofile.html", cat=selected_cat)
