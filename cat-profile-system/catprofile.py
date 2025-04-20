@@ -64,12 +64,14 @@ def view_profiles(): #View all cat profiles
 
     for profile in profiles:
         if profile['photo']:
-            profile['photo'] = f"{profile['photo']}"  # Use relative path for profile picture
-            full_path = os.path.join(app.config['UPLOAD_FOLDER'], profile['photo'])
-        if not os.path.exists(full_path):  # Check if the file exists
-            print(f"DEBUG: Missing file for profile {profile['name']} at {full_path}")
-    else:
-        profile['photo'] = "default.png"  # Use a default placeholder image
+            profile['photo'] = f"uploads{profile['photo']}" if not profile['photo'].startswith('uploads/') else profile['photo']  # Use relative path for profile picture
+            full_path = os.path.join(app.config['UPLOAD_FOLDER'], os.path.basename(profile['photo']))
+            if not os.path.exists(full_path):  # Check if the file exists
+                print(f"DEBUG: Missing file for profile {profile['name']} at {full_path}")
+                profile['photo'] = "uploads/default.png"
+        else:
+            profile['photo'] = "uploads/default.png"  # Use a default placeholder image
+            print(f"DEBUG: Missing photo for profile {profile['name']}, defaulting to {profile['photo']}")
     
     print(f"DEBUG: Profile photo paths = {[profile['photo'] for profile in profiles]}")  #Debugging log
     return render_template('viewprofile.html', profiles=profiles, current_user=session.get('user'))
