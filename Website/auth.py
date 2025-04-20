@@ -84,3 +84,28 @@ def sign_up():
 @login_required
 def user_profile():
     return render_template("user_profile.html", user=current_user)
+
+@auth.route("/change-password", methods=["GET", "POST"])
+@login_required
+def change_password():
+    if request.method == "POST":
+        current_ps = request.form.get("current_password")
+        new_ps = request.form.get("new_password")
+        confirm_ps = request.form.get("confirm_password")
+
+        if not current_ps or not new_ps or not confirm_ps:
+            flash("All fields are required.", category="error")
+        elif not check_password_hash(current_user.ps, current_ps):
+            flash("Current password is incorrect.", category="error")
+        elif len(new_ps) < 7:
+            flash("New password must be at least 7 characters long.", category="error")
+        elif new_ps != confirm_ps:
+            flash("New passwords do not match.", category="error")
+        else:
+            #update the password
+            current_user.ps = generate_password_hash(new_ps, method="pbkdf2:sha256")
+            db.session.commit()
+            flash("Password changed successfully!", category="success")
+            return redirect(url_for("auth.user_profile"))
+
+    return render_template("change_password.html", user=current_user)
