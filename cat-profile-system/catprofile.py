@@ -10,6 +10,14 @@ UPLOAD_FOLDER = 'static/uploads'
 ALLOWED_EXTENSIONS = {'png','jpg','jpeg'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+@app.route('/')
+def homepage():
+    return render_template('homepage.html')
+
+@app.route('/login')
+def login():  
+    return render_template('login.html')
+
 def get_db_connection():
     conn = sqlite3.connect('cat_profiles.db')  #Creates a connection to the database cat_profiles.db
     conn.row_factory = sqlite3.Row  #Access rows as dictionaries
@@ -32,20 +40,12 @@ def view_profiles(): #View all cat profiles
 @app.route('/profiles/create', methods=['GET', 'POST'])
 def create_profile():
     if not session.get('user'): #Ensure only logged in users can create profile
-        flash("You must be logged in to create a profile.", "error")
-        return redirect(url_for('view_profiles')) #Sends user back to profile list page
+        flash("You must be logged in to create a profile. Please log in.", "error")
+        return redirect(url_for('login')) #Sends user back to login page
 
-    #Handle removing the temporary profile picture during creation
-    if request.method == 'POST' and 'remove_picture' in request.form:
-        temp_picture = session.get('temp_profile_picture')
-        if temp_picture:
-            temp_picture_path = os.path.join(app.config['UPLOAD_FOLDER'], temp_picture)
-            if os.path.exists(temp_picture_path):
-                os.remove(temp_picture_path)  #Delete the temporary picture from the filesystem
-            session.pop('temp_profile_picture', None)  #Remove the reference from the session
-        flash('Temporary profile picture removed.', 'success')
-        return redirect(url_for('create_profile')) #Sends user back to create profile page
-
+    if request.method == 'GET': 
+        return render_template('createprofile.html')
+    
     #Create a new cat profile
     if request.method == 'POST':
         name = request.form['name'].strip().capitalize()
@@ -66,7 +66,7 @@ def create_profile():
         #Validate that a profile picture is uploaded
         if 'profile_picture' not in request.files or request.files['profile_picture'].filename == '':
             flash('A profile picture is required!', 'error')
-            return redirect(url_for('create_profile')) #Sendss user back to the create profile page
+            return redirect(url_for('create_profile')) #Sends user back to the create profile page
 
         #Handle file upload 
         file = request.files['profile_picture']
@@ -106,8 +106,8 @@ def create_profile():
 @app.route('/profiles/<int:id>/edit', methods=['GET', 'POST'])
 def edit_profile(id):
     if not session.get('user'): #Ensure only logged in users can create profile
-        flash("You must be logged in to create a profile.", "error")
-        return redirect(url_for('view_profiles')) #Sends user back to profile list page
+        flash("You must be logged in to edit a profile. Please log in.", "error")
+        return redirect(url_for('login')) #Sends user back to login page
 
     conn = get_db_connection() #Connect to the database to retrieve the profile information
     profile = conn.execute('SELECT * FROM profiles WHERE id = ?', (id,)).fetchone() #Get the cat profile with the matching ID
