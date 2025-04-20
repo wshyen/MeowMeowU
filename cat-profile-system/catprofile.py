@@ -36,6 +36,12 @@ def login():
 
     return render_template('login.html')
 
+@app.route('/simulate_login')
+def simulate_login():
+    session['user'] = 'test_user'  # Simulate a logged-in user
+    flash("You are logged in as test_user (simulation).", "success")
+    return redirect(url_for('view_profiles'))  # Redirect to the profiles page
+
 def get_db_connection():
     conn = sqlite3.connect('cat_profiles.db')  #Creates a connection to the database cat_profiles.db
     conn.execute('PRAGMA journal_mode=WAL;')  #Activates Write-Ahead Logging (WAL) in SQLite, enabling simultaneous database reads while a process is writing, improving efficiency and synchronization
@@ -124,7 +130,7 @@ def create_profile():
             with get_db_connection() as conn:
                 conn.execute( 
                     'INSERT INTO profiles (name, gender, color, description, photo, creator) VALUES (?, ?, ?, ?, ?, ?)',
-                    (name, gender, color, description, photo, session['user']) #Automatically assign the logged in user as the creator
+                    (name, gender, color, description, photo, creator) #Automatically assign the logged in user as the creator
                 )
                 conn.commit() #Save changes to the database
             flash('Cat Profile created successfully!', 'success')
@@ -191,7 +197,7 @@ def edit_profile(id):
         flash('Profile updated successfully!', 'success') #Notify user profile updated successfully
         return redirect(url_for('view_profiles')) #Sends user back to the profile list page
 
-    return render_template('editprofiles.html', profile=profile)
+    return render_template('editprofile.html', profile=profile)
 
 @app.route('/profiles/remove_picture/<int:id>', methods=['POST'])
 def remove_profile_picture(id):
