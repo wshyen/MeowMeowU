@@ -23,13 +23,13 @@
         <div style="margin-bottom: 20px; text-align: center;">
             <div style="width: 150px; height: 150px; border-radius: 50%; border: 2px solid #ddd; margin: 0 auto; position: relative; display: flex; justify-content: center; align-items: center; overflow: hidden;">
                 <p id="profilePictureText" style="margin: 0; font-size: 14px; color: #666; text-align: center; position: absolute; font-weight: bold;">Profile Picture Preview</p>
-                <img id="profilePicturePreview" src="{{ profile.profile_picture }}" alt="Profile Picture Preview" class="{{ 'block' if profile.profile_picture else 'none' }}" style="width: 100%; height: 100%; object-fit: cover;">
+                <img id="profilePicturePreview" src="{{ url_for('static', filename=profile.photo) }}" alt="Profile Picture Preview" style="width: 100%; height: 100%; object-fit: cover;">
             </div>
             <br>
             <label for="profile_picture" style="display: block; font-weight: bold; margin-bottom: 5px;">Upload Profile Picture:</label>
             <input type="file" id="profile_picture" name="profile_picture" accept="image/*" onchange="previewProfilePicture()" style="margin-bottom: 10px;">
             <br>
-            <button type="button" id="removePictureButton" class="{{ 'block' if profile.profile_picture else 'none' }}" onclick="removeProfilePicture()" style="padding: 5px 10px; background-color: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer;">Remove</button>
+            <button type="button" id="removePictureButton" class="{{ 'block' if profile.photo else 'none' }}" onclick="removeProfilePicture()" style="padding: 5px 10px; background-color: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer; margin: auto; display: block;">Remove</button>
         </div>
         <div style="margin-bottom: 15px;">
             <label for="name" style="display: inline-block; width: 150px; font-weight: bold;">Name:</label>
@@ -61,7 +61,7 @@
         </div>
         <div style="margin-bottom: 15px;">
             <label for="description" style="display: inline-block; width: 150px; vertical-align: top; font-weight: bold;">Description:</label>
-            <textarea id="description" name="description" rows="4" style="width: 300px; height: 100px; padding: 5px; border: 1px solid #ccc; border-radius: 5px;">{{ profile.description }}</textarea>
+            <textarea id="description" name="description" rows="4" style="width: 300px; height: 100px; padding: 5px; border: 1px solid #ccc; border-radius: 5px; font-family: 'Times New Roman', Times, serif;">{{ profile.description }}</textarea>
         </div>
         <div style="text-align: center;">
             <button type="submit" style="padding: 10px 20px; background-color: #94693e; color: white; border: none; border-radius: 5px; cursor: pointer;">Save Changes</button>
@@ -102,6 +102,16 @@
         previewImage.style.display = 'none';
         previewText.style.display = 'block';
         removeButton.style.display = 'none'; 
+    }
+    window.onload = function() {
+        const previewImage = document.getElementById('profilePicturePreview');
+        const previewText = document.getElementById('profilePictureText');
+
+        if (previewImage.src && !previewImage.src.includes("default.png")) {
+            previewText.style.display = 'none'; //Hide the "Profile Picture Preview" text
+        } else {
+            previewText.style.display = 'block'; //Show the "Profile Picture Preview" text
+        }
     }
 </script>
 {% endblock %}
