@@ -8,11 +8,16 @@
         background-color: #EDE0D7;
     }
     .profile-picture {
-    width: 100px; 
-    height: 100px;
-    border-radius: 50%; 
-    object-fit: cover;
-    display: block;
+        width: 100px; 
+        height: 100px;
+        border-radius: 50%; 
+        object-fit: cover;
+        display: block;
+    }
+    .profile-card p {
+        word-wrap: break-word;  /*Ensures long words break properly*/
+        overflow-wrap: anywhere;  /*Handles text wrapping more effectively*/
+        line-height: 1.5;  /*Improves readability of description text*/
     }
 </style>
 <div style="padding: 20px;">
@@ -28,7 +33,9 @@
                 <h2 style="margin: 0 0 10px; font-size: 1.5rem; color: #333;">{{ profile.name }}</h2>
             <p style="margin: 0 0 5px; font-size: 0.9rem; color: #333"><strong>Gender:</strong> {{ profile.gender }}</p>
             <p style="margin: 0 0 5px; font-size: 0.9rem; color: #333"><strong>Color:</strong> {{ profile.color }}</p>
-            <p style="margin: 0 0 10px; font-size: 0.9rem; color: #333;"><strong>Description:</strong> {{ profile.description or 'No description available.' }}</p>
+                <p style="margin: 0 0 10px; font-size: 0.9rem; color: #333; word-wrap:break-word; overflow-wrap: anywhere; white-space: normal; line-height: 1.5;">
+                    <strong>Description:</strong> {{ profile.description or 'No description available.' }}
+                </p>
                 
             <div style="display: flex; justify-content: space-between; margin-top: 10px;">
                 <a href="{{ url_for('edit_profile', id=profile.id) }}" 
