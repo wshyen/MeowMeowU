@@ -179,39 +179,36 @@ def edit_profile(id):
         profile['photo'] = f"uploads/{profile['photo']}"  # Ensure the path includes 'uploads'
 
     if request.method == 'POST':
-        if 'remove_picture' in request.form:
-            #Check if the user has removed the picture but hasn't uploaded a new one
-            if 'profile_picture' not in request.files or request.files['profile_picture'].filename == '':
-                flash("You must upload a new profile picture before saving changes.", "error")
-                return redirect(url_for('edit_profile', id=id))  #Prevent submission and reload the edit page
-            
-            with get_db_connection() as conn:
-                conn.execute(
-                    'UPDATE profiles SET gender = ?, color = ?, description = ?, photo = ? WHERE id = ?',
-                    (gender, color, description, photo, id)  #Ensure all fields are updated
-                )
-                conn.commit()
-
-            flash('Profile picture removed successfully!', 'success')
-            return redirect(url_for('edit_profile', id=id)) #Send user back to edit profile page
-
         name = request.form.get('name', profile['name']).strip().capitalize()
         gender = request.form['gender']
         color = request.form['color']
         description = request.form.get('description', '')
-        photo = profile['photo']
+        photo = profile['photo']  #Default to the existing photo
 
         #Validate required fields
         if not name or not gender or not color:
             flash('Name, gender, and color are required!', 'error')
             return redirect(url_for('edit_profile', id=id))
 
-        #Handle file upload 
-        if 'profile_picture' in request.files and request.files['profile_picture'].filename != '':
+        #Handle picture removal
+        if 'remove_picture' in request.form:
+            #Check if the user has removed the picture but hasn't uploaded a new one
+            if 'profile_picture' not in request.files or request.files['profile_picture'].filename == '':
+                flash("You must upload a new profile picture before saving changes.", "error")
+                return redirect(url_for('edit_profile', id=id))  #Prevent submission and reload the edit page
+            
+            if profile['photo'] and profile['photo'] != "uploads/default.png":
+                full_path = os.path.join(app.config['UPLOAD_FOLDER'], os.path.basename(profile['photo']))
+                if os.path.exists(full_path):
+                    os.remove(full_path)  #Remove the file from the filesystem
+            photo = "uploads/default.png"  #Update to default placeholder
+
+        #Handle file upload
+        elif 'profile_picture' in request.files and request.files['profile_picture'].filename != '':
             file = request.files['profile_picture']
-            if file.content_length is None or file.content_length > 2 * 1024 * 1024: 
-                flash("File size is too large. Please upload an image under 2MB.", "error") #Display error message to user if file size too big
-                return redirect(url_for('edit_profile', id=id)) #Sends user back to the edit profile page
+            if file.content_length is None or file.content_length > 2 * 1024 * 1024:
+                flash("File size is too large. Please upload an image under 2MB.", "error")
+                return redirect(url_for('edit_profile', id=id))  #Prevent submission and reload the edit page
 
             if allowed_file(file.filename):
                 secure_file = secure_filename(file.filename)
@@ -224,13 +221,13 @@ def edit_profile(id):
                     flash(f"An error occurred while saving the file: {str(e)}", 'error')
                     return redirect(url_for('edit_profile', id=id))
         else:
-            photo = profile['photo']
+            photo = profile['photo'] #Keep the old profile picture if no new one is uploaded
 
         with get_db_connection() as conn:
             conn.execute(
                 'UPDATE profiles SET gender = ?, color = ?, description = ?, photo = ? WHERE id = ?',
-                (gender, color, description, photo, id)  # Ensure all fields are updated
-                )
+                (gender, color, description, photo, id)  #Ensure all fields are updated
+            )
             conn.commit()
 
         flash('Profile updated successfully!', 'success') #Notify user profile updated successfully
