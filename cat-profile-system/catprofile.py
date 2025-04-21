@@ -172,18 +172,18 @@ def edit_profile(id):
         flash('Cat Profile not found.', 'error') #Display error message to user if no profile is found
         return redirect(url_for('view_profiles')) #Sends user back to the profile list page
 
-    profile = dict(profile) #Convert sqlite3.Row to dictionary
+    profile = dict(profile)  # Convert sqlite3.Row to dictionary
     if not profile['photo']:  # Provide a fallback if photo is missing
-        profile['photo'] = "default.png"  # Use a default placeholder image
-    print(f"DEBUG: Profile photo path = {profile['photo']}")  #Debugging log
+        profile['photo'] = "uploads/default.png"  # Use a default placeholder image
+    else:
+        profile['photo'] = f"uploads/{profile['photo']}"  # Ensure the path includes 'uploads'
 
     if request.method == 'POST':
         if 'remove_picture' in request.form:
-            if profile['photo'] and profile['photo'] != "uploads/default.png":
-                full_path = os.path.join(app.config['UPLOAD_FOLDER'], os.path.basename(profile['photo']))
-                if os.path.exists(full_path):
-                    os.remove(full_path)  #Remove the file from the filesystem
-                profile['photo'] = "uploads/default.png"
+            #Check if the user has removed the picture but hasn't uploaded a new one
+            if 'profile_picture' not in request.files or request.files['profile_picture'].filename == '':
+                flash("You must upload a new profile picture before saving changes.", "error")
+                return redirect(url_for('edit_profile', id=id))  #Prevent submission and reload the edit page
             
             with get_db_connection() as conn:
                 conn.execute(
@@ -300,6 +300,10 @@ def confirm_delete(id):
     if session.get('user') is None or profile['creator'] != session['user']:
         flash('You are not authorized to delete this profile.', 'error')
         return redirect(url_for('view_profiles')) #Sends user back to the profile list page
+
+    if profile['photo']:
+        profile = dict(profile)  
+        profile['photo'] = f"uploads/{profile['photo']}" 
 
     return render_template('confirmdelete.html', profile=profile)
 
