@@ -7,21 +7,45 @@
     body {
         background-color: #EDE0D7;
         }
+    /* Center and style the profile picture container */
+    .profile-picture-container {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;  /* Ensures a circular shape */
+        background-color: #e0e0e0;  
+        display: flex;  /* Use flexbox for centering content */
+        align-items: center;  /* Vertical alignment */
+        justify-content: center;  /* Horizontal alignment */
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);  /* Adds a shadow for styling */
+        margin: 0 auto 15px;  /* Centers the circle and adds spacing below */
+        overflow: hidden;  /* Ensures no content overflows the circle */
+    }
+
+    /* Ensure the image fills the container properly */
+    .profile-picture-container img {
+        width: 100%;  
+        height: 100%;  
+        object-fit: cover;  /* Maintain aspect ratio while filling the circle */
+    }
+
+    /* Style for the placeholder text */
+    .profile-placeholder {
+        color: #888;  
+        font-size: 14px;  
+    }
 </style>
 <div style="text-align: center; margin-top: 50px; font-family: 'Times New Roman', Times, serif;">
     <h1>Are you sure you want to delete the profile for "{{ profile.name }}"?</h1>
     <p style="color: red; font-size: 15px; font-weight: bold; margin-bottom: 20px;">This action cannot be undone.</p>
     
     <div style="border: 1px solid #ddd; padding: 20px; margin: 0 auto 20px; width: 400px; text-align: center; border-radius: 10px; background-color: #f9f9f9; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
-        {% if profile.photo %}
-        <div style="text-align: center; margin-bottom: 15px;">
-            <img src="{{ profile.profile_picture }}" alt="Profile Picture" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+        <div class="profile-picture-container">
+            {% if profile.photo %}
+                <img src="{{ url_for('static', filename=profile.photo) }}" alt="Profile Picture">
+            {% else %}
+            <span class="profile-placeholder">Profile Picture</span>
+            {% endif %}
         </div>
-        {% else %}
-        <div style="width: 120px; height: 120px; border-radius: 50%; background-color: #e0e0e0; display: flex; align-items: center; justify-content: center; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); margin: 0 auto 15px;">
-            <span style="color: #888; font-size: 14px;">Profile Picture</span>
-        </div>
-        {% endif %}
         <p><strong>Name:</strong> {{ profile.name }}</p>
         <p><strong>Gender:</strong> {{ profile.gender }}</p>
         <p><strong>Color:</strong> {{ profile.color }}</p>
