@@ -38,9 +38,10 @@ def login():
 
 @app.route('/simulate_login')
 def simulate_login():
-    session['user'] = 'test_user'  # Simulate a logged-in user
-    flash("You are logged in as test_user (simulation).", "success")
-    return redirect(url_for('view_profiles'))  # Redirect to the profiles page
+    session['user'] = 'test_user'  #Simulate a logged-in user
+    print(f"DEBUG: Simulated login as {session['user']}")  #Debugging log
+    flash("Simulated login successful! You are logged in as test_user.", "success")
+    return redirect(url_for('view_profiles'))  #Redirect to view profiles page
 
 def get_db_connection():
     conn = sqlite3.connect('cat_profiles.db')  #Creates a connection to the database cat_profiles.db
@@ -78,7 +79,7 @@ def view_profiles(): #View all cat profiles
 def create_profile():
     if not session.get('user'): #Ensure only logged in users can create profile
         flash("You must be logged in to create a profile. Please log in.", "error")
-        return redirect(url_for('login')) #Sends user back to login page
+        return redirect(url_for('simulate_login')) #Sends user back to login page
 
     if request.method == 'GET': 
         return render_template('createprofile.html')
@@ -162,7 +163,7 @@ def create_profile():
 def edit_profile(id):
     if not session.get('user'): #Ensure only logged in users can create profile
         flash("You must be logged in to edit a profile. Please log in", "error")
-        return redirect(url_for('login')) #Sends user back to login page
+        return redirect(url_for('simulate_login')) #Sends user back to login page
 
     with get_db_connection() as conn: #Connect to the database to retrieve the profile information
         profile = conn.execute('SELECT * FROM profiles WHERE id = ?', (id,)).fetchone() #Get the cat profile with the matching ID
