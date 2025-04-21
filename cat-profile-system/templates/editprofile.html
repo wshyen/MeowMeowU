@@ -79,13 +79,13 @@
         const removeButton = document.getElementById('removePictureButton');
 
         const file = fileInput.files[0];
-        if (file) {
-            const reader = new FileReader();
+        if (file) { //Checks if a file was uploaded//
+            const reader = new FileReader(); //Creates a FileReader to read the file//
             reader.onload = function(e) {
-                previewImage.src = e.target.result;
-                previewImage.style.display = 'block';
-                previewText.style.display = 'none';
-                removeButton.style.display = 'inline-block';
+                previewImage.src = e.target.result;  //Updates the image preview to show the uploaded file//
+                previewImage.style.display = 'block'; //Makes the image preview visible//
+                previewText.style.display = 'none'; //Hides the placeholder text since a picture is uploaded//
+                removeButton.style.display = 'inline-block'; //Shows the remove button so users can delete the picture//
             }
             reader.readAsDataURL(file);
         } else {
@@ -108,22 +108,35 @@
         removeButton.style.display = 'none'; 
     }
 
-    window.onload = function() {
-        const previewImage = document.getElementById('profilePicturePreview');
-        const previewText = document.getElementById('profilePictureText');
-        const descriptionField = document.getElementById('description');
-        const charCount = document.getElementById('charCount');
+    function validateProfileForm() {
+        const fileInput = document.getElementById('profile_picture');
+        const removeButton = document.getElementById('removePictureButton');
+        const isPictureRemoved = removeButton.style.display === 'none'; // Check if the picture is removed
 
-        if (previewImage.src.includes("default.png")) {
+        if (isPictureRemoved && fileInput.files.length === 0) {
+            alert("You must upload a new profile picture before saving changes.");
+            return false; // Prevent form submission
+        }
+
+        return true; // Allow form submission
+    }
+
+    window.onload = function() { //Function runs automatically when the webpage finishes loading //
+        const previewImage = document.getElementById('profilePicturePreview'); //Selects the image element with the ID 'profilePicturePreview' and stores it in the variable 'previewImage'//
+        const previewText = document.getElementById('profilePictureText'); //Selects the text element with the ID 'profilePictureText' and stores it in the variable 'previewText'//
+        const descriptionField = document.getElementById('description'); //Selects the input field with the ID 'description' where users type descriptions//
+        const charCount = document.getElementById('charCount'); //Selects the element with the ID 'charCount' which shows the character count for the description field//
+
+        if (previewImage.src.includes("default.png")) { //Checks if the source (URL) of the image contains the filename 'default.png' and means the user has not uploaded a custom profile picture and is using the default one//
             previewText.style.display = 'block'; 
         } else {
-            previewText.style.display = 'none'; 
+            previewText.style.display = 'none'; //Hides the text element since the custom image is displayed instead//
         }
 
         charCount.textContent = `${descriptionField.value.length}/200 characters`;
         descriptionField.addEventListener('input', () => { //When the user types in the box, it counts the characters and shows the total out of 200//
             charCount.textContent = `${descriptionField.value.length}/200 characters`; //Updates the character counter to show the number of characters typed out of 200//
-            if (descriptionField.value.length > 200) { //Ensure user cannot exceed the maxlength
+            if (descriptionField.value.length > 200) { //Ensure user cannot exceed the maxlength//
                 descriptionField.value = descriptionField.value.slice(0, 200);
             }
         });
