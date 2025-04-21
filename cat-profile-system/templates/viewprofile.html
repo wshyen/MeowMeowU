@@ -19,12 +19,69 @@
         overflow-wrap: anywhere;  /*Handles text wrapping more effectively*/
         line-height: 1.5;  /*Improves readability of description text*/
     }
+    .profile-card {
+        width: 250px;
+        height: 450px;  
+        border-radius: 12px;
+        background: #fff;
+        overflow: hidden;
+        padding: 18px;
+        text-align: left;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        position: relative;
+    }
+    .profile-card p.description {
+        text-overflow: ellipsis;  /*Show ellipsis for truncated text*/
+        text-align:center;
+        flex-grow: 1;
+        overflow: auto;
+        margin-top: 10px;
+    }
+    .profile-container {
+        display: flex;  /*Use flexbox for consistent alignment*/
+        flex-wrap: wrap;  /* Wrap cards to the next row if they exceed the container width*/
+        gap: 15px;  /*Add spacing between profile cards*/
+        justify-content: center;  /*Center-align profile cards*/
+    }
+    .description {
+        flex-grow: 1;  /* Allows the description to take up available space */
+        overflow: visible;
+        white-space: normal;
+    }
+    .actions {
+        position: absolute;
+        bottom: 10px;
+        left: 0;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 10px;
+        box-sizing: border-box;
+    }
+    .action-btn {
+        padding: 10px 15px;
+        background: #94693e;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        font-weight: bold;
+    }
+    .action-btn.delete {
+        background: #ff0000;  
+        margin-right: 10px;  
+    }
 </style>
 <div style="padding: 20px;">
     <h1 style="text-align: center; margin-bottom: 20px;">Cat Profiles</h1>
-    <div style="overflow-x: auto; white-space: nowrap; padding: 10px; border: 1px solid #ddd; border-radius: 10px; background-color: #f0f0f0;">
+    <div class="profile-container">
         {% for profile in profiles if not profile.deleted %}
-        <div class="profile-card" style="display: inline-block; width: 250px; border-radius: 12px; background: #fff; overflow: hidden; padding: 18px; text-align: center; margin-right: 15px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+        <div class="profile-card" style="display: inline-block; width: 250px; height: 410px; border-radius: 12px; background: #fff; overflow: hidden; padding: 18px; text-align: center; margin-right: 15px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
         {% if profile.photo %}
             <img class="profile-picture" src="{{ url_for('static', filename=profile.photo) }}" alt="{{ profile.name }}" style="width: 150px; height: 150px; border-radius: 50%; border: 2px solid #ddd; margin: 0 auto; position: relative; display: flex; justify-content: center; align-items: center; overflow: hidden;">
         {% else %}
@@ -33,17 +90,16 @@
                 <h2 style="margin: 0 0 10px; font-size: 1.5rem; color: #333;">{{ profile.name }}</h2>
             <p style="margin: 0 0 5px; font-size: 0.9rem; color: #333"><strong>Gender:</strong> {{ profile.gender }}</p>
             <p style="margin: 0 0 5px; font-size: 0.9rem; color: #333"><strong>Color:</strong> {{ profile.color }}</p>
-                <p style="margin: 0 0 10px; font-size: 0.9rem; color: #333; word-wrap:break-word; overflow-wrap: anywhere; white-space: normal; line-height: 1.5;">
-                    <strong>Description:</strong> {{ profile.description or 'No description available.' }}
-                </p>
-                
-            <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+            <p class="description" style="margin: 0 0 10px; font-size: 0.9rem; color: #333;">
+                <strong>Description:</strong> {{ profile.description or 'No description available.' }}
+            </p>
+            <div class="actions">
                 <a href="{{ url_for('edit_profile', id=profile.id) }}" 
                    style="padding: 10px 15px; background: #94693e; color: white; text-decoration: none; border-radius: 5px; font-size: 0.9rem; cursor: pointer; font-weight: bold;">Edit</a>
 
                 {% if profile.creator == current_user['username'] %}
                 <a href="{{ url_for('confirm_delete', id=profile.id) }}" 
-                    style="padding: 10px 15px; background: #dc3545; color: white; text-decoration: none; border-radius: 5px; font-size: 0.9; cursor: pointer; font-weight: bold;">Delete</a>
+                    style="padding: 10px 15px; background: #ff0000; color: white; text-decoration: none; border-radius: 5px; font-size: 0.9; cursor: pointer; font-weight: bold;">Delete</a>
                 {% endif %}
             </div>
         </div>
