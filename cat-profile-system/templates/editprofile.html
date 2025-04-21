@@ -63,6 +63,7 @@
         <div style="margin-bottom: 15px;">
             <label for="description" style="display: inline-block; width: 150px; vertical-align: top; font-weight: bold;">Description:</label>
             <textarea id="description" name="description" rows="4" maxlength="200" style="width: 300px; height: 100px; padding: 5px; border: 1px solid #ccc; border-radius: 5px; font-family: 'Times New Roman', Times, serif; resize: none;">{{ profile.description }}</textarea>
+            <small id="charCount" style="display: block; font-size: 12px; color: gray;">0/200 characters</small>
         </div>
         <div style="text-align: center;">
             <button type="submit" style="padding: 10px 20px; background-color: #94693e; color: white; border: none; border-radius: 5px; cursor: pointer;">Save Changes</button>
@@ -122,6 +123,9 @@
         charCount.textContent = `${descriptionField.value.length}/200 characters`;
         descriptionField.addEventListener('input', () => { //When the user types in the box, it counts the characters and shows the total out of 200//
             charCount.textContent = `${descriptionField.value.length}/200 characters`; //Updates the character counter to show the number of characters typed out of 200//
+            if (descriptionField.value.length > 200) { //Ensure user cannot exceed the maxlength
+                descriptionField.value = descriptionField.value.slice(0, 200);
+            }
         });
     }
 </script>
