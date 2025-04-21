@@ -18,7 +18,7 @@
     .none { display: none; }
 </style>
 <div style="display: flex; justify-content: center; align-items: center; height: calc(100vh - 40px);">
-    <form action="{{ url_for('edit_profile', id=profile.id) }}" method="post" enctype="multipart/form-data" onsubmit="return validateProfileForm()" style="width: 500px; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9" onsubmit="return validateProfileForm();">
+    <form action="{{ url_for('edit_profile', id=profile.id) }}" method="post" enctype="multipart/form-data" onsubmit="return validateProfileForm();" style="width: 500px; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9" onsubmit="return validateProfileForm();">
         <h1 style="text-align: center; margin-bottom: 20px;">Edit Cat Profile</h1>
         <div style="margin-bottom: 20px; text-align: center;">
             <div style="width: 150px; height: 150px; border-radius: 50%; border: 2px solid #ddd; margin: 0 auto; position: relative; display: flex; justify-content: center; align-items: center; overflow: hidden;">
@@ -62,7 +62,7 @@
         </div>
         <div style="margin-bottom: 15px;">
             <label for="description" style="display: inline-block; width: 150px; vertical-align: top; font-weight: bold;">Description:</label>
-            <textarea id="description" name="description" rows="4" style="width: 300px; height: 100px; padding: 5px; border: 1px solid #ccc; border-radius: 5px; font-family: 'Times New Roman', Times, serif;">{{ profile.description }}</textarea>
+            <textarea id="description" name="description" rows="4" maxlength="200" style="width: 300px; height: 100px; padding: 5px; border: 1px solid #ccc; border-radius: 5px; font-family: 'Times New Roman', Times, serif; resize: none;">{{ profile.description }}</textarea>
         </div>
         <div style="text-align: center;">
             <button type="submit" style="padding: 10px 20px; background-color: #94693e; color: white; border: none; border-radius: 5px; cursor: pointer;">Save Changes</button>
@@ -110,24 +110,19 @@
     window.onload = function() {
         const previewImage = document.getElementById('profilePicturePreview');
         const previewText = document.getElementById('profilePictureText');
+        const descriptionField = document.getElementById('description');
+        const charCount = document.getElementById('charCount');
 
         if (previewImage.src.includes("default.png")) {
             previewText.style.display = 'block'; 
         } else {
             previewText.style.display = 'none'; 
         }
-    }
-    function validateProfileForm() {
-    const fileInput = document.getElementById('profile_picture');
-    const profilePictureField = document.getElementById('profilePicturePreview');
-    const existingPhoto = profilePictureField && profilePictureField.src;
 
-    if (!fileInput.files.length && (!existingPhoto || existingPhoto.includes("default.png"))) {
-        alert('A profile picture is required. Please upload a new picture.');
-        return false;
+        charCount.textContent = `${descriptionField.value.length}/200 characters`;
+        descriptionField.addEventListener('input', () => { //When the user types in the box, it counts the characters and shows the total out of 200//
+            charCount.textContent = `${descriptionField.value.length}/200 characters`; //Updates the character counter to show the number of characters typed out of 200//
+        });
     }
-
-    return true;  
-}
 </script>
 {% endblock %}
