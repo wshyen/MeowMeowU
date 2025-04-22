@@ -12,7 +12,7 @@ auth = Blueprint("auth", __name__) #a Blueprint for authentication routes, Bluep
 #HTTP request methods are ways for a web browser or app to communicate with a server over the internet
 def login():
     if request.method == "POST":
-        email = request.form.get("email")
+        email = request.form.get("email").strip().lower()
         ps = request.form.get("ps")
 
         user = User.query.filter_by(email=email).first()
@@ -41,11 +41,12 @@ def logout():
 @auth.route("/sign-up", methods=["GET", "POST"])
 def sign_up():
     if request.method == "POST":
-        email = request.form.get("email").lower()
+        email = request.form.get("email").strip().lower()
         UserName = request.form.get("UserName")
         ps1 = request.form.get("ps1")
         ps2 = request.form.get("ps2")
-        secret_answer = request.form.get("secret_answer").lower()
+        secret_answer = request.form.get("secret_answer").strip().lower()
+        hashed_secret_answer = generate_password_hash(secret_answer, method="pbkdf2:sha256")
 
         existing_user = User.query.filter_by(email=email).first()
         
@@ -71,8 +72,9 @@ def sign_up():
 
         else: #if all correct
             new_user = User(email=email,UserName=UserName,ps=generate_password_hash(ps1, method="pbkdf2:sha256"),
-            secret_answer="Where is your hometown?",secret_answer=generate_password_hash(secret_answer, method="pbkdf2:sha256"))
+                            secret_answer=hashed_secret_answer)
             db.session.add(new_user) #add new user to database
+
             try:
                 db.session.commit()
                 login_user(new_user, remember=True)
@@ -117,17 +119,17 @@ def change_password():
 @auth.route("/reset-password", methods=["GET", "POST"])
 def reset_password():
     if request.method == "POST":
-        email = request.form.get("email").lower()
-        secret_answer = request.form.get("secret_answer").lower()
+        email = request.form.get("email").strip().lower()
+        secret_answer = request.form.get("secret_answer").strip().lower()
         new_password = request.form.get("new_password")
         confirm_password = request.form.get("confirm_password")
 
         user = User.query.filter_by(email=email).first()
 
         if not user:
-            flash("Invalid email or answer.", category="error")
+            flash("Invalid email.", category="error")
         elif not check_password_hash(user.secret_answer, secret_answer):
-            flash("Invalid email or answer.", category="error")
+            flash("Invalid answer.", category="error")
         elif len(new_password) < 7:
             flash("New password must be at least 7 characters.", category="error")
         elif new_password != confirm_password:
@@ -139,3 +141,4 @@ def reset_password():
             return redirect(url_for("auth.login"))
 
     return render_template("reset_password.html", user=current_user)
+
