@@ -1,10 +1,12 @@
 import os
 import sqlite3 #Connect to SQLite database to store and retrieve cat profile infromation
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session 
+#Flask to build web app, request to read data sent by users
+#Redirect to send users to a different page, flash to show quick messages, session to remember things about users
 from werkzeug.utils import secure_filename #Helps secure file uploads, preventing unsafe filenames that can cause errors or security issues
 
 app = Flask(__name__) 
-app.secret_key = 'your_secret_key'
+app.secret_key = 'your_secret_key' #keeps messages and user data safe
 
 UPLOAD_FOLDER = 'static/uploads'
 ALLOWED_EXTENSIONS = {'png','jpg','jpeg'}
@@ -12,7 +14,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route('/')
 def homepage():
-    return render_template('homepage.html')
+    return render_template('home.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():  
@@ -36,7 +38,7 @@ def login():
 
     return render_template('login.html')
 
-@app.route('/simulate_login')
+@app.route('/simulate_login') #LATER NEED TO DELETE 
 def simulate_login():
     session['user'] = 'test_user'  #Simulate a logged-in user
     print(f"DEBUG: Simulated login as {session['user']}")  #Debugging log
@@ -67,10 +69,10 @@ def view_profiles(): #View all cat profiles
         if profile['photo'] and profile['photo'] != '':
             profile['photo'] = f"uploads/{profile['photo']}" 
             full_path = os.path.join(app.config['UPLOAD_FOLDER'], os.path.basename(profile['photo']))
-            if not os.path.exists(full_path):  # Check if the file exists
+            if not os.path.exists(full_path):  #Check if the file exists
                 profile['photo'] = "uploads/default.png"
         else:
-            profile['photo'] = "uploads/default.png"  # Use a default placeholder image
+            profile['photo'] = "uploads/default.png"  #Use a default placeholder image
     
     print(f"DEBUG: Profile photo paths = {[profile['photo'] for profile in profiles]}")  #Debugging log
     return render_template('viewprofile.html', profiles=profiles, current_user=session.get('user'))
@@ -79,7 +81,8 @@ def view_profiles(): #View all cat profiles
 def create_profile():
     if not session.get('user'): #Ensure only logged in users can create profile
         flash("You must be logged in to create a profile. Please log in.", "error")
-        return redirect(url_for('simulate_login')) #Sends user back to login page
+        return redirect(url_for('simulate_login')) #Sends user back to login page 
+        #NEED TO CHANGE THE URL 
 
     if request.method == 'GET': 
         return render_template('createprofile.html')
@@ -94,9 +97,12 @@ def create_profile():
 
         #Check for duplicate names
         with get_db_connection() as conn:
+            all_names = conn.execute('SELECT name FROM profiles').fetchall() #Retrieve all names from 'profiles' table
+            print("DEBUG: All names in DB", all_names)
+
             existing_names = conn.execute(
-                'SELECT name FROM profiles WHERE LOWER(name) = ?',
-                (name.lower(),)
+                'SELECT name FROM profiles WHERE TRIM(LOWER(name)) = ?', #Finds a matching name after trimming spaces & making it lowercase
+                (name.lower().strip(),) #Format input name into lowercase and remove extra spaces
             ).fetchone()
 
         if existing_names:
@@ -163,7 +169,8 @@ def create_profile():
 def edit_profile(id):
     if not session.get('user'): #Ensure only logged in users can create profile
         flash("You must be logged in to edit a profile. Please log in", "error")
-        return redirect(url_for('simulate_login')) #Sends user back to login page
+        return redirect(url_for('simulate_login')) #Sends user back to login page 
+        #NEED TO CHANGE THE URL
 
     with get_db_connection() as conn: #Connect to the database to retrieve the profile information
         profile = conn.execute('SELECT * FROM profiles WHERE id = ?', (id,)).fetchone() #Get the cat profile with the matching ID
@@ -231,7 +238,7 @@ def edit_profile(id):
             conn.commit()
 
         flash('Profile updated successfully!', 'success') #Notify user profile updated successfully
-        return redirect(url_for('view_profiles')) #Sends user back to the profile list page
+        return redirect(url_for('view_profiles', id=id)) #Sends user back to the profile list page
 
     return render_template('editprofile.html', profile=profile, photo_display=photo_display)
 
