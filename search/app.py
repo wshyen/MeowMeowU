@@ -1,11 +1,13 @@
 import sqlite3
+import os
 from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
 def get_db_connection():
-    conn = sqlite3.connect('cat_profiles.db') 
-    conn.row_factory = sqlite3.Row
+    db_path = os.path.join(os.path.dirname(__file__), '..', 'cat-profile-system', 'cat_profiles.db')
+    db_path = os.path.abspath(db_path)
+    conn = sqlite3.connect(db_path)
     return conn
 
 @app.route('/')
@@ -21,7 +23,6 @@ def cat_list():
     conn = get_db_connection()
     cursor = conn.cursor()
     query = "SELECT * FROM profiles WHERE 1=1"
-
     cat_filters = [] 
 
     if name:
