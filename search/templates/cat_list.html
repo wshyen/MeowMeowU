@@ -47,8 +47,7 @@
         }
 
         .cat-card:hover {
-            transform: scale(1.15); 
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            transform: scale(1.2); 
         }
 
         .cat-card img {
@@ -66,11 +65,6 @@
             font-size: larger;
         }
 
-        a {
-            text-decoration: none;
-            color: inherit; 
-        }
-
     </style>
     </head>
 
@@ -82,15 +76,13 @@
         <div class="cat-grid">
             {% for cat in profiles %}
                 <div class="cat-card">
-                    <a href="/single_profile?name={{ cat.name | lower }}">
-                        {% if cat.photo %}
-                            <img class="profile-picture" src="{{ url_for('static', filename='uploads/' + cat['photo']) }}" alt="{{ cat['name'] }}">
-                        {% else %}
-                            <img class="profile-picture" src="{{ url_for('static', filename='uploads/default.png') }}" alt="Default Placeholder">
-                        {% endif %}
-                        <p><strong>Name: </strong>{{ cat.name }}</p>
-                        <p><strong>Gender: </strong>{{ cat.gender }}</p>
-                    </a>    
+                    {% if cat.photo %}
+                        <img class="profile-picture" src="{{ url_for('static', filename='uploads/' + cat['photo']) }}" alt="{{ cat['name'] }}">
+                    {% else %}
+                        <img class="profile-picture" src="{{ url_for('static', filename='uploads/default.png') }}" alt="Default Placeholder">
+                    {% endif %}
+                    <p><strong>Name: </strong>{{ cat.name }}</p>
+                    <p><strong>Gender: </strong>{{ cat.gender }}</p>
                 </div>
             {% endfor %}
         </div>
