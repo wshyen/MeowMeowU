@@ -5,9 +5,9 @@
 {% block content %}
 <style>
     body {
-        background-color: #EDE0D7;
+        background-color: #f2eadf;
         }
-    /* Center and style the profile picture container */
+    /* Container for profile picture (circular with shadow) */
     .profile-picture-container {
         width: 120px;
         height: 120px;
@@ -34,28 +34,40 @@
         font-size: 14px;  
     }
 </style>
+<!-- confirmation box -->
 <div style="text-align: center; margin-top: 50px; font-family: 'Times New Roman', Times, serif;">
     <h1>Are you sure you want to delete the profile for "{{ profile.name }}"?</h1>
+    <!-- warning message -->
     <p style="color: red; font-size: 15px; font-weight: bold; margin-bottom: 20px;">This action cannot be undone.</p>
     
+    <!-- display profile details inside a styled card -->
     <div style="border: 1px solid #ddd; padding: 20px; margin: 0 auto 20px; width: 400px; text-align: center; border-radius: 10px; background-color: #f9f9f9; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
         <div class="profile-picture-container">
             {% if profile.photo %}
+            <!-- show profile picture if there is one-->
                 <img src="{{ url_for('static', filename=profile.photo) }}" alt="Profile Picture">
             {% else %}
-            <span class="profile-placeholder">Profile Picture</span>
+                <!-- placeholder if no photo -->
+                <span class="profile-placeholder">Profile Picture</span>
             {% endif %}
         </div>
+
+        <!-- profile info -->
         <p><strong>Name:</strong> {{ profile.name }}</p>
         <p><strong>Gender:</strong> {{ profile.gender }}</p>
         <p><strong>Color:</strong> {{ profile.color }}</p>
         <p><strong>Description:</strong> {{ profile.description }}</p>
     </div>
+
+    <!-- buttons to confirm or cancel -->
     <div style="display: flex; justify-content: center; gap: 20px; margin-top: 20px;">
+        <!-- if cancel, go back to view profile page -->
         <a href="{{ url_for('view_profiles') }}" 
            style="padding: 10px 0; width: 150px; height: 40px; background-color: gray; color: white; text-decoration: none; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; font-family: 'Times New Roman', Times, serif; box-sizing: border-box;">
             Cancel
         </a>
+        
+        <!-- confirm deletion form -->
         <form action="{{ url_for('delete_profile', id=profile.id) }}" method="POST" style="margin: 0;">
             <button type="submit" 
                     style="padding: 10px 0; width: 150px; height: 40px; background-color: red; color: white; border: none; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; font-family: 'Times New Roman', Times, serif; box-sizing: border-box; outline: none; cursor: pointer;">
