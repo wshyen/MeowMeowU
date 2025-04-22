@@ -24,7 +24,7 @@ def login():
             else:
                 flash("Incorrect password, please try again.", category="error")
         else:
-            flash("Email does not exist!", category="error")
+            flash("Invalid email or password.", category="error")
 
     return render_template("login.html", user=current_user)
 
@@ -45,7 +45,7 @@ def sign_up():
         UserName = request.form.get("UserName")
         ps1 = request.form.get("ps1")
         ps2 = request.form.get("ps2")
-        secret_question = request.form.get("secret_question") 
+        secret_answer = request.form.get("secret_answer").lower()
 
         existing_user = User.query.filter_by(email=email).first()
         
@@ -66,12 +66,12 @@ def sign_up():
         elif ps1 != ps2:
             flash("Passwords do not match.", category="error")
 
-        elif not secret_question:
+        elif not secret_answer:
             flash("Secret question answer is required.", category="error")
 
         else: #if all correct
             new_user = User(email=email,UserName=UserName,ps=generate_password_hash(ps1, method="pbkdf2:sha256"),
-                secret_question="Where is your hometown?",secret_answer=generate_password_hash(secret_question, method="pbkdf2:sha256"))
+            secret_answer="Where is your hometown?",secret_answer=generate_password_hash(secret_answer, method="pbkdf2:sha256"))
             db.session.add(new_user) #add new user to database
             try:
                 db.session.commit()
@@ -113,3 +113,29 @@ def change_password():
             return redirect(url_for("auth.user_profile"))
 
     return render_template("change_password.html", user=current_user)
+
+@auth.route("/reset-password", methods=["GET", "POST"])
+def reset_password():
+    if request.method == "POST":
+        email = request.form.get("email").lower()
+        secret_answer = request.form.get("secret_answer").lower()
+        new_password = request.form.get("new_password")
+        confirm_password = request.form.get("confirm_password")
+
+        user = User.query.filter_by(email=email).first()
+
+        if not user:
+            flash("Invalid email or answer.", category="error")
+        elif not check_password_hash(user.secret_answer, secret_answer):
+            flash("Invalid email or answer.", category="error")
+        elif len(new_password) < 7:
+            flash("New password must be at least 7 characters.", category="error")
+        elif new_password != confirm_password:
+            flash("Passwords do not match.", category="error")
+        else:
+            user.ps = generate_password_hash(new_password, method="pbkdf2:sha256")
+            db.session.commit()
+            flash("Password has been reset successfully!", category="success")
+            return redirect(url_for("auth.login"))
+
+    return render_template("reset_password.html", user=current_user)

@@ -2,16 +2,20 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy #SQLAlchemy is used for database operations
 from os import path #path is used for file system checks
 from flask_login import LoginManager
+from flask_migrate import Migrate
 
 db = SQLAlchemy() #initialize SQLAlchemy instance for database handling
 DB_NAME = "datebase.db" #name the file
+migrate = Migrate()
 
 def create_app(): #a function to create and configure the Flask app
     app = Flask(__name__) #create Flask app
     app.config['SECRET_KEY'] = "Hello"
     app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{DB_NAME}" #path to database
+    
     db.init_app(app) #initialize the database with the Flask app
-
+    migrate.init_app(app, db)
+    
     from .views import views #import views and auth Blueprint, views handle general routes and auth handle authentication routes
     from .auth import auth
 

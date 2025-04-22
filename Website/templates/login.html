@@ -34,7 +34,7 @@
 
     <div class="button-container">
         <button type="submit" class="btn btn-primary" style="font-family: 'Times New Roman';background-color: rgb(176, 148, 119);color: white;border: none">🐾Login🐾</button>
-        <a href="/forgot_password" class="forgot-password">Forgot Password?</a>
+        <a href="{{ url_for('auth.reset_password') }}" class="forgot-password">Forgot Password?</a>
     </div>
 
 </form>

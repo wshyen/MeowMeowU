@@ -13,4 +13,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String, unique=True)
     ps = db.Column(db.String(150)) #hashed password for the user
     UserName = db.Column(db.String(150)) #allows accessing all notes for the user, (link to note model)
+
+    secret_answer = db.Column(db.String(255)) 
+    
     notes = db.relationship("Note")
