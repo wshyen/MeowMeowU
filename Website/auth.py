@@ -45,6 +45,7 @@ def sign_up():
         UserName = request.form.get("UserName")
         ps1 = request.form.get("ps1")
         ps2 = request.form.get("ps2")
+        secret_question = request.form.get("secret_question") 
 
         existing_user = User.query.filter_by(email=email).first()
         
@@ -52,10 +53,9 @@ def sign_up():
             flash("Email already exist!", category="error")
             return render_template("sign_up.html", user=current_user)
 
-        #check email address is mmu email onot
-        if not re.match(r'^[\w\.-]+@student\.mmu\.edu\.my$', email): #"^" this means starting of the string and "$" this means closing
-            flash("Only MMU student emails are allowed.", category="error")
-        
+        elif not re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email):
+            flash("Invalid email address.", category="error")
+
         elif not re.match(r'^[A-Z][a-zA-Z0-9]{2,14}$', UserName):
             flash("Username must start with a capital letter and be 3 to 15 characters long.", category="error")
 
@@ -66,8 +66,12 @@ def sign_up():
         elif ps1 != ps2:
             flash("Passwords do not match.", category="error")
 
+        elif not secret_question:
+            flash("Secret question answer is required.", category="error")
+
         else: #if all correct
-            new_user = User(email=email, UserName=UserName, ps=generate_password_hash(ps1, method="pbkdf2:sha256"))
+            new_user = User(email=email,UserName=UserName,ps=generate_password_hash(ps1, method="pbkdf2:sha256"),
+                secret_question="Where is your hometown?",secret_answer=generate_password_hash(secret_question, method="pbkdf2:sha256"))
             db.session.add(new_user) #add new user to database
             try:
                 db.session.commit()
