@@ -174,9 +174,9 @@ def edit_profile(id):
 
     profile = dict(profile)  # Convert sqlite3.Row to dictionary
     if not profile['photo']:  # Provide a fallback if photo is missing
-        profile['photo'] = "uploads/default.png"  # Use a default placeholder image
+        photo_display = "uploads/default.png"  # Use a default placeholder image
     else:
-        profile['photo'] = f"uploads/{profile['photo']}"  # Ensure the path includes 'uploads'
+        photo_display = f"uploads/{profile['photo']}"  # Ensure the path includes 'uploads'
 
     if request.method == 'POST':
         name = request.form.get('name', profile['name']).strip().capitalize()
@@ -233,7 +233,7 @@ def edit_profile(id):
         flash('Profile updated successfully!', 'success') #Notify user profile updated successfully
         return redirect(url_for('view_profiles')) #Sends user back to the profile list page
 
-    return render_template('editprofile.html', profile=profile)
+    return render_template('editprofile.html', profile=profile, photo_display=photo_display)
 
 @app.route('/profiles/remove_picture/<int:id>', methods=['POST'])
 def remove_profile_picture(id):
