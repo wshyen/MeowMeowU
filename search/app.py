@@ -2,12 +2,13 @@ import sqlite3
 import os
 from flask import Flask, render_template, request
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='../cat-profile-system/static', static_url_path='/static')
 
 def get_db_connection():
     db_path = os.path.join(os.path.dirname(__file__), '..', 'cat-profile-system', 'cat_profiles.db')
     db_path = os.path.abspath(db_path)
     conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
     return conn
 
 @app.route('/')
