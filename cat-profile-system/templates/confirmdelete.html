@@ -37,6 +37,7 @@
 <!-- confirmation box -->
 <div style="text-align: center; margin-top: 50px; font-family: 'Times New Roman', Times, serif;">
     <h1>Are you sure you want to delete the profile for "{{ profile.name }}"?</h1>
+    
     <!-- warning message -->
     <p style="color: red; font-size: 15px; font-weight: bold; margin-bottom: 20px;">This action cannot be undone.</p>
     
@@ -66,7 +67,7 @@
            style="padding: 10px 0; width: 150px; height: 40px; background-color: gray; color: white; text-decoration: none; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; font-family: 'Times New Roman', Times, serif; box-sizing: border-box;">
             Cancel
         </a>
-        
+
         <!-- confirm deletion form -->
         <form action="{{ url_for('delete_profile', id=profile.id) }}" method="POST" style="margin: 0;">
             <button type="submit" 
