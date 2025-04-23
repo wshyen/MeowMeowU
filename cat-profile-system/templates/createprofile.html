@@ -3,6 +3,12 @@
 {% block title %}Create Profile{% endblock %}
 
 {% block content %}
+{% if not session.get('user') %}
+    <div style="text-align: center; padding: 20px;">
+        <h2>Please log in to create a profile</h2>
+        <a href="{{ url_for('login') }}" style="padding: 10px 20px; background-color: #94693e; color: white; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px;">Login</a>
+    </div>
+{% else %}
 <style>
     body {
         background-color: #f2eadf;
@@ -175,4 +181,5 @@
         });
     });
 </script>
+{% endif %}
 {% endblock %}
