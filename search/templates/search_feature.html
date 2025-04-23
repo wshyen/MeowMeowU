@@ -17,7 +17,7 @@
             margin-bottom: 10px;
         }
 
-        .search-bar {
+        .form-container{
             max-width:500px;
             background-color: #fffaf3;
             margin: 40px auto;
@@ -27,13 +27,14 @@
             box-shadow: 0px 8px 3px #c39f76;
         }
 
-        .search-bar label {
+        .search-bar label,
+        .filter-bar label {
             color: #6b4f2f;
             font-weight: bold;
         }
         
         .search-bar input,
-        .search-bar select {
+        .filter-bar select {
             width: 100%;
             padding: 10px;
             background-color: #fffbe9;
@@ -43,7 +44,7 @@
         }
 
         .search-bar input:focus,
-        .search-bar select:focus {
+        .filter-bar select:focus {
             border: 2px solid #94693e;
             outline: none;
         }
@@ -53,7 +54,7 @@
             font-style: italic;
 }
 
-        .search-bar select {
+        .filter-bar select {
             font-size: 14px;
             color: #380c0c;
             cursor: pointer;
@@ -64,8 +65,7 @@
             background-size: 20px;
         }
 
-
-        .search-bar button {
+        .button-container button{
             width: 100%;
             padding: 12px;
             background-color: #dccbb7;
@@ -78,7 +78,7 @@
             transition: transform 0.2s ease;
         }    
             
-        .search-bar button:hover {
+        .button-container button:hover {
             background-color: #d4bfae;
             transform: scale(1.05);
             box-shadow: 0px 8px 15px rgba(255, 163, 71, 0.2);
@@ -91,37 +91,47 @@
         <h1>SEARCH CAT PROFILE</h1>
         
         <form action="/cat_list" method="get">
-            <div class="search-bar">
+    
+            <div class="form-container">
 
-                <label for="name">Search by name:</label> 
-                <input type="text" id="name" name="name" placeholder="e.g., Tom, Bubble" /> 
+                <div class="search-bar">
+                    <label for="name">Search by name:</label> 
+                    <input type="text" id="name" name="name" placeholder="e.g., Tom, Bubble" /> 
+                </div>   
                 
-                <label for="gender">Filter by gender:</label>
-                <select id="gender" name="gender">
-                    <option value="">Select gender</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Not sure">Not sure</option>
-                </select>
+                <div class="filter-bar">
+                    <label for="gender">Filter by gender:</label>
+                    <select id="gender" name="gender">
+                        <option value="">Select gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Not sure">Not sure</option>
+                    </select>
 
-                <label for="color">Filter by color:</label>
-                <select id="color" name="color">
-                    <option value="">Select color</option>
-                    <option value="Black">Black</option>
-                    <option value="White">White</option>
-                    <option value="Brown">Brown</option>
-                    <option value="Gray(Blue)">Gray (Blue)</option>
-                    <option value="Orange(Ginger)">Orange (Ginger)</option>
-                    <option value="Calico">Calico</option>
-                    <option value="Tortoiseshell">Tortoiseshell</option>
-                    <option value="Tabby">Tabby</option>
-                    <option value="Cream">Cream</option>
-                    <option value="Silver">Silver</option>
-                    <option value="Other">Other</option>
-                </select>
- 
-                <button type="submit">🐾Go🐾</button>    
+                    <label for="color">Filter by color:</label>
+                    <select id="color" name="color">
+                        <option value="">Select color</option>
+                        <option value="Black">Black</option>
+                        <option value="White">White</option>
+                        <option value="Brown">Brown</option>
+                        <option value="Gray(Blue)">Gray (Blue)</option>
+                        <option value="Orange(Ginger)">Orange (Ginger)</option>
+                        <option value="Calico">Calico</option>
+                        <option value="Tortoiseshell">Tortoiseshell</option>
+                        <option value="Tabby">Tabby</option>
+                        <option value="Cream">Cream</option>
+                        <option value="Silver">Silver</option>
+                        <option value="Other">Other</option>
+                    </select>
+                 </div>
+    
+                 <div class="button-container">
+                    <button type="submit">🐾Go🐾</button> 
+                </div>
+
             </div>
+           
+
         </form>    
 
 
