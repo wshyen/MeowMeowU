@@ -38,12 +38,12 @@ def login():
 
     return render_template('login.html')
 
-@app.route('/simulate_login') #LATER NEED TO DELETE 
-def simulate_login():
-    session['user'] = 'test_user'  #Simulate a logged-in user
-    print(f"DEBUG: Simulated login as {session['user']}")  #Debugging log
-    flash("Simulated login successful! You are logged in as test_user.", "success")
-    return redirect(url_for('view_profiles'))  #Redirect to view profiles page
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash('You have been logged out.', 'success')
+    return redirect(url_for('login'))
+
 
 def get_db_connection():
     conn = sqlite3.connect('cat_profiles.db')  #Creates a connection to the database cat_profiles.db
@@ -81,8 +81,7 @@ def view_profiles(): #View all cat profiles
 def create_profile():
     if not session.get('user'): #Ensure only logged in users can create profile
         flash("You must be logged in to create a profile. Please log in.", "error")
-        return redirect(url_for('simulate_login')) #Sends user back to login page 
-        #NEED TO CHANGE THE URL 
+        return redirect(url_for('login')) #Sends user back to login page 
 
     if request.method == 'GET': 
         return render_template('createprofile.html')
@@ -168,9 +167,8 @@ def create_profile():
 @app.route('/profiles/<int:id>/edit', methods=['GET', 'POST'])
 def edit_profile(id):
     if not session.get('user'): #Ensure only logged in users can edit profile
-        flash("You must be logged in to edit a profile. Please log in", "error")
-        return redirect(url_for('simulate_login')) #Sends user back to login page 
-        #NEED TO CHANGE THE URL
+        flash("You must be logged in to edit a profile. Please log in.", "error")
+        return redirect(url_for('login')) #Sends user back to login page 
 
     with get_db_connection() as conn: #Connect to the database to retrieve the profile information
         profile = conn.execute('SELECT * FROM profiles WHERE id = ?', (id,)).fetchone() #Get the cat profile with the matching ID
@@ -244,10 +242,9 @@ def edit_profile(id):
 
 @app.route('/profiles/remove_picture/<int:id>', methods=['POST'])
 def remove_profile_picture(id):
-    if not session.get('user'): #Ensure only logged in users can create profile
-        flash("You must be logged in to create a profile. Please log in.", "error")
-        return redirect(url_for('simulate_login')) #Sends user back to login page 
-        #NEED TO CHANGE THE URL
+    if not session.get('user'): #Ensure only logged in users can remove profile picture of a profile
+        flash("You must be logged in to remove profile picture of a profile. Please log in.", "error")
+        return redirect(url_for('login')) #Sends user back to login page 
 
     with get_db_connection() as conn:
         profile = conn.execute('SELECT * FROM profiles WHERE id = ?', (id,)).fetchone()
@@ -272,7 +269,7 @@ def remove_profile_picture(id):
 def delete_profile(id):
     if not session.get('user'): #Ensure only logged in users can delete profile
         flash("You must be logged in to delete a profile.", "error")
-        return redirect(url_for('simulate_login')) #Sends user back to login page
+        return redirect(url_for('login')) #Sends user back to login page
         #NEED TO CHANGE THE URL
 
     with get_db_connection() as conn:
