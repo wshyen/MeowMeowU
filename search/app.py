@@ -13,9 +13,9 @@ def get_db_connection():
 
 @app.route('/')
 def search():
-    return render_template("search-feature.html")
+    return render_template("search_feature.html")
 
-@app.route('/cat-list')
+@app.route('/cat_list')
 def cat_list():
     name = request.args.get("name", "").lower()
     gender = request.args.get("gender", "")
@@ -29,9 +29,11 @@ def cat_list():
     if name:
         query += " AND LOWER(name) LIKE ?"
         cat_filters.append(f"%{name}%")  #to find names containing the input 'name' anywhere in the text
-    if gender:
+
+    if gender != "Not sure" :
         query += " AND gender = ?"
         cat_filters.append(gender)
+        
     if color:
         query += " AND color = ?"
         cat_filters.append(color)
@@ -41,14 +43,14 @@ def cat_list():
     conn.close()
 
     if profiles:
-        return render_template("cat-list.html", profiles=profiles)
+        return render_template("cat_list.html", profiles=profiles)
     else:
-        return render_template("cat-list.html", message="No cats found matching your criteria.")
+        return render_template("cat_list.html", message="No cats found matching your criteria.")
 
 
  
-@app.route('/viewprofile')
-def view_profile():
+@app.route('/single_profile')
+def single_profile():
     name = request.args.get("name", "").lower()
     selected_cat = None
 
@@ -59,7 +61,7 @@ def view_profile():
     conn.close()
 
     if selected_cat:
-        return render_template("viewprofile.html", cat=selected_cat)
+        return render_template("single_profile.html", cat=selected_cat)
     
 if __name__ == '__main__':
     app.run(debug=True)
