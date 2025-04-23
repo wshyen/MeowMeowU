@@ -3,8 +3,8 @@
 {% block title %}Create Profile{% endblock %}
 
 {% block content %}
-{% if not session.get('user') %}
-    <div style="text-align: center; padding: 20px;">
+{% if not user.is_authenticated %}
+    <div style="text-align: center; padding: 20px; font-family:'Times New Roman', Times, serif;">
         <h2>Please log in to create a profile</h2>
         <a href="{{ url_for('auth.login') }}" style="padding: 10px 20px; background-color: #94693e; color: white; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px;">Login</a>
     </div>
@@ -23,7 +23,7 @@
     block { display: block; }
     .none { display: none; }
 </style>
-<div style="display: flex; justify-content: center; align-items: center; height: calc(100vh - 40px);">
+<div style="display: flex; justify-content: center; align-items: center;>
 
     <!-- display flash messages -->
     <div style="text-align: center; margin-bottom: 20px;">
