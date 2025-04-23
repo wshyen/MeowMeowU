@@ -1,0 +1,64 @@
+<html>
+    <head>
+        <title>{{ cat['name'] }}'s Profile</title>
+        <style>
+            body {
+            font-family: 'Times New Roman', Times, serif;
+            background-color: #f2eadf;
+            display: flex;
+            flex-direction: column; 
+            justify-content: flex-start;
+            align-items: center;
+            height: 100vh;
+        }
+
+        h1 {
+            color: #94693e;
+            text-align: center;
+            font-size: 36px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #6b4f2f;
+        }
+
+        .profile-container {
+            padding: 30px;
+            background-color: #fffbe9;
+            border-radius: 12px;
+            width: 80%;
+            max-width: 500px;
+            height: 90%;
+            text-align: center;
+            flex-direction: column;
+        }
+
+        .profile-picture {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .profile-container p {
+            color: #6b4f2f;
+        }
+
+        </style>
+    </head>
+
+    <body>
+        <h1>{{ cat['name'] }}'s Profile</h1>
+
+        <div class="profile-container">
+            <img class="profile-picture" src="{{ url_for('static', filename='uploads/' + cat['photo']) if cat['photo'] else url_for('static', filename='uploads/default.png') }}" alt="{{ cat['name'] }}">
+            <h2>Personal information</h2>
+            <p><strong>Name: </strong>{{ cat.name }}</p>
+            <p><strong>Gender: </strong>{{ cat.gender }}</p>
+            <p><strong>Color: </strong>{{ cat.color }}</p>
+            <p><strong>Description: </strong>{{ cat.description }}</p>
+        </div>
+    </body>
+</html>
