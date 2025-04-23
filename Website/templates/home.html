@@ -1,4 +1,4 @@
-{% extends "base.html" %} 
+{% extends "base.html" %}
 {% block title %}Home{% endblock %}
 
 {% block content %}
@@ -6,23 +6,36 @@
     body {background-color: #f2eadf;font-family: 'Times New Roman', serif;color: rgb(78, 68, 57);}
 
     .about-section {max-width: 800px;margin: 60px auto;padding: 40px;background-color: #fff7ec;
-        border-radius: 10px;box-shadow: 0 0 10px rgba(0,0,0,0.05);}
+        border-radius: 10px;box-shadow: 0 0 10px rgba(0,0,0,0.05);
+        display: flex;align-items: center;}
 
-    h3 {text-align: center;margin-bottom: 25px;}
+    .text {flex: 1;margin-right: 20px;}
+
+    .photo img {max-width: 300px;height: auto;border-radius: 10px;}
+
+    h2 {text-align: center;margin-bottom: 25px;}
 </style>
 
 <div class="about-section">
-    <h3><b>About MeowMeow U</b></h3>
-    <p>
-        Campus Cats is a fun and engaging platform for students to share their love for the cats roaming around campus.
-        Here, you can upload photos or videos of cats you’ve spotted, create unique profiles for them, and interact with fellow cat enthusiasts.
-    </p>
-    <p>
-        Whether it’s giving a cat a name, voting in art and meme contests, or simply commenting on a cute post — this site is built for students to connect through their shared love of campus cats.
-    </p>
-    <p>
-        You can also report cat-related incidents (like stealing snacks or being a little too curious), and browse through searchable cat profiles to get to know your feline neighbors.
-        Join the community, earn badges, and help create a cat-friendly campus environment!
-    </p>
+    <!-- Text content -->
+    <div class="text">
+        <h2><b>About MeowMeow U</b></h2>
+        <p>
+            Campus Cats is a fun and engaging platform for students to share their love for the cats roaming around campus.
+            Here, you can upload photos or videos of cats you’ve spotted, create unique profiles for them, and interact with fellow cat enthusiasts.
+        </p>
+        <p>
+            Whether it’s giving a cat a name, voting in art and meme contests, or simply commenting on a cute post — this site is built for students to connect through their shared love of campus cats.
+        </p>
+        <p>
+            You can also report cat-related incidents (like stealing snacks or being a little too curious), and browse through searchable cat profiles to get to know your feline neighbors.
+            Join the community, earn badges, and help create a cat-friendly campus environment!
+        </p>
+    </div>
+
+    <!-- Image section -->
+    <div class="photo">
+        <img src="static/Images/home.image.jpeg" alt="MeowMeow U Photo">
+    </div>
 </div>
 {% endblock %}
