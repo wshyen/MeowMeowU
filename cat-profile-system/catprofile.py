@@ -167,7 +167,7 @@ def create_profile():
 
 @app.route('/profiles/<int:id>/edit', methods=['GET', 'POST'])
 def edit_profile(id):
-    if not session.get('user'): #Ensure only logged in users can create profile
+    if not session.get('user'): #Ensure only logged in users can edit profile
         flash("You must be logged in to edit a profile. Please log in", "error")
         return redirect(url_for('simulate_login')) #Sends user back to login page 
         #NEED TO CHANGE THE URL
@@ -179,11 +179,11 @@ def edit_profile(id):
         flash('Cat Profile not found.', 'error') #Display error message to user if no profile is found
         return redirect(url_for('view_profiles')) #Sends user back to the profile list page
 
-    profile = dict(profile)  # Convert sqlite3.Row to dictionary
-    if not profile['photo']:  # Provide a fallback if photo is missing
-        photo_display = "uploads/default.png"  # Use a default placeholder image
+    profile = dict(profile)  #Convert sqlite3.Row to dictionary
+    if not profile['photo']:  #Provide a fallback if photo is missing
+        photo_display = "uploads/default.png"  #Use a default placeholder image
     else:
-        photo_display = f"uploads/{profile['photo']}"  # Ensure the path includes 'uploads'
+        photo_display = f"uploads/{profile['photo']}"  #Ensure the path includes 'uploads'
 
     if request.method == 'POST':
         name = request.form.get('name', profile['name']).strip().capitalize()
@@ -244,6 +244,11 @@ def edit_profile(id):
 
 @app.route('/profiles/remove_picture/<int:id>', methods=['POST'])
 def remove_profile_picture(id):
+    if not session.get('user'): #Ensure only logged in users can create profile
+        flash("You must be logged in to create a profile. Please log in.", "error")
+        return redirect(url_for('simulate_login')) #Sends user back to login page 
+        #NEED TO CHANGE THE URL
+
     with get_db_connection() as conn:
         profile = conn.execute('SELECT * FROM profiles WHERE id = ?', (id,)).fetchone()
 
@@ -265,9 +270,10 @@ def remove_profile_picture(id):
 
 @app.route('/profiles/<int:id>/delete', methods=['POST'])
 def delete_profile(id):
-    if not session.get('user'): #Ensure only logged in users can create profile
-        flash("You must be logged in to create a profile.", "error")
-        return redirect(url_for('view_profiles')) #Sends user back to profile list page
+    if not session.get('user'): #Ensure only logged in users can delete profile
+        flash("You must be logged in to delete a profile.", "error")
+        return redirect(url_for('simulate_login')) #Sends user back to login page
+        #NEED TO CHANGE THE URL
 
     with get_db_connection() as conn:
         profile = conn.execute('SELECT * FROM profiles WHERE id = ?', (id,)).fetchone()
@@ -279,7 +285,7 @@ def delete_profile(id):
     #Check if the current user is the creator of the profile
     if profile['creator'] != session['user']:
         flash("You are not authorized to delete this profile.", "error")
-        return redirect(url_for('view_profiles'))  # Sends user back to the profile list page
+        return redirect(url_for('view_profiles'))  #Sends user back to the profile list page
 
     if profile['photo'] and os.path.exists(profile['photo']): #Delete the photo from the filesystem if it exists
         os.remove(profile['photo'])
