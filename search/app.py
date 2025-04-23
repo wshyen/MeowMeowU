@@ -6,7 +6,7 @@ app = Flask(__name__, static_folder='../cat-profile-system/static', static_url_p
 
 def get_db_connection():
     db_path = os.path.join(os.path.dirname(__file__), '..', 'cat-profile-system', 'cat_profiles.db')
-    db_path = os.path.abspath(db_path)
+    db_path = os.path.abspath(db_path) 
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     return conn
@@ -30,14 +30,15 @@ def cat_list():
         query += " AND LOWER(name) LIKE ?"
         cat_filters.append(f"%{name}%")  #to find names containing the input 'name' anywhere in the text
 
-    if gender != "Not sure" :
+    if gender and gender != "Not sure":
         query += " AND gender = ?"
         cat_filters.append(gender)
+
         
     if color:
         query += " AND color = ?"
         cat_filters.append(color)
-    
+
     cursor.execute(query, cat_filters)
     profiles = cursor.fetchall()
     conn.close()
@@ -62,6 +63,7 @@ def single_profile():
 
     if selected_cat:
         return render_template("single_profile.html", cat=selected_cat)
+    
     
 if __name__ == '__main__':
     app.run(debug=True)
