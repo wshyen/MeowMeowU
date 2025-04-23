@@ -57,7 +57,15 @@
     <body>
         <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgb(176, 148, 119);">
             <a class="nav-item nav-link" style="font-family: 'Times New Roman'; color: white; font-size: 19px;" href="/">Home</a>
-        
+            
+            <div class="dropdown">
+                <a href="#" class="nav-link">Cat Profile</a>
+                <div class="dropdown-menu">
+                    <a href="{{ url_for('view_profiles') }}">View Cat Profiles</a>
+                    <a href="{{ url_for('create_profile') }}">Create A Cat Profile</a>
+                </div>
+            </div>            
+
             <div class="ml-auto d-flex align-items-center">
                 <div class="dropdown">
                     <button class="dropbtn">
