@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy #SQLAlchemy is used for database operati
 from os import path #path is used for file system checks
 from flask_login import LoginManager
 from flask_migrate import Migrate
+import os
 
 db = SQLAlchemy() #initialize SQLAlchemy instance for database handling
 DB_NAME = "datebase.db" #name the file
