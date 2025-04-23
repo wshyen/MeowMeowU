@@ -11,7 +11,7 @@
     .dropdown {position: relative;display: inline-block;margin-left: auto;}
 
     .dropbtn {background-color: transparent;border: none;
-        cursor: pointer;padding: 6px;margin-left: -90px;}
+        cursor: pointer;padding: 6px; margin-left: -90px;}
 
     .dropbtn i {color: white;font-size: 20px;
         background-color: #ffffff22;padding: 8px;border-radius: 50%;
@@ -32,11 +32,11 @@
 
     .dropdown:hover .dropdown-content {display: block;}
 
-    .navbar {display: flex;justify-content: space-between;align-items: center;}
+    .navbar {display: flex; justify-content: space-between;align-items: center; margin: 0 0 40px 0;}
 
-    .ml-auto {margin-left: auto !important;}
+    .ml-auto {margin-left: "auto !important;"}
 
-    body {background-color: #f9f4ef;}
+    body {background-color: #f9f4ef; margin: 0; padding: 0;}
 
     button:hover { background-color: rgb(158, 134, 106);transform: scale(1.1);border-radius: 5px;}
 
@@ -55,16 +55,18 @@
     </head>
 
     <body>
-        <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgb(176, 148, 119);">
+        <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgb(176, 148, 119); ">
             <a class="nav-item nav-link" style="font-family: 'Times New Roman'; color: white; font-size: 19px;" href="/">Home</a>
             
             <div class="dropdown">
-                <a href="#" class="nav-link">Cat Profile</a>
-                <div class="dropdown-menu">
-                    <a href="{{ url_for('view_profiles') }}">View Cat Profiles</a>
-                    <a href="{{ url_for('create_profile') }}">Create A Cat Profile</a>
+                <a class="nav-link" href="#" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"  style="font-family: 'Times New Roman'; color: white; font-size: 19px;">
+                    Cat Profile
+                </a>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                    <a class="dropdown-item"  style="color: rgb(176, 148, 119); font-family: 'Times New Roman', Times, serif;" href="{{ url_for('auth.view_profiles') }}">View Cat Profiles</a>
+                    <a class="dropdown-item"  style="color: rgb(176, 148, 119); font-family: 'Times New Roman', Times, serif;" href="{{ url_for('auth.create_profiles') }}">Create A Cat Profile</a>
                 </div>
-            </div>            
+            </div>                                    
 
             <div class="ml-auto d-flex align-items-center">
                 <div class="dropdown">
@@ -113,7 +115,7 @@
             {% endwith %}
         </div>
 
-        <div class="container">{% block content %}{% endblock %}</div>
+        <div class="container" >{% block content %}{% endblock %}</div>
 
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
@@ -125,5 +127,5 @@
         </script>
 
     </body>
-
+    
 </html>
