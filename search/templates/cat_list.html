@@ -29,6 +29,11 @@
             margin-bottom: 20px;
         }
 
+        .sort-container label {
+            color: #6b4f2f;
+            font-weight: bold;
+        }
+
         .sort-container select {
             padding: 10px 40px 10px 10px;
             cursor: pointer;
@@ -102,9 +107,12 @@
             <form method="GET" action="/cat_list">
                 <label for="sort">Sort by:</label>
                 <select name="sort" id="sort" onchange="this.form.submit()">
-                    <option value="name_asc">Name (A-Z)</option>
-                    <option value="name_desc">Name (Z-A)</option>
+                    <option value="name_asc" {% if request.args.get('sort') == 'name_asc' %}selected{% endif %}>Name (A-Z)</option>
+                    <option value="name_desc" {% if request.args.get('sort') == 'name_desc' %}selected{% endif %}>Name (Z-A)</option>
                 </select>
+                <input type="hidden" name="name" value="{{ request.args.get('name', '') }}">
+                <input type="hidden" name="gender" value="{{ request.args.get('gender', '') }}">
+                <input type="hidden" name="color" value="{{ request.args.get('color', '') }}">
             </form>
         </div>
 

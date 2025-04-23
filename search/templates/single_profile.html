@@ -46,6 +46,25 @@
             color: #6b4f2f;
         }
 
+        .back-button {
+                margin-top: 20px;
+                padding: 10px 20px;
+                background-color: #dccbb7;
+                color: #6b4f2f;
+                font-weight: bold;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                text-align: center;
+                text-decoration: none;
+            }
+
+            .back-button:hover {
+                background-color: #d4bfae;
+                transform: scale(1.05);
+                box-shadow: 0px 8px 15px rgba(255, 163, 71, 0.2);
+            }
+
         </style>
     </head>
 
@@ -60,5 +79,8 @@
             <p><strong>Color: </strong>{{ cat.color }}</p>
             <p><strong>Description: </strong>{{ cat.description }}</p>
         </div>
+
+        <a href="/cat_list" class="back-button">Back</a>
+        
     </body>
 </html>

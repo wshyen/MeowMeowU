@@ -5,7 +5,7 @@ from flask import Flask, render_template, request
 app = Flask(__name__, static_folder='../cat-profile-system/static', static_url_path='/static')
 
 def get_db_connection():
-    db_path = os.path.join(os.path.dirname(__file__), '..', 'cat-profile-system', 'cat_profiles.db')
+    db_path = os.path.join(os.path.dirname(__file__), '..', 'instance', 'cat_profiles.db')
     db_path = os.path.abspath(db_path) 
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
@@ -68,13 +68,5 @@ def single_profile():
         return render_template("single_profile.html", cat=selected_cat)
     
     
-    
 if __name__ == '__main__':
-    # 调试：列出所有表名
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
-    print("📋 数据库中存在的表：", cursor.fetchall())
-    conn.close()
-
     app.run(debug=True)
