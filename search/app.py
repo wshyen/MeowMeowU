@@ -20,12 +20,13 @@ def cat_list():
     name = request.args.get("name", "").lower()
     gender = request.args.get("gender", "")
     color = request.args.get("color", "")
+    sort = request.args.get("sort") 
 
     conn = get_db_connection()
     cursor = conn.cursor()
     query = "SELECT * FROM profiles WHERE 1=1"
     cat_filters = [] 
-
+    
     if name:
         query += " AND LOWER(name) LIKE ?"
         cat_filters.append(f"%{name}%")  #to find names containing the input 'name' anywhere in the text
@@ -38,6 +39,11 @@ def cat_list():
         query += " AND color = ?"
         cat_filters.append(color)
 
+    if sort == "name_asc":
+        query += " ORDER BY name ASC"
+    elif sort == "name_desc":
+        query += " ORDER BY name DESC"
+
     cursor.execute(query, cat_filters)
     profiles = cursor.fetchall()
     conn.close()
@@ -46,8 +52,6 @@ def cat_list():
         return render_template("cat_list.html", profiles=profiles)
     else:
         return render_template("cat_list.html", message="No cats found matching your criteria.")
-
-
  
 @app.route('/single_profile')
 def single_profile():
@@ -64,5 +68,13 @@ def single_profile():
         return render_template("single_profile.html", cat=selected_cat)
     
     
+    
 if __name__ == '__main__':
+    # 调试：列出所有表名
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    print("📋 数据库中存在的表：", cursor.fetchall())
+    conn.close()
+
     app.run(debug=True)
