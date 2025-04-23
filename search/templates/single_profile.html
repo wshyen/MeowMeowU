@@ -20,6 +20,10 @@
             margin-bottom: 20px;
         }
 
+        h2 {
+            color: #6b4f2f;
+        }
+
         .profile-container {
             padding: 30px;
             background-color: #fffbe9;
@@ -50,8 +54,10 @@
 
         <div class="profile-container">
             <img class="profile-picture" src="{{ url_for('static', filename='uploads/' + cat['photo']) if cat['photo'] else url_for('static', filename='uploads/default.png') }}" alt="{{ cat['name'] }}">
+            <h2>Personal information</h2>
             <p><strong>Name: </strong>{{ cat.name }}</p>
             <p><strong>Gender: </strong>{{ cat.gender }}</p>
+            <p><strong>Color: </strong>{{ cat.color }}</p>
             <p><strong>Description: </strong>{{ cat.description }}</p>
         </div>
     </body>
