@@ -34,7 +34,6 @@ def cat_list():
         query += " AND gender = ?"
         cat_filters.append(gender)
 
-        
     if color:
         query += " AND color = ?"
         cat_filters.append(color)
