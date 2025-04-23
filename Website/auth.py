@@ -141,3 +141,11 @@ def reset_password():
             return redirect(url_for("auth.login"))
 
     return render_template("reset_password.html", user=current_user)
+
+@auth.route("/view_profiles", methods=["GET", "POST"])
+def view_profiles():
+    return render_template("viewprofile.html", user=current_user)
+
+@auth.route("/create_profiles", methods=["GET", "POST"])
+def create_profiles():
+    return render_template("createprofile.html", user=current_user)

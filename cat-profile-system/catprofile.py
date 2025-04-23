@@ -5,12 +5,13 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 #Redirect to send users to a different page, flash to show quick messages, session to remember things about users
 from werkzeug.utils import secure_filename #Helps secure file uploads, preventing unsafe filenames that can cause errors or security issues
 
-app = Flask(__name__) 
+app = Flask(__name__, instance_relative_config=True)
 app.secret_key = 'your_secret_key' #keeps messages and user data safe
 
 UPLOAD_FOLDER = 'static/uploads'
 ALLOWED_EXTENSIONS = {'png','jpg','jpeg'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['DATABASE'] = os.path.join(app.instance_path, 'cat_profiles.db')
 
 @app.route('/')
 def homepage():
@@ -46,7 +47,7 @@ def logout():
 
 
 def get_db_connection():
-    conn = sqlite3.connect('cat_profiles.db')  #Creates a connection to the database cat_profiles.db
+    conn = sqlite3.connect(app.config['DATABASE'])  
     conn.execute('PRAGMA journal_mode=WAL;')  #Activates Write-Ahead Logging (WAL) in SQLite, enabling simultaneous database reads while a process is writing, improving efficiency and synchronization
     conn.row_factory = sqlite3.Row  #Access rows as dictionaries
     return conn
