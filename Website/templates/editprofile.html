@@ -19,35 +19,36 @@
         background-repeat: no-repeat;
         background-position: right 10px center;
         background-size: 20px;
+        font-family: 'Times New Roman', Times, serif;
     }
     .block { display: block; } /*Class for visible elements*/
     .none { display: none; } /*Class for hidden element*/
 </style>
 <div style="display: flex; justify-content: center; align-items: center; height: calc(100vh - 40px);">
     <form action="{{ url_for('edit_profile', id=profile.id) }}" method="post" enctype="multipart/form-data" onsubmit="return validateProfileForm();" style="width: 500px; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9" onsubmit="return validateProfileForm();">
-        <h1 style="text-align: center; margin-bottom: 20px;">Edit Cat Profile</h1>
+        <h1 style="text-align: center; margin-bottom: 20px; font-family: 'Times New Roman', Times, serif;">Edit Cat Profile</h1>
         <div style="margin-bottom: 20px; text-align: center;">
             
             <!-- profile picture section -->
             <div style="width: 150px; height: 150px; border-radius: 50%; border: 2px solid #ddd; margin: 0 auto; position: relative; display: flex; justify-content: center; align-items: center; overflow: hidden;">
-                <p id="profilePictureText" style="margin: 0; font-size: 14px; color: #666; text-align: center; position: absolute; font-weight: bold;">Profile Picture Preview</p>
-                <img id="profilePicturePreview" src="{{ url_for('static', filename=photo_display) }}" alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover;">
+                <p id="profilePictureText" style="margin: 0; font-size: 14px; color: #666; text-align: center; position: absolute; font-weight: bold; font-family: 'Times New Roman', Times, serif;">Profile Picture Preview</p>
+                <img id="profilePicturePreview" src="{{ url_for('static', filename=photo_display) }}" alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover; font-family: 'Times New Roman', Times, serif;">
             </div>
             <br>
 
             <!-- file input to upload profile pic -->
-            <label for="profile_picture" style="display: block; font-weight: bold; margin-bottom: 5px;">Upload Profile Picture:</label>
-            <input type="file" id="profile_picture" name="profile_picture" accept="image/*" onchange="previewProfilePicture()" style="margin-bottom: 10px;">
+            <label for="profile_picture" style="display: block; font-weight: bold; margin-bottom: 5px; font-family: 'Times New Roman', Times, serif;">Upload Profile Picture:</label>
+            <input type="file" id="profile_picture" name="profile_picture" accept="image/*" onchange="previewProfilePicture()" style="margin-bottom: 10px; font-family: 'Times New Roman', Times, serif;">
             <br>
 
             <!-- button to remove upload pic -->
-            <button type="button" id="removePictureButton" class="{{ 'block' if profile.photo else 'none' }}" onclick="removeProfilePicture()" style="padding: 5px 10px; background-color: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer; margin: auto; display: block;">Remove</button>
+            <button type="button" id="removePictureButton" class="{{ 'block' if profile.photo else 'none' }}" onclick="removeProfilePicture()" style="padding: 5px 10px; background-color: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer; margin: auto; display: block; font-family: 'Times New Roman', Times, serif;">Remove</button>
         </div>
 
         <!-- name field disabled -->
         <div style="margin-bottom: 15px;">
-            <label for="name" style="display: inline-block; width: 150px; font-weight: bold;">Name:</label>
-            <input type="text" id="name" name="name" value="{{ profile.name }}" required disabled style="width: 300px; padding: 5px; border: 1px solid #ccc; border-radius: 5px;">
+            <label for="name" style="display: inline-block; width: 150px; font-weight: bold; font-family: 'Times New Roman', Times, serif;">Name:</label>
+            <input type="text" id="name" name="name" value="{{ profile.name }}" required disabled style="width: 300px; padding: 5px; border: 1px solid #ccc; border-radius: 5px; font-family: 'Times New Roman', Times, serif;">
             <input type="hidden" name="name" value="{{ profile.name }}">
         </div>
 
@@ -63,7 +64,7 @@
 
         <!-- color select dropdown -->
         <div style="margin-bottom: 15px;">
-            <label for="color" style="display: inline-block; width: 150px; font-weight: bold;">Color:</label>
+            <label for="color" style="display: inline-block; width: 150px; font-weight: bold; font-family: 'Times New Roman', Times, serif;">Color:</label>
             <select id="color" name="color" required style="width: 310px; padding: 5px; border: 1px solid #ccc; border-radius: 5px;">
                 <option value="Black" {% if profile.color == 'Black' %}selected{% endif %}>Black</option>
                 <option value="White" {% if profile.color == 'White' %}selected{% endif %}>White</option>
@@ -80,15 +81,15 @@
         </div>
         
         <!-- description field with character count -->
-        <div style="margin-bottom: 15px;">
-            <label for="description" style="display: inline-block; width: 150px; vertical-align: top; font-weight: bold;">Description:</label>
+        <div style="margin-bottom: 15px; font-family: 'Times New Roman', Times, serif;">
+            <label for="description" style="display: inline-block; width: 150px; vertical-align: top; font-weight: bold; font-family: 'Times New Roman', Times, serif;">Description:</label>
             <textarea id="description" name="description" rows="4" maxlength="250" style="width: 300px; height: 100px; padding: 5px; border: 1px solid #ccc; border-radius: 5px; font-family: 'Times New Roman', Times, serif; resize: none;">{{ profile.description }}</textarea>
-            <small id="charCount" style="display: block; font-size: 12px; color: gray;">0/250 characters</small>
+            <small id="charCount" style="display: block; font-size: 12px; color: gray; font-family: 'Times New Roman', Times, serif;">0/250 characters</small>
         </div>
 
         <!-- save changes button -->
         <div style="text-align: center;">
-            <button type="submit" style="padding: 10px 20px; background-color: #94693e; color: white; border: none; border-radius: 5px; cursor: pointer;">Save Changes</button>
+            <button type="submit" style="padding: 10px 20px; background-color: #94693e; color: white; border: none; border-radius: 5px; cursor: pointer; font-family: 'Times New Roman', Times, serif;">Save Changes</button>
         </div>
     </form>
 </div>
