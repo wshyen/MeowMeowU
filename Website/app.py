@@ -15,6 +15,10 @@ def get_db_connection():
 def search():
     return render_template("search_feature.html")
 
+@app.route('/search-feature')
+def search_feature():
+    return render_template('search/search_feature.html')
+
 @app.route('/cat_list')
 def cat_list():
     name = request.args.get("name", "").lower()
