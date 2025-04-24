@@ -58,6 +58,10 @@
         <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgb(176, 148, 119); ">
             <a class="nav-item nav-link" style="font-family: 'Times New Roman'; color: white; font-size: 19px;" href="/">Home</a>
             
+            <a class="nav-item nav-link" href="{{ url_for('search_feature') }}" style="color: white; font-size: 19px; margin-left: auto;">
+                <img src="{{ url_for('static', filename='Images/option 2.png') }}" alt="Search" style="width: 20px; height: 20px;">
+            </a>
+
             <div class="dropdown">
                 <a class="nav-link" href="#" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"  style="font-family: 'Times New Roman'; color: white; font-size: 19px;">
                     Cat Profile
@@ -66,7 +70,7 @@
                     <a class="dropdown-item"  style="color: rgb(176, 148, 119); font-family: 'Times New Roman', Times, serif;" href="{{ url_for('auth.view_profiles') }}">View Cat Profiles</a>
                     <a class="dropdown-item"  style="color: rgb(176, 148, 119); font-family: 'Times New Roman', Times, serif;" href="{{ url_for('auth.create_profiles') }}">Create A New Profile</a>
                 </div>
-            </div>                                    
+            </div> 
 
             <div class="ml-auto d-flex align-items-center">
                 <div class="dropdown">
