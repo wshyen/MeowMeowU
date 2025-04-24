@@ -3,10 +3,10 @@
 {% block title %}Create Profile{% endblock %}
 
 {% block content %}
-{% if not user.is_authenticated %}
-    <div style="text-align: center; padding: 20px; font-family:'Times New Roman', Times, serif;">
+{% if not session.get('user') %}
+    <div style="text-align: center; padding: 20px;">
         <h2>Please log in to create a profile</h2>
-        <a href="{{ url_for('auth.login') }}" style="padding: 10px 20px; background-color: #94693e; color: white; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px;">Login</a>
+        <a href="{{ url_for('login') }}" style="padding: 10px 20px; background-color: #94693e; color: white; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px;">Login</a>
     </div>
 {% else %}
 <style>
@@ -23,7 +23,7 @@
     block { display: block; }
     .none { display: none; }
 </style>
-<div style="display: flex; justify-content: center; align-items: center;>
+<div style="display: flex; justify-content: center; align-items: center; height: calc(100vh - 40px);">
 
     <!-- display flash messages -->
     <div style="text-align: center; margin-bottom: 20px;">
@@ -54,7 +54,7 @@
         {% endif %}
     {% endwith %}
 
-    <form action="{{ url_for('auth.create_profiles')}}" method="post" enctype="multipart/form-data" onsubmit="return confirmSubmission();" style="width: 500px; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9;">
+    <form action="{{ url_for('create_profile')}}" method="post" enctype="multipart/form-data" onsubmit="return confirmSubmission();" style="width: 500px; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9;">
         <h1 style="text-align: center; margin-bottom: 20px;">Create a New Cat Profile</h1>
         
         <!-- profile picture preview box -->
