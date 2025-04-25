@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Contest{% endblock %}
+
+{% block content %}
+<div style="padding: 20px;">
+    <h1>Create a New Contest</h1>
+    <form action="/create_contest" method="POST">
+        <input type="text" name="name" placeholder="Contest Name" required>
+        <textarea name="description" placeholder="Contest Description" required></textarea>
+        <input type="date" name="start_date" required>
+        <input type="date" name="end_date" required>
+        <input type="rules" name="rules & guidelines" placeholder="Rules & Guidelines" required>
+        <button type="submit">Create Contest</button>
+    </form>
+</div>
+{% endblock %}
