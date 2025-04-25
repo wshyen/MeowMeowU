@@ -1,7 +1,5 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for #Flask is a web framework that allows developers to build web applications
 import re
-import sqlite3
-import os
 from .models import User
 from . import db
 from werkzeug.security import generate_password_hash, check_password_hash #for password hashing and verification
@@ -151,72 +149,3 @@ def view_profiles():
 @auth.route("/create_profiles", methods=["GET", "POST"])
 def create_profiles():
     return render_template("createprofile.html", user=current_user)
-
-def get_db_connection():
-    db_path = os.path.join(os.path.dirname(__file__), '..', 'instance', 'cat_profiles.db')
-    db_path = os.path.abspath(db_path) 
-    conn = sqlite3.connect(db_path)
-    conn.row_factory = sqlite3.Row
-    return conn
-
-@auth.route('/search-feature')
-def search_feature():
-    return render_template('search_feature.html')
-
-@auth.route('/cat_list')
-def cat_list():
-    name = request.args.get("name", "").lower()
-    gender = request.args.get("gender", "")
-    color = request.args.get("color", "")
-    sort = request.args.get("sort")
-
-    print(f"Name: {name}, Gender: {gender}, Color: {color}, Sort: {sort}")
-
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    query = "SELECT * FROM profiles WHERE 1=1"
-    cat_filters = []
-
-    if name:
-        query += " AND LOWER(name) LIKE ?"
-        cat_filters.append(f"%{name}%")
-
-    if gender and gender != "Not sure":
-        query += " AND gender = ?"
-        cat_filters.append(gender)
-
-    if color:
-        query += " AND color = ?"
-        cat_filters.append(color)
-
-    if sort == "name_asc":
-        query += " ORDER BY name ASC"
-    elif sort == "name_desc":
-        query += " ORDER BY name DESC"
-
-    cursor.execute(query, cat_filters)
-    profiles = cursor.fetchall()
-    conn.close()
-
-    if profiles:
-        return render_template("cat_list.html", profiles=profiles)
-    else:
-        return render_template("cat_list.html", message="No cats found matching your criteria.")
-
- 
-@auth.route('/single_profile')
-def single_profile():
-    name = request.args.get("name", "").lower()
-    selected_cat = None
-
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM profiles WHERE LOWER(name) = ?", (name.lower(),))
-    selected_cat = cursor.fetchone()
-    conn.close()
-
-    if selected_cat:
-        return render_template("single_profile.html", cat=selected_cat)
-    
-    
