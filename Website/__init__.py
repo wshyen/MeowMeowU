@@ -18,10 +18,12 @@ def create_app(): #a function to create and configure the Flask app
     
     from .views import views #import views and auth Blueprint, views handle general routes and auth handle authentication routes
     from .auth import auth
+    from .search import search_bp
 
     #register Blueprints with the app
     app.register_blueprint(views, urlprefix="/")
     app.register_blueprint(auth, urlprefix="/")
+    app.register_blueprint(search_bp, urlprefix="/")
 
     from .models import User, Note #import this to make sure models.py file run before we initialize database
 
