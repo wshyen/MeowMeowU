@@ -149,3 +149,4 @@ def view_profiles():
 @auth.route("/create_profiles", methods=["GET", "POST"])
 def create_profiles():
     return render_template("createprofile.html", user=current_user)
+

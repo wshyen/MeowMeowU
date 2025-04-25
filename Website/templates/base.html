@@ -2,134 +2,171 @@
 <html>
 
 <style>
-    a:hover {background-color: #f2eadf;border-radius: 5px;}
+    a:hover {
+        background-color: #f2eadf;
+        border-radius: 5px;
+    }
 
-    .nav-link:hover {color: rgb(176, 148, 119) !important;font-family: Courier !important;}
+    .nav-link:hover {
+        color: rgb(176, 148, 119) !important;
+        font-family: Courier !important;
+    }
 
-    .flash-container {font-family: 'Times New Roman';}
+    .flash-container {
+        font-family: 'Times New Roman';
+    }
 
-    .dropdown {position: relative;display: inline-block;margin-left: auto;}
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
 
-    .dropbtn {background-color: transparent;border: none;
-        cursor: pointer;padding: 6px; margin-left: -90px;}
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: white !important;
+        min-width: 160px;
+        box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+        text-align: center;
+        border-radius: 4px;
+        left: 0;
+        right: auto;
+    }
 
-    .dropbtn i {color: white;font-size: 20px;
-        background-color: #ffffff22;padding: 8px;border-radius: 50%;
-        transition: background-color 0.3s ease;}
+    .dropdown-content a {
+        color: rgb(176, 148, 119);
+        padding: 10px 15px;
+        text-decoration: none;
+        display: block;
+        font-family: 'Times New Roman';
+    }
 
-    .dropbtn i:hover {background-color: transparent;}
+    .dropdown-content a:hover {
+        background-color: #f2f2f2;
+        text-decoration: none;
+        color: rgb(78, 68, 57);
+        font-family: Courier !important;
+        font-size: 15px;
+    }
 
-    .dropdown-content {display: none;position: absolute;margin-left: -150px;
-        background-color: white !important;min-width: 160px;
-        box-shadow: 0px 8px 16px rgba(0,0,0,0.2);z-index: 1;
-        text-align: center;border-radius: 4px;left: 0;right: auto;}
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
 
-    .dropdown-content a {color: rgb(176, 148, 119);padding: 10px 15px;
-        text-decoration: none;display: block;font-family: 'Times New Roman';}
+    .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 
-    .dropdown-content a:hover {background-color: #f2f2f2;text-decoration: none;
-        color: rgb(78, 68, 57);font-family: Courier !important;}
+    .ml-auto {
+        margin-left: auto !important;
+    }
 
-    .dropdown:hover .dropdown-content {display: block;}
+    body {
+        background-color: #f9f4ef;
+    }
 
-    .navbar {display: flex; justify-content: space-between;align-items: center; margin: 0 0 40px 0;}
+    button:hover {
+        background-color: rgb(158, 134, 106);
+        transform: scale(1.1);
+        border-radius: 5px;
+    }
 
-    .ml-auto {margin-left: "auto !important;"}
-
-    body {background-color: #f9f4ef; margin: 0; padding: 0;}
-
-    button:hover { background-color: rgb(158, 134, 106);transform: scale(1.1);border-radius: 5px;}
+    .alert {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
 
 </style>
 
-    <head>
-        <meta charset="utf-8"/>
-        <meta name="viewpoint" content="width=device-width, initial-scale=1"> <!--makes the webpage responsive based on the device's screen size-->
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" 
-        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
-        crossorigin="anonymous"/> <!--link to bootstrap for css styling-->
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
-        crossorigin="anonymous"/> 
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewpoint" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+          crossorigin="anonymous" />
 
-        <title>{% block title %}Home{% endblock %}</title> <!--title section that can be changed in other templates-->
-    </head>
+    <title>{% block title %}Home{% endblock %}</title>
+</head>
 
-    <body>
-        <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgb(176, 148, 119); ">
-            <a class="nav-item nav-link" style="font-family: 'Times New Roman'; color: white; font-size: 19px;" href="/">Home</a>
-            
-            <a class="nav-item nav-link" href="{{ url_for('search.search_feature') }}" style="color: white; font-size: 19px; margin-left: auto;">
-                <img src="{{ url_for('static', filename='Images/option2.png') }}" alt="Search" style="width: 30px; height: 30px;">
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgb(176, 148, 119);">
+    <a class="nav-item nav-link" style="font-family: 'Times New Roman'; color: white; font-size: 19px;" href="/">Home</a>
+
+    <div class="dropdown nav-item">
+        <a class="nav-link" href="#" id="dropdownMenuLink" aria-haspopup="true" aria-expanded="false"
+           style="font-family: 'Times New Roman'; color: white; font-size: 19px;">
+            Cat Profiles
+        </a>
+        <div class="dropdown-content">
+            <a class="dropdown-item" href="{{ url_for('auth.view_profiles') }}">View Cat Profiles</a>
+            <a class="dropdown-item" href="{{ url_for('auth.create_profiles') }}">Create A New Profile</a>
+        </div>
+    </div>
+
+    <a class="nav-item nav-link" href="{{ url_for('search.search_feature') }}" style="color: white; font-size: 19px;">
+        <img src="{{ url_for('static', filename='Images/option2.png') }}" alt="Search" style="width: 30px; height: 30px;">
+    </a>
+
+    <div class="ml-auto d-flex align-items-center">
+        <div class="dropdown">
+            <a class="nav-link" href="#" aria-haspopup="true" aria-expanded="false" style="color: white; font-size: 19px;">
+                <i class="fa fa-user" aria-hidden="true"></i>
             </a>
-
-            <div class="dropdown">
-                <a class="nav-link" href="#" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"  style="font-family: 'Times New Roman'; color: white; font-size: 19px;">
-                    Cat Profile
-                </a>
-                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                    <a class="dropdown-item"  style="color: rgb(176, 148, 119); font-family: 'Times New Roman', Times, serif;" href="{{ url_for('auth.view_profiles') }}">View Cat Profiles</a>
-                    <a class="dropdown-item"  style="color: rgb(176, 148, 119); font-family: 'Times New Roman', Times, serif;" href="{{ url_for('auth.create_profiles') }}">Create A New Profile</a>
-                </div>
-            </div> 
-
-            <div class="ml-auto d-flex align-items-center">
-                <div class="dropdown">
-                    <button class="dropbtn">
-                        <i class="fa fa-user" aria-hidden="true"></i>
-                    </button>
-                    <div class="dropdown-content">
-                        {% if user.is_authenticated %}
-                            <a href="{{ url_for('auth.user_profile') }}">User Profile</a>
-                            <a href="{{ url_for('auth.change_password') }}">Change Password</a>
-                            <a href="{{ url_for('auth.logout') }}">Logout</a>
-                        {% else %}
-                            <a href="{{ url_for('auth.sign_up') }}">Sign Up</a>
-                            <a href="{{ url_for('auth.login') }}">Login</a>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </nav>
-        
-        <div class="flash-container">
-            {% with messages = get_flashed_messages(with_categories = true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                {% if category == "error" %}
-            
-                <div class="alert alert-danger alert-dismissable fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="close" data-dismiss="alert" onclick="this.parentElement.style.display='none';">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-
+            <div class="dropdown-content" style="margin-left: -100px;">
+                {% if user.is_authenticated %}
+                    <a href="{{ url_for('auth.user_profile') }}">User Profile</a>
+                    <a href="{{ url_for('auth.change_password') }}">Change Password</a>
+                    <a href="{{ url_for('auth.logout') }}">Logout</a>
                 {% else %}
-
-                <div class="alert alert-success alert-dismissable fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="close" date-dismiss="alert" onclick="this.parentElement.style.display='none';">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-
+                    <a href="{{ url_for('auth.sign_up') }}">Sign Up</a>
+                    <a href="{{ url_for('auth.login') }}">Login</a>
                 {% endif %}
-                {% endfor %}
-            {% endif %}
-            {% endwith %}
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="flash-container">
+    {% with messages = get_flashed_messages(with_categories = true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+        {% if category == "error" %}
+    
+        <div class="alert alert-danger alert-dismissable fade show" role="alert">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" onclick="this.parentElement.style.display='none';">
+                <span aria-hidden="true">&times;</span>
+            </button>
         </div>
 
-        <div class="container" >{% block content %}{% endblock %}</div>
+        {% else %}
 
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+        <div class="alert alert-success alert-dismissable fade show" role="alert">
+            {{ message }}
+            <button type="button" class="close" date-dismiss="alert" onclick="this.parentElement.style.display='none';">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
 
-        <script>
-            setTimeout(() => {
-            $(".alert").alert("close");
-            }, 5000);
-        </script>
+        {% endif %}
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+</div>
 
-    </body>
+<div class="container">{% block content %}{% endblock %}</div>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+
+<script>
+    setTimeout(() => {
+        $(".alert").alert("close");
+    }, 5000);
+</script>
+
+</body>
 </html>
