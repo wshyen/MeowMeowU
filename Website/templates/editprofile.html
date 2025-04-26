@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Cat Profile{% endblock %}
+
+{% block content %}
+{% if not session.get('user') %}
+    <div style="text-align: center; padding: 20px;">
+        <h2>Please log in to Edit a profile</h2>
+        <a href="{{ url_for('login') }}" style="padding: 10px 20px; background-color: #94693e; color: white; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px;">Login</a>
+    </div>
+{% else %}
+<style>
+    body {
+        background-color: #f2eadf;
+    }
+    select {
+        appearance: none; /*Remove default dropdown arrow*/
+        background-image: url('{{ url_for("static", filename="cat_paws_icon.png") }}');
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 20px;
+        font-family: 'Times New Roman', Times, serif;
+    }
+    .block { display: block; } /*Class for visible elements*/
+    .none { display: none; } /*Class for hidden element*/
+</style>
+<div style="display: flex; justify-content: center; align-items: center; height: calc(100vh - 40px);">
+    <form action="{{ url_for('edit_profile', id=profile.id) }}" method="post" enctype="multipart/form-data" onsubmit="return validateProfileForm();" style="width: 500px; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9" onsubmit="return validateProfileForm();">
+        <h1 style="text-align: center; margin-bottom: 20px; font-family: 'Times New Roman', Times, serif;">Edit Cat Profile</h1>
+        <div style="margin-bottom: 20px; text-align: center;">
+            
+            <!-- profile picture section -->
+            <div style="width: 150px; height: 150px; border-radius: 50%; border: 2px solid #ddd; margin: 0 auto; position: relative; display: flex; justify-content: center; align-items: center; overflow: hidden;">
+                <p id="profilePictureText" style="margin: 0; font-size: 14px; color: #666; text-align: center; position: absolute; font-weight: bold; font-family: 'Times New Roman', Times, serif;">Profile Picture Preview</p>
+                <img id="profilePicturePreview" src="{{ url_for('static', filename=photo_display) }}" alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover; font-family: 'Times New Roman', Times, serif;">
+            </div>
+            <br>
+
+            <!-- file input to upload profile pic -->
+            <label for="profile_picture" style="display: block; font-weight: bold; margin-bottom: 5px; font-family: 'Times New Roman', Times, serif;">Upload Profile Picture:</label>
+            <input type="file" id="profile_picture" name="profile_picture" accept="image/*" onchange="previewProfilePicture()" style="margin-bottom: 10px; font-family: 'Times New Roman', Times, serif;">
+            <br>
+
+            <!-- button to remove upload pic -->
+            <button type="button" id="removePictureButton" class="{{ 'block' if profile.photo else 'none' }}" onclick="removeProfilePicture()" style="padding: 5px 10px; background-color: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer; margin: auto; display: block; font-family: 'Times New Roman', Times, serif;">Remove</button>
+        </div>
+
+        <!-- name field disabled -->
+        <div style="margin-bottom: 15px;">
+            <label for="name" style="display: inline-block; width: 150px; font-weight: bold; font-family: 'Times New Roman', Times, serif;">Name:</label>
+            <input type="text" id="name" name="name" value="{{ profile.name }}" required disabled style="width: 300px; padding: 5px; border: 1px solid #ccc; border-radius: 5px; font-family: 'Times New Roman', Times, serif;">
+            <input type="hidden" name="name" value="{{ profile.name }}">
+        </div>
+
+        <!-- gender select dropdown -->
+        <div style="margin-bottom: 15px;">
+            <label for="gender" style="display: inline-block; width: 150px; font-weight: bold;">Gender:</label>
+            <select id="gender" name="gender" required style="width: 310px; padding: 5px; border: 1px solid #ccc; border-radius: 5px;">
+                <option value="Male" {% if profile.gender == 'Male' %}selected{% endif %}>Male</option>
+                <option value="Female" {% if profile.gender == 'Female' %}selected{% endif %}>Female</option>
+                <option value="Not sure" {% if profile.gender == 'Not sure' %}selected{% endif %}>Not sure</option>
+            </select>
+        </div>
+
+        <!-- color select dropdown -->
+        <div style="margin-bottom: 15px;">
+            <label for="color" style="display: inline-block; width: 150px; font-weight: bold; font-family: 'Times New Roman', Times, serif;">Color:</label>
+            <select id="color" name="color" required style="width: 310px; padding: 5px; border: 1px solid #ccc; border-radius: 5px;">
+                <option value="Black" {% if profile.color == 'Black' %}selected{% endif %}>Black</option>
+                <option value="White" {% if profile.color == 'White' %}selected{% endif %}>White</option>
+                <option value="Brown" {% if profile.color == 'Brown' %}selected{% endif %}>Brown</option>
+                <option value="Gray(Blue)" {% if profile.color == 'Gray(Blue)' %}selected{% endif %}>Gray (Blue)</option>
+                <option value="Orange(Ginger)" {% if profile.color == 'Orange(Ginger)' %}selected{% endif %}>Orange (Ginger)</option>
+                <option value="Calico" {% if profile.color == 'Calico' %}selected{% endif %}>Calico</option>
+                <option value="Tortoiseshell" {% if profile.color == 'Tortoiseshell' %}selected{% endif %}>Tortoiseshell</option>
+                <option value="Tabby" {% if profile.color == 'Tabby' %}selected{% endif %}>Tabby</option>
+                <option value="Cream" {% if profile.color == 'Cream' %}selected{% endif %}>Cream</option>
+                <option value="Silver" {% if profile.color == 'Silver' %}selected{% endif %}>Silver</option>
+                <option value="Other" {% if profile.color == 'Other' %}selected{% endif %}>Other</option> 
+            </select>
+        </div>
+        
+        <!-- description field with character count -->
+        <div style="margin-bottom: 15px; font-family: 'Times New Roman', Times, serif;">
+            <label for="description" style="display: inline-block; width: 150px; vertical-align: top; font-weight: bold; font-family: 'Times New Roman', Times, serif;">Description:</label>
+            <textarea id="description" name="description" rows="4" maxlength="250" style="width: 300px; height: 100px; padding: 5px; border: 1px solid #ccc; border-radius: 5px; font-family: 'Times New Roman', Times, serif; resize: none;">{{ profile.description }}</textarea>
+            <small id="charCount" style="display: block; font-size: 12px; color: gray; font-family: 'Times New Roman', Times, serif;">0/250 characters</small>
+        </div>
+
+        <!-- save changes button -->
+        <div style="text-align: center;">
+            <button type="submit" style="padding: 10px 20px; background-color: #94693e; color: white; border: none; border-radius: 5px; cursor: pointer; font-family: 'Times New Roman', Times, serif;">Save Changes</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    //Preview uploaded profile picture 
+    function previewProfilePicture() {
+        const fileInput = document.getElementById('profile_picture');
+        const previewImage = document.getElementById('profilePicturePreview');
+        const previewText = document.getElementById('profilePictureText');
+        const removeButton = document.getElementById('removePictureButton'); 
+
+        const file = fileInput.files[0];
+        //Checks if a file was uploaded
+        if (file) { 
+            const reader = new FileReader(); //Creates a FileReader to read the file
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;  //Updates the image preview to show the uploaded file
+                previewImage.style.display = 'block'; //Makes the image preview visible
+                previewText.style.display = 'none'; //Hides the placeholder text since a picture is uploaded
+                removeButton.style.display = 'inline-block'; //Shows the remove button so users can delete the picture
+            }
+            reader.readAsDataURL(file); //Read the file as data URL 
+        } else {
+            previewImage.style.display = 'none';
+            previewText.style.display = 'block';
+            removeButton.style.display = 'none';
+        }
+    }
+
+    function removeProfilePicture() {
+        const fileInput = document.getElementById('profile_picture');
+        const previewImage = document.getElementById('profilePicturePreview');
+        const previewText = document.getElementById('profilePictureText');
+        const removeButton = document.getElementById('removePictureButton');
+
+        fileInput.value = '';
+        previewImage.src = ""; 
+        previewImage.style.display = 'none';
+        previewText.style.display = 'block';
+        removeButton.style.display = 'none'; 
+    }
+
+    //Validate prfoile form before submitting 
+    function validateProfileForm() {
+        const fileInput = document.getElementById('profile_picture');
+        const removeButton = document.getElementById('removePictureButton');
+        const isPictureRemoved = removeButton.style.display === 'none'; //Check if the picture is removed
+
+        if (isPictureRemoved && fileInput.files.length === 0) {
+            alert("You must upload a new profile picture before saving changes.");
+            return false; //Prevent form submission
+        }
+
+        return true; //Allow form submission
+    }
+
+    //Function runs automatically when the webpage finishes loading
+    window.onload = function() {  
+        const previewImage = document.getElementById('profilePicturePreview'); //Selects the image element with the ID 'profilePicturePreview' and stores it in the variable 'previewImage'
+        const previewText = document.getElementById('profilePictureText'); //Selects the text element with the ID 'profilePictureText' and stores it in the variable 'previewText'
+        const descriptionField = document.getElementById('description'); //Selects the input field with the ID 'description' where users type descriptions
+        const charCount = document.getElementById('charCount'); //Selects the element with the ID 'charCount' which shows the character count for the description field
+
+        //Checks if the source (URL) of the image contains the filename 'default.png' and means the user has not uploaded a custom profile picture and is using the default one
+        if (previewImage.src.includes("default.png")) { 
+            previewText.style.display = 'block'; 
+        } else {
+            previewText.style.display = 'none'; //Hides the text element since the custom image is displayed instead
+        }
+
+        charCount.textContent = `${descriptionField.value.length}/250 characters`;
+        descriptionField.addEventListener('input', () => { //When the user types in the box, it counts the characters and shows the total out of 250
+            charCount.textContent = `${descriptionField.value.length}/250 characters`; //Updates the character counter to show the number of characters typed out of 250
+            if (descriptionField.value.length > 250) { //Restrict user to the maxlength
+                descriptionField.value = descriptionField.value.slice(0, 250);
+            }
+        });
+    }
+</script>
+{% endif %}
+{% endblock %}

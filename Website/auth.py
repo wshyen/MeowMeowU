@@ -12,7 +12,7 @@ auth = Blueprint("auth", __name__) #a Blueprint for authentication routes, Bluep
 #HTTP request methods are ways for a web browser or app to communicate with a server over the internet
 def login():
     if request.method == "POST":
-        email = request.form.get("email")
+        email = request.form.get("email").strip().lower()
         ps = request.form.get("ps")
 
         user = User.query.filter_by(email=email).first()
@@ -24,7 +24,7 @@ def login():
             else:
                 flash("Incorrect password, please try again.", category="error")
         else:
-            flash("Email does not exist!", category="error")
+            flash("Invalid email or password.", category="error")
 
     return render_template("login.html", user=current_user)
 
@@ -41,10 +41,12 @@ def logout():
 @auth.route("/sign-up", methods=["GET", "POST"])
 def sign_up():
     if request.method == "POST":
-        email = request.form.get("email").lower()
+        email = request.form.get("email").strip().lower()
         UserName = request.form.get("UserName")
         ps1 = request.form.get("ps1")
         ps2 = request.form.get("ps2")
+        secret_answer = request.form.get("secret_answer").strip().lower()
+        hashed_secret_answer = generate_password_hash(secret_answer, method="pbkdf2:sha256")
 
         existing_user = User.query.filter_by(email=email).first()
         
@@ -52,10 +54,9 @@ def sign_up():
             flash("Email already exist!", category="error")
             return render_template("sign_up.html", user=current_user)
 
-        #check email address is mmu email onot
-        if not re.match(r'^[\w\.-]+@student\.mmu\.edu\.my$', email): #"^" this means starting of the string and "$" this means closing
-            flash("Only MMU student emails are allowed.", category="error")
-        
+        elif not re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email):
+            flash("Invalid email address.", category="error")
+
         elif not re.match(r'^[A-Z][a-zA-Z0-9]{2,14}$', UserName):
             flash("Username must start with a capital letter and be 3 to 15 characters long.", category="error")
 
@@ -66,9 +67,14 @@ def sign_up():
         elif ps1 != ps2:
             flash("Passwords do not match.", category="error")
 
+        elif not secret_answer:
+            flash("Secret question answer is required.", category="error")
+
         else: #if all correct
-            new_user = User(email=email, UserName=UserName, ps=generate_password_hash(ps1, method="pbkdf2:sha256"))
+            new_user = User(email=email,UserName=UserName,ps=generate_password_hash(ps1, method="pbkdf2:sha256"),
+                            secret_answer=hashed_secret_answer)
             db.session.add(new_user) #add new user to database
+
             try:
                 db.session.commit()
                 login_user(new_user, remember=True)
@@ -84,3 +90,62 @@ def sign_up():
 @login_required
 def user_profile():
     return render_template("user_profile.html", user=current_user)
+
+@auth.route("/change-password", methods=["GET", "POST"])
+@login_required
+def change_password():
+    if request.method == "POST":
+        current_ps = request.form.get("current_password")
+        new_ps = request.form.get("new_password")
+        confirm_ps = request.form.get("confirm_password")
+
+        if not current_ps or not new_ps or not confirm_ps:
+            flash("All fields are required.", category="error")
+        elif not check_password_hash(current_user.ps, current_ps):
+            flash("Current password is incorrect.", category="error")
+        elif len(new_ps) < 7:
+            flash("New password must be at least 7 characters long.", category="error")
+        elif new_ps != confirm_ps:
+            flash("New passwords do not match.", category="error")
+        else:
+            #update the password
+            current_user.ps = generate_password_hash(new_ps, method="pbkdf2:sha256")
+            db.session.commit()
+            flash("Password changed successfully!", category="success")
+            return redirect(url_for("auth.user_profile"))
+
+    return render_template("change_password.html", user=current_user)
+
+@auth.route("/reset-password", methods=["GET", "POST"])
+def reset_password():
+    if request.method == "POST":
+        email = request.form.get("email").strip().lower()
+        secret_answer = request.form.get("secret_answer").strip().lower()
+        new_password = request.form.get("new_password")
+        confirm_password = request.form.get("confirm_password")
+
+        user = User.query.filter_by(email=email).first()
+
+        if not user:
+            flash("Invalid email.", category="error")
+        elif not check_password_hash(user.secret_answer, secret_answer):
+            flash("Invalid answer.", category="error")
+        elif len(new_password) < 7:
+            flash("New password must be at least 7 characters.", category="error")
+        elif new_password != confirm_password:
+            flash("Passwords do not match.", category="error")
+        else:
+            user.ps = generate_password_hash(new_password, method="pbkdf2:sha256")
+            db.session.commit()
+            flash("Password has been reset successfully!", category="success")
+            return redirect(url_for("auth.login"))
+
+    return render_template("reset_password.html", user=current_user)
+
+@auth.route("/view_profiles", methods=["GET", "POST"])
+def view_profiles():
+    return render_template("viewprofile.html", user=current_user)
+
+@auth.route("/create_profiles", methods=["GET", "POST"])
+def create_profiles():
+    return render_template("createprofile.html", user=current_user)

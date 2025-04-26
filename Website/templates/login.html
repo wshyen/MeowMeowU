@@ -6,12 +6,31 @@
 {% block content %}
 
 <style>
-    body {background-color: #f2eadf;}
+    body {
+        background-image: url('static/Images/Login.bg.png');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-color: #f2eadf;
+    }
+
+    .forgot-password {
+        display: inline-block;
+        font-family: 'Times New Roman';
+        color: rgb(78, 68, 57);
+        text-decoration: none;
+        padding: 10px 20px;
+    }
+
+    .forgot-password:hover {
+        text-decoration: underline;
+        color: rgb(62, 55, 48);
+    }
 </style>
 
 <!-- create a form for user login -->
-<form method="post"> <!-- the form will send data using the POST method -->
-    <h2 style="text-align: center;font-family: 'Times New Roman';padding-top: 25px;color: rgb(176, 148, 119);"><b>Login</b></h2>
+<form method="post" style="max-width: 750px; margin: auto;"> <!-- the form will send data using the POST method -->
+    <h2 style="text-align: center;font-family: 'Times New Roman';padding-top: 25px;color: rgb(78, 68, 57);"><b>Login</b></h2>
 
     <div class="form-group">
         <label for="email" style="font-family: 'Times New Roman';">Email Address</label>
@@ -25,8 +44,11 @@
 
     <br/>
 
-    <button type="submit" class="btn btn-primary" style="font-family: 'Times New Roman';background-color: rgb(176, 148, 119);color: white;border: none">
-        🐾Login🐾</button>
+    <div class="button-container">
+        <button type="submit" class="btn btn-primary" style="font-family: 'Times New Roman';background-color: rgb(176, 148, 119);color: white;border: none">🐾Login🐾</button>
+        <a href="{{ url_for('auth.reset_password') }}" class="forgot-password">Forgot Password?</a>
+    </div>
+
 </form>
 
 {% endblock %}
