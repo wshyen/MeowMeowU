@@ -5,38 +5,108 @@
 {% block content %}
 
 <style>
-  body {background-color: #f2eadf;}
+  body {
+    background-color: #f2eadf;
+  }
 
-  h2 {font-family: 'Times New Roman';color: rgb(78, 68, 57);}
+  h2, p {
+    text-align: center;
+    font-family: 'Times New Roman';
+    color: rgb(78, 68, 57);
+  }
 
-  p {font-family: 'Times New Roman';}
+  .profile-header {
+    position: relative;
+    text-align: center;
+    margin-bottom: 30px;
+    margin-top: 80px;
+  }
+
+  .cover-photo {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+
+  .profile-picture {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid white;
+    position: absolute;
+    bottom: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+  }
+
+  .profile-info {
+    margin-top: 80px;
+    text-align: center;
+  }
+
+  .profile-info p {
+    margin: 5px 0;
+  }
+
+  .alert-container {
+    margin-bottom: 20px;
+  }
+
+  .profile-details {
+    margin-top: 30px;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+  }
+
+  .profile-details p {
+    text-align: left;
+    margin: 10px 0;
+    font-family: 'Times New Roman';
+    font-size: 18px;
+  }
 </style>
 
 <div class="container mt-4">
-    <!-- Flash messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <div class="alert-container">
-          {% for category, message in messages %}
-            <div class="alert alert-{{ category }}" role="alert">
-              {{ message }}
-            </div>
-          {% endfor %}
-        </div>
-      {% endif %}
-    {% endwith %}
-    
-    <!-- User profile information -->
+  <!-- Flash messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="alert-container">
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}" role="alert">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- Profile Info -->
+  <div class="profile-info">
     <h2><b>Welcome, {{ user.UserName }}!</b></h2>
-    <p>This is user profile page.</p>
+    {% if user.StatusMessage %}
+      <p><i>"{{ user.StatusMessage }}"</i></p>
+    {% else %}
+      <p><i>No status message set.</i></p>
+    {% endif %}
+  </div>
+
+  <!-- Profile Details -->
+  <div class="profile-details">
+    <p><b>Email:</b>  {{ user.email }}</p>
+
+    <p><b>Bio/About Me:</b><br>
+      {% if user.Bio %}
+        {{ user.Bio }}
+      {% else %}
+        No bio set yet.
+      {% endif %}
+    </p>
+  </div>
+
 </div>
-{% endblock %}
-
-  h2,p {text-align: center;;font-family: 'Times New Roman';color: rgb(78, 68, 57);}
-  
-</style>
-
-<h2 style="padding-top: 40px;"><b>Welcome, {{ user.UserName }}!</b></h2>
-<p>This is user profile page.</p>
 
 {% endblock %}
