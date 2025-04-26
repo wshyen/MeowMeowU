@@ -7,18 +7,27 @@
     body {
         background-color: #f2eadf;
     }
+    select {
+        width: 200px;
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-family: 'Times New Roman', Times, serif;
+        background-color: #f9f9f9;
+        cursor: pointer;
+    }
 </style>
-<form action="{{ url_for('create_contest')}}" method="post" enctype="multipart/form-data" onsubmit="return confirmSubmission();" style="width: 500px; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9;">
+<form action="{{ url_for('create_contest')}}" method="post" enctype="multipart/form-data" onsubmit="return confirmSubmission();" style="width: 1000px; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9; display:inline-block; align-items: center;">
     <h1 style="text-align: center; margin-bottom: 20px; font-family: 'Times New Roman', Times, serif;">Create a Contest</h1>
 
     <div style="display: flex; align-items: left; flex-direction: column; margin-bottom: 15px;">
         <label for="contest_name" style="width: 150px; font-weight: bold; text-align: left; font-family: 'Times New Roman', Times, serif;">Contest name:</label>
-        <input type="text" id="contest_name" name="contest_name" required style="width: 400px; padding: 5px; border: 1px solid #ccc; border-radius: 5px; font-family:'Times New Roman', Times, serif" placeholder="Enter contest name">
+        <input type="text" id="contest_name" name="contest_name" required style="width: 700px; padding: 5px; border: 1px solid #ccc; border-radius: 5px; font-family:'Times New Roman', Times, serif" placeholder="Enter contest name">
     </div>
 
     <div style="display: flex; align-items: left; flex-direction: column; margin-bottom: 15px;">
         <label for="details" style="display: inline-block; width: 150px; vertical-align: top; align-self: flex-start; font-weight: bold; text-align: left;">Details:</label>
-        <textarea id="details" name="details" required style="width: 400px; height: 100px; padding: 5px; border: 1px solid #ccc; border-radius: 5px; resize: none; font-family: 'Times New Roman', Times, serif;" placeholder="Enter contest details"></textarea>
+        <textarea id="details" name="details" required style="width: 700px; height: 100px; padding: 5px; border: 1px solid #ccc; border-radius: 5px; resize: none; font-family: 'Times New Roman', Times, serif;" placeholder="Enter contest details"></textarea>
     </div>
         
     <div style="display: flex; align-items: left; flex-direction: column; margin-bottom: 15px;">
@@ -33,11 +42,38 @@
 
     <div style="display: flex; align-items: left; flex-direction: column; margin-bottom: 15px;">
         <label for="rules" style="display: inline-block; width: 150px; vertical-align: top; align-self: flex-start; font-weight: bold; text-align: left;">Rules & Guidelines:</label>
-        <textarea id="rules" name="rules" required style="width: 400px; height: 150px; padding: 5px; border: 1px solid #ccc; border-radius: 5px; resize: none; font-family: 'Times New Roman', Times, serif;" placeholder="Enter rules & guidelines"></textarea>
+    
+        <select id="format" onchange="formatText()" style="width: 150px; padding: 5px; border-radius: 5px;">
+            <option value="" disabled selected>Select Format</option>
+            <option value="none">None</option>
+            <option value="bullet">Bullet Points</option>
+            <option value="number">Numbered List</option>
+        </select>
+        <textarea id="rules" name="rules" required style="width: 700px; height: 150px; padding: 5px; border: 1px solid #ccc; border-radius: 5px; resize: none; font-family: 'Times New Roman', Times, serif;" placeholder="Enter rules & guidelines"></textarea>
     </div>
 
     <div style="text-align: right;">
         <button type="submit" style="padding: 10px 20px; background-color: #94693e; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">Create</button>
     </div>
 </form>
+
+<script>
+function formatText() {
+    let formatType = document.getElementById("format").value;
+    let rulesInput = document.getElementById("rules").value;
+    
+    // Remove any existing formatting by stripping numbers or bullet points
+    let cleanText = rulesInput.replace(/^(\d+\.\s|•\s)/gm, '');
+
+    // Apply the new format
+    let formattedText = cleanText.split("\n").map((line, index) => {
+        if (formatType === "bullet") return `• ${line}`;
+        if (formatType === "number") return `${index + 1}. ${line}`;
+        return line;
+    }).join("\n"); // Keeps the new line structure in textarea
+    
+    document.getElementById("rules").value = formattedText;
+}
+</script>
+
 {% endblock %}
