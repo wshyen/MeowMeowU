@@ -1,0 +1,75 @@
+{% extends "base.html" %} 
+
+{% block title %}Suggestion{% endblock %} 
+
+{% block content %}
+
+<style>
+  body {
+      background-color: #f2eadf;
+  }
+
+  .list-group-item {
+      width: 700px;
+      border: 1px solid rgb(176, 148, 119);
+      border-radius: 10px;
+      margin-bottom: 10px;
+      font-family: 'Times New Roman', serif;
+      font-size: 16px;
+      padding: 15px;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  textarea {
+      width: 700px;
+      height: 300px;
+      resize: none;
+      border: 1px solid rgb(176, 148, 119);
+      border-radius: 10px;
+      padding: 15px;
+      font-size: 16px;
+      font-family: 'Times New Roman', serif;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  p {
+    text-align: center;
+    font-family: 'Times New Roman';
+    color: rgb(78, 68, 57);
+  }
+
+</style>
+
+<h2 style="text-align: center; font-family: 'Times New Roman', serif; padding-top: 35px; color: rgb(78, 68, 57);"><b>Suggestion Box</b></h2>
+<p>Feel free to give us suggestion!</p>
+  
+<form method="POST" style="display: flex; flex-direction: column; align-items: center; margin-bottom: 40px;">
+
+  <textarea 
+    name="note" 
+    id="note"></textarea>
+
+  <br />
+
+  <button type="submit" class="btn btn-primary" style="font-family: 'Times New Roman';background-color: rgb(176, 148, 119);color: white;border: none;">
+    🐾Suggest!🐾</button>
+
+</form>
+
+<hr style="width: 100%; margin: 20px auto; border: 1px solid rgb(148, 148, 148);">
+
+<div style="text-align: center; margin-top: 20px;">
+  <h3 style="font-family: 'Times New Roman', serif; color: rgb(78, 68, 57); margin-bottom: 20px;padding-top: 25px;"><b>History of Suggestions</b></h3>
+
+  <ul class="list-group list-group-flush" id="notes" style="align-items: center;">
+    {% for note in user.notes %}
+    <li class="list-group-item">
+      {{ note.data }}
+    </li>
+    {% endfor %}
+  </ul>
+  
+</div>
+
+{% endblock %}
+  

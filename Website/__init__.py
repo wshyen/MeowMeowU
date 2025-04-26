@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy #SQLAlchemy is used for database operati
 from os import path #path is used for file system checks
 from flask_login import LoginManager
 from flask_migrate import Migrate
+from sqlalchemy.sql import text
 
 db = SQLAlchemy() #initialize SQLAlchemy instance for database handling
 DB_NAME = "datebase.db" #name the file
@@ -15,8 +16,14 @@ def create_app(): #a function to create and configure the Flask app
     
     db.init_app(app) #initialize the database with the Flask app
     migrate.init_app(app, db)
+
+    #enable Write-Ahead Logging (WAL),to minimizes database locking issues
+    def setup_wal():
+        with db.engine.connect() as connection:
+            connection.execute(text("PRAGMA journal_mode=WAL;"))
     
-    from .views import views #import views and auth Blueprint, views handle general routes and auth handle authentication routes
+    #import views and auth Blueprint, views handle general routes and auth handle authentication routes
+    from .views import views
     from .auth import auth
     from .search import search_bp
 
