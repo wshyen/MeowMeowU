@@ -1,8 +1,8 @@
 import sqlite3
 import os
-from flask import Flask, render_template, request
+from flask import Blueprint, render_template, request
 
-app = Flask(__name__, static_folder='../cat-profile-system/static', static_url_path='/static')
+search_bp = Blueprint('search', __name__, template_folder='templates', static_folder='static')
 
 def get_db_connection():
     db_path = os.path.join(os.path.dirname(__file__), '..', 'instance', 'cat_profiles.db')
@@ -11,29 +11,28 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
-@app.route('/')
-def search():
-    return render_template("search_feature.html")
-
-@app.route('/search-feature')
+@search_bp.route('/search-feature')
 def search_feature():
-    return render_template('search/search_feature.html')
+    return render_template('search_feature.html')
 
-@app.route('/cat_list')
+@search_bp.route('/cat_list')
 def cat_list():
     name = request.args.get("name", "").lower()
     gender = request.args.get("gender", "")
     color = request.args.get("color", "")
-    sort = request.args.get("sort") 
+    sort = request.args.get("sort")
+
+    print(f"Name: {name}, Gender: {gender}, Color: {color}, Sort: {sort}")
 
     conn = get_db_connection()
     cursor = conn.cursor()
+
     query = "SELECT * FROM profiles WHERE 1=1"
-    cat_filters = [] 
-    
+    cat_filters = []
+
     if name:
         query += " AND LOWER(name) LIKE ?"
-        cat_filters.append(f"%{name}%")  #to find names containing the input 'name' anywhere in the text
+        cat_filters.append(f"%{name}%")
 
     if gender and gender != "Not sure":
         query += " AND gender = ?"
@@ -56,8 +55,9 @@ def cat_list():
         return render_template("cat_list.html", profiles=profiles)
     else:
         return render_template("cat_list.html", message="No cats found matching your criteria.")
+
  
-@app.route('/single_profile')
+@search_bp.route('/single_profile')
 def single_profile():
     name = request.args.get("name", "").lower()
     selected_cat = None
@@ -71,6 +71,3 @@ def single_profile():
     if selected_cat:
         return render_template("single_profile.html", cat=selected_cat)
     
-    
-if __name__ == '__main__':
-    app.run(debug=True)

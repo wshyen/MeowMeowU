@@ -12,6 +12,6 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(150), unique=True, nullable=False)
     ps = db.Column(db.String(150), nullable=False)  
-    UserName = db.Column(db.String(150), nullable=False)  
+    UserName = db.Column(db.String(150), nullable=False)
     secret_answer = db.Column(db.String(150), nullable=False) 
     notes = db.relationship("Note", backref="user", lazy=True)
