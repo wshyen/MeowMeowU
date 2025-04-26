@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Contest Preview{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f2eadf;
+        display: flex; /* Centers preview box */
+        justify-content: center;
+        align-items: center;
+        height: 100vh; /* Full height to center vertically */
+        margin: 0;
+    }
+    .preview-container {
+        width: 800px;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        background-color: #f9f9f9;
+        text-align: left;
+    }
+    h2 {
+        text-align: center;
+        font-family: 'Times New Roman', Times, serif;
+        margin-bottom: 15px;
+    }
+    p, ul {
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+</style>
+
+<div class="preview-container">
+    <h2>Contest Preview</h2>
+
+    <p><strong>Contest Name:</strong> {{ contest_name }}</p>
+    
+    <!-- Start & End Date in One Row -->
+    <div style="display: flex; align-items: center; gap: 20px;">
+        <p><strong>Start Date & Time:</strong> {{ start_datetime }}</p>
+        <p><strong>End Date & Time:</strong> {{ end_datetime }}</p>
+    </div>
+
+    <p><strong>Purpose:</strong></p>
+    <p>{{ purpose }}</p>
+
+    <p><strong>Rules & Guidelines:</strong></p>
+    <ul>
+        {% for rule in rules.split("\n") %}
+        <li>{{ rule }}</li>
+        {% endfor %}
+    </ul>
+
+    <!-- Back to Creation Button -->
+    <a href="{{ url_for('create_contest') }}" style="
+        display: inline-block;
+        width: 180px;
+        padding: 10px 15px;
+        background-color: #94693e;
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        border: none;
+        border-radius: 8px;
+        text-decoration: none;
+        box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+        transition: background-color 0.3s ease-in-out;">
+        Back
+    </a>
+</div>
+{% endblock %}
