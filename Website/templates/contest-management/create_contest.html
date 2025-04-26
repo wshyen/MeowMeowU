@@ -1,0 +1,238 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Contest{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f2eadf;
+    }
+    select {
+        width: 200px;
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-family: 'Times New Roman', Times, serif;
+        cursor: pointer;
+    }
+    p {
+    margin-top: 5px; /* Reduce space above the format text */
+    margin-bottom: 5px; /* Reduce space below */
+    padding: 0px; /* Remove unnecessary padding */
+    }
+</style>
+<form action="{{ url_for('create_contest')}}" method="post" enctype="multipart/form-data" onsubmit="return confirmSubmission();" style="width: 1000px; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9; display:inline-block; align-items: center;">
+    <h1 style="text-align: center; margin-bottom: 20px; font-family: 'Times New Roman', Times, serif;">Create a Contest</h1>
+
+    <div style="display: flex; align-items: left; flex-direction: column; margin-bottom: 15px;">
+        <label for="contest_name" style="width: 150px; font-weight: bold; text-align: left; font-family: 'Times New Roman', Times, serif;">Contest name:</label>
+        <input type="text" id="contest_name" name="contest_name" required value="{{ contest_name or '' }}" style="width: 700px; padding: 5px; border: 1px solid #ccc; border-radius: 5px; font-family:'Times New Roman', Times, serif" placeholder="Enter contest name">
+    </div>
+        
+    <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 15px;">
+        <!-- Start Date & Time -->
+        <div>
+            <label for="start_datetime" style="font-weight: bold; text-align: left;">Start date & time:</label>
+            <input type="datetime-local" id="start_datetime" name="start_datetime" required value="{{ start_datetime or '' }}" style="width: 200px; padding: 5px; border: 1px solid #ccc; border-radius: 5px;">
+        </div>
+    
+        <!-- End Date & Time -->
+        <div>
+            <label for="end_datetime" style="font-weight: bold; text-align: left;">End date & time:</label>
+            <input type="datetime-local" id="end_datetime" name="end_datetime" required value="{{ end_datetime or '' }}" style="width: 200px; padding: 5px; border: 1px solid #ccc; border-radius: 5px;">
+        </div>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 15px;">
+        <!-- Voting start -->
+        <div>
+            <label for="voting_start" style="font-weight: bold; text-align: left;">Voting period:</label>
+            <input type="datetime-local" id="voting_start" name="voting_start" required value="{{ voting_start or '' }}" style="width: 200px; padding: 5px; border: 1px solid #ccc; border-radius: 5px;">
+            <span style="margin: 0 10px; font-weight: bold;">to</span>
+
+        <!-- Voting ends -->
+            <label for="voting_end" style="font-weight: bold; text-align: left;"></label>
+            <input type="datetime-local" id="voting_end" name="voting_end" required value="{{ voting_end or '' }}" style="width: 200px; padding: 5px; border: 1px solid #ccc; border-radius: 5px;">
+        </div>
+    </div>
+
+    <!-- Result announcement date -->
+    <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 15px;">
+            <label for="result_announcement" style="font-weight: bold; text-align: left;">Result announcement date:</label>
+            <input type="date" id="result_announcement" name="result_announcement" required value="{{ result_announcement or '' }}" style="width: 200px; padding: 5px; border: 1px solid #ccc; border-radius: 5px;">
+    </div>
+
+    <!-- Purpose -->
+    <div style="display: flex; align-items: left; flex-direction: column; margin-bottom: 15px;">
+        <label for="purpose" style="display: inline-block; width: 150px; vertical-align: top; align-self: flex-start; font-weight: bold; text-align: left;">Purpose:</label>
+        <p style="font-size: 14px; color: #555; margin-bottom: 5px; font-family: 'Times New Roman', Times, serif;">
+            Choose a format (Numbered/Bullet) before pressing. Enter to apply formatting to new rows.
+        </p>
+        
+        <select id="formatPurpose" onchange="formatPurpose()">
+            <option value="" disabled selected>Select Format</option>
+            <option value="none">None</option>
+            <option value="bullet">Bullet Points</option>
+            <option value="number">Numbered List</option>
+        </select>
+        
+        <textarea id="purpose" name="purpose" required style="width: 700px; height: 100px; padding: 5px; border: 1px solid #ccc; border-radius: 5px; resize: none; font-family: 'Times New Roman', Times, serif;" placeholder="Enter purpose of the contest">{{ purpose or ''}}</textarea>
+    </div>
+
+    <!-- Rules & Guidelines -->
+    <div style="display: flex; align-items: left; flex-direction: column; margin-bottom: 15px;">
+        <label for="rules" style="display: inline-block; width: 150px; vertical-align: top; align-self: flex-start; font-weight: bold; text-align: left;">Rules & Guidelines:</label>
+    
+        <p style="font-size: 14px; color: #555; margin-bottom: 5px; font-family: 'Times New Roman', Times, serif;">
+            Choose a format (Numbered/Bullet) before pressing. Enter to apply formatting to new rows.
+        </p>
+
+        <select id="format" onchange="formatText()">
+            <option value="" disabled selected>Select Format</option>
+            <option value="none">None</option>
+            <option value="bullet">Bullet Points</option>
+            <option value="number">Numbered List</option>
+        </select>
+        <textarea id="rules" name="rules" required style="width: 700px; height: 150px; padding: 5px; border: 1px solid #ccc; border-radius: 5px; resize: none; font-family: 'Times New Roman', Times, serif;" placeholder="Enter rules & guidelines">{{ rules or '' }}</textarea>
+    </div>
+
+    <!-- Prizes -->
+    <div style="display: flex; align-items: left; flex-direction: column; margin-bottom: 15px;">
+        <label for="prizes" style="width: 150px; font-weight: bold; text-align: left; font-family: 'Times New Roman', Times, serif;">Prizes:</label>
+        <input type="text" id="prizes" name="prizes" required value="{{ prizes or '' }}" style="width: 700px; padding: 5px; border: 1px solid #ccc; border-radius: 5px; font-family:'Times New Roman', Times, serif" placeholder="Describe the prizes for winners">
+    </div>
+        
+    <!-- Preview Contest button -->
+    <button type="submit" formaction="{{ url_for('preview_contest') }}" formmethod="post"
+        style="display: inline-block; width: 180px; padding: 10px 15px; background-color: #D3AA72; color: white; font-size: 16px; font-weight: bold; text-align: center; border: none; border-radius: 8px; text-decoration: none; box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2); transition: background-color 0.3s ease-in-out;">
+        🐾 Preview 🐾
+    </button>
+
+    <!-- Create button -->
+    <div style="text-align: right;">
+        <button type="submit" style="padding: 10px 20px; background-color: #94693e; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">Create</button>
+    </div>
+</form>
+
+<script>
+    //Formating Purpose of the Contest
+    document.getElementById("formatPurpose").addEventListener("change", function() {
+    let formatType = this.value;
+    let purposeInput = document.getElementById("purpose").value;
+    let lines = purposeInput.split("\n");  //Split text into seperate rows
+
+    //If the first row is empty, apply format immediately
+    if (lines.length === 1 && lines[0].trim() === "") {
+        if (formatType === "bullet") {
+            lines[0] = `• `;
+        } else if (formatType === "number") {
+            lines[0] = `1. `;
+        }
+    }
+
+        document.getElementById("purpose").value = lines.join("\n");
+    });
+
+    //Handling Enter key for purpose textarea
+    document.getElementById("purpose").addEventListener("keydown", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault(); //Prevent default Enter behavior
+            let purposeInput = this.value;
+            let lines = purposeInput.split("\n");
+
+            let formatType = document.getElementById("formatPurpose").value;
+
+            //Apply format to the new row when pressing Enter
+            if (formatType === "bullet") {
+                lines.push(`• `);
+            } else if (formatType === "number") {
+                let count = lines.filter(line => line.match(/^\d+\./)).length + 1;
+                lines.push(`${count}. `);
+            } else {
+                lines.push(""); //No formatting applied
+            }
+
+            this.value = lines.join("\n");
+        }
+    });
+
+    //Formating Rules & Guidelines
+    document.getElementById("format").addEventListener("change", function() {
+        let formatType = this.value;
+        let rulesInput = document.getElementById("rules").value;
+        let lines = rulesInput.split("\n"); //Split text into seperate rows
+    
+        //If the first row is empty, apply format immediately
+        if (lines.length === 1 && lines[0].trim() === "") {
+            if (formatType === "bullet") {
+                lines[0] = `• `;
+            } else if (formatType === "number") {
+                lines[0] = `1. `;
+            }
+        }
+    
+        document.getElementById("rules").value = lines.join("\n");
+    });
+    
+    ///Handling Enter key for rules textarea
+    document.getElementById("rules").addEventListener("keydown", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault(); //Prevent default Enter behavior
+            let rulesInput = this.value;
+            let lines = rulesInput.split("\n");
+    
+            let formatType = document.getElementById("format").value;
+    
+            //Apply format to the new row when pressing Enter
+            if (formatType === "bullet") {
+                lines.push(`• `);
+            } else if (formatType === "number") {
+                let count = lines.filter(line => line.match(/^\d+\./)).length + 1;
+                lines.push(`${count}. `);
+            } else {
+                lines.push(""); //No formatting applied
+            }
+    
+            this.value = lines.join("\n");
+        }
+    });
+
+    document.querySelector("form").addEventListener("submit", function(event) { //Event listener for form submission
+        let startDate = new Date(document.getElementById("start_datetime").value); 
+        let endDate = new Date(document.getElementById("end_datetime").value);
+        let votingStart = new Date(document.getElementById("voting_start").value);
+        let votingEnd = new Date(document.getElementById("voting_end").value);
+        let resultDate = new Date(document.getElementById("result_announcement").value);
+
+        //Validate End Date must be AFTER Start Date
+        if (endDate <= startDate) { //Check if end date is before start date
+            alert("Contest End Date cannot be earlier than Start Date!"); //If true, show alert
+            event.preventDefault(); //Prevent form submission if validation fails
+            return;
+        }
+
+        //Validate Voting Start Date must START after Contest End Date
+        if (votingStart < endDate) { //Check if voting starts after contest end date
+            alert("Voting Start Date cannot be before the Contest End Date!"); //If true, show alert
+            event.preventDefault(); //Prevent form submission if validation fails
+            return;
+        }
+        //Validate Voting End Date must be AFTER Voting Start Date
+        if (votingEnd <= votingStart) { //Check if voting end is same or earlier than voting start
+            alert("Voting End Date must be AFTER Voting Start Date!"); //If true, show alert
+            event.preventDefault(); //Prevent form submission if validation fails
+            return;
+        }
+
+        //Validate Result Announcement must be ON or AFTER Voting End Date
+        if (resultDate < votingEnd) { //Check if result announcement date is before voting end date
+            alert("Result Announcement Date must be on or after the last day of Voting!"); //If true, show alert
+            event.preventDefault(); ///Prevent form submission if validation fails
+            return;
+        }
+    });
+    function confirmSubmission() {
+    return confirm("Are you sure you want to create the contest?");
+    }
+</script>
+{% endblock %}
