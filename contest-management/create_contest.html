@@ -16,6 +16,11 @@
         background-color: #f9f9f9;
         cursor: pointer;
     }
+    p {
+    margin-top: 5px; /* Reduce space above the format text */
+    margin-bottom: 5px; /* Reduce space below */
+    padding: 0px; /* Remove unnecessary padding */
+    }
 </style>
 <form action="{{ url_for('create_contest')}}" method="post" enctype="multipart/form-data" onsubmit="return confirmSubmission();" style="width: 1000px; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9; display:inline-block; align-items: center;">
     <h1 style="text-align: center; margin-bottom: 20px; font-family: 'Times New Roman', Times, serif;">Create a Contest</h1>
@@ -27,6 +32,17 @@
 
     <div style="display: flex; align-items: left; flex-direction: column; margin-bottom: 15px;">
         <label for="details" style="display: inline-block; width: 150px; vertical-align: top; align-self: flex-start; font-weight: bold; text-align: left;">Details:</label>
+        <p style="font-size: 14px; color: #555; margin-bottom: 5px; font-family: 'Times New Roman', Times, serif;">
+            Choose a format (Numbered/Bullet) before pressing. Enter to apply formatting to new rows.
+        </p>
+        
+        <select id="formatDetails" onchange="formatDetails()">
+            <option value="" disabled selected>Select Format</option>
+            <option value="none">None</option>
+            <option value="bullet">Bullet Points</option>
+            <option value="number">Numbered List</option>
+        </select>
+        
         <textarea id="details" name="details" required style="width: 700px; height: 100px; padding: 5px; border: 1px solid #ccc; border-radius: 5px; resize: none; font-family: 'Times New Roman', Times, serif;" placeholder="Enter contest details"></textarea>
     </div>
         
@@ -43,7 +59,11 @@
     <div style="display: flex; align-items: left; flex-direction: column; margin-bottom: 15px;">
         <label for="rules" style="display: inline-block; width: 150px; vertical-align: top; align-self: flex-start; font-weight: bold; text-align: left;">Rules & Guidelines:</label>
     
-        <select id="format" onchange="formatText()" style="width: 150px; padding: 5px; border-radius: 5px;">
+        <p style="font-size: 14px; color: #555; margin-bottom: 5px; font-family: 'Times New Roman', Times, serif;">
+            Choose a format (Numbered/Bullet) before pressing. Enter to apply formatting to new rows.
+        </p>
+
+        <select id="format" onchange="formatText()">
             <option value="" disabled selected>Select Format</option>
             <option value="none">None</option>
             <option value="bullet">Bullet Points</option>
@@ -58,22 +78,86 @@
 </form>
 
 <script>
-function formatText() {
-    let formatType = document.getElementById("format").value;
-    let rulesInput = document.getElementById("rules").value;
-    
-    // Remove any existing formatting by stripping numbers or bullet points
-    let cleanText = rulesInput.replace(/^(\d+\.\s|•\s)/gm, '');
+    //Formating Details
+    document.getElementById("formatDetails").addEventListener("change", function() {
+    let formatType = this.value;
+    let detailsInput = document.getElementById("details").value;
+    let lines = detailsInput.split("\n");  //Split text into seperate rows
 
-    // Apply the new format
-    let formattedText = cleanText.split("\n").map((line, index) => {
-        if (formatType === "bullet") return `• ${line}`;
-        if (formatType === "number") return `${index + 1}. ${line}`;
-        return line;
-    }).join("\n"); // Keeps the new line structure in textarea
+    //If the first row is empty, apply format immediately
+    if (lines.length === 1 && lines[0].trim() === "") {
+        if (formatType === "bullet") {
+            lines[0] = `• `;
+        } else if (formatType === "number") {
+            lines[0] = `1. `;
+        }
+    }
+
+        document.getElementById("details").value = lines.join("\n");
+    });
+
+    //Handling Enter key for details textarea
+    document.getElementById("details").addEventListener("keydown", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault(); //Prevent default Enter behavior
+            let detailsInput = this.value;
+            let lines = detailsInput.split("\n");
+
+            let formatType = document.getElementById("formatDetails").value;
+
+            //Apply format to the new row when pressing Enter
+            if (formatType === "bullet") {
+                lines.push(`• `);
+            } else if (formatType === "number") {
+                let count = lines.filter(line => line.match(/^\d+\./)).length + 1;
+                lines.push(`${count}. `);
+            } else {
+                lines.push(""); //No formatting applied
+            }
+
+            this.value = lines.join("\n");
+        }
+    });
+
+    // Formating Rules & Guidelines
+    document.getElementById("format").addEventListener("change", function() {
+        let formatType = this.value;
+        let rulesInput = document.getElementById("rules").value;
+        let lines = rulesInput.split("\n"); //Split text into seperate rows
     
-    document.getElementById("rules").value = formattedText;
-}
+        //If the first row is empty, apply format immediately
+        if (lines.length === 1 && lines[0].trim() === "") {
+            if (formatType === "bullet") {
+                lines[0] = `• `;
+            } else if (formatType === "number") {
+                lines[0] = `1. `;
+            }
+        }
+    
+        document.getElementById("rules").value = lines.join("\n");
+    });
+    
+    ///Handling Enter key for rules textarea
+    document.getElementById("rules").addEventListener("keydown", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault(); //Prevent default Enter behavior
+            let rulesInput = this.value;
+            let lines = rulesInput.split("\n");
+    
+            let formatType = document.getElementById("format").value;
+    
+            //Apply format to the new row when pressing Enter
+            if (formatType === "bullet") {
+                lines.push(`• `);
+            } else if (formatType === "number") {
+                let count = lines.filter(line => line.match(/^\d+\./)).length + 1;
+                lines.push(`${count}. `);
+            } else {
+                lines.push(""); //No formatting applied
+            }
+    
+            this.value = lines.join("\n");
+        }
+    });
 </script>
-
 {% endblock %}
