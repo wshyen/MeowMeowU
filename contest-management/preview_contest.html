@@ -6,10 +6,10 @@
 <style>
     body {
         background-color: #f2eadf;
-        display: flex; /* Centers preview box */
+        display: flex; 
         justify-content: center;
         align-items: center;
-        height: 100vh; /* Full height to center vertically */
+        height: 100vh; 
         margin: 0;
     }
     .preview-container {
@@ -20,11 +20,6 @@
         background-color: #f9f9f9;
         text-align: left;
     }
-    h2 {
-        text-align: center;
-        font-family: 'Times New Roman', Times, serif;
-        margin-bottom: 15px;
-    }
     p, ul {
         font-family: 'Times New Roman', Times, serif;
         font-size: 16px;
@@ -32,12 +27,17 @@
     }
 </style>
 
+{% set session['contest_name'] = request.form['contest_name'] %}
+{% set session['start_datetime'] = request.form['start_datetime'] %}
+{% set session['end_datetime'] = request.form['end_datetime'] %}
+{% set session['purpose'] = request.form['purpose'] %}
+{% set session['rules'] = request.form['rules'] %}
+
 <div class="preview-container">
-    <h2>Contest Preview</h2>
+    <h2 style="text-align: center; font-family: 'Times New Roman', Times, serif; margin-bottom: 15px;">Contest Preview</h2>
 
     <p><strong>Contest Name:</strong> {{ contest_name }}</p>
     
-    <!-- Start & End Date in One Row -->
     <div style="display: flex; align-items: center; gap: 20px;">
         <p><strong>Start Date & Time:</strong> {{ start_datetime }}</p>
         <p><strong>End Date & Time:</strong> {{ end_datetime }}</p>
