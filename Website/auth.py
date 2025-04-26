@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for #Flask is a web framework that allows developers to build web applications
+from flask import Blueprint, render_template, request, flash, redirect, url_for, session #Flask is a web framework that allows developers to build web applications
 import re
 from .models import User
 from . import db
@@ -149,3 +149,16 @@ def view_profiles():
 @auth.route("/create_profiles", methods=["GET", "POST"])
 def create_profiles():
     return render_template("createprofile.html", user=current_user)
+
+@auth.route("/update-status", methods=["POST"])
+@login_required
+def update_status():
+    new_status = request.form.get("status")
+    
+    if not new_status:
+        flash("Please select a valid status message.", category="error")
+    else:
+        session['StatusMessage'] = new_status   
+        flash("Status message updated successfully!", category="success")
+
+    return redirect(url_for("auth.user_profile"))
