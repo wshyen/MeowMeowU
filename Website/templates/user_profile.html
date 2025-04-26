@@ -9,7 +9,7 @@
     background-color: #f2eadf;
   }
 
-  h3, p {
+  h2, p {
     font-family: 'Times New Roman';
     color: rgb(78, 68, 57);
   }
@@ -57,13 +57,9 @@
     text-align: left;
   }
 
-  .alert-container {
-    margin-bottom: 20px;
-  }
-
   .profile-details {
     margin-top: 45px;
-    background:#fff7ec;
+    background: #fff7ec;
     padding: 20px;
     border-radius: 10px;
   }
@@ -76,27 +72,37 @@
   }
 
   .profile-picture:hover {
-  transform: scale(1.05);
-  transition: transform 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  form {
+    margin-top: 20px;
+  }
+
+  select {
+    font-family: 'Times New Roman';
+    font-size: 16px;
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+
+  button {
+    font-family: 'Times New Roman';
+    background-color: rgb(176, 148, 119);
+    color: white;
+    border: none;
+    padding: 7px 15px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
   }
 
 </style>
 
 <div class="container mt-4">
-  <!-- Flash messages -->
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      <div class="alert-container">
-        {% for category, message in messages %}
-          <div class="alert alert-{{ category }}" role="alert">
-            {{ message }}
-          </div>
-        {% endfor %}
-      </div>
-    {% endif %}
-  {% endwith %}
-
   <div class="profile-details">
 
     <!-- Profile Header -->
@@ -115,12 +121,22 @@
         {% endif %}
 
         <div class="profile-info">
-          <h3><b>{{ user.UserName }}</b></h3>
-          {% if user.StatusMessage %}
-            <p>"{{ user.StatusMessage }}"</p>
-          {% else %}
-            <p><i>No status message set.</i></p>
-          {% endif %}
+          <h2 style="text-decoration: underline;"><b>{{ user.UserName }}</b></h2>
+          <form method="POST" action="{{ url_for('auth.update_status') }}">
+            <label for="status" style="font-family: 'Times New Roman'; font-size: 20px;"><b>Status:</b></label>
+            <select name="status" id="status" required>
+              <option value="Select status">Select status</option>
+              <option value="Meow~">Meow~🐱</option>
+              <option value="Sleepy...">Sleepy...🥱</option>
+              <option value="So tired!">So tired!💀</option>
+              <option value="On a break.">On a break.📴</option>
+              <option value="Need coffee!">Need coffee!☕</option>
+              <option value="Feeling great!">Feeling great!💪🏻</option>
+              <option value="Do not disturb.">Do not disturb.🫥</option>
+              <option value="Busy but productive.">Busy but productive.📖</option>
+            </select>
+            <button type="submit">Save</button>
+          </form>
         </div>
       </div>
     </div>
@@ -140,7 +156,7 @@
       <i>No bio set yet.</i>
       {% endif %}
     </p>
-    
+
   </div>
 </div>
 
