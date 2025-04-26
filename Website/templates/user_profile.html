@@ -9,23 +9,33 @@
     background-color: #f2eadf;
   }
 
-  h2, p {
-    text-align: center;
+  h3, p {
     font-family: 'Times New Roman';
     color: rgb(78, 68, 57);
   }
 
   .profile-header {
     position: relative;
-    text-align: center;
     margin-bottom: 30px;
-    margin-top: 80px;
+    margin-top: 25px;
+    align-items: center;
+    box-shadow: black;
   }
 
   .cover-photo {
     width: 100%;
-    height: 200px;
+    height: 250px;
     object-fit: cover;
+    border-radius: 10px;
+  }
+
+  .profile-content {
+    position: absolute;
+    top: 100px;
+    left: 30px;
+    display: flex;
+    align-items: center;
+    padding-bottom: 200px;
     border-radius: 10px;
   }
 
@@ -35,20 +45,16 @@
     border-radius: 50%;
     object-fit: cover;
     border: 4px solid white;
-    position: absolute;
-    bottom: -60px;
-    left: 50%;
-    transform: translateX(-50%);
     background: white;
   }
 
   .profile-info {
-    margin-top: 80px;
-    text-align: center;
+    margin-left: 20px;
   }
 
-  .profile-info p {
+  .profile-info h2, .profile-info p {
     margin: 5px 0;
+    text-align: left;
   }
 
   .alert-container {
@@ -56,8 +62,8 @@
   }
 
   .profile-details {
-    margin-top: 30px;
-    background: white;
+    margin-top: 45px;
+    background:#fff7ec;
     padding: 20px;
     border-radius: 10px;
   }
@@ -68,6 +74,13 @@
     font-family: 'Times New Roman';
     font-size: 18px;
   }
+
+  .profile-picture:hover {
+  transform: scale(1.05);
+  transition: transform 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
 </style>
 
 <div class="container mt-4">
@@ -84,44 +97,51 @@
     {% endif %}
   {% endwith %}
 
-  <!-- Profile Header -->
-  <div class="profile-header">
-    {% if user.CoverPhoto %}
-      <img src="{{ url_for('static', filename='Userprofile/' ~ user.CoverPhoto) }}" alt="Cover Photo" class="cover-photo">
-    {% else %}
-      <img src="static/Userprofile/default_cover.png" alt="Cover Photo" class="cover-photo">
-    {% endif %}
-
-    {% if user.ProfilePicture %}
-      <img src="{{ url_for('static', filename='Userprofile/' ~ user.ProfilePicture) }}" alt="Profile Picture" class="profile-picture">
-    {% else %}
-      <img src="static/Userprofile/default_profilepic.png" alt="Profile Picture" class="profile-picture">
-    {% endif %}
-  </div>
-
-  <!-- Profile Info -->
-  <div class="profile-info">
-    <h2><b>Welcome, {{ user.UserName }}!</b></h2>
-    {% if user.StatusMessage %}
-      <p><i>"{{ user.StatusMessage }}"</i></p>
-    {% else %}
-      <p><i>No status message set.</i></p>
-    {% endif %}
-  </div>
-
-  <!-- Profile Details -->
   <div class="profile-details">
-    <p><b>Email:</b>  {{ user.email }}</p>
 
-    <p><b>Bio/About Me:</b><br>
+    <!-- Profile Header -->
+    <div class="profile-header">
+      {% if user.CoverPhoto %}
+        <img src="{{ url_for('static', filename='Userprofile/' ~ user.CoverPhoto) }}" alt="Cover Photo" class="cover-photo">
+      {% else %}
+        <img src="{{ url_for('static', filename='Userprofile/default_cover.png') }}" alt="Cover Photo" class="cover-photo">
+      {% endif %}
+
+      <div class="profile-content">
+        {% if user.ProfilePicture %}
+          <img src="{{ url_for('static', filename='Userprofile/' ~ user.ProfilePicture) }}" alt="Profile Picture" class="profile-picture">
+        {% else %}
+          <img src="{{ url_for('static', filename='Userprofile/default_profilepic.png') }}" alt="Profile Picture" class="profile-picture">
+        {% endif %}
+
+        <div class="profile-info">
+          <h3><b>{{ user.UserName }}</b></h3>
+          {% if user.StatusMessage %}
+            <p>"{{ user.StatusMessage }}"</p>
+          {% else %}
+            <p><i>No status message set.</i></p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <p><b>Username:</b> 
+      {{ user.UserName }}
+    </p>
+
+    <p><b>Email:</b> 
+      {{ user.email }}
+    </p>
+
+    <p><b>Bio:</b>
       {% if user.Bio %}
         {{ user.Bio }}
       {% else %}
-        No bio set yet.
+      <i>No bio set yet.</i>
       {% endif %}
     </p>
+    
   </div>
-
 </div>
 
 {% endblock %}
