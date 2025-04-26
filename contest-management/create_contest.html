@@ -13,7 +13,6 @@
         border: 1px solid #ccc;
         border-radius: 5px;
         font-family: 'Times New Roman', Times, serif;
-        background-color: #f9f9f9;
         cursor: pointer;
     }
     p {
@@ -75,6 +74,9 @@
         </select>
         <textarea id="rules" name="rules" required style="width: 700px; height: 150px; padding: 5px; border: 1px solid #ccc; border-radius: 5px; resize: none; font-family: 'Times New Roman', Times, serif;" placeholder="Enter rules & guidelines"></textarea>
     </div>
+
+    <a href="{{ url_for('preview_contest') }}" style=" display: inline-block; width: 180px; padding: 10px 15px; background-color: #D3AA72; color: white; font-size: 16px; font-weight: bold; text-align: center; 
+    border: none; border-radius: 8px; text-decoration: none; box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2); transition: background-color 0.3s ease-in-out;">🐾 Preview 🐾</a>
 
     <div style="text-align: right;">
         <button type="submit" style="padding: 10px 20px; background-color: #94693e; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">Create</button>
