@@ -34,7 +34,7 @@ def cat_list():
         query += " AND LOWER(name) LIKE ?"
         cat_filters.append(f"%{name}%")
 
-    if gender and gender != "Not sure":
+    if gender and gender != "Any":
         query += " AND gender = ?"
         cat_filters.append(gender)
 
