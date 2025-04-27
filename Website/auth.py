@@ -3,10 +3,20 @@ import re
 from .models import User
 from . import db
 from werkzeug.security import generate_password_hash, check_password_hash #for password hashing and verification
+from werkzeug.utils import secure_filename #handling file uploads
 from flask_login import login_user, login_required, logout_user, current_user
 from sqlalchemy.exc import IntegrityError
+import os
 
 auth = Blueprint("auth", __name__) #a Blueprint for authentication routes, Blueprint is like a container for related routes and functions
+
+# Configuration for file uploads
+UPLOAD_FOLDER = 'static/Userprofile'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+
+def allowed_file(filename):
+    #Check if the uploaded file has an allowed extension
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @auth.route("/login", methods=["GET", "POST"]) #POST is a HTTP request methods that send data to the server
 #HTTP request methods are ways for a web browser or app to communicate with a server over the internet
@@ -154,11 +164,51 @@ def create_profiles():
 @login_required
 def update_status():
     new_status = request.form.get("status")
-    
     if not new_status:
         flash("Please select a valid status message.", category="error")
     else:
-        session['StatusMessage'] = new_status   
+        current_user.status = new_status
         flash("Status message updated successfully!", category="success")
 
     return redirect(url_for("auth.user_profile"))
+
+@auth.route("/update-profile", methods=["GET", "POST"])
+@login_required
+def update_profile():
+    if request.method == "POST":
+
+        username = request.form.get("username")
+        if username:
+            current_user.UserName = username
+
+        bio = request.form.get("bio")
+        if bio:
+            current_user.Bio = bio
+
+        status = request.form.get("status")
+        if status:
+            current_user.status = status
+
+        if 'profile_picture' in request.files:
+            profile_picture = request.files['profile_picture']
+            if profile_picture and allowed_file(profile_picture.filename):
+                filename = secure_filename(profile_picture.filename)
+                profile_picture.save(os.path.join(UPLOAD_FOLDER, filename))
+                current_user.ProfilePicture = filename
+
+        if 'cover_photo' in request.files:
+            cover_photo = request.files['cover_photo']
+            if cover_photo and allowed_file(cover_photo.filename):
+                filename = secure_filename(cover_photo.filename)
+                cover_photo.save(os.path.join(UPLOAD_FOLDER, filename))
+                current_user.CoverPhoto = filename
+
+        #commit changes to the database (didnt do yet)
+        try:
+            flash("Profile updated successfully!", category="success")
+        except IntegrityError:
+            flash("An error occurred while updating the profile. Please try again.", category="error")
+
+        return redirect(url_for("auth.user_profile"))
+
+    return render_template("update_profile.html", user=current_user)
