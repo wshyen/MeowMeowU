@@ -20,3 +20,13 @@ def create_contest():
         return redirect(url_for('contest_preview')) #Redirects to Preview Page
 
     return render_template('create_contest.html', session)
+
+@app.route('/contest_preview', methods=['GET', 'POST'])
+def contest_preview():
+    if not session.get('contest_name'):
+        return redirect(url_for('create_contest'))  #if no data, go back to create contest page
+    
+    return render_template('contest_preview.html', **session)
+
+if __name__ == '__main__':
+    app.run(debug=True)
