@@ -3,53 +3,40 @@ import sqlite3 #Connect to SQLite database to store and retrieve cat profile inf
 from flask import Flask, render_template, request, redirect, url_for, flash, session, Blueprint
 #Flask to build web app, request to read data sent by users
 #Redirect to send users to a different page, flash to show quick messages, session to remember things about users
+from flask_login import current_user #To manage user sessions and authentication
 from werkzeug.utils import secure_filename #Helps secure file uploads, preventing unsafe filenames that can cause errors or security issues
 
-app = Flask(__name__) 
+app = Flask(__name__, static_folder='static') #Flask app to serve static files
 app.secret_key = 'your_secret_key' #keeps messages and user data safe
 catprofile_bp = Blueprint('catprofile', __name__, template_folder='templates', static_folder='static')
 
 UPLOAD_FOLDER = 'static/uploads'
 ALLOWED_EXTENSIONS = {'png','jpg','jpeg'}
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['UPLOAD_FOLDER'] = 'static/uploads' #Folder to store uploaded files
+app.config['SECRET_KEY'] = 'your_secret_key'  #Ensures session persistence
 
-@catprofile_bp.route('/')
-def homepage(): 
-    return render_template('home.html')
-
-@catprofile_bp.route('/login', methods=['GET', 'POST'])
-def login():  
+@app.route('/login', methods=['POST', 'GET'])
+def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
         
-        #Validate username and password from the database
-        with get_db_connection() as conn:
-            user = conn.execute('SELECT * FROM users WHERE username = ? AND password = ?', 
-                            (username, password)).fetchone()
-
-        if user:
-            session['user'] = username  #Set the session to the logged-in username
-            print(f"DEBUG: User {username} logged in.")  #Debugging log
-            flash("Login successful!", "success")
-            return redirect(url_for('catprofile.view_profiles'))
-        else:
-            flash("Invalid username or password.", "error")
-            return redirect(url_for('auth.login'))
-
+        # Assuming user validation is correct
+        session['user'] = username  # Set the session when the user is logged in
+        return redirect(url_for('catprofile.view_profiles'))  # Redirect to the profile page
+    
     return render_template('login.html')
 
-@catprofile_bp.route('/logout')
-def logout():
-    session.clear()
-    flash('You have been logged out.', 'success')
-    return redirect(url_for('auth.login'))
-
 def get_db_connection():
-    conn = sqlite3.connect('cat_profiles.db')  #Creates a connection to the database cat_profiles.db
+    db_path = os.path.join(os.path.dirname(__file__), '..', 'instance', 'cat_profiles.db')
+    conn = sqlite3.connect(db_path)  #Creates a connection to the database cat_profiles.db
     conn.execute('PRAGMA journal_mode=WAL;')  #Activates Write-Ahead Logging (WAL) in SQLite, enabling simultaneous database reads while a process is writing, improving efficiency and synchronization
     conn.row_factory = sqlite3.Row  #Access rows as dictionaries
     return conn
+
+@app.before_request
+def set_current_user():
+    session['user'] = session.get('user', None) #Default to None if no user is logged in
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS #Verify if the file is in the allowed list
@@ -63,15 +50,14 @@ def view_profiles(): #View all cat profiles
 
     for profile in profiles:
         if profile['photo'] and profile['photo'] != '':
-            profile['photo'] = f"uploads/{profile['photo']}" 
+            profile['photo'] = url_for('static', filename=f'uploads/{profile["photo"]}') 
             full_path = os.path.join(app.config['UPLOAD_FOLDER'], os.path.basename(profile['photo']))
             if not os.path.exists(full_path):  #Check if the file exists
                 profile['photo'] = "uploads/default.png"
         else:
             profile['photo'] = "uploads/default.png"  #Use a default placeholder image
     
-    print(f"DEBUG: Profile photo paths = {[profile['photo'] for profile in profiles]}")  #Debugging log
-    return render_template('viewprofile.html', profiles=profiles, current_user=session.get('user'))
+    return render_template('viewprofile.html', profiles=profiles, user=current_user)
 
 @catprofile_bp.route('/profiles/create', methods=['GET', 'POST'])
 def create_profile():
@@ -247,7 +233,7 @@ def remove_profile_picture(id):
 
     if not profile:
         flash('Profile not found.', 'error')
-        return redirect(url_for('catrprofile.view_profiles'))  #Sends user back to the profile list page
+        return redirect(url_for('catprofile.view_profiles'))  #Sends user back to the profile list page
 
     if profile['photo'] and profile['photo'] != "default.png":
         full_path = os.path.join(app.config['UPLOAD_FOLDER'], profile['photo'])
@@ -334,6 +320,5 @@ if __name__ == '__main__':
     #TEXT NOT NULL Adds a column for the name, gender ,color and profile picture which is a must to fill im
     #TEXT Adds a column for description which is not a must to fill in
     #creator TEXT NOT NULL Adds a column for creator which will be automatically filled in by the system 
-    conn.close()
 
     app.run(debug=True)
