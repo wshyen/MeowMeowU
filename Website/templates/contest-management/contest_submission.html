@@ -5,39 +5,73 @@
 {% block content %}
 <style>
     body {
-        background-color: #f2eadf;
+    background-color: #f2eadf;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.submission-container {
+    width: 800px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    text-align: left;
+}
+
+label, input, textarea {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 16px;
+    display: block;
+    margin-bottom: 10px;
+    width: 100%;
     }
-    
-    .upload-container {
-        width: 800px;
-        padding: 20px;
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        background-color: #f9f9f9;
-        margin: auto;
+
+textarea {
+    resize: none;  
+    height: 120px; 
+    overflow: auto;
     }
+
+button {
+    background-color: #94693e;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease-in-out;
+    }
+
 </style>
 
-<form action="{{ url_for('submit_entry') }}" method="post" enctype="multipart/form-data" class="upload-container">
-    <h2 style="text-align: center;">Submit Your Entry</h2>
+<div class="submission-container">
+    <h2 style="text-align: center; font-family: 'Times New Roman', Times, serif;">Submit Your Entry</h2>
 
-    <label for="username">Your username:</label>
-    <input type="text" id="username" name="username" required placeholder="Enter your username">
+    <form method="POST" enctype="multipart/form-data">
+        <label for="username"><strong>Username:</strong></label>
+        <input type="text" id="username" name="username" placeholder="Enter your username" required>
 
-    <label for="contest_select">Select Contest:</label>
-    <select id="contest_select" name="contest_id" required>
-        <option value="" disabled selected>Choose a contest</option>
-        {% for contest in contests %}
-        <option value="{{ contest.id }}">{{ contest.name }}</option>
-        {% endfor %}
-    </select>
+        <label for="contest"><strong>Select Contest:</strong></label>
+        <select id="contest" name="contest" required>
+            <option value="">Choose a contest</option>
+        </select>
 
-    <label for="entry_description">Entry Description:</label>
-    <textarea id="entry_description" name="entry_description" placeholder="Describe your submission">optional</textarea>
+        <label for="description" style="margin-top: 8px;"><strong>Entry description:</strong></label>
+        <textarea id="description" name="description" placeholder="Describe your entry (optional)"></textarea>
 
-    <label for="submission">Upload Your Entry:</label>
-    <input type="file" id="submission" name="submission" accept="image/*,video/*" required>
+        <label for="file"><strong>Upload Your Entry:</strong></label>
+        <input type="file" id="file" name="file" required>
 
-    <button type="submit" style="background-color: #94693e; color: white; border-radius: 5px;">Submit Entry</button>
-</form>
+        <button type="submit">Submit Entry</button>
+    </form>
+</div>
+
 {% endblock %}
