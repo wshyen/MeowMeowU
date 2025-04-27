@@ -34,10 +34,6 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row  #Access rows as dictionaries
     return conn
 
-@app.before_request
-def set_current_user():
-    session['user'] = session.get('user', None) #Default to None if no user is logged in
-
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS #Verify if the file is in the allowed list
 
@@ -50,12 +46,12 @@ def view_profiles(): #View all cat profiles
 
     for profile in profiles:
         if profile['photo'] and profile['photo'] != '':
-            profile['photo'] = url_for('static', filename=f'uploads/{profile["photo"]}') 
+            profile['photo_url'] = url_for('static', filename=f'uploads/{profile["photo"]}') 
             full_path = os.path.join(app.config['UPLOAD_FOLDER'], os.path.basename(profile['photo']))
             if not os.path.exists(full_path):  #Check if the file exists
-                profile['photo'] = "uploads/default.png"
+                profile['photo_url'] = "uploads/default.png"
         else:
-            profile['photo'] = "uploads/default.png"  #Use a default placeholder image
+            profile['photo_url'] = "uploads/default.png"  #Use a default placeholder image
     
     return render_template('viewprofile.html', profiles=profiles, user=current_user)
 
