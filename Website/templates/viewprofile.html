@@ -20,24 +20,20 @@
         line-height: 1.5;  /*Improves readability of description text*/
     }
     .profile-card {
-        width: 250px;
-        height: 450px;  
         border-radius: 12px;
         background: #fff;
         overflow: hidden;
         padding: 20px;
         text-align: left;
         box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-        display: flex;
         flex-direction: column;
         justify-content: flex-start;
         position: relative;
     }
     .profile-card p.description {
-        text-overflow: ellipsis;  /*Show ellipsis for truncated text*/
         text-align:center;
         flex-grow: 1;
-        overflow: auto;
+        overflow: visible;
         margin-top: 10px;
     }
     .profile-container {
@@ -97,34 +93,38 @@
 
     <!-- container for profile cards -->
     <div class="profile-container">
-        {% for profile in profiles if not profile.deleted %}
+        {% for profile in profiles %}
+            {% if not profile.deleted %}
 
         <!-- profile card box -->
-        <div class="profile-card" style="display: inline-block; width: 250px; height: 410px; border-radius: 12px; background: #fff; overflow: hidden; padding: 18px; text-align: center; margin-right: 15px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
-        {% if profile.photo %}
-            <img class="profile-picture" src="{{ url_for('static', filename=profile.photo) }}" alt="{{ profile.name }}" style="width: 150px; height: 150px; border-radius: 50%; border: 2px solid #ddd; margin: 0 auto; position: relative; display: flex; justify-content: center; align-items: center; overflow: hidden;">
-        {% else %}
-            <img class="profile-picture" src="{{ url_for('static', filename='uploads/default.png') }}" alt="Default Placeholder">
-        {% endif %}
-            <h2 style="margin: 0 0 10px; font-size: 1.5rem; color: #333;">{{ profile.name }}</h2>
-            <p style="margin: 0 0 5px; font-size: 0.9rem; color: #333"><strong>Gender:</strong> {{ profile.gender }}</p>
-            <p style="margin: 0 0 5px; font-size: 0.9rem; color: #333"><strong>Color:</strong> {{ profile.color }}</p>
-            <p class="description" style="margin: 0 0 10px; font-size: 0.9rem; color: #333;">
-                <strong>Description:</strong> {{ profile.description or 'No description available.' }}
-            </p>
+            <div class="profile-card" style="display: inline-block; width: 300px; height: 550px; border-radius: 12px; background: #fff; overflow: hidden; padding: 18px; text-align: center; margin-right: 15px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+                {% if profile.photo %}
+                    <img class="profile-picture" src="{{ url_for('static', filename=profile.photo) }}" alt="{{ profile.name }}" style="width: 150px; height: 150px; border-radius: 50%; border: 2px solid #ddd; margin: 0 auto; position: relative; display: flex; justify-content: center; align-items: center; overflow: hidden;">
+                {% else %}
+                    <img class="profile-picture" src="{{ url_for('static', filename='uploads/default.png') }}" alt="Default Placeholder">
+                {% endif %}
+                <h2 style="margin: 0 0 10px; font-size: 1.5rem; color: #333;">{{ profile.name }}</h2>
+                <p style="margin: 0 0 5px; font-size: 0.9rem; color: #333"><strong>Gender:</strong> {{ profile.gender }}</p>
+                <p style="margin: 0 0 5px; font-size: 0.9rem; color: #333"><strong>Color:</strong> {{ profile.color }}</p>
+                <p class="description" style="margin: 0 0 10px; font-size: 0.9rem; color: #333;">
+                    <strong>Description:</strong> {{ profile.description or 'No description available.' }}
+                </p>
 
-            <!-- edit and delete buttons -->
-            <div class="actions">
-                <a href="{{ url_for('edit_profile', id=profile.id) }}" 
-                   style="padding: 10px 15px; background: #94693e; color: white; text-decoration: none; border-radius: 5px; font-size: 0.9rem; cursor: pointer; font-weight: bold;">Edit</a>
+                <!-- edit and delete buttons -->
+                {% if current_user %}
+                    <div class="actions">
+                        <a href="{{ url_for('catprofile.edit_profile', id=profile.id) }}" 
+                        style="padding: 10px 15px; background: #94693e; color: white; text-decoration: none; border-radius: 5px; font-size: 0.9rem; cursor: pointer; font-weight: bold;">Edit</a>
 
-                {% if profile.creator == current_user['username'] %}
-                <a href="{{ url_for('confirm_delete', id=profile.id) }}" 
-                    style="padding: 10px 15px; background: #ff0000; color: white; text-decoration: none; border-radius: 5px; font-size: 0.9; cursor: pointer; font-weight: bold; margin-right: 10px;">Delete</a>
+                        {% if profile.creator == current_user %}
+                        <a href="{{ url_for('catprofile.confirm_delete', id=profile.id) }}" 
+                            style="padding: 10px 15px; background: #ff0000; color: white; text-decoration: none; border-radius: 5px; font-size: 0.9; cursor: pointer; font-weight: bold; margin-right: 10px;">Delete</a>
+                        {% endif %}
+                    </div>
                 {% endif %}
             </div>
-        </div>
-        {% endfor %}
+        {% endif %}
+    {% endfor %}
     </div>
     {% if profiles|length == 0 %}
     <p style="margin-top: 20px; font-size: 1.2rem; color: #555; text-align: center;">No profiles found. Create one by clicking <a href="{{ url_for('create_profile') }}" style="color: #007bff; text-decoration: none;">here</a>.</p>
