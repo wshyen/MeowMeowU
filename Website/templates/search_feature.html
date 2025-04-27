@@ -1,21 +1,24 @@
-<html>
-    <head>
-    <title>Search</title>
-    <style>
-         body {
+{% extends "base.html" %}
+{% block title %}SEARCH{% endblock %}
+
+{% block content %}
+
+<style>
+    body {
             font-family: 'Times New Roman', Times, serif;
             background-color: #f2eadf;
             margin: 0;
-            padding: 20px;
-            height: 100vh;
+            padding: 0;
         }
 
         h1 {
+            font-weight: bold;
             color: #94693e;
             text-align: center;
             font-size: 36px;
             margin-bottom: 10px;
             padding-top: 25px;
+            
         }
 
         .form-container{
@@ -23,7 +26,7 @@
             background-color: #fffaf3;
             margin: 40px auto;
             padding: 30px;
-            border-radius: 5px;
+            border-radius: 10px;
             box-sizing: border-box;
             box-shadow: 0px 8px 3px #c39f76;
         }
@@ -32,15 +35,16 @@
         .filter-bar label {
             color: #6b4f2f;
             font-weight: bold;
+            margin-bottom: 3px;
         }
         
         .search-bar input,
         .filter-bar select {
             width: 100%;
-            padding: 10px;
+            padding: 8px;
             background-color: #fffbe9;
             border-radius: 12px;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             transition: border-color 0.3s ease;
         }
 
@@ -52,10 +56,10 @@
 
         .search-bar input::placeholder {
             color: #c2a177;
-            font-style: italic;
-}
+            font-style: italic;     
+        }
 
-        .filter-bar select {
+    .filter-bar select {
             font-size: 14px;
             color: #380c0c;
             cursor: pointer;
@@ -85,56 +89,53 @@
             box-shadow: 0px 8px 15px rgba(255, 163, 71, 0.2);
         }
         
-    </style>
-    </head>
-
-    <body>
-        <h1>SEARCH CAT PROFILE</h1>
-        
-        <form action="/cat_list" method="get">
+</style>    
     
-            <div class="form-container">
+<h1>SEARCH CAT PROFILE</h1>
+  
+<form action="/cat_list" method="get">
+    
+    <div class="form-container">    
 
-                <div class="search-bar">
-                    <label for="name">Search by name:</label> 
-                    <input type="text" id="name" name="name" placeholder="e.g., Tom, Bubble" /> 
-                </div>   
+        <div class="search-bar">
+            <label for="name">Search by name:</label> 
+            <input type="text" id="name" name="name" placeholder="e.g., Tom, Bubble" /> 
+        </div>   
                 
-                <div class="filter-bar">
-                    <label for="gender">Filter by gender:</label>
-                    <select id="gender" name="gender">
-                        <option value="">Any</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                        <option value="Not sure">Not sure</option>
-                    </select>
+        <div class="filter-bar">
+            <label for="gender">Filter by gender:</label>
+            <select id="gender" name="gender">
+                <option value="">Any</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Not sure">Not sure</option>
+            </select>
 
-                    <label for="color">Filter by color:</label>
-                    <select id="color" name="color">
-                        <option value="">Any</option>
-                        <option value="Black">Black</option>
-                        <option value="White">White</option>
-                        <option value="Brown">Brown</option>
-                        <option value="Gray(Blue)">Gray (Blue)</option>
-                        <option value="Orange(Ginger)">Orange (Ginger)</option>
-                        <option value="Calico">Calico</option>
-                        <option value="Tortoiseshell">Tortoiseshell</option>
-                        <option value="Tabby">Tabby</option>
-                        <option value="Cream">Cream</option>
-                        <option value="Silver">Silver</option>
-                        <option value="Other">Other</option>
-                    </select>
-                 </div>
+            <label for="color">Filter by color:</label>
+            <select id="color" name="color">
+                <option value="">Any</option>
+                <option value="Black">Black</option>
+                <option value="White">White</option>
+                <option value="Brown">Brown</option>
+                <option value="Gray(Blue)">Gray (Blue)</option>
+                <option value="Orange(Ginger)">Orange (Ginger)</option>
+                <option value="Calico">Calico</option>
+                <option value="Tortoiseshell">Tortoiseshell</option>
+                <option value="Tabby">Tabby</option>
+                <option value="Cream">Cream</option>
+                <option value="Silver">Silver</option>
+                <option value="Other">Other</option>
+                </select>
+        </div>
     
-                 <div class="button-container">
-                    <button type="submit">🐾Go🐾</button> 
-                </div>
+         <div class="button-container">
+            <button type="submit">🐾Go🐾</button> 
+        </div>    
 
-            </div>
+    </div>    
            
 
-        </form>    
+</form>                    
+    
 
-
-    </body>
-</html>
+{% endblock %}
