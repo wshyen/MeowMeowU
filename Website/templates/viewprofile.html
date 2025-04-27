@@ -97,9 +97,9 @@
             {% if not profile.deleted %}
 
         <!-- profile card box -->
-            <div class="profile-card" style="display: inline-block; width: 300px; height: 550px; border-radius: 12px; background: #fff; overflow: hidden; padding: 18px; text-align: center; margin-right: 15px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); font-family: 'Times New Roman', Times, serif;">
+            <div class="profile-card" style="display: inline-block; width: 300px; height: 470px; border-radius: 12px; background: #fff; overflow: hidden; padding: 18px; text-align: center; margin-right: 15px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); font-family: 'Times New Roman', Times, serif;">
                 {% if profile.photo %}
-                    <img class="profile-picture" src="{{ url_for('static', filename='uploads/' + profile.photo) }}" alt="{{ profile.name }}" style="width: 150px; height: 150px; border-radius: 50%; border: 2px solid #ddd; margin: 0 auto; position: relative; display: flex; justify-content: center; align-items: center; overflow: hidden;">
+                    <img class="profile-picture" src="{{ url_for('static', filename='uploads/' + profile.photo) }}" alt="{{ profile.name }}" style="width: 150px; height: 150px; border-radius: 50%; border: 2px solid #ddd; margin: 0 auto; position: relative; overflow: hidden; display: block; object-fit: cover;">
                 {% else %}
                     <img class="profile-picture" src="{{ url_for('static', filename='uploads/default.png') }}" alt="Default Placeholder">
                 {% endif %}
