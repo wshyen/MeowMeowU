@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Edit User Profile{% endblock %}
+
+{% block content %}
+
+<style>
+  body {
+    background-color: #f2eadf;
+  }
+
+  h2, label {
+    font-family: 'Times New Roman';
+    color: rgb(78, 68, 57);
+  }
+
+  .form-container {
+    background: #fff7ec;
+    padding: 20px;
+    border-radius: 10px;
+    width: 80%;
+    margin: 0 auto;
+  }
+
+  input[type="text"], textarea, select, input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    font-family: 'Times New Roman', serif;
+  }
+
+  .readonly-field {
+    background-color: #e9ecef;
+    color: #6c757d;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    font-family: 'Times New Roman', serif;
+    margin-bottom: 10px;
+  }
+
+  button {
+    font-family: 'Times New Roman';
+    background-color: rgb(176, 148, 119);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background-color: rgb(156, 128, 100);
+  }
+</style>
+
+<div class="form-container">
+  <h2>Edit Profile</h2>
+  <form method="POST" action="{{ url_for('auth.update_profile') }}" enctype="multipart/form-data">
+    <!-- Username -->
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" value="{{ user.UserName }}" required>
+
+    <!-- Email (Read-only) -->
+    <label for="email">Email:</label>
+    <div class="readonly-field">{{ user.email }}</div>
+
+    <!-- Bio -->
+    <label for="bio">Bio:</label>
+    <textarea id="bio" name="bio" rows="4">{{ user.Bio }}</textarea>
+
+    <!-- Status -->
+    <label for="status">Status:</label>
+    <select id="status" name="status" required>
+      <option value="Meow~" {% if user.status == "Meow~" %}selected{% endif %}>Meow~🐱</option>
+      <option value="Sleepy..." {% if user.status == "Sleepy..." %}selected{% endif %}>Sleepy...🥱</option>
+      <option value="So tired!" {% if user.status == "So tired!" %}selected{% endif %}>So tired!💀</option>
+      <option value="On a break." {% if user.status == "On a break." %}selected{% endif %}>On a break.📴</option>
+      <option value="Need coffee!" {% if user.status == "Need coffee!" %}selected{% endif %}>Need coffee!☕</option>
+      <option value="Feeling great!" {% if user.status == "Feeling great!" %}selected{% endif %}>Feeling great!💪🏻</option>
+      <option value="Do not disturb." {% if user.status == "Do not disturb." %}selected{% endif %}>Do not disturb.🫥</option>
+      <option value="Busy but productive." {% if user.status == "Busy but productive." %}selected{% endif %}>Busy but productive.📖</option>
+    </select>
+
+    <!-- Profile Picture -->
+    <label for="profile_picture">Profile Picture:</label>
+    <input type="file" id="profile_picture" name="profile_picture" accept="image/*">
+
+    <!-- Cover Photo -->
+    <label for="cover_photo">Cover Photo:</label>
+    <input type="file" id="cover_photo" name="cover_photo" accept="image/*">
+
+    <!-- Submit Button -->
+    <button type="submit">Save Changes</button>
+  </form>
+</div>
+
+{% endblock %}
