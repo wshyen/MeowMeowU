@@ -43,6 +43,9 @@
         <p><strong>End Date & Time:</strong> {{ end_datetime }}</p>
     </div>
 
+    <p><strong>Voting Period:</strong> {{ voting_start }} to {{ voting_end }}</p>
+    <p><strong>Result Announcement Date:</strong> {{ result_announcement }}</p>
+
     <p><strong>Purpose:</strong></p>
     <p>{{ purpose }}</p>
 
@@ -52,6 +55,8 @@
         <li>{{ rule }}</li>
         {% endfor %}
     </ul>
+
+    <p><strong>Prizes:</strong> {{ prizes }}</p>
 
     <!-- Back to Creation Button -->
     <a href="{{ url_for('create_contest') }}" style="
