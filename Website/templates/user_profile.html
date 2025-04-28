@@ -9,7 +9,7 @@
     background-color: #f2eadf;
   }
 
-  h2, p, label {
+  h2, h5, label {
     font-family: 'Times New Roman';
     color: rgb(78, 68, 57);
   }
@@ -46,12 +46,20 @@
     background: white;
   }
 
+  .profile-picture:hover {
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+
   .profile-info {
     margin-left: 20px;
   }
 
   .profile-details {
     margin-top: 45px;
+    margin-bottom: 45px;
     background: #fff7ec;
     padding: 20px;
     border-radius: 10px;
@@ -66,6 +74,7 @@
     font-size: 16px;
     border-radius: 5px;
     cursor: pointer;
+    margin-top: 10px;
   }
 
   button:hover {
@@ -76,7 +85,6 @@
 <div class="container mt-4">
   <div class="profile-details">
 
-    <!-- Profile Header -->
     <div class="profile-header">
       {% if user.CoverPhoto %}
         <img src="{{ url_for('static', filename='Userprofile/' ~ user.CoverPhoto) }}" alt="Cover Photo" class="cover-photo">
@@ -90,16 +98,20 @@
         {% else %}
           <img src="{{ url_for('static', filename='Userprofile/default_profilepic.png') }}" alt="Profile Picture" class="profile-picture">
         {% endif %}
+
+        <div class="profile-info">
+          <h2><b>{{ user.UserName }}</b></h2>
+          <h5><b>Status:</b> {{ user.status }}</h5>
+        </div>
       </div>
     </div>
 
-    <h2>User Profile</h2>
-    <p><b>Username:</b> {{ user.UserName }}</p>
-    <p><b>Email:</b> {{ user.email }}</p>
-    <p><b>Bio:</b> {{ user.Bio if user.Bio else "No bio set yet." }}</p>
-    <p><b>Status:</b> {{ user.status }}</p>
+    <h5 style="padding: 5px;"><b>Email:</b> {{ user.email }}</h5>
+    <h5 style="padding: 5px;"><b>Birthday:</b> {{ user.Birthday if user.Birthday else "No birthday set yet." }}</h5>
+    <h5 style="padding: 5px;"><b>Hobby:</b> {{ user.hobby if user.hobby else "No hobby set yet." }}</h5>
+    <h5 style="padding: 5px;"><b>Bio:</b> {{ user.Bio if user.Bio else "No bio set yet." }}</h5>
 
-    <button onclick="location.href='{{ url_for('auth.update_profile') }}'">Edit Profile</button>
+    <button onclick="location.href='{{ url_for('auth.update_profile') }}'">🐾Edit Profile🐾</button>
 
   </div>
 </div>
