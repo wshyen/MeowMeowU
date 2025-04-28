@@ -20,6 +20,9 @@
     margin-bottom: 5px; /* Reduce space below */
     padding: 0px; /* Remove unnecessary padding */
     }
+    button {
+        font-size: 16px;
+    }
 </style>
 <form action="{{ url_for('create_contest')}}" method="post" enctype="multipart/form-data" onsubmit="return confirmSubmission();" style="width: 1000px; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9; display:inline-block; align-items: center;">
     <h1 style="text-align: center; margin-bottom: 20px; font-family: 'Times New Roman', Times, serif;">Create a Contest</h1>
@@ -103,7 +106,7 @@
     </div>
 
     <!-- Preview button -->
-    <button type="button" onclick="previewContest()">Preview</button>
+    <button type="button" style="padding: 10px 20px; background-color: #ffc107; color: #333333; border: none; outline: none; box-shadow: none; border-radius: 5px; cursor: pointer; font-family: 'Times New Roman', Times, serif; font-weight: bold;" onclick="previewContest()">Preview</button>
 
     <!-- Preview Section -->
     <div id="previewSection" style="display: none; border: 1px solid #ccc; padding: 10px; margin-top: 10px;">
@@ -120,7 +123,7 @@
 
     <!-- Create button -->
     <div style="text-align: right;">
-        <button type="submit" style="padding: 10px 20px; background-color: #94693e; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">Create</button>
+        <button type="submit" style="padding: 10px 20px; background-color: #94693e; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-family: 'Times New Roman', Times, serif;">Create</button>
     </div>
 </form>
 
