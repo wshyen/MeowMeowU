@@ -179,15 +179,29 @@ def update_profile():
 
         username = request.form.get("username")
         if username:
-            current_user.UserName = username
+            if len(username) < 3 or len(username) > 15 or not username[0].isupper():
+                flash("Username must be 3-15 characters long and start with a capital letter.", category="error")
+            else:
+                current_user.UserName = username
 
         bio = request.form.get("bio")
         if bio:
-            current_user.Bio = bio
+            if len(bio) > 200:
+                flash("Bio must not exceed 200 characters.", category="error")
+            else:
+                current_user.Bio = bio
 
         status = request.form.get("status")
         if status:
             current_user.status = status
+
+        birthday = request.form.get("birthday")
+        if birthday:
+            current_user.Birthday = birthday
+            
+        hobby = request.form.get("hobby")
+        if hobby:
+            current_user.Hobby = hobby
 
         if 'profile_picture' in request.files:
             profile_picture = request.files['profile_picture']
