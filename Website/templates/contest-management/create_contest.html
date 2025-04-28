@@ -27,6 +27,17 @@
 <form action="{{ url_for('create_contest')}}" method="post" enctype="multipart/form-data" onsubmit="return confirmSubmission();" style="width: 1000px; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9; display:inline-block; align-items: center;">
     <h1 style="text-align: center; margin-bottom: 20px; font-family: 'Times New Roman', Times, serif;">Create a Contest</h1>
 
+    <div style="display: flex; align-items: flex-start; flex-direction: column; margin-bottom: 15px;">
+        <label for="contestBanner" style="font-weight: bold; text-align: left; display: block; font-family: 'Times New Roman', Times, serif;">Upload contest banner:</label>
+        <input type="file" id="contestBanner" name="contest_banner" accept="image/*" onchange="previewBanner(event)">
+        <p style="font-size: 14px; color: gray; margin-top: 5px;">
+            Recommended size: 800x400px (Landscape, JPG/PNG format)
+        </p>
+
+        <!-- Banner Preview Area -->
+        <img id="bannerPreview" src="#" alt="Banner Preview" style="display: none; width: 500px; height: 150px; margin-top: 10px; border-radius: 10px;">
+    </div>
+
     <div style="display: flex; align-items: left; flex-direction: column; margin-bottom: 15px;">
         <label for="contest_name" style="width: 150px; font-weight: bold; text-align: left; font-family: 'Times New Roman', Times, serif;">Contest name:</label>
         <input type="text" id="contest_name" name="contest_name" required value="{{ contest_name or '' }}" style="width: 700px; padding: 5px; border: 1px solid #ccc; border-radius: 5px; font-family:'Times New Roman', Times, serif" placeholder="Enter contest name">
@@ -105,22 +116,6 @@
         <input type="text" id="prizes" name="prizes" required value="{{ prizes or '' }}" style="width: 700px; padding: 5px; border: 1px solid #ccc; border-radius: 5px; font-family:'Times New Roman', Times, serif" placeholder="Describe the prizes for winners">
     </div>
 
-    <!-- Preview button -->
-    <button type="button" style="padding: 10px 20px; background-color: #ffc107; color: #333333; border: none; outline: none; box-shadow: none; border-radius: 5px; cursor: pointer; font-family: 'Times New Roman', Times, serif; font-weight: bold;" onclick="previewContest()">Preview</button>
-
-    <!-- Preview Section -->
-    <div id="previewSection" style="display: none; border: 1px solid #ccc; padding: 10px; margin-top: 10px;">
-        <h3>Contest Preview</h3>
-        <p><strong>Contest Name:</strong> <span id="previewContestName"></span></p>
-        <p><strong>Start Date & Time:</strong> <span id="previewStartDate"></span></p>
-        <p><strong>End Date & Time:</strong> <span id="previewEndDate"></span></p>
-        <p><strong>Voting Period:</strong> <span id="previewVotingPeriod"></span></p>
-        <p><strong>Result Announcement Date:</strong> <span id="previewResultDate"></span></p>
-        <p><strong>Purpose:</strong> <span id="previewPurpose"></span></p>
-        <p><strong>Rules & Guidelines:</strong> <span id="previewRules"></span></p>
-        <p><strong>Prizes:</strong> <span id="previewPrizes"></span></p>
-    </div>
-
     <!-- Create button -->
     <div style="text-align: right;">
         <button type="submit" style="padding: 10px 20px; background-color: #94693e; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-family: 'Times New Roman', Times, serif;">Create</button>
@@ -128,6 +123,20 @@
 </form>
 
 <script>
+    //Preview the uploaded banner image before submission
+    function previewBanner(event) {
+      const file = event.target.files[0];
+      if (file) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+              const previewImage = document.getElementById("bannerPreview");
+              previewImage.src = e.target.result;
+              previewImage.style.display = "block"; // Show the preview
+          };
+          reader.readAsDataURL(file);
+        }
+    }
+
     //Formating Purpose of the Contest
     document.getElementById("formatPurpose").addEventListener("change", function() {
     let formatType = this.value;
@@ -244,21 +253,6 @@
             return;
         }
     });
-
-    function previewContest() {
-    //Get values from input fields
-    document.getElementById("previewContestName").innerText = document.querySelector("[name='contest_name']").value;
-    document.getElementById("previewStartDate").innerText = document.querySelector("[name='start_datetime']").value;
-    document.getElementById("previewEndDate").innerText = document.querySelector("[name='end_datetime']").value;
-    document.getElementById("previewVotingPeriod").innerText = document.querySelector("[name='voting_period']").value;
-    document.getElementById("previewResultDate").innerText = document.querySelector("[name='result_date']").value;
-    document.getElementById("previewPurpose").innerText = document.querySelector("[name='purpose']").value;
-    document.getElementById("previewRules").innerText = document.querySelector("[name='rules']").value;
-    document.getElementById("previewPrizes").innerText = document.querySelector("[name='prizes']").value;
-
-    //Make the preview section visible
-    document.getElementById("previewSection").style.display = "block";
-    }
 
     function confirmSubmission() {
     return confirm("Are you sure you want to create the contest?");
