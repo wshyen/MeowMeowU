@@ -11,18 +11,18 @@
     align-items: center;
     height: 100vh;
     margin: 0;
-}
+    }
 
-.submission-container {
+    .submission-container {
     width: 800px;
     padding: 20px;
     border: 1px solid #ddd;
     border-radius: 10px;
     background-color: #f9f9f9;
     text-align: left;
-}
+    }
 
-label, input, textarea {
+    label, input, textarea {
     font-family: 'Times New Roman', Times, serif;
     font-size: 16px;
     display: block;
@@ -30,13 +30,13 @@ label, input, textarea {
     width: 100%;
     }
 
-textarea {
+    textarea {
     resize: none;  
     height: 120px; 
     overflow: auto;
     }
 
-button {
+    button {
     background-color: #94693e;
     color: white;
     font-size: 16px;
@@ -48,6 +48,13 @@ button {
     text-align: center;
     box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
     transition: background-color 0.3s ease-in-out;
+    }
+
+    input[type="checkbox"] {
+    margin: 0;
+    vertical-align: middle;
+    width: 18px;
+    height: 18px;
     }
 
 </style>
@@ -62,6 +69,7 @@ button {
         <label for="contest"><strong>Select Contest:</strong></label>
         <select id="contest" name="contest" required>
             <option value="">Choose a contest</option>
+            <option value="contest1">Contest 1</option>
         </select>
 
         <label for="description" style="margin-top: 8px;"><strong>Entry description:</strong></label>
@@ -70,8 +78,17 @@ button {
         <label for="file"><strong>Upload Your Entry:</strong></label>
         <input type="file" id="file" name="file" required>
 
-        <button type="submit">Submit Entry</button>
+        <label for="rulesAgree" style="display: flex; align-items: center; gap: 10px;">
+            <input type="checkbox" id="rulesAgree" required>
+            I have read and agree to the Rules & Guidelines.
+        </label>        
+
+        <button type="submit" onclick="return confirmSubmission()">Submit Entry</button>
     </form>
 </div>
-
+<script>
+    function confirmSubmission() {
+        return confirm("Are you sure you want to submit your entry?");
+    }
+</script>
 {% endblock %}
