@@ -1,1 +1,17 @@
+<<<<<<< HEAD
 "*.pyc" 
+=======
+# 忽略 Python 缓存文件
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 忽略 VSCode 工作区配置（如果你用 VSCode）
+.vscode/
+
+# 忽略虚拟环境（如果你有）
+venv/
+env/
+
+>>>>>>> 6dc9133c705e0a42553ff7243527556b5012f2ae
