@@ -7,20 +7,34 @@
     body {
         background-color: #f2eadf;
     }
+
+    .banner {
+    width: 100%;
+    max-width: 800px; /* Limits banner size */
+    height: auto; /* Keeps aspect ratio */
+    display: block;
+    margin: 0 auto; /* Centers the banner */
+    }
 </style>
 
-<div style="padding: 20px;">
+    <div style="padding: 20px;">
     <h1 style="text-align: center; margin-bottom: 20px; font-family: 'Times New Roman', Times, serif;">Contest</h1>
 
-    <ul>
-        {% for contest in contests %}
-            <li style="margin-bottom: 10px; font-family: 'Times New Roman', Times, serif">
+    {% for contest in contests %}
+    <div class="contest-card">
+        <h2>{{ contest.name }}</h2>
 
-        {% endfor %}
-    </ul>
+        <!-- Show contest banner if available -->
+        {% if contest.banner_url %}
+            <img src="{{ contest.banner_url }}" alt="Contest Banner" class="banner">
+        {% endif %}
+
+        <p>{{ contest.description }}</p>
+        <p>Start Date: {{ contest.start_datetime }}</p>
+        <p>End Date: {{ contest.end_datetime }}</p>
 
     {% if current_user.role == 'admin' %}
-    <button id="addContest" style="position: fixed; bottom: 20px; right: 20px;">+</button>
+        <button id="addContest" style="position: fixed; bottom: 20px; right: 20px;">+</button>
     {% endif %}
 
 </div>
