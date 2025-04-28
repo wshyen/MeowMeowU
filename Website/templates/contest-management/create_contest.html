@@ -244,6 +244,22 @@
             return;
         }
     });
+
+    function previewContest() {
+    //Get values from input fields
+    document.getElementById("previewContestName").innerText = document.querySelector("[name='contest_name']").value;
+    document.getElementById("previewStartDate").innerText = document.querySelector("[name='start_datetime']").value;
+    document.getElementById("previewEndDate").innerText = document.querySelector("[name='end_datetime']").value;
+    document.getElementById("previewVotingPeriod").innerText = document.querySelector("[name='voting_period']").value;
+    document.getElementById("previewResultDate").innerText = document.querySelector("[name='result_date']").value;
+    document.getElementById("previewPurpose").innerText = document.querySelector("[name='purpose']").value;
+    document.getElementById("previewRules").innerText = document.querySelector("[name='rules']").value;
+    document.getElementById("previewPrizes").innerText = document.querySelector("[name='prizes']").value;
+
+    //Make the preview section visible
+    document.getElementById("previewSection").style.display = "block";
+    }
+
     function confirmSubmission() {
     return confirm("Are you sure you want to create the contest?");
     }
