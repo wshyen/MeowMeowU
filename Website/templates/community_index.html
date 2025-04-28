@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}SEARCH{% endblock %}
+
+{% block content %}
+
+<h1>Meow Meow Community</h1>
+<p>Share the lives of our campus cats</p>
+
+<!-- Create Post -->
+
+<p><a href="{{ url_for('posts.create') }}">+ Create New Post</a></p>
+
+<hr>
+
+<h2>Latest Posts</h2>
+
+{% for post in posts %}
+<div class="post">
+    <p><strong>{{ post['username'] }}</strong> posted at {{ post['created_at'] }}</p>
+    <p>{{ post['content'] }}</p>
+    {% if post['image_path'] %}
+        <img src="{{ url_for('static', filename=post['image_path']) }}" width="300">
+    {% endif %}
+    <p>
+        ❤️ {{ post['like_count'] }}
+        <a href="/posts/like/{{ post['id'] }}">Like</a> | 
+        <a href="/posts/{{ post['id'] }}">Comments</a>
+    </p>
+</div>
+<hr>
+{% endfor %}
+{% endblock %}
