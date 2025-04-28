@@ -3,6 +3,11 @@
 {% block title %}Contest{% endblock %}
 
 {% block content %}
+<style>
+    body {
+        background-color: #f2eadf;
+    }
+</style>
 
 <div style="padding: 20px;">
     <h1 style="text-align: center; margin-bottom: 20px; font-family: 'Times New Roman', Times, serif;">Contest</h1>
@@ -14,5 +19,17 @@
         {% endfor %}
     </ul>
 
+    {% if current_user.role == 'admin' %}
+    <button id="addContest" style="position: fixed; bottom: 20px; right: 20px;">+</button>
+    {% endif %}
+
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const userRole = "{{ current_user.role }}"; //Get role from backend
+        if (userRole !== "admin") {
+            document.getElementById("addContest").style.display = "none"; //Hide button for non-admins
+        }
+    });
+</script>
 {% endblock %}
