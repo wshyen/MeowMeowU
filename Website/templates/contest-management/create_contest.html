@@ -101,12 +101,22 @@
         <label for="prizes" style="width: 150px; font-weight: bold; text-align: left; font-family: 'Times New Roman', Times, serif;">Prizes:</label>
         <input type="text" id="prizes" name="prizes" required value="{{ prizes or '' }}" style="width: 700px; padding: 5px; border: 1px solid #ccc; border-radius: 5px; font-family:'Times New Roman', Times, serif" placeholder="Describe the prizes for winners">
     </div>
-        
-    <!-- Preview Contest button -->
-    <button type="submit" formaction="{{ url_for('preview_contest') }}" formmethod="post"
-        style="display: inline-block; width: 180px; padding: 10px 15px; background-color: #D3AA72; color: white; font-size: 16px; font-weight: bold; text-align: center; border: none; border-radius: 8px; text-decoration: none; box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2); transition: background-color 0.3s ease-in-out;">
-        🐾 Preview 🐾
-    </button>
+
+    <!-- Preview button -->
+    <button type="button" onclick="previewContest()">Preview</button>
+
+    <!-- Preview Section -->
+    <div id="previewSection" style="display: none; border: 1px solid #ccc; padding: 10px; margin-top: 10px;">
+        <h3>Contest Preview</h3>
+        <p><strong>Contest Name:</strong> <span id="previewContestName"></span></p>
+        <p><strong>Start Date & Time:</strong> <span id="previewStartDate"></span></p>
+        <p><strong>End Date & Time:</strong> <span id="previewEndDate"></span></p>
+        <p><strong>Voting Period:</strong> <span id="previewVotingPeriod"></span></p>
+        <p><strong>Result Announcement Date:</strong> <span id="previewResultDate"></span></p>
+        <p><strong>Purpose:</strong> <span id="previewPurpose"></span></p>
+        <p><strong>Rules & Guidelines:</strong> <span id="previewRules"></span></p>
+        <p><strong>Prizes:</strong> <span id="previewPrizes"></span></p>
+    </div>
 
     <!-- Create button -->
     <div style="text-align: right;">
