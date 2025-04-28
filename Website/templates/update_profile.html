@@ -12,35 +12,45 @@
   h2, label {
     font-family: 'Times New Roman';
     color: rgb(78, 68, 57);
+    margin-top: 10px;
+  }
+
+  label {
+    font-size: 20px;
   }
 
   .form-container {
+    margin-top: 45px;
+    margin-bottom: 45px;
     background: #fff7ec;
     padding: 20px;
     border-radius: 10px;
-    width: 80%;
-    margin: 0 auto;
   }
 
   input[type="text"], textarea, select, input[type="file"] {
     width: 100%;
-    padding: 10px;
-    margin: 10px 0;
+    padding: 8px;
+    margin: 6px 0;
     border-radius: 5px;
     border: 1px solid #ccc;
     font-size: 16px;
-    font-family: 'Times New Roman', serif;
+    font-family: 'Times New Roman';
+  }
+
+  textarea {
+    height: 120px;
+    resize: none;
   }
 
   .readonly-field {
     background-color: #e9ecef;
     color: #6c757d;
-    padding: 10px;
+    padding: 8px;
     border-radius: 5px;
     font-size: 16px;
     border: 1px solid #ccc;
-    font-family: 'Times New Roman', serif;
-    margin-bottom: 10px;
+    font-family: 'Times New Roman';
+    margin-bottom: 6px;
   }
 
   button {
@@ -52,31 +62,29 @@
     font-size: 16px;
     border-radius: 5px;
     cursor: pointer;
+    margin-top: 20px;
   }
 
   button:hover {
     background-color: rgb(156, 128, 100);
   }
+
+  input[type="date"] {
+    font-family: 'Times New Roman';
+  }
+
 </style>
 
 <div class="form-container">
-  <h2>Edit Profile</h2>
+  <h2><b>Edit Profile</b></h2>
   <form method="POST" action="{{ url_for('auth.update_profile') }}" enctype="multipart/form-data">
-    <!-- Username -->
+
     <label for="username">Username:</label>
-    <input type="text" id="username" name="username" value="{{ user.UserName }}" required>
+    <input type="text" id="username" name="username" value="{{ user.UserName }}">
 
-    <!-- Email (Read-only) -->
-    <label for="email">Email:</label>
-    <div class="readonly-field">{{ user.email }}</div>
-
-    <!-- Bio -->
-    <label for="bio">Bio:</label>
-    <textarea id="bio" name="bio" rows="4">{{ user.Bio }}</textarea>
-
-    <!-- Status -->
     <label for="status">Status:</label>
     <select id="status" name="status" required>
+      <option value="" disabled selected>Select your status🐾</option>
       <option value="Meow~" {% if user.status == "Meow~" %}selected{% endif %}>Meow~🐱</option>
       <option value="Sleepy..." {% if user.status == "Sleepy..." %}selected{% endif %}>Sleepy...🥱</option>
       <option value="So tired!" {% if user.status == "So tired!" %}selected{% endif %}>So tired!💀</option>
@@ -87,16 +95,38 @@
       <option value="Busy but productive." {% if user.status == "Busy but productive." %}selected{% endif %}>Busy but productive.📖</option>
     </select>
 
-    <!-- Profile Picture -->
+    <label for="email">Email:</label>
+    <div class="readonly-field">{{ user.email }}</div>
+
+    <label for="birthday">Birthday:</label>
+    <input type="date" id="birthday" name="birthday" value="{{ user.Birthday }}">
+
+    <br>
+
+    <label for="hobby">Hobby:</label>
+    <select id="hobby" name="hobby" required>
+      <option value="" disabled selected>Select your hobby🐾</option>
+      <option value="Cat Photography" {% if user.hobbies == "Cat Photography" %}selected{% endif %}>Cat Photography 📸</option>
+      <option value="Cat Blogging" {% if user.hobbies == "Cat Blogging" %}selected{% endif %}>Cat Blogging 📝</option>
+      <option value="Cat Toy Crafting" {% if user.hobbies == "Cat Toy Crafting" %}selected{% endif %}>Cat Toy Crafting 🧶</option>
+      <option value="Fostering Cats" {% if user.hobbies == "Fostering Cats" %}selected{% endif %}>Fostering Cats 🏡</option>
+      <option value="Cat Grooming" {% if user.hobbies == "Cat Grooming" %}selected{% endif %}>Cat Grooming 🧼</option>
+      <option value="Building Cat Furniture" {% if user.hobbies == "Building Cat Furniture" %}selected{% endif %}>Building Cat Furniture 🛠️</option>
+      <option value="Exploring Cat Cafes" {% if user.hobbies == "Exploring Cat Cafes" %}selected{% endif %}>Exploring Cat Cafes ☕</option>
+      <option value="Creating Cat Memes" {% if user.hobbies == "Creating Cat Memes" %}selected{% endif %}>Creating Cat Memes 🎥</option>
+    </select>
+
+    <label for="bio">Bio:</label>
+    <textarea id="bio" name="bio" rows="4">{{ user.Bio }}</textarea>
+
+
     <label for="profile_picture">Profile Picture:</label>
     <input type="file" id="profile_picture" name="profile_picture" accept="image/*">
 
-    <!-- Cover Photo -->
     <label for="cover_photo">Cover Photo:</label>
     <input type="file" id="cover_photo" name="cover_photo" accept="image/*">
 
-    <!-- Submit Button -->
-    <button type="submit">Save Changes</button>
+    <button type="submit">🐾Save Changes🐾</button>
   </form>
 </div>
 
