@@ -3,12 +3,46 @@
 
 {% block content %}
 
+<style>
+    body {
+        font-family: 'Times New Roman', Times, serif;
+        background-color: #f2eadf;
+        margin: 0;
+        padding: 0;
+    }
+
+    h1 {
+        font-weight: bold;
+        color: #94693e;
+        text-align: center;
+        font-size: 36px;
+        margin-bottom: 10px;
+        padding-top: 25px;
+    }
+
+    h2{
+        font-weight: bold;
+        font-size: 25px;
+        color: #6b4f2f;
+        text-align: center;
+        font-style: italic;
+        margin-top: 0;
+        margin-bottom: 20px;
+    }
+    p {
+        text-align: center;
+        color: #5c4430;
+        font-size: 18px;
+    }
+
+</style>
+
 <h1>Meow Meow Community</h1>
 <p>Share the lives of our campus cats</p>
 
 <!-- Create Post -->
 
-<p><a href="{{ url_for('posts.create') }}">+ Create New Post</a></p>
+<button onclick="openModal()">+ New Post</button>
 
 <hr>
 
@@ -21,12 +55,38 @@
     {% if post['image_path'] %}
         <img src="{{ url_for('static', filename=post['image_path']) }}" width="300">
     {% endif %}
-    <p>
+    <div class="post-actions">
         ❤️ {{ post['like_count'] }}
         <a href="/posts/like/{{ post['id'] }}">Like</a> | 
         <a href="/posts/{{ post['id'] }}">Comments</a>
-    </p>
+    </div>
 </div>
+
 <hr>
+
 {% endfor %}
+
+<div id="postModal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h3>New Post</h3>
+        <form action="/posts/create" method="post" enctype="multipart/form-data">
+            <textarea name="content" placeholder="What's on your mind?" required></textarea><br>
+            <input type="file" name="image"><br>
+            <button type="submit">Post</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function openModal() {
+    document.getElementById('postModal').style.display = 'block';
+}
+function closeModal() {
+    document.getElementById('postModal').style.display = 'none';
+}
+</script>
 {% endblock %}
