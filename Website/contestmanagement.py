@@ -1,32 +1,26 @@
-from flask import Flask, render_templates, request, session, redirect, url_for
+from flask import Flask, render_template, request, session, redirect, url_for, jsonify, flash
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  
 
+@app.route("/")
+def contest_page():
+    return render_template("contest.html", contests=contests, user=current_user)
+
 @app.route('/create_contest', methods=['GET', 'POST'])
 def create_contest():
-    if request.method == 'POST':
-        # Store form data in session
-        session['contest_name'] = request.form.get('contest_name', '')
-        session['start_datetime'] = request.form.get('start_datetime', '')
-        session['end_datetime'] = request.form.get('end_datetime', '')
-        session['voting_start'] = request.form.get('voting_start', '')
-        session['voting_end'] = request.form.get('voting_end', '')
-        session['result_announcement'] = request.form.get('result_announcement', '')
-        session['purpose'] = request.form.get('purpose', '')
-        session['rules'] = request.form.get('rules', '')
-        session['prizes'] = request.form.get('prizes', '')
+    if current_user.role != 'admin':  #Check if user is an admin
+        flash("Access Denied. Admins Only!", "error")
+        return redirect(url_for('home'))  #Send non-admins users to homepage
+    return render_template('create_contest.html')
 
-        return redirect(url_for('contest_preview')) #Redirects to Preview Page
-
-    return render_template('create_contest.html', session)
-
-@app.route('/contest_preview', methods=['GET', 'POST'])
-def contest_preview():
-    if not session.get('contest_name'):
-        return redirect(url_for('create_contest'))  #if no data, go back to create contest page
-    
-    return render_template('contest_preview.html', **session)
+def check_user_submission(user_id):
+    existing_entry = Submission.query.filter_by(user_id=user_id).first()
+    if existing_entry:
+        return "You have already submitted an entry."
+    else:
+        return None
 
 if __name__ == '__main__':
     app.run(debug=True)
