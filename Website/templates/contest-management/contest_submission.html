@@ -56,6 +56,43 @@
         width: 18px;
         height: 18px;
     }
+    
+    .hidden {
+        display: none;
+    }
+
+    #confirmation-message {
+        text-align: center;
+        font-size: 18px;
+        font-weight: bold;
+        color: #4caf50;
+        margin-top: 20px;
+        padding: 10px;
+        background-color: #eaffea;
+        border-radius: 8px;
+        animation: fadeIn 0.8s ease-in-out;
+    }
+
+    #paw-stamp {
+    width: 80px;
+    opacity: 0;
+    visibility: hidden;
+    margin: 10px auto;
+    transform: scale(0.5) rotate(-20deg);
+    transition: opacity 0.5s ease-in-out, transform 0.3s ease-in-out;
+    animation: stampEffect 0.5s ease-in-out forwards;
+    animation-delay: 0.5s;
+    }
+
+    @keyframes fadeIn {
+        0% { opacity: 0; transform: scale(0.9); }
+        100% { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes stampEffect {
+        0% { opacity: 0; transform: scale(2) rotate(0deg); }
+        100% { opacity: 1; transform: scale(1) rotate(-20deg); }
+    }
 
 </style>
 
@@ -83,12 +120,40 @@
             I have read and agree to the Rules & Guidelines.
         </label>        
 
-        <button type="submit" style="cursor: pointer;" onclick="return confirmSubmission()">Submit Entry</button>
+        <button type="submit" style="cursor: pointer;" onclick="validateForm(event)">Submit Entry</button>
+        
     </form>
+    
+    <div id="confirmation-message" class="hidden">
+        <p>Your entry has been submitted successfully!</p>
+        <img id="paw-stamp" src="/static/images/paw-stamp.png" alt="Paw Stamp" style="width: 50px; height: 50px; margin-top: 10px; display: none;">
+    </div>
 </div>
 <script>
-    function confirmSubmission() {
-        return confirm("Are you sure you want to submit your entry?");
+    function validateForm(event) {
+        event.preventDefault();
+
+        //Get required fields
+        const username = document.getElementById("username").value.trim();
+        const contest = document.getElementById("contest").value;
+        const file = document.getElementById("file").value;
+        const rulesAgree = document.getElementById("rulesAgree").checked;
+
+        //Check if all required fields are filled
+        if (username === "" || contest === "" || file === "" || !rulesAgree) {
+            alert("Please complete all required fields before submitting.");
+            return;
+        }
+
+        //Show confirmation message
+        document.getElementById("confirmation-message").classList.remove("hidden");
+
+        //Make the paw stamp visible after a short delay
+        setTimeout(() => {
+            const pawStamp = document.getElementById("paw-stamp");
+            pawStamp.style.display = "block"; // Make sure it's visible
+            pawStamp.style.opacity = "1"; // Fade it in
+        }, 500); //Delay for smoother appearance
     }
 </script>
 {% endblock %}
