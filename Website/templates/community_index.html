@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}SEARCH{% endblock %}
+{% block title %}COMMUNITY{% endblock %}
 
 {% block content %}
 
@@ -35,12 +35,94 @@
         font-size: 18px;
     }
 
+    .post {
+        width: 80%;
+        max-width: 600px;
+        background-color: #ffffff;
+        border-radius: 10px;
+        padding: 15px;
+        margin: 20px auto;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    .post img {
+        display: block;
+        margin: 10px auto;
+        border-radius: 10px;
+        max-width: 100%;
+        height: auto;
+    }
+
+    .post-actions {
+        text-align: center;
+        margin-top: 10px;
+        font-size: 16px;
+    }
+
+    .post-actions a {
+        margin: 0 10px;
+        text-decoration: none;
+        color: #6b4f2f;
+        font-weight: bold;
+    }
+
+    button {
+        display: block;
+        margin: 10px auto;
+        padding: 10px 20px;
+        background-color: #94693e;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    button:hover {
+        background-color: #7d5732;
+    }
+
+    /* Modal styles */
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.4);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 999;
+    }
+
+    .modal-content {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        position: relative;
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    .close {
+        position: absolute;
+        top: 8px;
+        right: 12px;
+        font-size: 24px;
+        color: #333;
+        cursor: pointer;
+    }
+
 </style>
 
 <h1>Meow Meow Community</h1>
 <p>Share the lives of our campus cats</p>
 
-<!-- Create Post -->
 
 <button onclick="openModal()">+ New Post</button>
 
@@ -49,29 +131,29 @@
 <h2>Latest Posts</h2>
 
 {% for post in posts %}
-<div class="post">
-    <p><strong>{{ post['username'] }}</strong> posted at {{ post['created_at'] }}</p>
-    <p>{{ post['content'] }}</p>
-    {% if post['image_path'] %}
-        <img src="{{ url_for('static', filename=post['image_path']) }}" width="300">
-    {% endif %}
-    <div class="post-actions">
-        ❤️ {{ post['like_count'] }}
-        <a href="/posts/like/{{ post['id'] }}">Like</a> | 
-        <a href="/posts/{{ post['id'] }}">Comments</a>
+    <div class="post">
+        <p><strong>{{ post['username'] }}</strong> posted at {{ post['created_at'] }}</p>
+        <p>{{ post['content'] }}</p>
+        {% if post['image_path'] %}
+            <img src="{{ url_for('static', filename=item['image_path']) }}" width="300">
+        {% endif %}
+        <div class="post-actions">
+            ❤️ {{ post['like_count'] }}
+            <a href="/post/like/{{ post['id'] }}">Like</a> | 
+            <a href="/post/{{ post['id'] }}">Comments</a>
+        </div>
     </div>
-</div>
+{% endfor %}
 
 <hr>
 
-{% endfor %}
 
 <div id="postModal" class="modal" style="display:none;">
     <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>
         <h3>New Post</h3>
-        <form action="/posts/create" method="post" enctype="multipart/form-data">
-            <textarea name="content" placeholder="What's on your mind?" required></textarea><br>
+        <form action="/post/create" method="post" enctype="multipart/form-data">
+            <textarea name="content" placeholder="Have a meowment to share?" required></textarea><br>
             <input type="file" name="image"><br>
             <button type="submit">Post</button>
         </form>
