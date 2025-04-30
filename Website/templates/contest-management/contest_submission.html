@@ -76,7 +76,7 @@
     #paw-stamp {
     width: 80px;
     opacity: 0;
-    visibility: hidden;
+    display: none;
     margin: 10px auto;
     transform: scale(0.5) rotate(-20deg);
     transition: opacity 0.5s ease-in-out, transform 0.3s ease-in-out;
@@ -126,7 +126,7 @@
     
     <div id="confirmation-message" class="hidden">
         <p>Your entry has been submitted successfully!</p>
-        <img id="paw-stamp" src="/static/images/paw-stamp.png" alt="Paw Stamp" style="width: 50px; height: 50px; margin-top: 10px; display: none;">
+        <img id="paw-stamp" src="{{ url_for('static', filename='Images/paw-stamp.png') }}" alt="Paw Stamp" style="width: 50px; height: 50px; margin-top: 10px; display: none;">
     </div>
 </div>
 <script>
