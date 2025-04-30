@@ -33,7 +33,7 @@ def suggestion():
     user_notes = Note.query.filter_by(user_id=current_user.id).all()
     return render_template("suggestion.html", user=current_user, notes=user_notes)
 
-@views.route('/contest-submission', methods=['GET', 'POST'])
+@views.route('/contest_submission', methods=['GET', 'POST'])
 @login_required
 def contest_submission():
     if request.method == "POST":
