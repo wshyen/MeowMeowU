@@ -172,36 +172,71 @@ def update_status():
 
     return redirect(url_for("auth.user_profile"))
 
+from flask import render_template, request, flash, redirect, url_for
+from flask_login import login_required, current_user
+from werkzeug.utils import secure_filename
+import os
+from sqlalchemy.exc import IntegrityError
+
+UPLOAD_FOLDER = "static/Userprofile/"
+ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
+
+def allowed_file(filename):
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
 @auth.route("/update-profile", methods=["GET", "POST"])
 @login_required
 def update_profile():
     if request.method == "POST":
+        changes_made = False #track if any changes were made
 
         username = request.form.get("username")
-        if username:
+        if username and username != current_user.UserName:
             if len(username) < 3 or len(username) > 15 or not username[0].isupper():
                 flash("Username must be 3-15 characters long and start with a capital letter.", category="error")
+                return redirect(url_for("auth.update_profile"))
             else:
                 current_user.UserName = username
+                changes_made = True
 
         bio = request.form.get("bio")
-        if bio:
+        if bio and bio != current_user.Bio:
             if len(bio) > 200:
                 flash("Bio must not exceed 200 characters.", category="error")
+                return redirect(url_for("auth.update_profile"))
             else:
                 current_user.Bio = bio
+                changes_made = True
 
         status = request.form.get("status")
-        if status:
+        if status and status != current_user.status:
             current_user.status = status
+            changes_made = True
 
         birthday = request.form.get("birthday")
-        if birthday:
+        if birthday and birthday != current_user.Birthday:
             current_user.Birthday = birthday
+            changes_made = True
             
         hobby = request.form.get("hobby")
-        if hobby:
+        if hobby and hobby != current_user.Hobby:
             current_user.Hobby = hobby
+            changes_made = True
+
+        mbti = request.form.get("mbti")
+        if mbti and mbti != current_user.MBTI:
+            valid_mbti_types = [
+                "INTJ", "INTP", "ENTJ", "ENTP",
+                "INFJ", "INFP", "ENFJ", "ENFP",
+                "ISTJ", "ISFJ", "ESTJ", "ESFJ",
+                "ISTP", "ISFP", "ESTP", "ESFP"
+            ]
+            if mbti not in valid_mbti_types:
+                flash("Invalid MBTI type selected.", category="error")
+                return redirect(url_for("auth.update_profile"))
+            else:
+                current_user.MBTI = mbti
+                changes_made = True
 
         if 'profile_picture' in request.files:
             profile_picture = request.files['profile_picture']
@@ -209,6 +244,7 @@ def update_profile():
                 filename = secure_filename(profile_picture.filename)
                 profile_picture.save(os.path.join(UPLOAD_FOLDER, filename))
                 current_user.ProfilePicture = filename
+                changes_made = True
 
         if 'cover_photo' in request.files:
             cover_photo = request.files['cover_photo']
@@ -216,12 +252,18 @@ def update_profile():
                 filename = secure_filename(cover_photo.filename)
                 cover_photo.save(os.path.join(UPLOAD_FOLDER, filename))
                 current_user.CoverPhoto = filename
+                changes_made = True
+
+        if not changes_made:
+            flash("No changes made to your profile.", category="info")
+            return redirect(url_for("auth.update_profile"))
 
         #commit changes to the database (didnt do yet)
         try:
             flash("Profile updated successfully!", category="success")
         except IntegrityError:
             flash("An error occurred while updating the profile. Please try again.", category="error")
+            return redirect(url_for("auth.update_profile"))
 
         return redirect(url_for("auth.user_profile"))
 

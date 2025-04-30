@@ -1,6 +1,7 @@
 import sqlite3
 import os
 from flask import Blueprint, render_template, request
+from flask_login import current_user
 
 search_bp = Blueprint('search', __name__, template_folder='templates', static_folder='static')
 
@@ -13,7 +14,7 @@ def get_db_connection():
 
 @search_bp.route('/search-feature')
 def search_feature():
-    return render_template('search_feature.html')
+    return render_template("search_feature.html", user=current_user)
 
 @search_bp.route('/cat_list')
 def cat_list():
@@ -34,7 +35,7 @@ def cat_list():
         query += " AND LOWER(name) LIKE ?"
         cat_filters.append(f"%{name}%")
 
-    if gender and gender != "Not sure":
+    if gender and gender != "Any":
         query += " AND gender = ?"
         cat_filters.append(gender)
 
@@ -52,9 +53,9 @@ def cat_list():
     conn.close()
 
     if profiles:
-        return render_template("cat_list.html", profiles=profiles)
+        return render_template("cat_list.html", profiles=profiles, user=current_user)
     else:
-        return render_template("cat_list.html", message="No cats found matching your criteria.")
+        return render_template("cat_list.html", message="No cats found matching your criteria.", user=current_user)
 
  
 @search_bp.route('/single_profile')
