@@ -52,7 +52,6 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   }
 
-
   .profile-info {
     margin-left: 20px;
   }
@@ -80,6 +79,7 @@
   button:hover {
     background-color: rgb(156, 128, 100);
   }
+
 </style>
 
 <div class="container mt-4">
@@ -107,9 +107,10 @@
     </div>
 
     <h5 style="padding: 5px;"><b>Email:</b> {{ user.email }}</h5>
-    <h5 style="padding: 5px;"><b>Birthday:</b> {{ user.Birthday if user.Birthday else "No birthday set yet." }}</h5>
-    <h5 style="padding: 5px;"><b>Hobby:</b> {{ user.hobby if user.hobby else "No hobby set yet." }}</h5>
-    <h5 style="padding: 5px;"><b>Bio:</b> {{ user.Bio if user.Bio else "No bio set yet." }}</h5>
+    <h5 style="padding: 5px;"><b>Birthday:</b> {{ user.Birthday if user.Birthday else "-" }}</h5>
+    <h5 style="padding: 5px;"><b>MBTI:</b> {{ user.mbti if user.mbti else "-" }}</h5>
+    <h5 style="padding: 5px;"><b>Hobby:</b> {{ user.hobby if user.hobby else "-" }}</h5>
+    <h5 style="padding: 5px;"><b>Bio:</b> {{ user.Bio if user.Bio else "-" }}</h5>
 
     <button onclick="location.href='{{ url_for('auth.update_profile') }}'">🐾Edit Profile🐾</button>
 
