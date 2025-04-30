@@ -134,13 +134,17 @@
     <div class="post">
         <p><strong>{{ post['username'] }}</strong> posted at {{ post['created_at'] }}</p>
         <p>{{ post['content'] }}</p>
-        {% if post['image_path'] %}
-            <img src="{{ url_for('static', filename=item['image_path']) }}" width="300">
+        {% if post['media_url'] %}
+            <img src="{{ url_for('static', filename=post['media_url']) }}" width="300">  
         {% endif %}
         <div class="post-actions">
-            ❤️ {{ post['like_count'] }}
-            <a href="/post/like/{{ post['id'] }}">Like</a> | 
-            <a href="/post/{{ post['id'] }}">Comments</a>
+            <form action="{{ url_for('community.like_post', post_id=post['post_id']) }}" method="post" style="display:inline;">
+                <button type="submit" style="background:none; border:none; color:#6b4f2f; cursor:pointer;">
+                    ❤️ {{ post['like_count'] }} Like
+                </button>
+            </form>
+            |
+            <a href="/post/{{ post['post_id'] }}">Comments</a>
         </div>
     </div>
 {% endfor %}
@@ -154,7 +158,7 @@
         <h3>New Post</h3>
         <form action="/post/create" method="post" enctype="multipart/form-data">
             <textarea name="content" placeholder="Have a meowment to share?" required></textarea><br>
-            <input type="file" name="image"><br>
+            <input type="file" name="media"><br>
             <button type="submit">Post</button>
         </form>
     </div>
