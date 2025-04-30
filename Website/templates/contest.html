@@ -1,0 +1,77 @@
+{% extends 'base.html' %} 
+
+{% block title %}Contest{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f2eadf;
+    }
+
+    .banner {
+    width: 100%;
+    max-width: 800px; /* Limits banner size */
+    height: auto; /* Keeps aspect ratio */
+    display: block;
+    margin: 0 auto; /* Centers the banner */
+    }
+
+    .details{
+        display:none;
+        margin-top: 10px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #fff;
+    }
+
+    .toggle-button{
+        cursor: pointer;
+        color: blue; 
+        text-decoration: underline;
+        font-weight: bold;
+    }
+</style>
+
+    <div style="padding: 20px;">
+    <h1 style="text-align: center; margin-bottom: 20px; font-family: 'Times New Roman', Times, serif;">Contest</h1>
+
+    {% for contest in contests %}
+    <div class="contest-card">
+        <h2 onclick="toggleDetails('{{contest.name}}')" class="toggle-button">{{ contest.name }}</h2>
+
+        <!-- Show contest banner if available -->
+        {% if contest.banner_url %}
+            <img src="{{ contest.banner_url }}" alt="Contest Banner" class="banner">
+        {% endif %}
+
+        <div class="details" id="{{ contest.name }}">
+            <p><strong>Description:</strong> {{ contest.description }}</p>
+            <p><strong>Start Date:</strong> {{ contest.start_datetime }}</p>
+            <p><strong>End Date:</strong> {{ contest.end_datetime }}</p>
+            <p><strong>Voting Period:</strong> {{ contest.voting_start }} to {{ contest.voting_end}}</p>
+            <p><strong>Result Announcement:</strong> {{ contest.result_announcement }}</p>
+            <p><strong>Purpose:</strong> {{ contest.purpose }}</p>
+            <p><strong>Rules & Guidelines:</strong> {{ contest.rules }}</p>
+            <p><strong>Prizes:</strong> {{ contest.prizes }}</p>
+        </div>
+
+    {% if current_user.role == 'admin' %}
+        <button id="addContest" style="position: fixed; bottom: 20px; right: 20px;">+</button>
+    {% endif %}
+
+</div>
+<script>
+    function toggleDetails(contestName) {
+        const details = document.getElementById(contestName);
+        details.style.display = details.style.display === "none" ? "block" : "none"; //If details is hidden, show it; otherwise, hide it
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const userRole = "{{ current_user.role }}"; //Get role from backend
+        if (userRole !== "admin") {
+            document.getElementById("addContest").style.display = "none"; //Hide button for non-admins
+        }
+    });
+</script>
+{% endblock %}
