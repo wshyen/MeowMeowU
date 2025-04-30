@@ -7,34 +7,43 @@
 <style>
   body {
     background-color: #f2eadf;
+    font-family: 'Times New Roman', serif;
   }
 
   h2, label {
-    font-family: 'Times New Roman';
     color: rgb(78, 68, 57);
     margin-top: 10px;
   }
 
   label {
     font-size: 20px;
+    font-weight: bold;
   }
 
   .form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin: auto;
     margin-top: 45px;
     margin-bottom: 45px;
     background: #fff7ec;
-    padding: 20px;
-    border-radius: 10px;
+    padding: 30px;
+    border-radius: 15px;
+    max-width: 1100px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
   }
 
-  input[type="text"], textarea, select, input[type="file"] {
+  input[type="text"], textarea, select, input[type="file"], input[type="date"] {
     width: 100%;
-    padding: 8px;
-    margin: 6px 0;
-    border-radius: 5px;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 8px;
     border: 1px solid #ccc;
     font-size: 16px;
-    font-family: 'Times New Roman';
+    font-family: 'Times New Roman', serif;
+    background-color: white;
   }
 
   textarea {
@@ -45,45 +54,43 @@
   .readonly-field {
     background-color: #e9ecef;
     color: #6c757d;
-    padding: 8px;
-    border-radius: 5px;
+    padding: 10px;
+    border-radius: 8px;
     font-size: 16px;
     border: 1px solid #ccc;
-    font-family: 'Times New Roman';
-    margin-bottom: 6px;
+    font-family: 'Times New Roman', serif;
+    margin-bottom: 8px;
   }
 
   button {
-    font-family: 'Times New Roman';
+    font-family: 'Times New Roman', serif;
     background-color: rgb(176, 148, 119);
     color: white;
     border: none;
-    padding: 10px 20px;
-    font-size: 16px;
-    border-radius: 5px;
+    padding: 12px 25px;
+    font-size: 18px;
+    border-radius: 8px;
     cursor: pointer;
     margin-top: 20px;
+    transition: 0.3s ease;
   }
 
   button:hover {
     background-color: rgb(156, 128, 100);
-  }
-
-  input[type="date"] {
-    font-family: 'Times New Roman';
+    transform: scale(1.05);
   }
 
 </style>
 
 <div class="form-container">
-  <h2><b>Edit Profile</b></h2>
+  <h2><b>Edit Profile📝</b></h2>
   <form method="POST" action="{{ url_for('auth.update_profile') }}" enctype="multipart/form-data">
 
     <label for="username">Username:</label>
     <input type="text" id="username" name="username" value="{{ user.UserName }}">
 
     <label for="status">Status:</label>
-    <select id="status" name="status" required>
+    <select id="status" name="status">
       <option value="" disabled selected>Select your status🐾</option>
       <option value="Meow~" {% if user.status == "Meow~" %}selected{% endif %}>Meow~🐱</option>
       <option value="Sleepy..." {% if user.status == "Sleepy..." %}selected{% endif %}>Sleepy...🥱</option>
@@ -101,10 +108,32 @@
     <label for="birthday">Birthday:</label>
     <input type="date" id="birthday" name="birthday" value="{{ user.Birthday }}">
 
+    <label for="mbti">MBTI Personality Type:</label>
+    <select id="mbti" name="mbti">
+      <option value="" disabled selected>Select your MBTI🐾</option>
+      <option value="INTJ" {% if user.mbti == "INTJ" %}selected{% endif %}>INTJ - Architect 🏛️</option>
+      <option value="INTP" {% if user.mbti == "INTP" %}selected{% endif %}>INTP - Logician 🧠</option>
+      <option value="ENTJ" {% if user.mbti == "ENTJ" %}selected{% endif %}>ENTJ - Commander 🏆</option>
+      <option value="ENTP" {% if user.mbti == "ENTP" %}selected{% endif %}>ENTP - Debater 🗣️</option>
+      <option value="INFJ" {% if user.mbti == "INFJ" %}selected{% endif %}>INFJ - Advocate 💡</option>
+      <option value="INFP" {% if user.mbti == "INFP" %}selected{% endif %}>INFP - Mediator 🌿</option>
+      <option value="ENFJ" {% if user.mbti == "ENFJ" %}selected{% endif %}>ENFJ - Protagonist 🎭</option>
+      <option value="ENFP" {% if user.mbti == "ENFP" %}selected{% endif %}>ENFP - Campaigner 🎉</option>
+      <option value="ISTJ" {% if user.mbti == "ISTJ" %}selected{% endif %}>ISTJ - Logistician 📊</option>
+      <option value="ISFJ" {% if user.mbti == "ISFJ" %}selected{% endif %}>ISFJ - Defender 🛡️</option>
+      <option value="ESTJ" {% if user.mbti == "ESTJ" %}selected{% endif %}>ESTJ - Executive 🏢</option>
+      <option value="ESFJ" {% if user.mbti == "ESFJ" %}selected{% endif %}>ESFJ - Consul 🤝</option>
+      <option value="ISTP" {% if user.mbti == "ISTP" %}selected{% endif %}>ISTP - Virtuoso 🔧</option>
+      <option value="ISFP" {% if user.mbti == "ISFP" %}selected{% endif %}>ISFP - Adventurer 🎨</option>
+      <option value="ESTP" {% if user.mbti == "ESTP" %}selected{% endif %}>ESTP - Entrepreneur 🚀</option>
+      <option value="ESFP" {% if user.mbti == "ESFP" %}selected{% endif %}>ESFP - Entertainer 🎭</option>
+    </select>
+
+
     <br>
 
     <label for="hobby">Hobby:</label>
-    <select id="hobby" name="hobby" required>
+    <select id="hobby" name="hobby">
       <option value="" disabled selected>Select your hobby🐾</option>
       <option value="Cat Photography" {% if user.hobbies == "Cat Photography" %}selected{% endif %}>Cat Photography 📸</option>
       <option value="Cat Blogging" {% if user.hobbies == "Cat Blogging" %}selected{% endif %}>Cat Blogging 📝</option>
@@ -118,7 +147,6 @@
 
     <label for="bio">Bio:</label>
     <textarea id="bio" name="bio" rows="4">{{ user.Bio }}</textarea>
-
 
     <label for="profile_picture">Profile Picture:</label>
     <input type="file" id="profile_picture" name="profile_picture" accept="image/*">
