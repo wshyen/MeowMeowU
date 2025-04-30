@@ -135,8 +135,16 @@
         <p><strong>{{ post['username'] }}</strong> posted at {{ post['created_at'] }}</p>
         <p>{{ post['content'] }}</p>
         {% if post['media_url'] %}
-            <img src="{{ url_for('static', filename=post['media_url']) }}" width="300">  
+            {% set ext = post['media_url'].rsplit('.', 1)[1].lower() %}
+            {% if ext in ['jpg', 'jpeg', 'png', 'gif'] %}
+                <img src="{{ url_for('static', filename=post['media_url']) }}" width="300" alt="Image">
+            {% elif ext in ['mp4', 'mov', 'avi'] %}
+                <video width="300" controls>
+                    <source src="{{ url_for('static', filename=post['media_url']) }}" type="video/{{ ext }}">
+                </video>
+            {% endif %}
         {% endif %}
+
         <div class="post-actions">
             <form action="{{ url_for('community.like_post', post_id=post['post_id']) }}" method="post" style="display:inline;">
                 <button type="submit" style="background:none; border:none; color:#6b4f2f; cursor:pointer;">
