@@ -101,7 +101,7 @@
 
     <form method="POST" enctype="multipart/form-data">
         <label for="username"><strong>Username:</strong></label>
-        <input type="text" id="username" name="username" placeholder="Enter your username" required>
+        <input type="text" id="username" name="username" value="{{ request.user.username }}" readonly required>
 
         <label for="contest"><strong>Select Contest:</strong></label>
         <select id="contest" name="contest" required>
@@ -113,7 +113,7 @@
         <textarea id="description" name="description" placeholder="Describe your entry (optional)"></textarea>
 
         <label for="file"><strong>Upload Your Entry:</strong></label>
-        <input type="file" id="file" name="file" required>
+        <input type="file" id="file" name="file" accept=".jpg, .jpeg, .png" required>
 
         <label for="rulesAgree" style="display: flex; align-items: center; gap: 10px;">
             <input type="checkbox" id="rulesAgree" required>
