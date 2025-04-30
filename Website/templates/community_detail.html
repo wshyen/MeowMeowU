@@ -58,10 +58,10 @@
     </div>
 
     <div class="bottom-bar">
-        <form action="/posts/{{ post['id'] }}/comment" method="post" class="bottom-form">
+        <form action="/post/{{ post['id'] }}/comment" method="post" class="bottom-form">
             <input type="text" name="content" placeholder="Write a comment..." required>
             <button type="submit">Comment</button>
-            <a href="/posts/like/{{ post['id'] }}" class="like-btn">❤️ Like</a>
+            <a href="/post/like/{{ post['id'] }}" class="like-btn">❤️ Like</a>
         </form>
     </div>
 
