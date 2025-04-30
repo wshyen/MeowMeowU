@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block title %}Contest Submission{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f2eadf;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+
+    .submission-container {
+        width: 800px;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        background-color: #f9f9f9;
+        text-align: left;
+    }
+
+    label, input, textarea {
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 16px;
+        display: block;
+        margin-bottom: 10px;
+        width: 100%;
+    }
+
+    textarea {
+        resize: none;  
+        height: 120px; 
+        overflow: auto;
+    }
+
+    button {
+        background-color: #94693e;
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        text-align: center;
+        box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+        transition: background-color 0.3s ease-in-out;
+    }
+
+    input[type="checkbox"] {
+        margin: 0;
+        vertical-align: middle;
+        width: 18px;
+        height: 18px;
+    }
+    
+    .hidden {
+        display: none;
+    }
+
+    #confirmation-message {
+        text-align: center;
+        font-size: 18px;
+        font-weight: bold;
+        color: #4caf50;
+        margin-top: 20px;
+        padding: 10px;
+        background-color: #eaffea;
+        border-radius: 8px;
+        animation: fadeIn 0.8s ease-in-out;
+    }
+
+    #paw-stamp {
+    width: 80px;
+    opacity: 0;
+    display: none;
+    margin: 10px auto;
+    transform: scale(0.5) rotate(-20deg);
+    transition: opacity 0.5s ease-in-out, transform 0.3s ease-in-out;
+    animation: stampEffect 0.5s ease-in-out forwards;
+    animation-delay: 0.5s;
+    }
+
+    @keyframes fadeIn {
+        0% { opacity: 0; transform: scale(0.9); }
+        100% { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes stampEffect {
+        0% { opacity: 0; transform: scale(2) rotate(0deg); }
+        100% { opacity: 1; transform: scale(1) rotate(-20deg); }
+    }
+
+</style>
+
+<div class="submission-container">
+    <h2 style="text-align: center; font-family: 'Times New Roman', Times, serif;">Submit Your Entry</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+        <label for="username"><strong>Username:</strong></label>
+        <input type="text" id="username" name="username" value="{{ request.user.username }}" readonly required>
+
+        <label for="contest"><strong>Select Contest:</strong></label>
+        <select id="contest" name="contest" required>
+            <option value="">Choose a contest</option>
+            <option value="contest1">Contest 1</option>
+        </select>
+
+        <label for="description" style="margin-top: 8px;"><strong>Entry description:</strong></label>
+        <textarea id="description" name="description" placeholder="Describe your entry (optional)"></textarea>
+
+        <label for="file"><strong>Upload Your Entry:</strong></label>
+        <input type="file" id="file" name="file" accept=".jpg, .jpeg, .png" required>
+
+        <label for="rulesAgree" style="display: flex; align-items: center; gap: 10px;">
+            <input type="checkbox" id="rulesAgree" required>
+            I have read and agree to the Rules & Guidelines.
+        </label>        
+
+        <button type="submit" style="cursor: pointer;" onclick="validateForm(event)">Submit Entry</button>
+        
+    </form>
+    
+    <div id="confirmation-message" class="hidden">
+        <p>Your entry has been submitted successfully!</p>
+        <img id="paw-stamp" src="{{ url_for('static', filename='Images/paw-stamp.png') }}" alt="Paw Stamp" style="width: 50px; height: 50px; margin-top: 10px; display: none;">
+    </div>
+</div>
+<script>
+    function validateForm(event) {
+        event.preventDefault();
+
+        //Get required fields
+        const username = document.getElementById("username").value.trim();
+        const contest = document.getElementById("contest").value;
+        const file = document.getElementById("file").value;
+        const rulesAgree = document.getElementById("rulesAgree").checked;
+
+        //Check if all required fields are filled
+        if (username === "" || contest === "" || file === "" || !rulesAgree) {
+            alert("Please complete all required fields before submitting.");
+            return;
+        }
+
+        //Show confirmation message
+        document.getElementById("confirmation-message").classList.remove("hidden");
+
+        //Make the paw stamp visible after a short delay
+        setTimeout(() => {
+            const pawStamp = document.getElementById("paw-stamp");
+            pawStamp.style.display = "block"; // Make sure it's visible
+            pawStamp.style.opacity = "1"; // Fade it in
+        }, 500); //Delay for smoother appearance
+    }
+</script>
+{% endblock %}
