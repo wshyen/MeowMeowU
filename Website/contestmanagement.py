@@ -41,7 +41,6 @@ def contest_page():
 @contestmanagement_bp.route('/create_contest', methods=['GET', 'POST'])
 @login_required 
 def create_contest():
-    def create_contest():
     conn = get_db_connection()
     user = conn.execute("SELECT role FROM users WHERE username = ?", (current_user.username,)).fetchone()
     conn.close()
