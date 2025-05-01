@@ -42,7 +42,7 @@ def contest_page():
     #Check logged-in user is admin or not
     user_role = "user"
     if current_user.is_authenticated:
-        user = conn.execute("SELECT role FROM users WHERE username = ?", (current_user.username,)).fetchone()
+        user = conn.execute("SELECT role FROM users WHERE email = ?", (current_user.email,)).fetchone()
         if user and user['role'] == 'admin':
             user_role = "admin" #Set user role to admin if the logged-in user is an admin
 
@@ -130,8 +130,6 @@ def check_user_submission(user_id):
     else:
         return None
 
-app.register_blueprint(contestmanagement_bp)
-
 if __name__ == '__main__':
     #Ensure the upload folder exists
     if not os.path.exists(app.config['UPLOAD_FOLDER']):
@@ -142,16 +140,14 @@ if __name__ == '__main__':
         conn.execute('''
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                username TEXT NOT NULL UNIQUE,
-                password TEXT NOT NULL,
+                email TEXT NOT NULL UNIQUE,
                 role TEXT NOT NULL CHECK (role IN ('admin', 'user'))
             )
         ''')
         #Create the table if it doesn't exists
         #Name of the table is users
         #id INTEGER PRIMARY KEY AUTOINCREMENT Adds an id to the table
-        #TEXT NOT NULL UNIQUE Adds a column for the username which is a must to fill in and must be unique
-        #TEXT NOT NULL Adds a column for the password which is a must to fill in
+        #TEXT NOT NULL UNIQUE Adds a column for the email which is a must to fill in and must be unique
         #TEXT NOT NULL CHECK (role IN ('admin', 'user')) Adds a column for the role which is a must to fill in and can only be admin or user
 
         conn.execute('''
@@ -176,20 +172,20 @@ if __name__ == '__main__':
         #TEXT NOT NULL Adds a column for the name, description, start_datetime, end_datetime, voting_start, voting_end, result_announcement, purpose, rules and prizes which are a must to fill in
         #TEXT Adds a column for the banner_url which is not a must to fill in
 
-        #Insert admin users (NEED TO ADD DATA LATER)
+         #Insert admin users by email
         conn.execute('''
-            INSERT OR IGNORE INTO users (username, password, role) 
-            VALUES ('admin1', 'admin_password1', 'admin')
+            INSERT OR IGNORE INTO users (email, role) 
+            VALUES ('breannleemy@gmail.com', 'admin')
         ''')
         conn.execute('''
-            INSERT OR IGNORE INTO users (username, password, role) 
-            VALUES ('admin2', 'admin_password2', 'admin')
+            INSERT OR IGNORE INTO users (email, role) 
+            VALUES ('admin2@example.com', 'admin')
         ''')
         conn.execute('''
-            INSERT OR IGNORE INTO users (username, password, role) 
-            VALUES ('admin3', 'admin_password3', 'user') 
+            INSERT OR IGNORE INTO users (email, role) 
+            VALUES ('admin3@example.com', 'admin')
         ''')
-
+        
         conn.commit()
 
         app.run(debug=True)
