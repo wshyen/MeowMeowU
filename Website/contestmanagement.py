@@ -179,11 +179,11 @@ if __name__ == '__main__':
         ''')
         conn.execute('''
             INSERT OR IGNORE INTO users (email, role) 
-            VALUES ('admin2@example.com', 'admin')
+            VALUES ('limwanshyen@gmail.com', 'admin')
         ''')
         conn.execute('''
             INSERT OR IGNORE INTO users (email, role) 
-            VALUES ('admin3@example.com', 'admin')
+            VALUES ('yinniesiew@gmail.com', 'admin')
         ''')
         
         conn.commit()
