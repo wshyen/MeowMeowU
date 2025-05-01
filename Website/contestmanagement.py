@@ -38,9 +38,17 @@ def login():
 def contest_page():
     conn = get_db_connection()
     contests = conn.execute("SELECT * FROM contests").fetchall()  # Get all contests
+
+    #Check logged-in user is admin or not
+    admin_list= [   ]
+    user role= "user"
+
+    if current_user.is_authenticated and current_user.username in admin_list:
+        user_role = "admin""
+
     conn.close()
     
-    return render_template("contest.html", contests=contests, user=current_user)
+    return render_template("contest.html", contests=contests, user_role=user_role)
 
 @contestmanagement_bp.route('/create_contest', methods=['GET', 'POST'])
 @login_required 
@@ -110,6 +118,21 @@ if __name__ == '__main__':
     #Creates database table if it doesn't exist
     with get_db_connection() as conn:
         conn.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT NOT NULL UNIQUE,
+                password TEXT NOT NULL,
+                role TEXT NOT NULL CHECK (role IN ('admin', 'user'))
+            )
+        ''')
+        #Create the table if it doesn't exists
+        #Name of the table is users
+        #id INTEGER PRIMARY KEY AUTOINCREMENT Adds an id to the table
+        #TEXT NOT NULL UNIQUE Adds a column for the username which is a must to fill in and must be unique
+        #TEXT NOT NULL Adds a column for the password which is a must to fill in
+        #TEXT NOT NULL CHECK (role IN ('admin', 'user')) Adds a column for the role which is a must to fill in and can only be admin or user
+
+        conn.execute('''
             CREATE TABLE IF NOT EXISTS contests ( 
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
@@ -130,5 +153,21 @@ if __name__ == '__main__':
         #id INTEGER PRIMARY KEY AUTOINCREMENT Adds an id to the table
         #TEXT NOT NULL Adds a column for the name, description, start_datetime, end_datetime, voting_start, voting_end, result_announcement, purpose, rules and prizes which are a must to fill in
         #TEXT Adds a column for the banner_url which is not a must to fill in
+
+        #Insert admin users (NEED TO ADD DATA LATER)
+        conn.execute('''
+            INSERT OR IGNORE INTO users (username, password, role) 
+            VALUES ('admin1', 'admin_password1', 'admin')
+        ''')
+        conn.execute('''
+            INSERT OR IGNORE INTO users (username, password, role) 
+            VALUES ('admin2', 'admin_password2', 'admin')
+        ''')
+        conn.execute('''
+            INSERT OR IGNORE INTO users (username, password, role) 
+            VALUES ('admin3', 'admin_password3', 'user') 
+        ''')
+
+        conn.commit()
 
         app.run(debug=True)
