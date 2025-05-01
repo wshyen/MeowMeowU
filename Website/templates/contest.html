@@ -56,10 +56,12 @@
         </div>
 
     {% if current_user.role == 'admin' %}
-    <button onclick="window.location.href='{{ url_for('contestmanagement.create_contest') }}'"
-        style="font-size: 20px; background-color: #94693e; color: white; padding: 10px 15px; border-radius: 5px; cursor: pointer; border: none;">
-    + 
-    </button>
+        <div style="text-align: right; margin-bottom: 20px;"></div>
+            <button onclick="window.location.href='{{ url_for('contestmanagement.create_contest') }}'"
+                style="font-size: 20px; background-color: #94693e; color: white; padding: 10px 15px; border-radius: 5px; cursor: pointer; border: none;">
+                + 
+            </button>
+        </div>
     {% endif %}
 
 </div>

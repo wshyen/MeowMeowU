@@ -40,11 +40,11 @@ def contest_page():
     contests = conn.execute("SELECT * FROM contests").fetchall()  # Get all contests
 
     #Check logged-in user is admin or not
-    admin_list= [   ]
-    user role= "user"
-
-    if current_user.is_authenticated and current_user.username in admin_list:
-        user_role = "admin""
+    user_role = "user"
+    if current_user.is_authenticated:
+        user = conn.execute("SELECT role FROM users WHERE username = ?", (current_user.username,)).fetchone()
+        if user and user['role'] == 'admin':
+            user_role = "admin" #Set user role to admin if the logged-in user is an admin
 
     conn.close()
     
@@ -57,18 +57,40 @@ def create_contest():
     user = conn.execute("SELECT role FROM users WHERE username = ?", (current_user.username,)).fetchone()
     conn.close()
 
-    with get_db_connection() as conn:
-    conn.execute('''
-        INSERT INTO contests (name, description, start_datetime, end_datetime, voting_start, voting_end, result_announcement, purpose, rules, prizes, banner_url) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ''', (contest_name, description, start_datetime, end_datetime, voting_start, voting_end, result_announcement, purpose, rules, prizes, banner_url))
-    conn.commit()  #Save changes
+    if request.method == 'POST':
+        contest_name = request.form['contest_name']
+        description = request.form['description']
+        start_datetime = request.form['start_datetime']
+        end_datetime = request.form['end_datetime']
+        voting_start = request.form['voting_start']
+        voting_end = request.form['voting_end']
+        result_announcement = request.form['result_announcement']
+        purpose = request.form['purpose']
+        rules = request.form['rules']
+        prizes = request.form['prizes']
+        file = request.files['contest_banner']
+        
+        #Validate and save banner image
+        banner_url = None
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            banner_url = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(banner_url) #Save the file inside the contest folder
+
+        with get_db_connection() as conn:
+            conn.execute('''
+                INSERT INTO contests (name, description, start_datetime, end_datetime, voting_start, voting_end, result_announcement, purpose, rules, prizes, banner_url) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (contest_name, description, start_datetime, end_datetime, voting_start, voting_end, result_announcement, purpose, rules, prizes, banner_url))
+            conn.commit()  #Save changes
+
+        return redirect(url_for('contestmanagement.contest_page'))  #Send admins back to the contest page after creating a contest
 
     if user and user['role'] == 'admin':  
-        return render_template('create_contest.html')
+        return render_template('create_contest.html') 
     else:
         flash("Access Denied. Admins Only!", "error")
-        return redirect(url_for('contestmanagement.contest_page'))
+        return redirect(url_for('contestmanagement.contest_page')) #Send non-admins back to the contest page
 
 @contestmanagement_bp.route('/contest_submission', methods=['GET', 'POST'])
 def submit_contest():
