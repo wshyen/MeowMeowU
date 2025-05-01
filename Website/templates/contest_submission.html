@@ -85,13 +85,13 @@
     }
 
     @keyframes fadeIn {
-        0% { opacity: 0; transform: scale(0.9); }
-        100% { opacity: 1; transform: scale(1); }
+        0% { opacity: 0; transform: scale(0.9); } /* Element is invisible and slightly shrinks at the starting point */
+        100% { opacity: 1; transform: scale(1); } /* Element is fully visible and at its original size at the ending point */
     }
 
     @keyframes stampEffect {
-        0% { opacity: 0; transform: scale(2) rotate(0deg); }
-        100% { opacity: 1; transform: scale(1) rotate(-20deg); }
+        0% { opacity: 0; transform: scale(2) rotate(0deg); } /* Element is invisible and larger at the starting point */
+        100% { opacity: 1; transform: scale(1) rotate(-20deg); } /* Element is fully visible and at its original size with a slight rotation at the ending point */
     }
 
 </style>
@@ -101,7 +101,9 @@
 
     <form method="POST" enctype="multipart/form-data">
         <label for="username"><strong>Username:</strong></label>
-        <input type="text" id="username" name="username" value="{{ request.user.username }}" readonly required>
+        <!-- Prefills the username field with the logged-in user's username -->
+        <!-- The username field is set to readonly to prevent changes by the user -->
+        <input type="text" id="username" name="username" value="{{ request.user.username }}" readonly required> 
 
         <label for="contest"><strong>Select Contest:</strong></label>
         <select id="contest" name="contest" required>
@@ -131,13 +133,13 @@
 </div>
 <script>
     function validateForm(event) {
-        event.preventDefault();
+        event.preventDefault(); // Prevent form submission to validate first
 
         //Get required fields
-        const username = document.getElementById("username").value.trim();
-        const contest = document.getElementById("contest").value;
-        const file = document.getElementById("file").value;
-        const rulesAgree = document.getElementById("rulesAgree").checked;
+        const username = document.getElementById("username").value.trim(); //Check if username is filled
+        const contest = document.getElementById("contest").value; //Check if contest is selected
+        const file = document.getElementById("file").value; //Check if file is selected
+        const rulesAgree = document.getElementById("rulesAgree").checked; //Check if rules are agreed
 
         //Check if all required fields are filled
         if (username === "" || contest === "" || file === "" || !rulesAgree) {
