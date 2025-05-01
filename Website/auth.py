@@ -172,12 +172,6 @@ def update_status():
 
     return redirect(url_for("auth.user_profile"))
 
-from flask import render_template, request, flash, redirect, url_for
-from flask_login import login_required, current_user
-from werkzeug.utils import secure_filename
-import os
-from sqlalchemy.exc import IntegrityError
-
 UPLOAD_FOLDER = "static/Userprofile/"
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
 
@@ -188,54 +182,52 @@ def allowed_file(filename):
 @login_required
 def update_profile():
     if request.method == "POST":
-        changes_made = False #track if any changes were made
-
+        changes_made = False  # Track changes
+        errors = []  # Collect validation errors
+        
         username = request.form.get("username")
-        if username and username != current_user.UserName:
+        if username and username != getattr(current_user, "UserName", None):
             if len(username) < 3 or len(username) > 15 or not username[0].isupper():
-                flash("Username must be 3-15 characters long and start with a capital letter.", category="error")
-                return redirect(url_for("auth.update_profile"))
+                errors.append("Username must be 3-15 characters long and start with a capital letter.")
             else:
                 current_user.UserName = username
                 changes_made = True
 
         bio = request.form.get("bio")
-        if bio and bio != current_user.Bio:
+        if bio and bio != getattr(current_user, "Bio", None):
             if len(bio) > 200:
-                flash("Bio must not exceed 200 characters.", category="error")
-                return redirect(url_for("auth.update_profile"))
+                errors.append("Bio must not exceed 200 characters.")
             else:
                 current_user.Bio = bio
                 changes_made = True
 
         status = request.form.get("status")
-        if status and status != current_user.status:
-            current_user.status = status
+        if status and status.strip() and status != getattr(current_user, "status", None):
+            current_user.status = status.strip()
             changes_made = True
 
         birthday = request.form.get("birthday")
-        if birthday and birthday != current_user.Birthday:
+        if birthday and birthday != getattr(current_user, "Birthday", None):
             current_user.Birthday = birthday
             changes_made = True
             
         hobby = request.form.get("hobby")
-        if hobby and hobby != current_user.Hobby:
+        if hobby and hobby != getattr(current_user, "Hobby", None):
             current_user.Hobby = hobby
             changes_made = True
 
         mbti = request.form.get("mbti")
-        if mbti and mbti != current_user.MBTI:
+        if mbti and mbti.upper() != getattr(current_user, "MBTI", "").upper():
             valid_mbti_types = [
                 "INTJ", "INTP", "ENTJ", "ENTP",
                 "INFJ", "INFP", "ENFJ", "ENFP",
                 "ISTJ", "ISFJ", "ESTJ", "ESFJ",
                 "ISTP", "ISFP", "ESTP", "ESFP"
             ]
-            if mbti not in valid_mbti_types:
-                flash("Invalid MBTI type selected.", category="error")
-                return redirect(url_for("auth.update_profile"))
+            if mbti.upper() not in valid_mbti_types:
+                errors.append("Invalid MBTI type selected.")
             else:
-                current_user.MBTI = mbti
+                current_user.MBTI = mbti.upper()
                 changes_made = True
 
         if 'profile_picture' in request.files:
@@ -254,11 +246,16 @@ def update_profile():
                 current_user.CoverPhoto = filename
                 changes_made = True
 
+        if errors:
+            for error in errors:
+                flash(error, category="error")
+            return redirect(url_for("auth.update_profile"))
+
         if not changes_made:
             flash("No changes made to your profile.", category="info")
             return redirect(url_for("auth.update_profile"))
 
-        #commit changes to the database (didnt do yet)
+        # Commit changes to the database (not implemented yet)
         try:
             flash("Profile updated successfully!", category="success")
         except IntegrityError:
@@ -268,3 +265,4 @@ def update_profile():
         return redirect(url_for("auth.user_profile"))
 
     return render_template("update_profile.html", user=current_user)
+

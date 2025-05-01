@@ -25,7 +25,13 @@
     width: 100%;
     height: 250px;
     object-fit: cover;
-    border-radius: 10px;
+    border-radius: 20px;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  }
+
+  .cover-photo:hover {
+    transform: scale(1.01);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.15);
   }
 
   .profile-content {
