@@ -10,7 +10,7 @@ import os
 
 auth = Blueprint("auth", __name__) #a Blueprint for authentication routes, Blueprint is like a container for related routes and functions
 
-# Configuration for file uploads
+#configuration for file uploads
 UPLOAD_FOLDER = 'static/Userprofile'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
@@ -160,24 +160,6 @@ def view_profiles():
 def create_profiles():
     return render_template("createprofile.html", user=current_user)
 
-@auth.route("/update-status", methods=["POST"])
-@login_required
-def update_status():
-    new_status = request.form.get("status")
-    if not new_status:
-        flash("Please select a valid status message.", category="error")
-    else:
-        current_user.status = new_status
-        flash("Status message updated successfully!", category="success")
-
-    return redirect(url_for("auth.user_profile"))
-
-UPLOAD_FOLDER = "static/Userprofile/"
-ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
-
-def allowed_file(filename):
-    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
-
 @auth.route("/update-profile", methods=["GET", "POST"])
 @login_required
 def update_profile():
@@ -186,77 +168,67 @@ def update_profile():
         errors = []  # Collect validation errors
         
         username = request.form.get("username")
-        if username and username != getattr(current_user, "UserName", None):
+        if username and username != current_user.UserName:
             if len(username) < 3 or len(username) > 15 or not username[0].isupper():
-                errors.append("Username must be 3-15 characters long and start with a capital letter.")
+                flash("Username must be 3-15 characters long and start with a capital letter.", category="error")
+                return redirect(url_for("auth.update_profile"))
             else:
                 current_user.UserName = username
                 changes_made = True
 
         bio = request.form.get("bio")
-        if bio and bio != getattr(current_user, "Bio", None):
+        if bio and bio != current_user.Bio:
             if len(bio) > 200:
-                errors.append("Bio must not exceed 200 characters.")
+                flash("Bio must not exceed 200 characters.", category="error")
+                return redirect(url_for("auth.update_profile"))
             else:
                 current_user.Bio = bio
                 changes_made = True
 
         status = request.form.get("status")
-        if status and status.strip() and status != getattr(current_user, "status", None):
+        if status and status.strip() != current_user.status:
             current_user.status = status.strip()
             changes_made = True
 
         birthday = request.form.get("birthday")
-        if birthday and birthday != getattr(current_user, "Birthday", None):
+        if birthday and birthday != current_user.Birthday:
             current_user.Birthday = birthday
             changes_made = True
             
         hobby = request.form.get("hobby")
-        if hobby and hobby != getattr(current_user, "Hobby", None):
+        if hobby and hobby != current_user.Hobby:
             current_user.Hobby = hobby
             changes_made = True
 
         mbti = request.form.get("mbti")
-        if mbti and mbti.upper() != getattr(current_user, "MBTI", "").upper():
-            valid_mbti_types = [
-                "INTJ", "INTP", "ENTJ", "ENTP",
-                "INFJ", "INFP", "ENFJ", "ENFP",
-                "ISTJ", "ISFJ", "ESTJ", "ESFJ",
-                "ISTP", "ISFP", "ESTP", "ESFP"
-            ]
-            if mbti.upper() not in valid_mbti_types:
-                errors.append("Invalid MBTI type selected.")
+        valid_mbti = {"INTJ", "INTP", "ENTJ", "ENTP", "INFJ", "INFP", "ENFJ", "ENFP",
+                      "ISTJ", "ISFJ", "ESTJ", "ESFJ", "ISTP", "ISFP", "ESTP", "ESFP"}
+        if mbti and mbti.upper() != current_user.MBTI.upper():
+            if mbti.upper() not in valid_mbti:
+                flash("Invalid MBTI type selected.", category="error")
+                return redirect(url_for("auth.update_profile"))
             else:
                 current_user.MBTI = mbti.upper()
                 changes_made = True
 
-        if 'profile_picture' in request.files:
-            profile_picture = request.files['profile_picture']
-            if profile_picture and allowed_file(profile_picture.filename):
-                filename = secure_filename(profile_picture.filename)
-                profile_picture.save(os.path.join(UPLOAD_FOLDER, filename))
-                current_user.ProfilePicture = filename
-                changes_made = True
-
-        if 'cover_photo' in request.files:
-            cover_photo = request.files['cover_photo']
-            if cover_photo and allowed_file(cover_photo.filename):
-                filename = secure_filename(cover_photo.filename)
-                cover_photo.save(os.path.join(UPLOAD_FOLDER, filename))
-                current_user.CoverPhoto = filename
-                changes_made = True
-
-        if errors:
-            for error in errors:
-                flash(error, category="error")
-            return redirect(url_for("auth.update_profile"))
+        for file_type in ["profile_picture", "cover_photo"]:
+            if file_type in request.files:
+                file = request.files[file_type]
+                if file and allowed_file(file.filename):
+                    filename = secure_filename(file.filename)
+                    file.save(os.path.join(UPLOAD_FOLDER, filename))
+                    setattr(current_user, file_type.capitalize(), filename)
+                    changes_made = True
+                else:
+                    flash(f"Invalid file format for {file_type}. Only PNG, JPG, JPEG allowed.", category="error")
+                    return redirect(url_for("auth.update_profile"))
 
         if not changes_made:
             flash("No changes made to your profile.", category="info")
             return redirect(url_for("auth.update_profile"))
 
-        # Commit changes to the database (not implemented yet)
         try:
+            db.session.commit()
             flash("Profile updated successfully!", category="success")
         except IntegrityError:
             flash("An error occurred while updating the profile. Please try again.", category="error")
