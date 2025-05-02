@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+{% block title %}COMMUNITY{% endblock %}
+
+{% block content %}
+
+<style>
+    body {
+        font-family: 'Times New Roman', Times, serif;
+        background-color: #f2eadf;
+        margin: 0;
+        padding: 0;
+    }
+
+    h1 {
+        font-weight: bold;
+        color: #94693e;
+        text-align: center;
+        font-size: 36px;
+        margin-bottom: 10px;
+        padding-top: 25px;
+    }
+
+    h2{
+        font-weight: bold;
+        font-size: 25px;
+        color: #6b4f2f;
+        text-align: center;
+        font-style: italic;
+        margin-top: 0;
+        margin-bottom: 20px;
+    }
+    p {
+        text-align: center;
+        color: #5c4430;
+        font-size: 18px;
+    }
+
+    .post {
+        width: 80%;
+        max-width: 600px;
+        background-color: #ffffff;
+        border-radius: 10px;
+        padding: 15px;
+        margin: 20px auto;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    .post img, 
+    .post video {
+        display: block;
+        margin: 10px auto;
+        border-radius: 10px;
+        max-width: 100%;
+        height: auto;
+    }
+
+    .post-actions {
+        text-align: center;
+        margin-top: 10px;
+        font-size: 16px;
+    }
+
+    .post-actions a {
+        margin: 0 10px;
+        text-decoration: none;
+        color: #6b4f2f;
+        font-weight: bold;
+    }
+
+    button {
+        display: block;
+        margin: 10px auto;
+        padding: 10px 20px;
+        background-color: #94693e;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    button:hover {
+        background-color: #7d5732;
+    }
+
+    /* Modal styles */
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.4);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 999;
+    }
+
+    .modal-content {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        position: relative;
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    .close {
+        position: absolute;
+        top: 8px;
+        right: 12px;
+        font-size: 24px;
+        color: #333;
+        cursor: pointer;
+    }
+    
+    .hidden {
+        display: none;
+    }
+
+</style>
+
+<h1>Meow Meow Community</h1>
+<p>Share the lives of our campus cats</p>
+
+
+<button onclick="openModal()">+ New Post</button>
+
+<div style="text-align: center; margin-top: 10px;">
+    <button onclick="window.location.href='{{ url_for('community.my_posts') }}'" style="background-color: #94693e; color: white; border: none; border-radius: 8px; padding: 10px 20px; font-size: 16px; cursor: pointer;">
+        My Posts
+    </button>
+</div>
+
+<hr>
+
+<h2>Latest Posts</h2>
+
+
+{% for post in posts %}
+    <div class="post">
+        <p><strong>{{ post['username'] }}</strong> posted at {{ post['created_at'] }}</p>
+        <p>{{ post['content'] }}</p>
+        {% if post['media_url'] %}
+            {% set ext = post['media_url'].rsplit('.', 1)[1].lower() %}
+            {% if ext in ['jpg', 'jpeg', 'png', 'gif'] %}
+                <img src="{{ url_for('static', filename=post['media_url']) }}" width="300" alt="Image">
+            {% elif ext in ['mp4', 'mov', 'avi'] %}
+                <video width="300" controls>
+                    <source src="{{ url_for('static', filename=post['media_url']) }}" type="video/{{ ext }}">
+                </video>
+            {% endif %}
+        {% endif %}
+
+        <div class="post-actions">
+            <form action="{{ url_for('community.like_post' if not post['liked_by_current_user'] else 'community.unlike_post', post_id=post['post_id']) }}" method="post" style="display:inline;">
+                <button type="submit" style="background:none; border:none; color:#6b4f2f; cursor:pointer;">
+                    {% if post['liked_by_current_user'] %}
+                        ❤️ 
+                    {% else %}
+                        🤍 
+                    {% endif %}
+                    {{ post['like_count'] }} Like
+                </button>
+            </form>
+            |
+            <a href="/post/{{ post['post_id'] }}">Comments</a>
+        </div>
+    </div>
+{% endfor %}
+
+<hr>
+
+
+<div id="postModal" class="modal hidden">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h3>New Post</h3>
+        <form action="/post/create" method="post" enctype="multipart/form-data">
+            <textarea name="content" placeholder="Have a meowment to share?" required></textarea><br>
+            <input type="file" name="media"><br>
+            <button type="submit">Post</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function openModal() {
+    document.getElementById('postModal').classList.remove('hidden');
+}
+function closeModal() {
+    document.getElementById('postModal').classList.add('hidden');
+}
+
+</script>
+{% endblock %}

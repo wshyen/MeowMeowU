@@ -1,0 +1,15 @@
+
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+
+.vscode/
+
+
+venv/
+env/
+
+*.db-shm
+*.db-wal

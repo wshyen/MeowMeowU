@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}My Posts{% endblock %}
+
+{% block content %}
+
+<style>
+
+    body {
+        font-family: 'Times New Roman', Times, serif;
+        background-color: #f2eadf;
+        margin: 0;
+        padding: 0;
+    }
+
+    h1 {
+        font-weight: bold;
+        color: #94693e;
+        text-align: center;
+        font-size: 36px;
+        margin-bottom: 10px;
+        padding-top: 25px;
+    }
+
+    .post {
+        width: 80%;
+        max-width: 600px;
+        background-color: #ffffff;
+        border-radius: 10px;
+        padding: 15px;
+        margin: 20px auto;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    .post img, 
+    .post video {
+        display: block;
+        margin: 10px auto;
+        border-radius: 10px;
+        max-width: 100%;
+        height: auto;
+    }
+
+    .back-button {
+                display: block;
+                margin: 30px auto;
+                padding: 10px 20px;
+                background-color: #dccbb7;
+                color: #6b4f2f;
+                font-weight: bold;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                text-align: center;
+                text-decoration: none;
+            }
+
+        .back-button:hover {
+                background-color: #d4bfae;
+                transform: scale(1.05);
+                box-shadow: 0px 8px 15px rgba(255, 163, 71, 0.2);
+            }
+
+</style>
+
+<h1>My Post</h1>
+
+<hr>
+
+{% for post in posts %}
+  <div class="post">
+    <p><strong>{{ post.username }}</strong> @ {{ post.created_at }}</p>
+    <p>{{ post.content }}</p>
+    {% if post['media_url'] %}
+            {% set ext = post['media_url'].rsplit('.', 1)[1].lower() %}
+            {% if ext in ['jpg', 'jpeg', 'png', 'gif'] %}
+                <img src="{{ url_for('static', filename=post['media_url']) }}" width="300" alt="Image">
+            {% elif ext in ['mp4', 'mov', 'avi'] %}
+                <video width="300" controls>
+                    <source src="{{ url_for('static', filename=post['media_url']) }}" type="video/{{ ext }}">
+                </video>
+            {% endif %}
+    {% endif %}
+    <p>❤️ {{ post.like_count }} Like</p>
+
+    <form action="{{ url_for('community.delete_post', post_id=post.post_id) }}" method="post" style="display:inline;">
+        <button type="submit">Delete</button>
+    </form>
+    <button onclick="openEditModal({{ post.post_id }}, '{{ post.content | escape }}')">Edit</button>
+    <hr>
+  </div>
+{% endfor %}
+
+<div id="editModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <span class="close" onclick="closeEditModal()">&times;</span>
+      <h3>Edit Post</h3>
+      <form id="editForm" method="post">
+        <textarea name="content" id="editContent" rows="4" style="width:100%;" required></textarea>
+        <br>
+        <button type="submit">Save</button>
+      </form>
+    </div>
+  </div>
+
+<div style="text-align: center; margin-top: 30px;">
+    <button onclick="window.location.href='{{ url_for('community.community_feature') }}'"
+        style="background-color: #dccbb7; color: #6b4f2f; font-weight: bold; border: none; border-radius: 8px; padding: 10px 20px; font-size: 16px; cursor: pointer;">
+        Back
+    </button>
+</div>
+
+  <script>
+    function openEditModal(postId, content) {
+      document.getElementById("editContent").value = content;
+      document.getElementById("editForm").action = `/post/edit/${postId}`;
+      document.getElementById("editModal").style.display = "block";
+    }
+  
+    function closeEditModal() {
+      document.getElementById("editModal").style.display = "none";
+    }
+  </script>
+
+{% endblock %}
