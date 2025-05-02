@@ -164,9 +164,8 @@ def create_profiles():
 @login_required
 def update_profile():
     if request.method == "POST":
-        changes_made = False  # Track changes
-        errors = []  # Collect validation errors
-        
+        changes_made = False #track changes
+
         username = request.form.get("username")
         if username and username != current_user.UserName:
             if len(username) < 3 or len(username) > 15 or not username[0].isupper():
@@ -177,12 +176,11 @@ def update_profile():
                 changes_made = True
 
         bio = request.form.get("bio")
-        if bio and bio != current_user.Bio:
+        if bio and bio != current_user.bio:
             if len(bio) > 200:
                 flash("Bio must not exceed 200 characters.", category="error")
-                return redirect(url_for("auth.update_profile"))
             else:
-                current_user.Bio = bio
+                current_user.bio = bio
                 changes_made = True
 
         status = request.form.get("status")
@@ -191,40 +189,41 @@ def update_profile():
             changes_made = True
 
         birthday = request.form.get("birthday")
-        if birthday and birthday != current_user.Birthday:
-            current_user.Birthday = birthday
+        if birthday and birthday != current_user.birthday:
+            current_user.birthday = birthday
             changes_made = True
             
         hobby = request.form.get("hobby")
-        if hobby and hobby != current_user.Hobby:
-            current_user.Hobby = hobby
+        if hobby and hobby != current_user.hobby:
+            current_user.hobby = hobby
             changes_made = True
 
         mbti = request.form.get("mbti")
         valid_mbti = {"INTJ", "INTP", "ENTJ", "ENTP", "INFJ", "INFP", "ENFJ", "ENFP",
                       "ISTJ", "ISFJ", "ESTJ", "ESFJ", "ISTP", "ISFP", "ESTP", "ESFP"}
-        if mbti and mbti.upper() != current_user.MBTI.upper():
+        if mbti and mbti.upper() != current_user.mbti.upper():
             if mbti.upper() not in valid_mbti:
                 flash("Invalid MBTI type selected.", category="error")
                 return redirect(url_for("auth.update_profile"))
             else:
-                current_user.MBTI = mbti.upper()
+                current_user.mbti = mbti.upper()
                 changes_made = True
 
+        #handle file uploads
         for file_type in ["profile_picture", "cover_photo"]:
             if file_type in request.files:
                 file = request.files[file_type]
                 if file and allowed_file(file.filename):
                     filename = secure_filename(file.filename)
                     file.save(os.path.join(UPLOAD_FOLDER, filename))
-                    setattr(current_user, file_type.capitalize(), filename)
+                    setattr(current_user, file_type, filename)
                     changes_made = True
                 else:
                     flash(f"Invalid file format for {file_type}. Only PNG, JPG, JPEG allowed.", category="error")
                     return redirect(url_for("auth.update_profile"))
 
         if not changes_made:
-            flash("No changes made to your profile.", category="info")
+            flash("No changes were made to your profile.", category="info")
             return redirect(url_for("auth.update_profile"))
 
         try:
@@ -237,4 +236,5 @@ def update_profile():
         return redirect(url_for("auth.user_profile"))
 
     return render_template("update_profile.html", user=current_user)
+
 
