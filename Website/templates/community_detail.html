@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Post Detail{% endblock %}
+
+{% block content %}
+
+<style>
+    body {
+        font-family: 'Times New Roman', Times, serif;
+        background-color: #f2eadf;
+        margin: 0;
+        padding: 0;
+    }
+
+    h1 {
+        font-weight: bold;
+        color: #94693e;
+        text-align: center;
+        font-size: 36px;
+        margin-bottom: 10px;
+        padding-top: 25px;
+    }
+
+    h2{
+        font-weight: bold;
+        font-size: 25px;
+        color: #6b4f2f;
+        text-align: center;
+        font-style: italic;
+        margin-top: 0;
+        margin-bottom: 20px;
+    }
+    p {
+        text-align: center;
+        color: #5c4430;
+        font-size: 18px;
+    }
+
+</style>
+
+    <h2>Post Details</h2>
+
+    <div class="post">
+        <p><strong>{{ post['username'] }}</strong> posted at {{ post['created_at'] }}</p>
+        <p>{{ post['content'] }}</p>
+        {% if post['image_path'] %}
+            <img src="{{ url_for('static', filename=post['image_path']) }}" width="300">
+        {% endif %}
+    </div>
+
+    <h3>Comments</h3>
+
+    <!-- Comment List -->
+    {% for comment in comments %}
+    <div class="comment">
+        <p><strong>{{ comment['username'] }}</strong> commented at {{ comment['created_at'] }}</p>
+        <p>{{ comment['content'] }}</p>
+    </div>
+
+    <div class="bottom-bar">
+        <form action="/post/{{ post['id'] }}/comment" method="post" class="bottom-form">
+            <input type="text" name="content" placeholder="Write a comment..." required>
+            <button type="submit">Comment</button>
+            <a href="/post/like/{{ post['id'] }}" class="like-btn">❤️ Like</a>
+        </form>
+    </div>
+
+    {% endfor %}
+{% endblock %}
