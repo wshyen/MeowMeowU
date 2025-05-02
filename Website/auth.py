@@ -7,12 +7,20 @@ from werkzeug.utils import secure_filename #handling file uploads
 from flask_login import login_user, login_required, logout_user, current_user
 from sqlalchemy.exc import IntegrityError
 import os
+from datetime import datetime
 
 auth = Blueprint("auth", __name__) #a Blueprint for authentication routes, Blueprint is like a container for related routes and functions
 
 #configuration for file uploads
-UPLOAD_FOLDER = 'static/Userprofile'
+UPLOAD_FOLDER = 'Website/static/Userprofile'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+
+DEFAULT_PROFILE_PICTURE = "default_profilepic.png"
+DEFAULT_COVER_PHOTO = "default_cover.png"
+
+#makesure the upload folder exists before saving files
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
 
 def allowed_file(filename):
     #Check if the uploaded file has an allowed extension
@@ -176,47 +184,54 @@ def update_profile():
                 changes_made = True
 
         bio = request.form.get("bio")
-        if bio and bio != current_user.bio:
-            if len(bio) > 200:
+        if bio != current_user.bio:
+            if bio and len(bio) > 200:
                 flash("Bio must not exceed 200 characters.", category="error")
-            else:
-                current_user.bio = bio
-                changes_made = True
+                return redirect(url_for("auth.update_profile"))
+            current_user.bio = bio.strip() if bio else None
+            changes_made = True
 
         status = request.form.get("status")
-        if status and status.strip() != current_user.status:
-            current_user.status = status.strip()
+        if status != current_user.status:
+            current_user.status = status.strip() if status else None
             changes_made = True
 
         birthday = request.form.get("birthday")
-        if birthday and birthday != current_user.birthday:
-            current_user.birthday = birthday
+        if birthday:
+            try:
+                valid_birthday = datetime.strptime(birthday, "%Y-%m-%d").date()
+                if valid_birthday != current_user.birthday:
+                    current_user.birthday = valid_birthday
+                    changes_made = True
+            except ValueError:
+                flash("Invalid date format. Please use YYYY-MM-DD.", category="error")
+                return redirect(url_for("auth.update_profile"))
+        elif current_user.birthday is not None:
+            current_user.birthday = None
             changes_made = True
-            
+
         hobby = request.form.get("hobby")
-        if hobby and hobby != current_user.hobby:
-            current_user.hobby = hobby
+        if hobby != current_user.hobby:
+            current_user.hobby = hobby if hobby else None
             changes_made = True
 
         mbti = request.form.get("mbti")
-        valid_mbti = {"INTJ", "INTP", "ENTJ", "ENTP", "INFJ", "INFP", "ENFJ", "ENFP",
-                      "ISTJ", "ISFJ", "ESTJ", "ESFJ", "ISTP", "ISFP", "ESTP", "ESFP"}
-        if mbti and mbti.upper() != current_user.mbti.upper():
-            if mbti.upper() not in valid_mbti:
-                flash("Invalid MBTI type selected.", category="error")
-                return redirect(url_for("auth.update_profile"))
-            else:
-                current_user.mbti = mbti.upper()
-                changes_made = True
+        if mbti != current_user.mbti:
+            current_user.mbti = mbti if mbti else None
+            changes_made = True
 
         #handle file uploads
-        for file_type in ["profile_picture", "cover_photo"]:
-            if file_type in request.files:
+        for file_type, default_image in [("profile_picture", DEFAULT_PROFILE_PICTURE), ("cover_photo", DEFAULT_COVER_PHOTO)]:
+            if request.form.get(f"clear_{file_type}"):  # Reset to default if checkbox checked
+                setattr(current_user, file_type, default_image)
+                changes_made = True
+            elif file_type in request.files and request.files[file_type].filename != "":
                 file = request.files[file_type]
-                if file and allowed_file(file.filename):
+                if allowed_file(file.filename):
                     filename = secure_filename(file.filename)
-                    file.save(os.path.join(UPLOAD_FOLDER, filename))
-                    setattr(current_user, file_type, filename)
+                    file_path = os.path.join(UPLOAD_FOLDER, filename)
+                    file.save(file_path)  # Ensure file is saved
+                    setattr(current_user, file_type, filename)  # Store filename in DB
                     changes_made = True
                 else:
                     flash(f"Invalid file format for {file_type}. Only PNG, JPG, JPEG allowed.", category="error")
@@ -236,5 +251,3 @@ def update_profile():
         return redirect(url_for("auth.user_profile"))
 
     return render_template("update_profile.html", user=current_user)
-
-

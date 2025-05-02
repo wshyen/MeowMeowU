@@ -92,15 +92,15 @@
   <div class="profile-details">
 
     <div class="profile-header">
-      {% if user.CoverPhoto %}
-        <img src="{{ url_for('static', filename='Userprofile/' ~ user.CoverPhoto) }}" alt="Cover Photo" class="cover-photo">
+      {% if user.cover_photo %}
+        <img src="{{ url_for('static', filename='Userprofile/' ~ user.cover_photo) }}" alt="Cover Photo" class="cover-photo">
       {% else %}
         <img src="{{ url_for('static', filename='Userprofile/default_cover.png') }}" alt="Cover Photo" class="cover-photo">
       {% endif %}
 
       <div class="profile-content">
-        {% if user.ProfilePicture %}
-          <img src="{{ url_for('static', filename='Userprofile/' ~ user.ProfilePicture) }}" alt="Profile Picture" class="profile-picture">
+        {% if user.profile_picture %}
+          <img src="{{ url_for('static', filename='Userprofile/' ~ user.profile_picture) }}" alt="Profile Picture" class="profile-picture">
         {% else %}
           <img src="{{ url_for('static', filename='Userprofile/default_profilepic.png') }}" alt="Profile Picture" class="profile-picture">
         {% endif %}
@@ -113,10 +113,10 @@
     </div>
 
     <h5 style="padding: 5px;"><b>Email:</b> {{ user.email }}</h5>
-    <h5 style="padding: 5px;"><b>Birthday:</b> {{ user.Birthday if user.Birthday else "-" }}</h5>
+    <h5 style="padding: 5px;"><b>Birthday:</b> {{ user.birthday if user.birthday else "-" }}</h5>
     <h5 style="padding: 5px;"><b>MBTI:</b> {{ user.mbti if user.mbti else "-" }}</h5>
     <h5 style="padding: 5px;"><b>Hobby:</b> {{ user.hobby if user.hobby else "-" }}</h5>
-    <h5 style="padding: 5px;"><b>Bio:</b> {{ user.Bio if user.Bio else "-" }}</h5>
+    <h5 style="padding: 5px;"><b>Bio:</b> {{ user.bio if user.bio else "-" }}</h5>
 
     <button onclick="location.href='{{ url_for('auth.update_profile') }}'">🐾Edit Profile🐾</button>
 

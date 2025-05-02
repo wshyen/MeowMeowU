@@ -80,81 +80,87 @@
     transform: scale(1.05);
   }
 
+  .current-file {
+    color: #7a5c3e;
+    text-decoration: none;
+    font-weight: normal;
+  }
+
+  .current-file:hover {
+    text-decoration: underline;
+  }
+
+  .checkbox-label {
+    font-size: 14px;
+    color: #7a5c3e;
+    margin-top: 4px;
+    display: block;
+  }
 </style>
 
 <div class="form-container">
-  <h2><b>Edit Profile📝</b></h2>
+  <h2><b>Edit Profile 📝</b></h2>
   <form method="POST" action="{{ url_for('auth.update_profile') }}" enctype="multipart/form-data">
 
     <label for="username">Username:</label>
-    <input type="text" id="username" name="username" value="{{ user.UserName }}">
+    <input type="text" id="username" name="username" value="{{ user.UserName or '' }}" placeholder="Enter your username">
 
     <label for="status">Status:</label>
     <select id="status" name="status">
-      <option value="" disabled selected>Select your status🐾</option>
-      <option value="Meow~" {% if user.status == "Meow~" %}selected{% endif %}>Meow~🐱</option>
-      <option value="Sleepy..." {% if user.status == "Sleepy..." %}selected{% endif %}>Sleepy...🥱</option>
-      <option value="So tired!" {% if user.status == "So tired!" %}selected{% endif %}>So tired!💀</option>
-      <option value="On a break." {% if user.status == "On a break." %}selected{% endif %}>On a break.📴</option>
-      <option value="Need coffee!" {% if user.status == "Need coffee!" %}selected{% endif %}>Need coffee!☕</option>
-      <option value="Feeling great!" {% if user.status == "Feeling great!" %}selected{% endif %}>Feeling great!💪🏻</option>
-      <option value="Do not disturb." {% if user.status == "Do not disturb." %}selected{% endif %}>Do not disturb.🫥</option>
-      <option value="Busy but productive." {% if user.status == "Busy but productive." %}selected{% endif %}>Busy but productive.📖</option>
+      <option value="" disabled {% if not user.status %}selected{% endif %}>Select your status 🐾</option>
+      <option value="-" {% if user.status == "None" %}selected{% endif %}>None 🔍</option>
+      {% for status in ["Meow~🐱", "Sleepy...🥱", "So tired!💀", "On a break.📴", "Need coffee!☕", 
+                        "Feeling great!💪🏻", "Do not disturb.🫥", "Busy but productive.📖"] %}
+      <option value="{{ status }}" {% if user.status == status %}selected{% endif %}>{{ status }}</option>
+      {% endfor %}
     </select>
 
     <label for="email">Email:</label>
     <div class="readonly-field">{{ user.email }}</div>
 
     <label for="birthday">Birthday:</label>
-    <input type="date" id="birthday" name="birthday" value="{{ user.Birthday }}">
+    <input type="date" id="birthday" name="birthday" value="{{ user.birthday or '' }}">
 
     <label for="mbti">MBTI Personality Type:</label>
     <select id="mbti" name="mbti">
-      <option value="" disabled selected>Select your MBTI🐾</option>
-      <option value="INTJ" {% if user.mbti == "INTJ" %}selected{% endif %}>INTJ - Architect 🏛️</option>
-      <option value="INTP" {% if user.mbti == "INTP" %}selected{% endif %}>INTP - Logician 🧠</option>
-      <option value="ENTJ" {% if user.mbti == "ENTJ" %}selected{% endif %}>ENTJ - Commander 🏆</option>
-      <option value="ENTP" {% if user.mbti == "ENTP" %}selected{% endif %}>ENTP - Debater 🗣️</option>
-      <option value="INFJ" {% if user.mbti == "INFJ" %}selected{% endif %}>INFJ - Advocate 💡</option>
-      <option value="INFP" {% if user.mbti == "INFP" %}selected{% endif %}>INFP - Mediator 🌿</option>
-      <option value="ENFJ" {% if user.mbti == "ENFJ" %}selected{% endif %}>ENFJ - Protagonist 🎭</option>
-      <option value="ENFP" {% if user.mbti == "ENFP" %}selected{% endif %}>ENFP - Campaigner 🎉</option>
-      <option value="ISTJ" {% if user.mbti == "ISTJ" %}selected{% endif %}>ISTJ - Logistician 📊</option>
-      <option value="ISFJ" {% if user.mbti == "ISFJ" %}selected{% endif %}>ISFJ - Defender 🛡️</option>
-      <option value="ESTJ" {% if user.mbti == "ESTJ" %}selected{% endif %}>ESTJ - Executive 🏢</option>
-      <option value="ESFJ" {% if user.mbti == "ESFJ" %}selected{% endif %}>ESFJ - Consul 🤝</option>
-      <option value="ISTP" {% if user.mbti == "ISTP" %}selected{% endif %}>ISTP - Virtuoso 🔧</option>
-      <option value="ISFP" {% if user.mbti == "ISFP" %}selected{% endif %}>ISFP - Adventurer 🎨</option>
-      <option value="ESTP" {% if user.mbti == "ESTP" %}selected{% endif %}>ESTP - Entrepreneur 🚀</option>
-      <option value="ESFP" {% if user.mbti == "ESFP" %}selected{% endif %}>ESFP - Entertainer 🎭</option>
+      <option value="" disabled {% if not user.mbti %}selected{% endif %}>Select your MBTI 🐾</option>
+      <option value="-" {% if user.mbti == "None" %}selected{% endif %}>None 🔍</option>
+      {% for mbti in ["INTJ - Architect 🏛️", "INTP - Logician 🧠", "ENTJ - Commander 🏆", "ENTP - Debater 🗣️", 
+                      "INFJ - Advocate 💡", "INFP - Mediator 🌿", "ENFJ - Protagonist 🎭", "ENFP - Campaigner 🎉", 
+                      "ISTJ - Logistician 📊", "ISFJ - Defender 🛡️", "ESTJ - Executive 🏢", "ESFJ - Consul 🤝", 
+                      "ISTP - Virtuoso 🔧", "ISFP - Adventurer 🎨", "ESTP - Entrepreneur 🚀", "ESFP - Entertainer 🎭"] %}
+      <option value="{{ mbti }}" {% if user.mbti == mbti %}selected{% endif %}>{{ mbti }}</option>
+      {% endfor %}
     </select>
-
-
-    <br>
 
     <label for="hobby">Hobby:</label>
     <select id="hobby" name="hobby">
-      <option value="" disabled selected>Select your hobby🐾</option>
-      <option value="Cat Photography" {% if user.hobbies == "Cat Photography" %}selected{% endif %}>Cat Photography 📸</option>
-      <option value="Cat Blogging" {% if user.hobbies == "Cat Blogging" %}selected{% endif %}>Cat Blogging 📝</option>
-      <option value="Cat Toy Crafting" {% if user.hobbies == "Cat Toy Crafting" %}selected{% endif %}>Cat Toy Crafting 🧶</option>
-      <option value="Fostering Cats" {% if user.hobbies == "Fostering Cats" %}selected{% endif %}>Fostering Cats 🏡</option>
-      <option value="Cat Grooming" {% if user.hobbies == "Cat Grooming" %}selected{% endif %}>Cat Grooming 🧼</option>
-      <option value="Building Cat Furniture" {% if user.hobbies == "Building Cat Furniture" %}selected{% endif %}>Building Cat Furniture 🛠️</option>
-      <option value="Exploring Cat Cafes" {% if user.hobbies == "Exploring Cat Cafes" %}selected{% endif %}>Exploring Cat Cafes ☕</option>
-      <option value="Creating Cat Memes" {% if user.hobbies == "Creating Cat Memes" %}selected{% endif %}>Creating Cat Memes 🎥</option>
+      <option value="" disabled {% if not user.hobby %}selected{% endif %}>Select your hobby 🐾</option>
+      <option value="-" {% if user.hobby == "None" %}selected{% endif %}>None 🔍</option>
+      {% for hobby in ["Cat Photography 📸", "Cat Blogging 📝", "Cat Toy Crafting 🧶", "Fostering Cats 🏡", 
+                       "Cat Grooming 🧼", "Building Cat Furniture 🛠️", "Exploring Cat Cafes ☕", "Creating Cat Memes 🎥"] %}
+      <option value="{{ hobby }}" {% if user.hobby == hobby %}selected{% endif %}>{{ hobby }}</option>
+      {% endfor %}
     </select>
 
     <label for="bio">Bio:</label>
-    <textarea id="bio" name="bio" rows="4">{{ user.Bio }}</textarea>
+    <textarea id="bio" name="bio" rows="4" placeholder="Write something about yourself...✏️">{{ user.bio or '' }}</textarea>
 
     <label for="profile_picture">Profile Picture:</label>
     <input type="file" id="profile_picture" name="profile_picture" accept="image/*">
+    {% if user.profile_picture %}
+      <p>Current file: <code class="current-file">{{ user.profile_picture }}</code></p>
+      <label class="checkbox-label"><input type="checkbox" name="clear_profile_picture"> Remove current profile picture❌ (Default file can't remove)</label>
+    {% endif %}
 
     <label for="cover_photo">Cover Photo:</label>
     <input type="file" id="cover_photo" name="cover_photo" accept="image/*">
+    {% if user.cover_photo %}
+      <p>Current file: <code class="current-file">{{ user.cover_photo }}</code></p>
+      <label class="checkbox-label"><input type="checkbox" name="clear_cover_photo"> Remove current cover photo❌ (Default file can't remove)</label>
+    {% endif %}
 
-    <button type="submit">🐾Save Changes🐾</button>
+    <button type="submit">🐾 Save Changes 🐾</button>
   </form>
 </div>
 

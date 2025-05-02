@@ -23,4 +23,3 @@ class User(db.Model, UserMixin):
     bio = db.Column(db.Text)
     profile_picture = db.Column(db.String(255), default="default_profilepic.png")
     cover_photo = db.Column(db.String(255), default="default_cover.png")
-
