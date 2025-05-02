@@ -46,7 +46,8 @@
         font-family: 'Times New Roman', Times, serif;
     }
 
-    .post img {
+    .post img, 
+    .post video {
         display: block;
         margin: 10px auto;
         border-radius: 10px;
@@ -117,6 +118,10 @@
         color: #333;
         cursor: pointer;
     }
+    
+    .hidden {
+        display: none;
+    }
 
 </style>
 
@@ -126,9 +131,16 @@
 
 <button onclick="openModal()">+ New Post</button>
 
+<div style="text-align: center; margin-top: 10px;">
+    <button onclick="window.location.href='{{ url_for('community.my_posts') }}'" style="background-color: #94693e; color: white; border: none; border-radius: 8px; padding: 10px 20px; font-size: 16px; cursor: pointer;">
+        My Posts
+    </button>
+</div>
+
 <hr>
 
 <h2>Latest Posts</h2>
+
 
 {% for post in posts %}
     <div class="post">
@@ -146,9 +158,14 @@
         {% endif %}
 
         <div class="post-actions">
-            <form action="{{ url_for('community.like_post', post_id=post['post_id']) }}" method="post" style="display:inline;">
+            <form action="{{ url_for('community.like_post' if not post['liked_by_current_user'] else 'community.unlike_post', post_id=post['post_id']) }}" method="post" style="display:inline;">
                 <button type="submit" style="background:none; border:none; color:#6b4f2f; cursor:pointer;">
-                    ❤️ {{ post['like_count'] }} Like
+                    {% if post['liked_by_current_user'] %}
+                        ❤️ 
+                    {% else %}
+                        🤍 
+                    {% endif %}
+                    {{ post['like_count'] }} Like
                 </button>
             </form>
             |
@@ -160,7 +177,7 @@
 <hr>
 
 
-<div id="postModal" class="modal" style="display:none;">
+<div id="postModal" class="modal hidden">
     <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>
         <h3>New Post</h3>
@@ -177,10 +194,11 @@
 {% block scripts %}
 <script>
 function openModal() {
-    document.getElementById('postModal').style.display = 'block';
+    document.getElementById('postModal').classList.remove('hidden');
 }
 function closeModal() {
-    document.getElementById('postModal').style.display = 'none';
+    document.getElementById('postModal').classList.add('hidden');
 }
+
 </script>
 {% endblock %}
