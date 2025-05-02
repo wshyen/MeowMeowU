@@ -138,7 +138,7 @@ if __name__ == '__main__':
     #Creates database table if it doesn't exist
     with get_db_connection() as conn:
         conn.execute('''
-            CREATE TABLE IF NOT EXISTS users (
+            CREATE TABLE IF NOT EXISTS user_roles (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 email TEXT NOT NULL UNIQUE,
                 role TEXT NOT NULL CHECK (role IN ('admin', 'user'))
