@@ -15,7 +15,9 @@ app.config['UPLOAD_FOLDER'] = 'static/contest' #Folder to store uploaded files
 app.config['SECRET_KEY'] = 'your_secret_key'
 
 def get_db_connection():
-    conn = sqlite3.connect('datebase.db')  
+    db_path = os.path.join(os.path.dirname(__file__), '..', 'instance', 'datebase.db')
+    db_path = os.path.abspath(db_path) 
+    conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -41,8 +43,8 @@ def contest_page():
 
     #Check logged-in user is admin or not
     user_role = "user"
-    if current_user.is_authenticated:
-        user = conn.execute("SELECT role FROM users WHERE email = ?", (current_user.email,)).fetchone()
+    if 'user' in session:
+        user = conn.execute("SELECT role FROM user_roles WHERE email = ?", (session['user'],)).fetchone()
         if user and user['role'] == 'admin':
             user_role = "admin" #Set user role to admin if the logged-in user is an admin
 
