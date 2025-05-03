@@ -1,12 +1,30 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for #Flask is a web framework that allows developers to build web applications
+from flask import Blueprint, render_template, request, flash, redirect, url_for, session #Flask is a web framework that allows developers to build web applications
 import re
 from .models import User
 from . import db
 from werkzeug.security import generate_password_hash, check_password_hash #for password hashing and verification
+from werkzeug.utils import secure_filename #handling file uploads
 from flask_login import login_user, login_required, logout_user, current_user
 from sqlalchemy.exc import IntegrityError
+import os
+from datetime import datetime
 
 auth = Blueprint("auth", __name__) #a Blueprint for authentication routes, Blueprint is like a container for related routes and functions
+
+#configuration for file uploads
+UPLOAD_FOLDER = 'Website/static/Userprofile'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+
+DEFAULT_PROFILE_PICTURE = "default_profilepic.png"
+DEFAULT_COVER_PHOTO = "default_cover.png"
+
+#makesure the upload folder exists before saving files
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
+def allowed_file(filename):
+    #Check if the uploaded file has an allowed extension
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @auth.route("/login", methods=["GET", "POST"]) #POST is a HTTP request methods that send data to the server
 #HTTP request methods are ways for a web browser or app to communicate with a server over the internet
@@ -141,3 +159,95 @@ def reset_password():
             return redirect(url_for("auth.login"))
 
     return render_template("reset_password.html", user=current_user)
+
+@auth.route("/view_profiles", methods=["GET", "POST"])
+def view_profiles():
+    return render_template("viewprofile.html", user=current_user)
+
+@auth.route("/create_profiles", methods=["GET", "POST"])
+def create_profiles():
+    return render_template("createprofile.html", user=current_user)
+
+@auth.route("/update-profile", methods=["GET", "POST"])
+@login_required
+def update_profile():
+    if request.method == "POST":
+        changes_made = False #track changes
+
+        username = request.form.get("username")
+        if username and username != current_user.UserName:
+            if len(username) < 3 or len(username) > 15 or not username[0].isupper():
+                flash("Username must be 3-15 characters long and start with a capital letter.", category="error")
+                return redirect(url_for("auth.update_profile"))
+            else:
+                current_user.UserName = username
+                changes_made = True
+
+        bio = request.form.get("bio")
+        if bio != current_user.bio:
+            if bio and len(bio) > 200:
+                flash("Bio must not exceed 200 characters.", category="error")
+                return redirect(url_for("auth.update_profile"))
+            current_user.bio = bio.strip() if bio else None
+            changes_made = True
+
+        status = request.form.get("status")
+        if status != current_user.status:
+            current_user.status = status.strip() if status else None
+            changes_made = True
+
+        birthday = request.form.get("birthday")
+        if birthday:
+            try:
+                valid_birthday = datetime.strptime(birthday, "%Y-%m-%d").date()
+                if valid_birthday != current_user.birthday:
+                    current_user.birthday = valid_birthday
+                    changes_made = True
+            except ValueError:
+                flash("Invalid date format. Please use YYYY-MM-DD.", category="error")
+                return redirect(url_for("auth.update_profile"))
+        elif current_user.birthday is not None:
+            current_user.birthday = None
+            changes_made = True
+
+        hobby = request.form.get("hobby")
+        if hobby != current_user.hobby:
+            current_user.hobby = hobby if hobby else None
+            changes_made = True
+
+        mbti = request.form.get("mbti")
+        if mbti != current_user.mbti:
+            current_user.mbti = mbti if mbti else None
+            changes_made = True
+
+        #handle file uploads
+        for file_type, default_image in [("profile_picture", DEFAULT_PROFILE_PICTURE), ("cover_photo", DEFAULT_COVER_PHOTO)]:
+            if request.form.get(f"clear_{file_type}"):  # Reset to default if checkbox checked
+                setattr(current_user, file_type, default_image)
+                changes_made = True
+            elif file_type in request.files and request.files[file_type].filename != "":
+                file = request.files[file_type]
+                if allowed_file(file.filename):
+                    filename = secure_filename(file.filename)
+                    file_path = os.path.join(UPLOAD_FOLDER, filename)
+                    file.save(file_path)  # Ensure file is saved
+                    setattr(current_user, file_type, filename)  # Store filename in DB
+                    changes_made = True
+                else:
+                    flash(f"Invalid file format for {file_type}. Only PNG, JPG, JPEG allowed.", category="error")
+                    return redirect(url_for("auth.update_profile"))
+
+        if not changes_made:
+            flash("No changes were made to your profile.", category="info")
+            return redirect(url_for("auth.update_profile"))
+
+        try:
+            db.session.commit()
+            flash("Profile updated successfully!", category="success")
+        except IntegrityError:
+            flash("An error occurred while updating the profile. Please try again.", category="error")
+            return redirect(url_for("auth.update_profile"))
+
+        return redirect(url_for("auth.user_profile"))
+
+    return render_template("update_profile.html", user=current_user)
