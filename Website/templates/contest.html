@@ -55,14 +55,15 @@
             <p><strong>Prizes:</strong> {{ contest.prizes }}</p>
         </div>
 
-    {% if current_user.role == 'admin' %}
-        <div style="text-align: right; margin-bottom: 20px;"></div>
+        {% if user_role == 'admin' %}
+        <div style="text-align: right; margin-bottom: 20px;">
             <button onclick="window.location.href='{{ url_for('contestmanagement.create_contest') }}'"
                 style="font-size: 20px; background-color: #94693e; color: white; padding: 10px 15px; border-radius: 5px; cursor: pointer; border: none;">
                 + 
             </button>
         </div>
-    {% endif %}
+        {% endif %}
+    {% endfor %}
 
 </div>
 <script>
@@ -72,7 +73,7 @@
     }
 
     document.addEventListener("DOMContentLoaded", function() {
-        const userRole = "{{ current_user.role }}"; //Get role from backend
+        const userRole = "{{ user.role }}"; //Get role from backend
         if (userRole !== "admin") {
             document.getElementById("addContest").style.display = "none"; //Hide button for non-admins
         }
