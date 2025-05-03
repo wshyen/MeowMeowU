@@ -95,6 +95,10 @@
 <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgb(176, 148, 119);">
     <a class="nav-item nav-link" style="font-family: 'Times New Roman'; color: white; font-size: 19px;" href="/">Home</a>
 
+    <a class="nav-item nav-link" href="{{ url_for('search.search_feature') }}" style="color: white; font-size: 19px;">
+        <img src="{{ url_for('static', filename='Images/option2.png') }}" alt="Search" style="width: 30px; height: 30px;">
+    </a>
+
     <div class="dropdown nav-item">
         <a class="nav-link" href="#" id="dropdownMenuLink" aria-haspopup="true" aria-expanded="false"
            style="font-family: 'Times New Roman'; color: white; font-size: 19px;">
@@ -106,12 +110,17 @@
         </div>
     </div>
 
-    <a class="nav-item nav-link" href="{{ url_for('search.search_feature') }}" style="color: white; font-size: 19px;">
-        <img src="{{ url_for('static', filename='Images/option2.png') }}" alt="Search" style="width: 30px; height: 30px;">
-    </a>
-
     <a class="nav-item nav-link" style="font-family: 'Times New Roman'; color: white; font-size: 19px;" href="{{ url_for('community.community_feature') }}">Community</a>
 
+    <div class="dropdown nav-item">
+        <a class="nav-link" href="#" id="dropdownMenuLink" aria-haspopup="true" aria-expanded="false"
+           style="font-family: 'Times New Roman'; color: white; font-size: 19px;">
+            Entertainment
+        </a>
+        <div class="dropdown-content">
+            <a class="dropdown-item" href="{{ url_for('contestmanagement.contest_page') }}">Contest</a>
+        </div>
+    </div>
 
     <div class="ml-auto d-flex align-items-center">
         <div class="dropdown">
