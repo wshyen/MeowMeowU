@@ -160,14 +160,6 @@ def reset_password():
 
     return render_template("reset_password.html", user=current_user)
 
-@auth.route("/view_profiles", methods=["GET", "POST"])
-def view_profiles():
-    return render_template("viewprofile.html", user=current_user)
-
-@auth.route("/create_profiles", methods=["GET", "POST"])
-def create_profiles():
-    return render_template("createprofile.html", user=current_user)
-
 @auth.route("/update-profile", methods=["GET", "POST"])
 @login_required
 def update_profile():
