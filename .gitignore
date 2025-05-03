@@ -1,13 +1,21 @@
+<<<<<<< HEAD
+=======
 
+>>>>>>> origin/main
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 
+<<<<<<< HEAD
+.vscode/
+
+=======
 
 .vscode/
 
 
+>>>>>>> origin/main
 venv/
 env/
 

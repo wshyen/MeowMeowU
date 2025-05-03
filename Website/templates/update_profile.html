@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}Edit User Profile{% endblock %}
+
+{% block content %}
+
+<style>
+  body {
+    background-color: #f2eadf;
+    font-family: 'Times New Roman', serif;
+  }
+
+  h2, label {
+    color: rgb(78, 68, 57);
+    margin-top: 10px;
+  }
+
+  label {
+    font-size: 20px;
+    font-weight: bold;
+  }
+
+  .form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin: auto;
+    margin-top: 45px;
+    margin-bottom: 45px;
+    background: #fff7ec;
+    padding: 30px;
+    border-radius: 15px;
+    max-width: 1100px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  input[type="text"], textarea, select, input[type="file"], input[type="date"] {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    font-family: 'Times New Roman', serif;
+    background-color: white;
+  }
+
+  textarea {
+    height: 120px;
+    resize: none;
+  }
+
+  .readonly-field {
+    background-color: #e9ecef;
+    color: #6c757d;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    font-family: 'Times New Roman', serif;
+    margin-bottom: 8px;
+  }
+
+  button {
+    font-family: 'Times New Roman', serif;
+    background-color: rgb(176, 148, 119);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    font-size: 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: 0.3s ease;
+  }
+
+  button:hover {
+    background-color: rgb(156, 128, 100);
+    transform: scale(1.05);
+  }
+
+  .current-file {
+    color: #7a5c3e;
+    text-decoration: none;
+    font-weight: normal;
+  }
+
+  .current-file:hover {
+    text-decoration: underline;
+  }
+
+  .checkbox-label {
+    font-size: 14px;
+    color: #7a5c3e;
+    margin-top: 4px;
+    display: block;
+  }
+</style>
+
+<div class="form-container">
+  <h2><b>Edit Profile 📝</b></h2>
+  <form method="POST" action="{{ url_for('auth.update_profile') }}" enctype="multipart/form-data">
+
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" value="{{ user.UserName or '' }}" placeholder="Enter your username">
+
+    <label for="status">Status:</label>
+    <select id="status" name="status">
+      <option value="" disabled {% if not user.status %}selected{% endif %}>Select your status 🐾</option>
+      <option value="-" {% if user.status == "None" %}selected{% endif %}>None 🔍</option>
+      {% for status in ["Meow~🐱", "Sleepy...🥱", "So tired!💀", "On a break.📴", "Need coffee!☕", 
+                        "Feeling great!💪🏻", "Do not disturb.🫥", "Busy but productive.📖"] %}
+      <option value="{{ status }}" {% if user.status == status %}selected{% endif %}>{{ status }}</option>
+      {% endfor %}
+    </select>
+
+    <label for="email">Email:</label>
+    <div class="readonly-field">{{ user.email }}</div>
+
+    <label for="birthday">Birthday:</label>
+    <input type="date" id="birthday" name="birthday" value="{{ user.birthday or '' }}">
+
+    <label for="mbti">MBTI Personality Type:</label>
+    <select id="mbti" name="mbti">
+      <option value="" disabled {% if not user.mbti %}selected{% endif %}>Select your MBTI 🐾</option>
+      <option value="-" {% if user.mbti == "None" %}selected{% endif %}>None 🔍</option>
+      {% for mbti in ["INTJ - Architect 🏛️", "INTP - Logician 🧠", "ENTJ - Commander 🏆", "ENTP - Debater 🗣️", 
+                      "INFJ - Advocate 💡", "INFP - Mediator 🌿", "ENFJ - Protagonist 🎭", "ENFP - Campaigner 🎉", 
+                      "ISTJ - Logistician 📊", "ISFJ - Defender 🛡️", "ESTJ - Executive 🏢", "ESFJ - Consul 🤝", 
+                      "ISTP - Virtuoso 🔧", "ISFP - Adventurer 🎨", "ESTP - Entrepreneur 🚀", "ESFP - Entertainer 🎭"] %}
+      <option value="{{ mbti }}" {% if user.mbti == mbti %}selected{% endif %}>{{ mbti }}</option>
+      {% endfor %}
+    </select>
+
+    <label for="hobby">Hobby:</label>
+    <select id="hobby" name="hobby">
+      <option value="" disabled {% if not user.hobby %}selected{% endif %}>Select your hobby 🐾</option>
+      <option value="-" {% if user.hobby == "None" %}selected{% endif %}>None 🔍</option>
+      {% for hobby in ["Cat Photography 📸", "Cat Blogging 📝", "Cat Toy Crafting 🧶", "Fostering Cats 🏡", 
+                       "Cat Grooming 🧼", "Building Cat Furniture 🛠️", "Exploring Cat Cafes ☕", "Creating Cat Memes 🎥"] %}
+      <option value="{{ hobby }}" {% if user.hobby == hobby %}selected{% endif %}>{{ hobby }}</option>
+      {% endfor %}
+    </select>
+
+    <label for="bio">Bio:</label>
+    <textarea id="bio" name="bio" rows="4" placeholder="Write something about yourself...✏️">{{ user.bio or '' }}</textarea>
+
+    <label for="profile_picture">Profile Picture:</label>
+    <input type="file" id="profile_picture" name="profile_picture" accept="image/*">
+    {% if user.profile_picture %}
+      <p>Current file: <code class="current-file">{{ user.profile_picture }}</code></p>
+      <label class="checkbox-label"><input type="checkbox" name="clear_profile_picture"> Remove current profile picture❌ (Default file can't remove)</label>
+    {% endif %}
+
+    <label for="cover_photo">Cover Photo:</label>
+    <input type="file" id="cover_photo" name="cover_photo" accept="image/*">
+    {% if user.cover_photo %}
+      <p>Current file: <code class="current-file">{{ user.cover_photo }}</code></p>
+      <label class="checkbox-label"><input type="checkbox" name="clear_cover_photo"> Remove current cover photo❌ (Default file can't remove)</label>
+    {% endif %}
+
+    <button type="submit">🐾 Save Changes 🐾</button>
+  </form>
+</div>
+
+{% endblock %}
