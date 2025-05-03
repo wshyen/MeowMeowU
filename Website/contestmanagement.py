@@ -31,8 +31,21 @@ def login():
         password = request.form['password']
         
         # Assuming user validation is correct
-        session['user'] = username  # Set the session when the user is logged in
-        return redirect(url_for('contestmanagement.contest'))  # Redirect to the profile page
+        session['user'] = username  #Store the username in session
+
+        conn = get_db_connection()
+        user = conn.execute('''
+            SELECT users.username, user_roles.role
+            FROM users
+            JOIN user_roles ON users.email = user_roles.email
+            WHERE users.username = ?
+        ''', (username,)).fetchone()
+        conn.close()
+
+        if user:
+            session['role'] = user['role']  #Store the role in session
+
+        return redirect(url_for('contestmanagement.contest_page'))  # Redirect to the profile page
     
     return render_template('login.html')
 
@@ -41,54 +54,47 @@ def contest_page():
     conn = get_db_connection()
     contests = conn.execute("SELECT * FROM contests").fetchall()  # Get all contests
 
-    #Check logged-in user is admin or not
+    user = session.get('user') 
     user_role = "user"
-    if 'user' in session:
-        user = conn.execute("SELECT role FROM user_roles WHERE email = ?", (session['user'],)).fetchone()
-        if user and user['role'] == 'admin':
-            user_role = "admin" #Set user role to admin if the logged-in user is an admin
-
+    if user:
+        user_role = session.get('role', 'user')  #Default to 'user' if no role is found
     conn.close()
     
-    return render_template("contest.html", contests=contests, user_role=user_role)
+    return render_template("contest.html", contests=contests, user=current_user, user_role=user_role)
 
 @contestmanagement_bp.route('/create_contest', methods=['GET', 'POST'])
 @login_required 
 def create_contest():
-    conn = get_db_connection()
-    user = conn.execute("SELECT role FROM users WHERE username = ?", (current_user.username,)).fetchone()
-    conn.close()
-
-    if request.method == 'POST':
-        contest_name = request.form['contest_name']
-        description = request.form['description']
-        start_datetime = request.form['start_datetime']
-        end_datetime = request.form['end_datetime']
-        voting_start = request.form['voting_start']
-        voting_end = request.form['voting_end']
-        result_announcement = request.form['result_announcement']
-        purpose = request.form['purpose']
-        rules = request.form['rules']
-        prizes = request.form['prizes']
-        file = request.files['contest_banner']
+    if 'user' in session and session.get('role') == 'admin':
+        if request.method == 'POST':
+            contest_name = request.form['contest_name']
+            description = request.form['description']
+            start_datetime = request.form['start_datetime']
+            end_datetime = request.form['end_datetime']
+            voting_start = request.form['voting_start']
+            voting_end = request.form['voting_end']
+            result_announcement = request.form['result_announcement']
+            purpose = request.form['purpose']
+            rules = request.form['rules']
+            prizes = request.form['prizes']
+            file = request.files['contest_banner']
         
-        #Validate and save banner image
-        banner_url = None
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            banner_url = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(banner_url) #Save the file inside the contest folder
+            #Validate and save banner image
+            banner_url = None
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                banner_url = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file.save(banner_url) #Save the file inside the contest folder
 
-        with get_db_connection() as conn:
-            conn.execute('''
-                INSERT INTO contests (name, description, start_datetime, end_datetime, voting_start, voting_end, result_announcement, purpose, rules, prizes, banner_url) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (contest_name, description, start_datetime, end_datetime, voting_start, voting_end, result_announcement, purpose, rules, prizes, banner_url))
-            conn.commit()  #Save changes
+            with get_db_connection() as conn:
+                conn.execute('''
+                    INSERT INTO contests (name, description, start_datetime, end_datetime, voting_start, voting_end, result_announcement, purpose, rules, prizes, banner_url) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (contest_name, description, start_datetime, end_datetime, voting_start, voting_end, result_announcement, purpose, rules, prizes, banner_url))
+                conn.commit()  #Save changes
 
-        return redirect(url_for('contestmanagement.contest_page'))  #Send admins back to the contest page after creating a contest
+            return redirect(url_for('contestmanagement.contest_page'))  #Send admins back to the contest page after creating a contest
 
-    if user and user['role'] == 'admin':  
         return render_template('create_contest.html') 
     else:
         flash("Access Denied. Admins Only!", "error")
