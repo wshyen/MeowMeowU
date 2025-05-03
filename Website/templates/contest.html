@@ -33,7 +33,7 @@
     }
 </style>
 
-    <div style="padding: 20px;">
+<div style="padding: 20px;">
     <h1 style="text-align: center; margin-bottom: 20px; font-family: 'Times New Roman', Times, serif;">Contest</h1>
 
     {% for contest in contests %}
@@ -54,16 +54,17 @@
             <p><strong>Rules & Guidelines:</strong> {{ contest.rules }}</p>
             <p><strong>Prizes:</strong> {{ contest.prizes }}</p>
         </div>
-
-        {% if user_role == 'admin' %}
-        <div style="text-align: right; margin-bottom: 20px;">
-            <button onclick="window.location.href='{{ url_for('contestmanagement.create_contest') }}'"
-                style="font-size: 20px; background-color: #94693e; color: white; padding: 10px 15px; border-radius: 5px; cursor: pointer; border: none;">
-                + 
-            </button>
-        </div>
-        {% endif %}
+    </div>
     {% endfor %}
+
+    {% if user_role == 'admin' %}
+    <div style="text-align: right; margin-bottom: 20px;">
+        <button id="addContest" onclick="window.location.href='{{ url_for('contestmanagement.create_contest') }}'"
+            style="font-size: 20px; background-color: #94693e; color: white; padding: 10px 15px; border-radius: 5px; cursor: pointer; border: none;">
+            + 
+        </button>
+    </div>
+    {% endif %}
 
 </div>
 <script>
@@ -73,9 +74,14 @@
     }
 
     document.addEventListener("DOMContentLoaded", function() {
-        const userRole = "{{ user.role }}"; //Get role from backend
+        const userRole = "{{ user_role|safe }}";
+        console.log("DEBUG: User Role in JavaScript →", userRole);
+
         if (userRole !== "admin") {
-            document.getElementById("addContest").style.display = "none"; //Hide button for non-admins
+            const addButton = document.getElementById("addContest");
+            if (addButton) {
+                addButton.style.display = "none";  //Hide button only if ID exists
+            }
         }
     });
 </script>

@@ -24,42 +24,63 @@ def get_db_connection():
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+def initialize_database():
+    with get_db_connection() as conn:
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS user_roles (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                email TEXT NOT NULL UNIQUE,
+                role TEXT NOT NULL CHECK (role IN ('admin', 'user'))
+            )
+        ''')
+        
+        # Check if admins are already inserted
+        existing_admins = conn.execute("SELECT * FROM user_roles WHERE role='admin'").fetchall()
+        if not existing_admins:
+            conn.execute('''
+                INSERT INTO user_roles (email, role) VALUES 
+                ('breannleemy@gmail.com', 'admin'),
+                ('limwanshyen@gmail.com', 'admin'),
+                ('yinniesiew@gmail.com', 'admin')
+            ''')
+            conn.commit()
+
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        
-        # Assuming user validation is correct
-        session['user'] = username  #Store the username in session
+        email = request.form.get('email')
+        print(f"DEBUG: Email Submitted from Form → {email}")  # Log submitted email
 
         conn = get_db_connection()
         user = conn.execute('''
-            SELECT users.username, user_roles.role
-            FROM users
-            JOIN user_roles ON users.email = user_roles.email
-            WHERE users.username = ?
-        ''', (username,)).fetchone()
+            SELECT email, role
+            FROM user_roles
+            WHERE email = ?
+        ''', (email,)).fetchone()
         conn.close()
 
         if user:
-            session['role'] = user['role']  #Store the role in session
+            print(f"DEBUG: Retrieved from DB → email: {user['email']}, role: {user['role']}")  # Log fetched user
+            session['user'] = user['email']  # Store email in session
+            session['role'] = user['role']  # Store role in session
+            session.modified = True  # Ensure session changes are saved
+            print(f"DEBUG: Session After Login → {dict(session)}")
 
-        return redirect(url_for('contestmanagement.contest_page'))  # Redirect to the profile page
-    
+            return redirect(url_for('contestmanagement.contest_page'))
+        else:
+            print("DEBUG: User Not Found in Database")  # Log missing user
+            flash("Invalid credentials!", "error")
+            return render_template('login.html')
+
     return render_template('login.html')
 
 @contestmanagement_bp.route("/contest_page")
 def contest_page():
     conn = get_db_connection()
     contests = conn.execute("SELECT * FROM contests").fetchall()  # Get all contests
-
-    user = session.get('user') 
-    user_role = "user"
-    if user:
-        user_role = session.get('role', 'user')  #Default to 'user' if no role is found
     conn.close()
     
+    user_role = session.get('role', 'user')
     return render_template("contest.html", contests=contests, user=current_user, user_role=user_role)
 
 @contestmanagement_bp.route('/create_contest', methods=['GET', 'POST'])
@@ -180,20 +201,6 @@ if __name__ == '__main__':
         #TEXT NOT NULL Adds a column for the name, description, start_datetime, end_datetime, voting_start, voting_end, result_announcement, purpose, rules and prizes which are a must to fill in
         #TEXT Adds a column for the banner_url which is not a must to fill in
 
-         #Insert admin users by email
-        conn.execute('''
-            INSERT OR IGNORE INTO user_roles (email, role) 
-            VALUES ('breannleemy@gmail.com', 'admin')
-        ''')
-        conn.execute('''
-            INSERT OR IGNORE INTO user_roles (email, role) 
-            VALUES ('limwanshyen@gmail.com', 'admin')
-        ''')
-        conn.execute('''
-            INSERT OR IGNORE INTO user_roles (email, role) 
-            VALUES ('yinniesiew@gmail.com', 'admin')
-        ''')
-        
-        conn.commit()
+        initialize_database()  #Initialize the database with admin users
 
         app.run(debug=True)
