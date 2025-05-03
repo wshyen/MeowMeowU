@@ -1,7 +1,7 @@
 import os
 import sqlite3
 from flask import Flask, Blueprint, render_template, request, session, redirect, url_for, jsonify, flash
-from flask_login import current_user 
+from flask_login import current_user, login_required 
 from werkzeug.utils import secure_filename
 from datetime import datetime
 
@@ -106,7 +106,7 @@ def submit_contest():
             filename = secure_filename(file.filename)
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(file_path)  #Save the file inside the contest folder
-         else:
+        else:
             flash("Invalid file format! Only JPG, JPEG and PNG are allowed.", "error")
             return redirect(url_for('contestmanagement.submit_contest'))
 
@@ -174,15 +174,15 @@ if __name__ == '__main__':
 
          #Insert admin users by email
         conn.execute('''
-            INSERT OR IGNORE INTO users (email, role) 
+            INSERT OR IGNORE INTO user_roles (email, role) 
             VALUES ('breannleemy@gmail.com', 'admin')
         ''')
         conn.execute('''
-            INSERT OR IGNORE INTO users (email, role) 
+            INSERT OR IGNORE INTO user_roles (email, role) 
             VALUES ('limwanshyen@gmail.com', 'admin')
         ''')
         conn.execute('''
-            INSERT OR IGNORE INTO users (email, role) 
+            INSERT OR IGNORE INTO user_roles (email, role) 
             VALUES ('yinniesiew@gmail.com', 'admin')
         ''')
         
