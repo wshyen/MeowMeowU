@@ -228,27 +228,27 @@
         let resultDate = new Date(document.getElementById("result_announcement").value);
 
         //Validate End Date must be AFTER Start Date
-        if (endDate <= startDate) { //Check if end date is before start date
-            alert("Contest End Date cannot be earlier than Start Date!"); //If true, show alert
+        if (endDate <= startDate) { 
+            alert("Contest End Date cannot be the same as or earlier than Start Date!"); //If true, show alert
             event.preventDefault(); //Prevent form submission if validation fails
             return;
         }
 
         //Validate Voting Start Date must START after Contest End Date
-        if (votingStart < endDate) { //Check if voting starts after contest end date
-            alert("Voting Start Date cannot be before the Contest End Date!"); //If true, show alert
+        if (votingStart <= endDate) { 
+            alert("Voting Start Date cannot be the same as or before the Contest End Date!"); //If true, show alert
             event.preventDefault(); //Prevent form submission if validation fails
             return;
         }
         //Validate Voting End Date must be AFTER Voting Start Date
-        if (votingEnd <= votingStart) { //Check if voting end is same or earlier than voting start
+        if (votingEnd <= votingStart) { 
             alert("Voting End Date must be after Voting Start Date!"); //If true, show alert
             event.preventDefault(); //Prevent form submission if validation fails
             return;
         }
 
         //Validate Result Announcement must be ON or AFTER Voting End Date
-        if (resultDate < votingEnd) { //Check if result announcement date is before voting end date
+        if (resultDate <= votingEnd) { 
             alert("Result Announcement Date must be after the last day of Voting!"); //If true, show alert
             event.preventDefault(); ///Prevent form submission if validation fails
             return;
