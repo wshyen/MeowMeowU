@@ -53,9 +53,8 @@
             <img src="{{ contest.banner_url }}" alt="Contest Banner" class="banner">
         {% endif %}
         <div class="details" id="{{ contest.name }}">
-            <p><strong>Description:</strong> {{ contest.description }}</p>
-            <p><strong>Start Date:</strong> {{ contest.start_datetime }}</p>
-            <p><strong>End Date:</strong> {{ contest.end_datetime }}</p>
+            <p><strong>Start Date:</strong> {{ contest.start_date }}</p>
+            <p><strong>End Date:</strong> {{ contest.end_date }}</p>
             <p><strong>Voting Period:</strong> {{ contest.voting_start }} to {{ contest.voting_end}}</p>
             <p><strong>Result Announcement:</strong> {{ contest.result_announcement }}</p>
             <p><strong>Purpose:</strong> {{ contest.purpose }}</p>
