@@ -82,7 +82,7 @@
     }
 
     document.addEventListener("DOMContentLoaded", function() {
-        const userRole = "{{ user_role|safe }}";
+        const userRole = "{{ user_role|safe 
         console.log("DEBUG: User Role in JavaScript →", userRole);
 
         if (userRole !== "admin") {

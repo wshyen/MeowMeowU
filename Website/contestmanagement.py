@@ -9,45 +9,9 @@ app = Flask(__name__, static_folder='static')
 app.secret_key = 'your_secret_key'
 contestmanagement_bp = Blueprint('contestmanagement', __name__, template_folder='templates', static_folder='static')
 
-login_manager = LoginManager()
-login_manager.init_app(app)
-
-@login_manager.user_loader
-def load_user(user_id):
-    conn = get_db_connection()
-    query = '''
-        SELECT u.rowid AS id, u.email, ur.role
-        FROM users u
-        LEFT JOIN user_roles ur ON u.id = ur.user_id
-        WHERE u.rowid = ?
-    '''
-    user_data = conn.execute(query, (user_id,)).fetchone()
-    conn.close()
-
-    if user_data:
-        return CustomUser(id=user_data['id'], email=user_data['email'], role=user_data['role'])
-    return None
-
-class CustomUser(UserMixin):
-    def __init__(self, id, email, role):
-        self.id = id
-        self.email = email
-        self.role = role
-
-    def get_id(self):
-        return str(self.id)
-
-    @property
-    def is_authenticated(self):
-        return True  
-
-    def __repr__(self):
-        return f"<User {self.email}, Role: {self.role}>"  # Debugging info
-
 UPLOAD_FOLDER = 'static/uploads'
 ALLOWED_EXTENSIONS = {'png','jpg','jpeg'}
 app.config['UPLOAD_FOLDER'] = 'static/contest' #Folder to store uploaded files
-app.config['SECRET_KEY'] = 'your_secret_key'
 
 def get_db_connection():
     db_path = os.path.join(os.path.dirname(__file__), '..', 'instance', 'datebase.db')
@@ -62,7 +26,7 @@ def allowed_file(filename):
 def initialize_database():
     with get_db_connection() as conn:
         conn.execute('''
-            CREATE TABLE IF NOT EXISTS user_roles (
+            CREATE TABLE IF NOT EXISTS user (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 email TEXT NOT NULL UNIQUE,
                 role TEXT NOT NULL CHECK (role IN ('admin', 'user'))
@@ -70,7 +34,7 @@ def initialize_database():
         ''')
         
         # Check if admins are already inserted
-        existing_admins = conn.execute("SELECT * FROM user_roles WHERE role='admin'").fetchall()
+        existing_admins = conn.execute("SELECT * FROM user WHERE role='admin'").fetchall()
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
@@ -81,7 +45,7 @@ def login():
         conn = get_db_connection()
         user = conn.execute('''
             SELECT rowid AS id, email, role
-            FROM user_roles
+            FROM user
             WHERE email = ?
         ''', (email,)).fetchone()
         conn.close()
@@ -89,7 +53,7 @@ def login():
         print(f"DEBUG: Raw user query result = {user}") 
 
         if user:
-            user_obj = User(id=user['id'], email=user['email'], role=user['role'])
+            user_obj = CustomUser(id=user['id'], email=user['email'], role=user['role'])
             login_user(user_obj)
 
             print("DEBUG: Logged in user:", user_obj)
@@ -108,10 +72,11 @@ def login():
 
 @contestmanagement_bp.route("/contest_page")
 def contest_page():
-    print("DEBUG: Full session =", dict(session)) 
-    user_role = session.get('role','admin')
+    print(f"DEBUG: current_user = {current_user}")  # Debugging current_user 
+
+    user_role = getattr(current_user, 'role', 'admin')
     print(f"DEBUG: user_role = {user_role}")
-    
+
     conn = get_db_connection()
     contests = conn.execute("SELECT * FROM contests").fetchall()  # Get all contests
     conn.close()
@@ -124,7 +89,7 @@ def create_contest():
     print(f"DEBUG: current_user = {current_user}")
     print(f"DEBUG: current_user.__dict__ = {current_user.__dict__}")
 
-    if current_user.role == 'admin':
+    if hasattr(current_user, 'role') and current_user.role == 'admin':
         if request.method == 'POST':
             contest_name = request.form['contest_name']
             description = request.form['description']
@@ -208,7 +173,7 @@ if __name__ == '__main__':
         admin_emails = ['breannleemy@gmail.com', 'limwanshyen@gmail.com', 'yinniesiew@gmail.com']
         for email in admin_emails:
             conn.execute('''
-                INSERT OR IGNORE INTO user_roles (email, role)
+                INSERT OR IGNORE INTO user (email, role)
                 VALUES (?, 'admin')
             ''', (email,))
         conn.commit()
