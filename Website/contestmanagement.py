@@ -74,7 +74,7 @@ def login():
 def contest_page():
     print(f"DEBUG: current_user = {current_user}")  # Debugging current_user 
 
-    user_role = getattr(current_user, 'role', 'admin')
+    user_role = getattr(current_user, 'role', 'user')
     print(f"DEBUG: user_role = {user_role}")
 
     conn = get_db_connection()
@@ -119,7 +119,7 @@ def create_contest():
 
             return redirect(url_for('contestmanagement.contest_page'))  #Send admins back to the contest page after creating a contest
 
-        return render_template('create_contest.html') 
+        return render_template('create_contest.html', user=current_user) 
     else:
         flash("Access Denied. Admins Only!", "error")
         return redirect(url_for('contestmanagement.contest_page')) #Send non-admins back to the contest page
