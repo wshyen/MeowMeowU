@@ -64,7 +64,7 @@
         </div>
     </div>
     {% endfor %}
-    <p>Debug: user_role is "{{ user_role }}"</p>
+
     {% if user_role == 'admin' %}
     <div style="text-align: right; margin-bottom: 20px; position: fixed; bottom: 20px; right: 20px;">
         <button id="addContest" onclick="window.location.href='{{ url_for('contestmanagement.create_contest') }}'"
@@ -82,7 +82,7 @@
     }
 
     document.addEventListener("DOMContentLoaded", function() {
-        const userRole = "{{ user_role|safe 
+        const userRole = "{{ user_role|safe }}";
         console.log("DEBUG: User Role in JavaScript →", userRole);
 
         if (userRole !== "admin") {
