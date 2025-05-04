@@ -1,7 +1,17 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+"*.pyc" 
+=======
+# 忽略 Python 缓存文件
+=======
+
+>>>>>>> 17d5177fc74fc30dc358dcc5300b2ac58012ccad
+=======
 =======
 
 >>>>>>> origin/main
+>>>>>>> 98551f065215f05e2aa218864ba5449661f3a320
 __pycache__/
 *.pyc
 *.pyo
@@ -19,5 +29,11 @@ __pycache__/
 venv/
 env/
 
+<<<<<<< HEAD
+>>>>>>> 6dc9133c705e0a42553ff7243527556b5012f2ae
+=======
 *.db-shm
 *.db-wal
+>>>>>>> 17d5177fc74fc30dc358dcc5300b2ac58012ccad
+"__pycache__/" 
+"*.pyc" 
