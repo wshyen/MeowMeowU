@@ -4,6 +4,14 @@
 
 {% block content %}
 <style>
+    h1 {
+        font-weight: bold;
+        color: #94693e;
+        text-align: center;
+        font-size: 36px;
+        margin-bottom: 10px;
+    }
+
     body {
         background-color: #f2eadf;
     }
@@ -56,7 +64,7 @@
         </div>
     </div>
     {% endfor %}
-
+    <p>Debug: user_role is "{{ user_role }}"</p>
     {% if user_role == 'admin' %}
     <div style="text-align: right; margin-bottom: 20px;">
         <button id="addContest" onclick="window.location.href='{{ url_for('contestmanagement.create_contest') }}'"

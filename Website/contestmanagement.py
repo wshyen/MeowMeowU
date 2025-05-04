@@ -1,13 +1,48 @@
 import os
 import sqlite3
 from flask import Flask, Blueprint, render_template, request, session, redirect, url_for, jsonify, flash
-from flask_login import current_user, login_required 
+from flask_login import current_user, login_required, UserMixin, LoginManager, login_user
 from werkzeug.utils import secure_filename
 from datetime import datetime
 
 app = Flask(__name__, static_folder='static')
 app.secret_key = 'your_secret_key'
 contestmanagement_bp = Blueprint('contestmanagement', __name__, template_folder='templates', static_folder='static')
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+@login_manager.user_loader
+def load_user(user_id):
+    conn = get_db_connection()
+    query = '''
+        SELECT u.rowid AS id, u.email, ur.role
+        FROM users u
+        LEFT JOIN user_roles ur ON u.id = ur.user_id
+        WHERE u.rowid = ?
+    '''
+    user_data = conn.execute(query, (user_id,)).fetchone()
+    conn.close()
+
+    if user_data:
+        return CustomUser(id=user_data['id'], email=user_data['email'], role=user_data['role'])
+    return None
+
+class CustomUser(UserMixin):
+    def __init__(self, id, email, role):
+        self.id = id
+        self.email = email
+        self.role = role
+
+    def get_id(self):
+        return str(self.id)
+
+    @property
+    def is_authenticated(self):
+        return True  
+
+    def __repr__(self):
+        return f"<User {self.email}, Role: {self.role}>"  # Debugging info
 
 UPLOAD_FOLDER = 'static/uploads'
 ALLOWED_EXTENSIONS = {'png','jpg','jpeg'}
@@ -36,39 +71,36 @@ def initialize_database():
         
         # Check if admins are already inserted
         existing_admins = conn.execute("SELECT * FROM user_roles WHERE role='admin'").fetchall()
-        if not existing_admins:
-            conn.execute('''
-                INSERT INTO user_roles (email, role) VALUES 
-                ('breannleemy@gmail.com', 'admin'),
-                ('limwanshyen@gmail.com', 'admin'),
-                ('yinniesiew@gmail.com', 'admin')
-            ''')
-            conn.commit()
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':
         email = request.form.get('email')
-        print(f"DEBUG: Email Submitted from Form → {email}")  # Log submitted email
+        print(f"DEBUG: login POST hit — email = {email}")
 
         conn = get_db_connection()
         user = conn.execute('''
-            SELECT email, role
+            SELECT rowid AS id, email, role
             FROM user_roles
             WHERE email = ?
         ''', (email,)).fetchone()
         conn.close()
 
+        print(f"DEBUG: Raw user query result = {user}") 
+
         if user:
-            print(f"DEBUG: Retrieved from DB → email: {user['email']}, role: {user['role']}")  # Log fetched user
-            session['user'] = user['email']  # Store email in session
-            session['role'] = user['role']  # Store role in session
-            session.modified = True  # Ensure session changes are saved
-            print(f"DEBUG: Session After Login → {dict(session)}")
+            user_obj = User(id=user['id'], email=user['email'], role=user['role'])
+            login_user(user_obj)
+
+            print("DEBUG: Logged in user:", user_obj)
+
+            session['role'] = user_obj.role
+            session.permanent = True  # Make the session permanent
+            session.modified = True  #Mark session as modified to ensure it is saved
+            print(f"DEBUG: session role set to {session['role']}")
 
             return redirect(url_for('contestmanagement.contest_page'))
         else:
-            print("DEBUG: User Not Found in Database")  # Log missing user
             flash("Invalid credentials!", "error")
             return render_template('login.html')
 
@@ -76,17 +108,23 @@ def login():
 
 @contestmanagement_bp.route("/contest_page")
 def contest_page():
+    print("DEBUG: Full session =", dict(session)) 
+    user_role = session.get('role','admin')
+    print(f"DEBUG: user_role = {user_role}")
+    
     conn = get_db_connection()
     contests = conn.execute("SELECT * FROM contests").fetchall()  # Get all contests
     conn.close()
     
-    user_role = session.get('role', 'user')
     return render_template("contest.html", contests=contests, user=current_user, user_role=user_role)
 
 @contestmanagement_bp.route('/create_contest', methods=['GET', 'POST'])
 @login_required 
 def create_contest():
-    if 'user' in session and session.get('role') == 'admin':
+    print(f"DEBUG: current_user = {current_user}")
+    print(f"DEBUG: current_user.__dict__ = {current_user.__dict__}")
+
+    if current_user.role == 'admin':
         if request.method == 'POST':
             contest_name = request.form['contest_name']
             description = request.form['description']
@@ -120,8 +158,8 @@ def create_contest():
     else:
         flash("Access Denied. Admins Only!", "error")
         return redirect(url_for('contestmanagement.contest_page')) #Send non-admins back to the contest page
-
-@contestmanagement_bp.route('/contest_submission', methods=['GET', 'POST'])
+        
+@contestmanagement_bp.route('/contest_submission', methods=['POST'])
 def submit_contest():
     if request.method == 'POST':
         username = request.form['username']
@@ -151,7 +189,6 @@ def submit_contest():
 
     return render_template("contest_submission.html")
 
-@contestmanagement_bp.route('/contest_submission', methods=['POST'])
 def check_user_submission(user_id):
     existing_entry = Submission.query.filter_by(user_id=user_id).first()
     if existing_entry:
@@ -164,20 +201,17 @@ if __name__ == '__main__':
     if not os.path.exists(app.config['UPLOAD_FOLDER']):
         os.makedirs(app.config['UPLOAD_FOLDER'])
 
+    initialize_database() 
+
     #Creates database table if it doesn't exist
     with get_db_connection() as conn:
-        conn.execute('''
-            CREATE TABLE IF NOT EXISTS user_roles (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                email TEXT NOT NULL UNIQUE,
-                role TEXT NOT NULL CHECK (role IN ('admin', 'user'))
-            )
-        ''')
-        #Create the table if it doesn't exists
-        #Name of the table is users
-        #id INTEGER PRIMARY KEY AUTOINCREMENT Adds an id to the table
-        #TEXT NOT NULL UNIQUE Adds a column for the email which is a must to fill in and must be unique
-        #TEXT NOT NULL CHECK (role IN ('admin', 'user')) Adds a column for the role which is a must to fill in and can only be admin or user
+        admin_emails = ['breannleemy@gmail.com', 'limwanshyen@gmail.com', 'yinniesiew@gmail.com']
+        for email in admin_emails:
+            conn.execute('''
+                INSERT OR IGNORE INTO user_roles (email, role)
+                VALUES (?, 'admin')
+            ''', (email,))
+        conn.commit()
 
         conn.execute('''
             CREATE TABLE IF NOT EXISTS contests ( 
@@ -201,6 +235,6 @@ if __name__ == '__main__':
         #TEXT NOT NULL Adds a column for the name, description, start_datetime, end_datetime, voting_start, voting_end, result_announcement, purpose, rules and prizes which are a must to fill in
         #TEXT Adds a column for the banner_url which is not a must to fill in
 
-        initialize_database()  #Initialize the database with admin users
+        conn.commit()
 
-        app.run(debug=True)
+    app.run(debug=True)
