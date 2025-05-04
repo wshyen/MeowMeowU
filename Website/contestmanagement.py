@@ -92,7 +92,6 @@ def create_contest():
     if hasattr(current_user, 'role') and current_user.role == 'admin':
         if request.method == 'POST':
             contest_name = request.form['contest_name']
-            description = request.form['description']
             start_datetime = request.form['start_datetime']
             end_datetime = request.form['end_datetime']
             voting_start = request.form['voting_start']
@@ -112,9 +111,9 @@ def create_contest():
 
             with get_db_connection() as conn:
                 conn.execute('''
-                    INSERT INTO contests (name, description, start_datetime, end_datetime, voting_start, voting_end, result_announcement, purpose, rules, prizes, banner_url) 
+                    INSERT INTO contests (name, start_datetime, end_datetime, voting_start, voting_end, result_announcement, purpose, rules, prizes, banner_url) 
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (contest_name, description, start_datetime, end_datetime, voting_start, voting_end, result_announcement, purpose, rules, prizes, banner_url))
+                ''', (contest_name, start_datetime, end_datetime, voting_start, voting_end, result_announcement, purpose, rules, prizes, banner_url))
                 conn.commit()  #Save changes
 
             return redirect(url_for('contestmanagement.contest_page'))  #Send admins back to the contest page after creating a contest
@@ -182,7 +181,6 @@ if __name__ == '__main__':
             CREATE TABLE IF NOT EXISTS contests ( 
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
-                description TEXT NOT NULL,
                 start_datetime TEXT NOT NULL,
                 end_datetime TEXT NOT NULL,
                 voting_start TEXT NOT NULL,
@@ -197,7 +195,7 @@ if __name__ == '__main__':
         #Create the table if it doesn't exists
         #Name of the table is contests
         #id INTEGER PRIMARY KEY AUTOINCREMENT Adds an id to the table
-        #TEXT NOT NULL Adds a column for the name, description, start_datetime, end_datetime, voting_start, voting_end, result_announcement, purpose, rules and prizes which are a must to fill in
+        #TEXT NOT NULL Adds a column for the name, start_datetime, end_datetime, voting_start, voting_end, result_announcement, purpose, rules and prizes which are a must to fill in
         #TEXT Adds a column for the banner_url which is not a must to fill in
 
         conn.commit()
