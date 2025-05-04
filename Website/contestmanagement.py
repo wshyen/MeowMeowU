@@ -3,7 +3,7 @@ import sqlite3
 from flask import Flask, Blueprint, render_template, request, session, redirect, url_for, jsonify, flash
 from flask_login import current_user, login_required, UserMixin, LoginManager, login_user
 from werkzeug.utils import secure_filename
-from datetime import datetime
+from datetime import date
 
 app = Flask(__name__, static_folder='static')
 app.secret_key = 'your_secret_key'
@@ -92,8 +92,8 @@ def create_contest():
     if hasattr(current_user, 'role') and current_user.role == 'admin':
         if request.method == 'POST':
             contest_name = request.form['contest_name']
-            start_datetime = request.form['start_datetime']
-            end_datetime = request.form['end_datetime']
+            start_date = request.form['start_date']
+            end_date = request.form['end_date']
             voting_start = request.form['voting_start']
             voting_end = request.form['voting_end']
             result_announcement = request.form['result_announcement']
@@ -111,9 +111,9 @@ def create_contest():
 
             with get_db_connection() as conn:
                 conn.execute('''
-                    INSERT INTO contests (name, start_datetime, end_datetime, voting_start, voting_end, result_announcement, purpose, rules, prizes, banner_url) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (contest_name, start_datetime, end_datetime, voting_start, voting_end, result_announcement, purpose, rules, prizes, banner_url))
+                    INSERT INTO contests (name, start_date, end_date, voting_start, voting_end, result_announcement, purpose, rules, prizes, banner_url) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (contest_name, start_date, end_date, voting_start, voting_end, result_announcement, purpose, rules, prizes, banner_url))
                 conn.commit()  #Save changes
 
             return redirect(url_for('contestmanagement.contest_page'))  #Send admins back to the contest page after creating a contest
@@ -181,8 +181,8 @@ if __name__ == '__main__':
             CREATE TABLE IF NOT EXISTS contests ( 
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
-                start_datetime TEXT NOT NULL,
-                end_datetime TEXT NOT NULL,
+                start_date TEXT NOT NULL,
+                end_date TEXT NOT NULL,
                 voting_start TEXT NOT NULL,
                 voting_end TEXT NOT NULL,
                 result_announcement TEXT NOT NULL,
@@ -195,7 +195,7 @@ if __name__ == '__main__':
         #Create the table if it doesn't exists
         #Name of the table is contests
         #id INTEGER PRIMARY KEY AUTOINCREMENT Adds an id to the table
-        #TEXT NOT NULL Adds a column for the name, start_datetime, end_datetime, voting_start, voting_end, result_announcement, purpose, rules and prizes which are a must to fill in
+        #TEXT NOT NULL Adds a column for the name, start_date, end_date, voting_start, voting_end, result_announcement, purpose, rules and prizes which are a must to fill in
         #TEXT Adds a column for the banner_url which is not a must to fill in
 
         conn.commit()
