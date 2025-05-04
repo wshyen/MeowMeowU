@@ -32,3 +32,26 @@ def suggestion():
 
     user_notes = Note.query.filter_by(user_id=current_user.id).all()
     return render_template("suggestion.html", user=current_user, notes=user_notes)
+
+@views.route('/contest_submission', methods=['GET', 'POST'])
+@login_required
+def contest_submission():
+    if request.method == "POST":
+        contest_id = request.form.get("contest")
+        entry_description = request.form.get("description")
+        uploaded_file = request.files.get("file")
+
+        #Ensure logged in user is submitting the entry
+        user_id = current_user.id
+        username = current_user.username #Auto fetch user's current username
+
+        if contest_id and uploaded_file:
+            new_entry = ContestEntry(user_id=user_id, username=username,
+                                     contest_id=contest_id, description=entry_description, 
+                                     file=uploaded_file.filename)
+            db.session.add(new_entry)
+            db.session.commit()
+        
+        return redirect(url_for('views.contest_submission'))
+
+    return render_template("contest_submission.html", user=current_user)
