@@ -17,20 +17,20 @@
     }
 
     .banner {
-    width: 100%;
-    max-width: 800px; /* Limits banner size */
-    height: auto; /* Keeps aspect ratio */
-    display: block;
-    margin: 0 auto; /* Centers the banner */
+        width: 100%;
+        max-width: 800px; /* Limits banner size */
+        height: auto; /* Keeps aspect ratio */
+        display: block;
+        margin: 0 auto; /* Centers the banner */
     }
 
     .details{
-        display:none;
-        margin-top: 10px;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        background-color: #fff;
+        width: 500px; /* Set consistent width */
+        padding: 15px; /* Adjust spacing inside the box */
+        border: 1px solid #ccc; /* Ensure a defined border */
+        border-radius: 5px; /* Rounded corners for better look */
+        background-color: #fff; 
+        display: none; /* Initially hidden */
     }
 
     .toggle-button{
@@ -39,6 +39,40 @@
         text-decoration: underline;
         font-weight: bold;
     }
+
+    .banner {
+        width: 800px;
+        height: 400px;
+        object-fit: cover; 
+        border-radius: 10px;
+        float: left; 
+        margin-left: 0;
+        margin-right: auto; 
+    }
+
+    .contest-card {
+        display: flex;
+        align-items: flex-start;
+        flex-direction: column; 
+        gap: 15px; 
+        margin-bottom: 20px;
+    }
+
+    .contest-header {
+        display:block;
+        font-size: 24px;
+        font-weight: bold;
+        text-align: center;
+        width: 100%;
+    }
+
+    .contest-layout {
+        display: flex;
+        flex-direction: row; 
+        align-items: center;
+        gap: 20px; 
+        justify-content: flex-start;
+    }
 </style>
 
 <div style="padding: 20px;">
@@ -46,20 +80,24 @@
 
     {% for contest in contests %}
     <div class="contest-card">
-        <h2 onclick="toggleDetails('{{contest.name}}')" class="toggle-button">{{ contest.name }}</h2>
+        <div class="contest-header">
+            <h2 onclick="toggleDetails('{{contest.name}}')" class="toggle-button">{{ contest.name }}</h2>
+        </div>
 
         <!-- Show contest banner if available -->
-        {% if contest.banner_url %}
-            <img src="{{ url_for('static', filename='contest/' + contest.banner_url.split('/')[-1]) }}" alt="Contest Banner" class="banner">
-        {% endif %}
-        <div class="details" id="{{ contest.name }}">
-            <p><strong>Start Date:</strong> {{ contest.start_date }}</p>
-            <p><strong>End Date:</strong> {{ contest.end_date }}</p>
-            <p><strong>Voting Period:</strong> {{ contest.voting_start }} to {{ contest.voting_end}}</p>
-            <p><strong>Result Announcement:</strong> {{ contest.result_announcement }}</p>
-            <p><strong>Purpose:</strong> {{ contest.purpose }}</p>
-            <p><strong>Rules & Guidelines:</strong> {{ contest.rules }}</p>
-            <p><strong>Prizes:</strong> {{ contest.prizes }}</p>
+        <div class="contest-layout">
+            {% if contest.banner_url %}
+                <img src="{{ url_for('static', filename='contest/' + contest.banner_url.split('/')[-1]) }}" alt="Contest Banner" class="banner">
+            {% endif %}
+            <div class="details" id="{{ contest.name }}">
+                <p><strong>Start Date:</strong> {{ contest.start_date }}</p>
+                <p><strong>End Date:</strong> {{ contest.end_date }}</p>
+                <p><strong>Voting Period:</strong> {{ contest.voting_start }} to {{ contest.voting_end}}</p>
+                <p><strong>Result Announcement:</strong> {{ contest.result_announcement }}</p>
+                <p><strong>Purpose:</strong> {{ contest.purpose | replace('\n', '<br>') | safe }}</p>
+                <p><strong>Rules & Guidelines:</strong> {{ contest.rules | replace('\n', '<br>') | safe }}</p>
+                <p><strong>Prizes:</strong> {{ contest.prizes }}</p>
+            </div>
         </div>
     </div>
     {% endfor %}
@@ -77,7 +115,11 @@
 <script>
     function toggleDetails(contestName) {
         const details = document.getElementById(contestName);
-        details.style.display = details.style.display === "none" ? "block" : "none"; //If details is hidden, show it; otherwise, hide it
+        if (details.style.display === "none") {
+            details.style.display = "block"; // Show details
+        } else {
+            details.style.display = "none"; // Hide details
+        }
     }
 
     document.addEventListener("DOMContentLoaded", function() {
