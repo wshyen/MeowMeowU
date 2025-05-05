@@ -73,6 +73,11 @@
         gap: 20px; 
         justify-content: flex-start;
     }
+
+    .section p:first-of-type {
+        margin-bottom: 0px; /* Removes extra space below Purpose heading */
+        margin-top: 0px; /* Ensures no space above the text */
+    }   
 </style>
 
 <div style="padding: 20px;">
@@ -94,9 +99,19 @@
                 <p><strong>End Date:</strong> {{ contest.end_date }}</p>
                 <p><strong>Voting Period:</strong> {{ contest.voting_start }} to {{ contest.voting_end}}</p>
                 <p><strong>Result Announcement:</strong> {{ contest.result_announcement }}</p>
-                <p><strong>Purpose:</strong> {{ contest.purpose | replace('\n', '<br>') | safe }}</p>
-                <p><strong>Rules & Guidelines:</strong> {{ contest.rules | replace('\n', '<br>') | safe }}</p>
+                
+                <div class="section">
+                    <p><strong>Purpose:</strong></p>
+                    <p>{{ contest.purpose | replace('\n', '<br>') | safe }}</p>
+                </div>
+
+                <div class="section">
+                    <p><strong>Rules & Guidelines:</strong></p>
+                    <p>{{ contest.rules | replace('\n', '<br>') | safe }}</p>
+                </div>
+
                 <p><strong>Prizes:</strong> {{ contest.prizes }}</p>
+                <button class="join-button" style="background-color: #94693e; color: white; border: none; border-radius: 5px; padding: 6px 10px;" onclick="redirectToSubmission('{{ contest.id }}')">Join</button>
             </div>
         </div>
     </div>
@@ -113,6 +128,11 @@
 
 </div>
 <script>
+    function redirectToSubmission(contestId) {
+        window.location.href = "/contest_submission/" + contestId; // Redirects to submission page
+    }
+
+    
     function toggleDetails(contestName) {
         const details = document.getElementById(contestName);
         if (details.style.display === "none") {
