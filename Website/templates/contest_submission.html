@@ -19,6 +19,7 @@
         align-items: center;
         height: 100vh;
         margin: 0;
+        padding-top: 200px;
     }
 
     .submission-container {
@@ -69,6 +70,13 @@
         display: none;
     }
 
+    .navbar {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        z-index: 999; /* Ensures navbar stays above other elements */
+    }
+
     #confirmation-message {
         text-align: center;
         font-size: 18px;
@@ -111,12 +119,17 @@
         <label for="username"><strong>Username:</strong></label>
         <!-- Prefills the username field with the logged-in user's username -->
         <!-- The username field is set to readonly to prevent changes by the user -->
-        <input type="text" id="username" name="username" value="{{ request.user.username }}" readonly required> 
-
-        <label for="contest"><strong>Select Contest:</strong></label>
-        <select id="contest" name="contest" required>
+        <input type="text" id="username" name="username" value="{{ user.UserName if user else '' }}" readonly required>
+        <label for="contest"><strong>Select contest:</strong></label>
+        <select id="contest" name="contest" style="font-family: 'Times New Roman', Times, serif;" required>
+            {% if contests %}
             <option value="">Choose a contest</option>
-            <option value="contest1">Contest 1</option>
+                {% for contest in contests %}
+                    <option value="{{ contest['id'] }}">{{ contest['name'] }}</option>
+                {% endfor %}
+            {% else %}
+                <option disabled>No contests available</option>
+            {% endif %}
         </select>
 
         <label for="description" style="margin-top: 8px;"><strong>Entry description:</strong></label>
@@ -130,16 +143,25 @@
             I have read and agree to the Rules & Guidelines.
         </label>        
 
-        <button type="submit" style="cursor: pointer;" onclick="validateForm(event)">Submit Entry</button>
+        <button type="submit" style="cursor: pointer; font-family: 'Times New Roman', Times, serif;" onclick="validateForm(event)">Submit Entry</button>
         
     </form>
     
     <div id="confirmation-message" class="hidden">
         <p>Your entry has been submitted successfully!</p>
-        <img id="paw-stamp" src="{{ url_for('static', filename='Images/paw-stamp.png') }}" alt="Paw Stamp" style="width: 50px; height: 50px; margin-top: 10px; display: none;">
+        <img id="paw-stamp" src="{{ url_for('static', filename='Images/paw-stamp.png') }}" alt="Paw Stamp" style="width: 100px; height: 100px; margin-top: 10px; display: none;">
     </div>
 </div>
 <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const joinButton = document.querySelector(".join-button");
+        if (joinButton) {
+            joinButton.addEventListener("click", function(event) {
+                event.stopPropagation(); // Prevent navbar interference
+            });
+        }
+    });
+
     function validateForm(event) {
         event.preventDefault(); // Prevent form submission to validate first
 
@@ -148,6 +170,12 @@
         const contest = document.getElementById("contest").value; //Check if contest is selected
         const file = document.getElementById("file").value; //Check if file is selected
         const rulesAgree = document.getElementById("rulesAgree").checked; //Check if rules are agreed
+
+        // Check if there are contests available
+        if (document.getElementById("contest").options.length <= 1) { 
+            alert("No contests available. You cannot submit an entry.");
+            return;
+        }
 
         //Check if all required fields are filled
         if (username === "" || contest === "" || file === "" || !rulesAgree) {
