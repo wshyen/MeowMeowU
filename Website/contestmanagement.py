@@ -103,13 +103,17 @@ def create_contest():
             file = request.files['contest_banner']
         
             #Validate and save banner image
-            banner_url = f"contest/{filename}" if file and allowed_file(file.filename) else None
+            banner_url = None  #Default to None in case no file is uploaded or it's invalid
+
             if file and allowed_file(file.filename):
                 filename = secure_filename(file.filename)
 
-                os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True) #Create the upload folder if it doesn't exist
-                banner_url = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                file.save(banner_url) #Save the file inside the contest folder
+                os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)  #Ensure folder exists
+
+                file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file.save(file_path)  # Save the actual file
+
+                banner_url = f"contest/{filename}"
 
             with get_db_connection() as conn:
                 conn.execute('''
