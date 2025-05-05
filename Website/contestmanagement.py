@@ -25,6 +25,9 @@ def allowed_file(filename):
 
 def initialize_database():
     with get_db_connection() as conn:
+        #Enable Foreign Key Constraints 
+        conn.execute("PRAGMA foreign_keys = ON;")  #Stops submissions from referencing non-existent contests.
+
         conn.execute('''
             CREATE TABLE IF NOT EXISTS user (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -32,7 +35,22 @@ def initialize_database():
                 role TEXT NOT NULL CHECK (role IN ('admin', 'user'))
             )
         ''')
-        
+        conn.commit()
+
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS submissions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT NOT NULL,
+                contest_id INTEGER NOT NULL,
+                description TEXT,
+                file_path TEXT NOT NULL,
+                rules_agree BOOLEAN NOT NULL,
+                submission_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (contest_id) REFERENCES contests (id)
+            )
+        ''')
+        conn.commit()
+
         # Check if admins are already inserted
         existing_admins = conn.execute("SELECT * FROM user WHERE role='admin'").fetchall()
 
@@ -129,6 +147,15 @@ def create_contest():
 @contestmanagement_bp.route('/contest_submission/<int:contest_id>', methods=['GET', 'POST'])
 @login_required
 def submit_contest(contest_id):
+    conn = get_db_connection()
+    contests = conn.execute("SELECT id, name FROM contests").fetchall()  # Fetch all contests
+    conn.close()
+
+    if not contests:
+        flash("No contests available. You cannot submit an entry.", "error")
+        return redirect(url_for('contestmanagement.contest_page'))
+
+
     if request.method == 'POST':
         username = request.form['username']
         contest = request.form['contest']
@@ -138,14 +165,24 @@ def submit_contest(contest_id):
 
        #Validate the file type
         if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(file_path)  #Save the file inside the contest folder
-            
+            try:
+                filename = secure_filename(file.filename)
+                os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+                file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file.save(file_path)  #Save the file inside the contest folder
+            except Exception as e:
+                flash(f"Error saving file: {e}", "error")
+                return redirect(url_for('contestmanagement.submit_contest', contest_id=contest_id))
         else:
             flash("Invalid file format! Only JPG, JPEG and PNG are allowed.", "error")
-            return redirect(url_for('contestmanagement.submit_contest'))
+            return redirect(url_for('contestmanagement.submit_contest', contest_id=contest_id))
+
+        selected_contest = next((c for c in contests if str(c["id"]) == contest), None)
+
+        if not selected_contest:
+            flash("Invalid contest selection. Please choose a valid contest.", "error")
+            return redirect(url_for('contestmanagement.submit_contest', contest_id=contest_id))
+
 
         #Save the submission to the database
         with get_db_connection() as conn:
@@ -157,14 +194,17 @@ def submit_contest(contest_id):
 
         return redirect(url_for('contestmanagement.contest_page'))  # Sends user back to the contest page after submission
 
-    return render_template("contest_submission.html", contest_id=contest_id, user=current_user)
+    return render_template("contest_submission.html", contest_id=contest_id, user=current_user, contests=contests)
 
 def check_user_submission(user_id):
-    existing_entry = Submission.query.filter_by(user_id=user_id).first()
-    if existing_entry:
-        return "You have already submitted an entry."
-    else:
-        return None
+    if not isinstance(user_id, int):
+        return "Invalid user ID."
+
+    conn = get_db_connection()
+    existing_entry = conn.execute("SELECT * FROM submissions WHERE user_id = ?", (user_id,)).fetchone()
+    conn.close()
+
+    return "You have already submitted an entry." if existing_entry else None
 
 if __name__ == '__main__':
     #Ensure the upload folder exists
