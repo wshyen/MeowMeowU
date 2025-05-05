@@ -1,7 +1,7 @@
 import os
 import sqlite3
 from flask import Flask, Blueprint, render_template, request, session, redirect, url_for, jsonify, flash
-from flask_login import current_user, login_required, UserMixin, LoginManager, login_user
+from flask_login import current_user, login_required, login_user
 from werkzeug.utils import secure_filename
 from datetime import date
 
@@ -86,9 +86,6 @@ def contest_page():
 @contestmanagement_bp.route('/create_contest', methods=['GET', 'POST'])
 @login_required 
 def create_contest():
-    print(f"DEBUG: current_user = {current_user}")
-    print(f"DEBUG: current_user.__dict__ = {current_user.__dict__}")
-
     if hasattr(current_user, 'role') and current_user.role == 'admin':
         if request.method == 'POST':
             contest_name = request.form['contest_name']
@@ -129,8 +126,9 @@ def create_contest():
         flash("Access Denied. Admins Only!", "error")
         return redirect(url_for('contestmanagement.contest_page')) #Send non-admins back to the contest page
         
-@contestmanagement_bp.route('/contest_submission', methods=['POST'])
-def submit_contest():
+@contestmanagement_bp.route('/contest_submission/<int:contest_id>', methods=['GET', 'POST'])
+@login_required
+def submit_contest(contest_id):
     if request.method == 'POST':
         username = request.form['username']
         contest = request.form['contest']
@@ -159,7 +157,7 @@ def submit_contest():
 
         return redirect(url_for('contestmanagement.contest_page'))  # Sends user back to the contest page after submission
 
-    return render_template("contest_submission.html")
+    return render_template("contest_submission.html", contest_id=contest_id, user=current_user)
 
 def check_user_submission(user_id):
     existing_entry = Submission.query.filter_by(user_id=user_id).first()
@@ -177,14 +175,6 @@ if __name__ == '__main__':
 
     #Creates database table if it doesn't exist
     with get_db_connection() as conn:
-        admin_emails = ['breannleemy@gmail.com', 'limwanshyen@gmail.com', 'yinniesiew@gmail.com']
-        for email in admin_emails:
-            conn.execute('''
-                INSERT OR IGNORE INTO user (email, role)
-                VALUES (?, 'admin')
-            ''', (email,))
-        conn.commit()
-
         conn.execute('''
             CREATE TABLE IF NOT EXISTS contests ( 
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
