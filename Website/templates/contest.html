@@ -50,7 +50,7 @@
 
         <!-- Show contest banner if available -->
         {% if contest.banner_url %}
-            <img src="{{ contest.banner_url }}" alt="Contest Banner" class="banner">
+            <img src="{{ url_for('static', filename=contest['banner_url']) }}" alt="Contest Banner" class="banner">
         {% endif %}
         <div class="details" id="{{ contest.name }}">
             <p><strong>Start Date:</strong> {{ contest.start_date }}</p>
