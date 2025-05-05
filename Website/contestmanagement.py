@@ -9,9 +9,9 @@ app = Flask(__name__, static_folder='static')
 app.secret_key = 'your_secret_key'
 contestmanagement_bp = Blueprint('contestmanagement', __name__, template_folder='templates', static_folder='static')
 
-UPLOAD_FOLDER = 'static/uploads'
+UPLOAD_FOLDER = 'Website/static/uploads'
 ALLOWED_EXTENSIONS = {'png','jpg','jpeg'}
-app.config['UPLOAD_FOLDER'] = 'static/contest' #Folder to store uploaded files
+app.config['UPLOAD_FOLDER'] = 'Website/static/contest' #Folder to store uploaded files
 
 def get_db_connection():
     db_path = os.path.join(os.path.dirname(__file__), '..', 'instance', 'datebase.db')
@@ -103,9 +103,11 @@ def create_contest():
             file = request.files['contest_banner']
         
             #Validate and save banner image
-            banner_url = None
+            banner_url = f"contest/{filename}" if file and allowed_file(file.filename) else None
             if file and allowed_file(file.filename):
                 filename = secure_filename(file.filename)
+
+                os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True) #Create the upload folder if it doesn't exist
                 banner_url = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 file.save(banner_url) #Save the file inside the contest folder
 
@@ -135,8 +137,10 @@ def submit_contest():
        #Validate the file type
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
+            os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(file_path)  #Save the file inside the contest folder
+            
         else:
             flash("Invalid file format! Only JPG, JPEG and PNG are allowed.", "error")
             return redirect(url_for('contestmanagement.submit_contest'))
