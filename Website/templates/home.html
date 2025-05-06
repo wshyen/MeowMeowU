@@ -31,6 +31,13 @@
     h2 {
         text-align: center;
         margin-bottom: 25px;
+        color: rgb(78, 68, 57);
+    }
+
+    h3 {
+        margin-top: 10px;
+        font-size: 20px;
+        color: #4E4439;
     }
 
     .photo {
@@ -60,6 +67,72 @@
         66% { opacity: 1; }
         100% { opacity: 1; }
     }
+
+    .cat-news-section {
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 20px;
+        background-color: #fff7ec;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .cat-news-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+
+    .news-item {
+        background-color: #f2eadf;
+        border-radius: 10px;
+        padding: 15px;
+        text-align: center;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        position: relative;
+    }
+
+    .news-item input {
+        display: none;
+    }
+
+    .news-item label {
+        cursor: pointer;
+        display: block;
+    }
+
+    .news-item img {
+        width: 100%;
+        height: 200px;
+        border-radius: 10px;
+        object-fit: cover;
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .news-item input:checked + label::after {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 99;
+    }
+
+    .news-item input:checked + label img {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: auto;
+        height: 60vh;
+        max-width: 80vw;
+        max-height: 60vh;
+        object-fit: contain;
+        border: 10px solid #f2eadf;
+        z-index: 100;
+    }
 </style>
 
 <div class="about-section">
@@ -84,6 +157,86 @@
         <img src="static/Images/home.image.jpeg" alt="Cat 1">
         <img src="static/uploads/baka_cat1.jpeg" alt="Cat 2">
         <img src="static/posts/unknown_cat.jpeg" alt="Cat 3">
+    </div>
+</div>
+
+<hr style="width: 90%; margin: 20px auto; border: 1px solid rgb(148, 148, 148);">
+
+<div class="cat-news-section">
+    <h2 style="text-align: center; background-color: rgb(255, 222, 187); color: red; padding: 10px; border-radius: 8px;">
+        <b>🆘 Cat NEWS!!!</b>
+    </h2>
+    <div class="cat-news-grid">
+        <div class="news-item">
+            <input type="checkbox" id="cat1">
+            <label for="cat1">
+                <img src="static/Images/Cat_news_1.jpeg" alt="Cat 1">
+            </label>
+            <h3><b>😱 Cat at <strong style="color: #54d4ff; font-style: oblique;">Toilet</strong> !?</b></h3>
+            <p>This <strong style="color: orange; font-family: Courier;"><strong style="background-color: rgb(206, 159, 3); color: white;">Ca</strong>T</strong> was seen by a student in the hostel bathroom. It curled <strong style="color: rgb(191, 132, 255); font-family: 'Franklin Gothic Medium';">UP</strong>⬆️ in the corner. 
+                That <strong style="color: rgb(144, 96, 0);">NIghT</strong>, there was heavy rain, and it probably felt warm and <strong style="color: rgb(11, 174, 11); font-family: Courier;">SAfE</strong> there.</p> 
+        </div>
+
+        <div class="news-item">
+            <input type="checkbox" id="cat2">
+            <label for="cat2">
+                <img src="static/Images/Cat_news_2.jpeg" alt="Cat 2">
+            </label>
+            <h3><b><strong style="color: rgb(255, 132, 0); font-family: Courier;">Ki</strong>tten Fam 💕</b></h3>
+            <p>A student saw a group of <strong style="color: rgb(156, 55, 0);">KiTtEns</strong> on the way back to the dorm.  
+                They gathered <strong style="color: rgb(86, 0, 178); font-family: Courier;">AroUnD</strong> the student’s feet, acting <strong style="color: rgb(46, 138, 242); font-family: 'Franklin Gothic Medium';">CuTE</strong>—probably 
+                because they were <strong style="background-color: rgb(200, 120, 0); color: blanchedalmond;">H</strong><strong style="color: rgb(200, 120, 0);">Un</strong><strong style="background-color: rgb(200, 120, 0); color: rgb(0, 0, 0);">G</strong>ry
+                and hoping to be <strong style="color: rgb(17, 74, 218);">FE</strong>D.</p>
+        </div>
+
+        <div class="news-item">
+            <input type="checkbox" id="cat3">
+            <label for="cat3">
+                <img src="static/Images/Cat_news_3.jpeg" alt="Cat 3">
+            </label>
+            <h3><b>Sl<strong style="background-color: #ee8b00; color: beige;">eE</strong>ping <strong style="color: rgb(174, 127, 0); font-family: Courier;">BEAutY</strong> 💫</b></h3>
+            <p>A <strong style="color: rgb(220, 20, 60); font-family: 'Georgia', serif;">Mother</strong> Cat and her 
+                <strong style="color: rgb(75, 0, 130); font-family: 'Courier New', monospace;">Kitten</strong> are sleeping.  
+                The <strong style="color: rgb(0, 47, 93); font-family: 'Verdana', sans-serif; text-decoration: underline;">LiTtLe OnE</strong> is using the mother’s  
+                <strong style="background-color: rgb(255, 144, 236); color: white; font-family: 'Times New Roman', serif;">Belly</strong> as a pillow.</p>                          
+        </div>
+
+        <div class="news-item">
+            <input type="checkbox" id="cat4">
+            <label for="cat4">
+                <img src="static/Images/Cat_news_4.jpeg" alt="Cat 4">
+            </label>
+            <h3><b>Cat <strong style="color: #c694ff;">asmR<strong style="font-family: Courier; color: rgb(111, 179, 221);">Rr</strong></strong> Belike:</b></h3>
+            <p>This is a <strong style="color: rgb(114, 84, 0); font-family: 'Trebuchet MS', sans-serif; text-transform: uppercase;">Mother</strong> Cat.  
+                She looks <strong style="color: rgb(181, 69, 63); font-family: 'Courier New', monospace; font-style: italic;">very hungry</strong> and probably finished a whole pack of  
+                <strong style="background-color: rgb(229, 144, 201); color: black; font-family: 'Garamond', serif; letter-spacing: 2px;">Cat Food</strong> 🍽️.</p>
+             
+        </div>
+
+        <div class="news-item">
+            <input type="checkbox" id="cat5">
+            <label for="cat5">
+                <img src="static/Images/Cat_news_5.jpeg" alt="Cat 5">
+            </label>
+            <h3><b>✶Invisible C tss✶</b></h3>
+            <p>All <strong style="color: rgb(20, 20, 20); font-family: 'Franklin Gothic Medium';">B<strong style="background-color: #f5c491; color:#391c00;">LaC</strong>k Cats</strong> have a  
+                super <strong style="color: rgb(184, 0, 0);">Po<strong style="background-color: rgb(254, 145, 145); color: #ffffff;">W</strong>eR</strong> —  
+                they <strong style="color: #e5b168; font-family: Courier;">CAN</strong> disappear in the <strong style="background-color: rgb(0, 0, 0); color: white; font-family: 'Georgia', serif;">Dark</strong>.</p>
+             
+        </div>
+
+        <div class="news-item">
+            <input type="checkbox" id="cat6">
+            <label for="cat6">
+                <img src="static/Images/Cat_news_6.jpeg" alt="Cat 6">
+            </label>
+            <h3><b>Pret<strong style="background-color: rgb(208, 167, 255);">E</strong>nd<strong style="background-color: rgb(208, 167, 255);">ing</strong> to Be a <strong style="color: #ff92c3; font-family: 'Courier New'">Doll</strong></b></h3>
+            <p>A Sleepy Cat is <strong style="color:#75c506;">resting</strong> 
+                in someone’s <strong style="color: rgb(0, 68, 128); font-family: 'Franklin Gothic Medium';; text-decoration: underline;">Laundry Basket</strong>.  
+                It looks like it wants to be treated like a  
+                <strong style="background-color: rgb(255, 182, 193); color: rgb(75, 0, 130); font-family: 'Verdana', sans-serif; font-style: italic;">DOLL</strong> and given a bath.🛁</p>
+             
+        </div>
     </div>
 </div>
 
