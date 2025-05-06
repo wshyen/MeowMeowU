@@ -25,19 +25,25 @@
     }
 
     .details{
-        width: 500px; /* Set consistent width */
-        padding: 15px; /* Adjust spacing inside the box */
-        border: 1px solid #ccc; /* Ensure a defined border */
-        border-radius: 5px; /* Rounded corners for better look */
+        width: 350px; 
+        padding: 15px; 
+        border: 1px solid #ccc; 
+        border-radius: 5px; 
         background-color: #fff; 
-        display: none; /* Initially hidden */
+        visibility: hidden; 
+        font-family: 'Times New Roman', Times, serif;
+        transition: opacity 0.3s ease-in-out;
     }
 
     .toggle-button{
         cursor: pointer;
         color: #6b4f2f; 
-        text-decoration: underline;
         font-weight: bold;
+        transition: color 0.3s ease-in-out;
+    }
+
+    .toggle-button:hover {
+        color: #c79058; /* Change color slightly on hover */
     }
 
     .banner {
@@ -48,6 +54,7 @@
         float: left; 
         margin-left: 0;
         margin-right: auto; 
+        align-self: flex-start;
     }
 
     .contest-card {
@@ -55,15 +62,16 @@
         align-items: flex-start;
         flex-direction: column; 
         gap: 15px; 
-        margin-bottom: 20px;
+        margin-bottom: 50px;
     }
 
     .contest-header {
         display:block;
         font-size: 24px;
-        font-weight: bold;
-        text-align: center;
+        font-weight: bolder;
+        text-align: left;
         width: 100%;
+        font-family: 'Times New Roman', Times, serif;
     }
 
     .contest-layout {
@@ -77,7 +85,11 @@
     .section p:first-of-type {
         margin-bottom: 0px; /* Removes extra space below Purpose heading */
         margin-top: 0px; /* Ensures no space above the text */
-    }   
+    }
+
+    .container, .contest-layout {
+        max-width: 100%;
+    }
 </style>
 
 <div style="padding: 20px;">
@@ -111,7 +123,12 @@
                 </div>
 
                 <p><strong>Prizes:</strong> {{ contest.prizes }}</p>
-                <button class="join-button" style="background-color: #94693e; color: white; border: none; border-radius: 5px; padding: 6px 10px;" onclick="redirectToSubmission('{{ contest.id }}')">Join</button>
+                <button class="join-button" id="joinButton-{{ contest.id }}" 
+                        data-start="{{ contest.start_date }}" 
+                        data-end="{{ contest.end_date }}"
+                        onclick="redirectToSubmission('{{ contest.id }}')" style="background-color: #6b4f2f;; color: white; border: none; border-radius: 5px; padding: 6.5px 11px;" onclick="redirectToSubmission('{{ contest.id }}')">
+                    Join
+                </button>
             </div>
         </div>
     </div>
@@ -135,10 +152,12 @@
     
     function toggleDetails(contestName) {
         const details = document.getElementById(contestName);
-        if (details.style.display === "none") {
-            details.style.display = "block"; // Show details
+        if (details.style.opacity === "0") {
+            details.style.visibility = "visible"; 
+            details.style.opacity = "1"; //Fade details in
         } else {
-            details.style.display = "none"; // Hide details
+            details.style.visibility = "hidden";
+            details.style.opacity = "0"; //Fade details out
         }
     }
 
@@ -153,5 +172,33 @@
             }
         }
     });
+
+    window.onload = function() {
+        const today = new Date();
+        const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+        document.querySelectorAll(".join-button").forEach(button => {
+            const startDateStr = button.getAttribute("data-start");
+            const endDateStr = button.getAttribute("data-end");
+
+            //Convert date strings into Date objects, ensuring proper format
+            const startDate = new Date(startDateStr + "T00:00:00"); //Start date at midnight
+            const endDate = new Date(endDateStr + "T23:59:59"); //End date covers full day
+
+            const startDateOnly = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+            const endDateOnly = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+
+            //Disable only if today is before start date OR after end date
+            if (todayDate < startDateOnly || todayDate > endDateOnly) {
+                button.disabled = true;
+                button.style.backgroundColor = "#ccc"; //Grey color for disabled state which is not clickable
+                button.style.cursor = "not-allowed";
+            } else {
+                button.disabled = false; //Enable button exactly on the start date of the contest
+                button.style.backgroundColor = "#6b4f2f"; //Restore original color of button
+                button.style.cursor = "pointer"; //Allow user to click
+            }
+        });
+    };
 </script>
 {% endblock %}
