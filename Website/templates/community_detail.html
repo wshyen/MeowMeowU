@@ -14,38 +14,103 @@
 
     h1 {
         font-weight: bold;
-        color: #94693e;
-        text-align: center;
-        font-size: 36px;
-        margin-bottom: 10px;
-        padding-top: 25px;
-    }
-
-    h2{
-        font-weight: bold;
-        font-size: 25px;
+        font-size: 30px;
         color: #6b4f2f;
         text-align: center;
         font-style: italic;
-        margin-top: 0;
-        margin-bottom: 20px;
+        margin: 20px 0;
     }
+
     p {
         text-align: center;
         color: #5c4430;
-        font-size: 18px;
+        font-size: 20px;
     }
 
+    .post {
+        max-width: 600px;
+        background-color: #ffffff;
+        border-radius: 10px;
+        margin: 20px auto;
+        padding: 30px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        font-family: 'Times New Roman', Times, serif;
+        overflow: hidden;
+    }
+
+    .post img,
+    .post video {
+        display: block;
+        margin: 10px auto;
+        border-radius: 10px;
+        max-width: 100%;
+        height: auto;
+    }
+
+    .post-actions {
+        text-align: center;
+        margin-top: 10px;
+        font-size: 16px;
+        display: flex;
+        justify-content: center;
+        align-items: center; 
+    }
+
+    .post-action-button {
+        background: none;
+        border: none;
+        color: #6b4f2f;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 18px; 
+        margin: 0 10px;
+    }
+
+    .post-action-button:hover {
+        background-color: inherit;
+    }
+    
+    .post-actions .separator {
+        font-size: 30px;
+        color: #6b4f2f;
+    }
 </style>
 
-    <h2>Post Details</h2>
+    <h1>Post Details</h1>
 
     <div class="post">
         <p><strong>{{ post['username'] }}</strong> posted at {{ post['created_at'] }}</p>
         <p>{{ post['content'] }}</p>
-        {% if post['image_path'] %}
-            <img src="{{ url_for('static', filename=post['image_path']) }}" width="300">
+        {% if post['media_url'] %}
+            {% set ext = post['media_url'].rsplit('.', 1)[1].lower() %}
+            {% if ext in ['jpg', 'jpeg', 'png', 'gif'] %}
+                <img src="{{ url_for('static', filename=post['media_url']) }}" width="300" alt="Image">
+            {% elif ext in ['mp4', 'mov', 'avi'] %}
+                <video width="300" controls>
+                    <source src="{{ url_for('static', filename=post['media_url']) }}" type="video/{{ ext }}">
+                </video>
+            {% endif %}
         {% endif %}
+        
+        <div class="post-actions">
+            <form action="{{ url_for('community.like_post' if not post['liked_by_current_user'] else 'community.unlike_post', post_id=post['post_id']) }}" method="post" style="display:inline;">
+                <button type="submit" class="post-action-button">
+                    {% if post['liked_by_current_user'] %}
+                        ❤️ 
+                    {% else %}
+                        🤍 
+                    {% endif %}
+                    {{ post['like_count'] }} Like
+                </button>
+            </form>
+            
+            <span class="separator">|</span>
+
+            <button class="post-action-button">
+                💬 Comments
+            </button>
+        </div>
     </div>
 
     <h3>Comments</h3>
