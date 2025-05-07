@@ -17,9 +17,11 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100vh;
+        height: auto;
+        min-height: 100vh;
         margin: 0;
-        padding-top: 200px;
+        padding-top: 100px;
+        overflow: auto;
     }
 
     .submission-container {
@@ -29,9 +31,10 @@
         border-radius: 10px;
         background-color: #f9f9f9;
         text-align: left;
+        align-items: center;
     }
 
-    label, input, textarea {
+    label, input {
         font-family: 'Times New Roman', Times, serif;
         font-size: 16px;
         display: block;
@@ -43,6 +46,11 @@
         resize: none;  
         height: 120px; 
         overflow: auto;
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 16px;
+        display: block;
+        margin-bottom: 10px;
+        width: 100%;
     }
 
     button {
@@ -120,17 +128,9 @@
         <!-- Prefills the username field with the logged-in user's username -->
         <!-- The username field is set to readonly to prevent changes by the user -->
         <input type="text" id="username" name="username" value="{{ user.UserName if user else '' }}" readonly required>
-        <label for="contest"><strong>Select contest:</strong></label>
-        <select id="contest" name="contest" style="font-family: 'Times New Roman', Times, serif;" required>
-            {% if contests %}
-            <option value="">Choose a contest</option>
-                {% for contest in contests %}
-                    <option value="{{ contest['id'] }}">{{ contest['name'] }}</option>
-                {% endfor %}
-            {% else %}
-                <option disabled>No contests available</option>
-            {% endif %}
-        </select>
+        <label for="contest_name"><strong>Contest:</strong></label>
+        <input type="text" name="contest_name" value="{{ contest.name }}" readonly>
+        <input type="hidden" name="contest_id" value="{{ contest.id }}">
 
         <label for="description" style="margin-top: 8px;"><strong>Entry description:</strong></label>
         <textarea id="description" name="description" placeholder="Describe your entry (optional)"></textarea>
@@ -138,7 +138,7 @@
         <label for="file"><strong>Upload Your Entry:</strong></label>
         <input type="file" id="file" name="file" accept=".jpg, .jpeg, .png" required>
 
-        <label for="rulesAgree" style="display: flex; align-items: center; gap: 10px;">
+        <label for="rulesAgree" style="display: flex; align-items: center; gap: 10px; font-weight: bold;">
             <input type="checkbox" id="rulesAgree" required>
             I have read and agree to the Rules & Guidelines.
         </label>        
@@ -166,22 +166,16 @@
         event.preventDefault(); // Prevent form submission to validate first
 
         //Get required fields
-        const username = document.getElementById("username").value.trim(); //Check if username is filled
-        const contest = document.getElementById("contest").value; //Check if contest is selected
         const file = document.getElementById("file").value; //Check if file is selected
         const rulesAgree = document.getElementById("rulesAgree").checked; //Check if rules are agreed
 
-        // Check if there are contests available
-        if (document.getElementById("contest").options.length <= 1) { 
-            alert("No contests available. You cannot submit an entry.");
-            return;
-        }
-
         //Check if all required fields are filled
-        if (username === "" || contest === "" || file === "" || !rulesAgree) {
+        if (file === "" || !rulesAgree) {
             alert("Please complete all required fields before submitting.");
             return;
         }
+
+        document.body.style.overflow = "auto";
 
         //Show confirmation message
         document.getElementById("confirmation-message").classList.remove("hidden");
@@ -192,6 +186,10 @@
             pawStamp.style.display = "block"; // Make sure it's visible
             pawStamp.style.opacity = "1"; // Fade it in
         }, 500); //Delay for smoother appearance
+
+        setTimeout(() => {
+            window.location.href = "{{ url_for('contestmanagement.contest_page') }}";
+        }, 10000); //Delay for 10 seconds before send user to the contest page
     }
 </script>
 {% endblock %}
