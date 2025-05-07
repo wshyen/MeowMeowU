@@ -23,6 +23,7 @@ def get_db_connection():
 @community_bp.route('/community_feature')
 def community_feature():
     conn = get_db_connection()
+
     posts = conn.execute('''
     SELECT 
         post.*, 
@@ -46,6 +47,33 @@ def community_feature():
 
     conn.close()
     return render_template("community_index.html", user=current_user, posts=posts)
+
+@community_bp.route('/post/<int:post_id>')
+def post_detail(post_id):
+    conn = get_db_connection()
+    
+    post = conn.execute('''
+        SELECT 
+            post.*, 
+            user.username,
+             (SELECT COUNT(*) FROM likes WHERE likes.post_id = post.post_id) AS like_count,
+            CASE 
+                WHEN EXISTS (
+                    SELECT 1 FROM likes 
+                    WHERE likes.post_id = post.post_id AND likes.user_id = ?
+                ) THEN 1
+                ELSE 0
+            END AS liked_by_current_user
+        FROM post 
+        JOIN user ON post.user_id = user.id
+        WHERE post.post_id = ?
+    ''', (
+        current_user.id if current_user.is_authenticated else -1,
+        post_id
+    )).fetchone()
+
+    conn.close()
+    return render_template("community_detail.html", post=post, user=current_user)
 
 @community_bp.route('/post/create', methods=['POST'])
 @login_required
@@ -72,6 +100,9 @@ def create_post():
     conn.close()
 
     return redirect(url_for('community.community_feature'))
+
+
+#My Post
 
 @community_bp.route('/my-posts')
 @login_required
@@ -146,7 +177,12 @@ def like_post(post_id):
         conn.commit()
 
     conn.close()
-    return redirect(url_for('community.community_feature'))
+    referer = request.referrer
+
+    if '/community' in referer :
+        return redirect(url_for('community.community_feature'))
+
+    return redirect(url_for('community.post_detail', post_id=post_id))
 
 @community_bp.route('/post/unlike/<int:post_id>', methods=['POST'])
 @login_required
@@ -161,4 +197,9 @@ def unlike_post(post_id):
     conn.commit()
     conn.close()
 
-    return redirect(url_for('community.community_feature'))
+    referer = request.referrer
+
+    if '/community' in referer :
+        return redirect(url_for('community.community_feature'))
+
+    return redirect(url_for('community.post_detail', post_id=post_id))
