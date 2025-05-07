@@ -28,6 +28,7 @@ def community_feature():
     SELECT 
         post.*, 
         user.username, 
+        user.profile_picture,
         COUNT(likes.id) AS like_count,
         CASE 
             WHEN EXISTS (
@@ -56,6 +57,7 @@ def post_detail(post_id):
         SELECT 
             post.*, 
             user.username,
+            user.profile_picture,
              (SELECT COUNT(*) FROM likes WHERE likes.post_id = post.post_id) AS like_count,
             CASE 
                 WHEN EXISTS (
