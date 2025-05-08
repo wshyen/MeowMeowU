@@ -15,11 +15,82 @@
         color: #94693e; 
         font-weight: bold;
     }
+
+    .cat-box {
+        width: 350px;
+        height: 350px;
+        position: relative;
+        margin: auto;
+        background-image: url("{{ url_for('static', filename='Images/cat_face_shape.png') }}");
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-size: 20px;
+        font-weight: bold;
+        color: white;
+    }
 </style>
 <div style="padding: 20px;">
     <h1 style="text-align: center; font-family: 'Times New Roman', Times, serif;">Level 1</h1>
 
+    <div class="cat-box">
+        <h2 id="question-text">Loading...</h2>
+    </div>
 
+    <div class="options" id="options"></div>
 
+    <button id="next-button" style="font-family: 'Times New Roman', Times, serif;" onclick="nextQuestion()">Next Question</button>
 </div>
+
+<script>
+    let questions = [];
+    let currentIndex = 0;
+
+    async function fetchQuestions() {
+        const response = await fetch('/get_questions?level=1');
+        questions = await response.json();
+        currentIndex = 0;
+        displayQuestion();
+    }
+
+    function displayQuestion() {
+        if (currentIndex < questions.length) {
+            let q = questions[currentIndex];
+
+            let shuffledOptions = shuffleOptions([
+                { text: q.option_a, value: "A" },
+                { text: q.option_b, value: "B" },
+                { text: q.option_c, value: "C" }
+            ]);
+
+            document.getElementById("question-text").innerHTML = q.question;
+            document.getElementById("options").innerHTML = shuffledOptions.map(option =>
+                `<input type="radio" name="option" value="${option.value}"> ${option.text} <br>`
+            ).join("");
+        } else {
+            document.getElementById("question-text").innerHTML = "Quiz Complete!";
+            document.getElementById("options").innerHTML = "";
+            document.getElementById("next-button").style.display = "none";
+        }
+    }
+
+    function nextQuestion() {
+        currentIndex++;
+        displayQuestion();
+    }
+
+    function shuffleOptions(options) {
+        for (let i = options.length - 1; i > 0; i--) {
+            let j = Math.floor(Math.random() * (i + 1));
+            [options[i], options[j]] = [options[j], options[i]];
+        }
+        return options;
+    }
+
+    document.addEventListener("DOMContentLoaded", fetchQuestions);
+</script>
 {% endblock %}
