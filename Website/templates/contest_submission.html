@@ -123,7 +123,7 @@
 <div class="submission-container">
     <h2 style="text-align: center; font-family: 'Times New Roman', Times, serif;">Submit Your Entry</h2>
 
-    <form method="POST" enctype="multipart/form-data">
+    <form method="POST" enctype="multipart/form-data" action="{{ url_for('contestmanagement.submit_contest', contest_id=contest.id) }}">
         <label for="username"><strong>Username:</strong></label>
         <!-- Prefills the username field with the logged-in user's username -->
         <!-- The username field is set to readonly to prevent changes by the user -->
@@ -157,7 +157,7 @@
         const joinButton = document.querySelector(".join-button");
         if (joinButton) {
             joinButton.addEventListener("click", function(event) {
-                event.stopPropagation(); // Prevent navbar interference
+                event.stopPropagation(); //Prevent navbar interference
             });
         }
     });
@@ -188,7 +188,7 @@
         }, 500); //Delay for smoother appearance
 
         setTimeout(() => {
-            window.location.href = "{{ url_for('contestmanagement.contest_page') }}";
+            document.querySelector("form").submit();
         }, 10000); //Delay for 10 seconds before send user to the contest page
     }
 </script>
