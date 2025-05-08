@@ -146,6 +146,7 @@ def create_contest():
                 filename = secure_filename(file.filename)
                 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)  #Ensure folder exists
                 file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file_path = file_path.replace("\\", "/")  #Convert backslashes to forward slashes
                 file.save(file_path)  # Save the actual file
                 banner_url = f"contest/{filename}"
 
@@ -188,6 +189,7 @@ def submit_contest(contest_id):
                 filename = secure_filename(file.filename)
                 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
                 file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file_path = file_path.replace("\\", "/")  #Convert backslashes to forward slashes
                 file.save(file_path)  #Save the file inside the contest folder
             except Exception as e:
                 flash(f"Error saving file: {e}", "error")
