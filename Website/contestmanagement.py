@@ -45,7 +45,7 @@ def initialize_database():
                 description TEXT,
                 file_path TEXT NOT NULL,
                 rules_agree BOOLEAN NOT NULL,
-                submission_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                submission_date DATE DEFAULT DATE('now'),
                 FOREIGN KEY (contest_id) REFERENCES contests (id)
             )
         ''')
@@ -104,8 +104,8 @@ def contest_page():
     contests = [dict(c) for c in contests]
 
     for c in contests:
-        c["start_date"] = datetime.strptime(c["start_date"], "%Y-%m-%d").date()  
-        c["end_date"] = datetime.strptime(c["end_date"], "%Y-%m-%d").date()  
+        c["start_date"] = datetime.strptime(c["start_date"], "%Y-%m-%d").date()  #Convert string to date
+        c["end_date"] = datetime.strptime(c["end_date"], "%Y-%m-%d").date()  #Convert string to date
 
     #Categorize contests based on proper date comparisons
     ongoing_contests = sorted(
@@ -117,7 +117,7 @@ def contest_page():
     )  #Sort upcoming contests by start date
 
     completed_contests = sorted(
-        [c for c in contests if c["end_date"] < today], key=lambda x: x["end_date"], reverse=True
+        [c for c in contests if c["end_date"] < today], key=lambda x: x["end_date"], reverse=True 
     )  #Sort completed contests with the latest ended at the top
     
     return render_template("contest.html", contests=contests, user=current_user, user_role=user_role, user_has_submitted=user_has_submitted, ongoing_contests=ongoing_contests, upcoming_contests=upcoming_contests, completed_contests=completed_contests)
@@ -146,6 +146,7 @@ def create_contest():
                 filename = secure_filename(file.filename)
                 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)  #Ensure folder exists
                 file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file_path = file_path.replace("\\", "/")  #Convert backslashes to forward slashes
                 file.save(file_path)  # Save the actual file
                 banner_url = f"contest/{filename}"
 
@@ -167,21 +168,20 @@ def create_contest():
 @login_required
 def submit_contest(contest_id):
     conn = get_db_connection()
-    contests = conn.execute("SELECT id, name FROM contests").fetchall()  #Fetch all contests
-    if not contests:
-        flash("No contests available. You cannot submit an entry.", "error")
+    contest = conn.execute("SELECT id, name FROM contests WHERE id = ?", (contest_id,)).fetchone()
+    if contest is None:
+        flash("Invalid contest. You cannot submit an entry.", "error")
         return redirect(url_for('contestmanagement.contest_page'))
     
-    if user_has_submitted(current_user.id, contest_id):
+    if user_has_submitted(current_user.UserName, contest_id):
         flash("You have already submitted an entry for this contest.", "error")
         return redirect(url_for('contestmanagement.contest_page'))
 
     if request.method == 'POST':
-        username = request.form['username']
-        contest = request.form['contest']
+        print("Received Form Data:", request.form)  #Debugging 
         description = request.form['description']
         file = request.files['file']
-        rules_agree = request.form.get('rulesAgree')
+        rules_agree = bool(request.form.get('rulesAgree')) #Convert to boolean
 
        #Validate the file type
         if file and allowed_file(file.filename):
@@ -189,6 +189,7 @@ def submit_contest(contest_id):
                 filename = secure_filename(file.filename)
                 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
                 file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file_path = file_path.replace("\\", "/")  #Convert backslashes to forward slashes
                 file.save(file_path)  #Save the file inside the contest folder
             except Exception as e:
                 flash(f"Error saving file: {e}", "error")
@@ -197,34 +198,30 @@ def submit_contest(contest_id):
             flash("Invalid file format! Only JPG, JPEG and PNG are allowed.", "error")
             return redirect(url_for('contestmanagement.submit_contest', contest_id=contest_id))
 
-        selected_contest = next((c for c in contests if str(c["id"]) == contest), None)
-
-        if not selected_contest:
-            flash("Invalid contest selection. Please choose a valid contest.", "error")
-            return redirect(url_for('contestmanagement.submit_contest', contest_id=contest_id))
-
         #Save the submission to the database
-        conn = get_db_connection()
-        conn.execute('''
-            INSERT INTO submissions (username, contest, description, file_path, rules_agree) 
-            VALUES (?, ?, ?, ?, ?)
-        ''', (username, contest, description, file_path, rules_agree))
-        conn.commit()
-        conn.close()
+        with get_db_connection() as conn:
+                conn.execute('''
+                    INSERT INTO submissions (username, contest_id, description, file_path, rules_agree) 
+                    VALUES (?, ?, ?, ?, ?)
+                ''', (current_user.UserName, contest_id, description, file_path, rules_agree))
+                conn.commit() #Save changes
 
-        return redirect(url_for('contestmanagement.contest_page'))  # Sends user back to the contest page after submission
+        return redirect(url_for('contestmanagement.contest_page'))  #Sends user back to the contest page after submission
 
-    return render_template("contest_submission.html", contest_id=contest_id, user=current_user, contests=contests)
+    return render_template("contest_submission.html", contest_id=contest_id, user=current_user, contest=contest)
 
 def user_has_submitted(username, contest_id):
     if not username or not contest_id:
-        return False  #Return False if either value is missing
-    
+        return False
+
     conn = get_db_connection()
-    existing_entry = conn.execute("SELECT * FROM submissions WHERE username = ? AND contest_id = ?", (username, contest_id)).fetchone()
+    existing_entry = conn.execute(
+        "SELECT * FROM submissions WHERE username = ? AND contest_id = ?",
+        (username, contest_id)
+    ).fetchone()
     conn.close()
-    
-    return existing_entry is not None 
+
+    return existing_entry is not None
 
 if __name__ == '__main__':
     #Ensure the upload folder exists
