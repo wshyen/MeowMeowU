@@ -7,6 +7,14 @@ app = Flask(__name__, static_folder='static')
 app.secret_key = 'your_secret_key'
 quiz_bp = Blueprint('quiz', __name__, template_folder='templates', static_folder='static')
 
+def get_questions_from_db():
+    conn = sqlite3.connect('datebase.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM questions')
+    questions = cursor.fetchall()
+    conn.close()
+    return questions    
+
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':
