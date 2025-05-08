@@ -227,7 +227,7 @@ def my_posts():
 @login_required
 def edit_post(post_id):
     content = request.form['content']
-    cat_hashtag = request.form.get('cat_hashtag')  # 获取 Hashtag
+    cat_hashtag = request.form.get('cat_hashtag')
     conn = get_db_connection()
     post = conn.execute('SELECT * FROM post WHERE post_id = ?', (post_id,)).fetchone()
 
