@@ -32,6 +32,10 @@
         background-color: #f9f9f9;
         text-align: left;
         align-items: center;
+        position: absolute;
+        top: 55%;
+        left: 50%;
+        transform: translate(-50%, -50%);
     }
 
     label, input {
@@ -121,16 +125,9 @@
 </style>
 
 <div class="submission-container">
-    <h2 style="text-align: center; font-family: 'Times New Roman', Times, serif;">Submit Your Entry</h2>
+    <h2 style="text-align: center; font-family: 'Times New Roman', Times, serif;">{{ current_user.Name }}, Submit Your Entry for {{ contest.name }}</h2>
 
     <form method="POST" enctype="multipart/form-data" action="{{ url_for('contestmanagement.submit_contest', contest_id=contest.id) }}">
-        <label for="username"><strong>Username:</strong></label>
-        <!-- Prefills the username field with the logged-in user's username -->
-        <!-- The username field is set to readonly to prevent changes by the user -->
-        <input type="text" id="username" name="username" value="{{ user.UserName if user else '' }}" readonly required>
-        <label for="contest_name"><strong>Contest:</strong></label>
-        <input type="text" name="contest_name" value="{{ contest.name }}" readonly>
-        <input type="hidden" name="contest_id" value="{{ contest.id }}">
 
         <label for="description" style="margin-top: 8px;"><strong>Entry description:</strong></label>
         <textarea id="description" name="description" placeholder="Describe your entry (optional)"></textarea>
