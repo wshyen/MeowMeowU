@@ -128,7 +128,7 @@
         
         <div class="post-info">
             <img class="profile-picture" src="{{ url_for('static', filename='Userprofile/' + (post['profile_picture'] if post['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
-            <p><strong>{{ post['username'] }}</strong> posted at {{ post['created_at'] }}</p>
+            <p><strong>{{ post['name'] }}</strong> posted at {{ post['created_at'] }}</p>
         </div>
         
         <div class="media"">
