@@ -24,7 +24,7 @@
     }
 
     .details{
-        width: 350px; 
+        width: 500px; 
         padding: 15px; 
         border: 1px solid #ccc; 
         border-radius: 5px; 
@@ -130,7 +130,7 @@
                         <button class="join-button" id="joinButton-{{ contest.id }}" 
                                 data-start="{{ contest.start_date }}" 
                                 data-end="{{ contest.end_date }}"
-                                {% if user_has_submitted(current_user.username, contest.id) %}disabled style="background-color: #ccc; cursor: not-allowed;"{% endif %}
+                                {% if user_has_submitted(current_user.name, contest.id) %}disabled style="background-color: #ccc; cursor: not-allowed;"{% endif %}
                                 onclick="redirectToSubmission('{{ contest.id }}')" style="background-color: #6b4f2f;; color: white; border: none; border-radius: 5px; padding: 6.5px 11px;" onclick="redirectToSubmission('{{ contest.id }}')">
                             Join
                         </button>
@@ -175,7 +175,7 @@
                         <button class="join-button" id="joinButton-{{ contest.id }}" 
                                 data-start="{{ contest.start_date }}" 
                                 data-end="{{ contest.end_date }}"
-                                {% if user_has_submitted(current_user.username, contest.id) %}disabled style="background-color: #ccc; cursor: not-allowed;"{% endif %}
+                                {% if user_has_submitted(current_user.name, contest.id) %}disabled style="background-color: #ccc; cursor: not-allowed;"{% endif %}
                                 onclick="redirectToSubmission('{{ contest.id }}')" style="background-color: #6b4f2f;; color: white; border: none; border-radius: 5px; padding: 6.5px 11px;" onclick="redirectToSubmission('{{ contest.id }}')">
                             Join
                         </button>
@@ -220,7 +220,7 @@
                         <button class="join-button" id="joinButton-{{ contest.id }}" 
                                 data-start="{{ contest.start_date }}" 
                                 data-end="{{ contest.end_date }}"
-                                {% if user_has_submitted(current_user.username, contest.id) %}disabled style="background-color: #ccc; cursor: not-allowed;"{% endif %}
+                                {% if user_has_submitted(current_user.name, contest.id) %}disabled style="background-color: #ccc; cursor: not-allowed;"{% endif %}
                                 onclick="redirectToSubmission('{{ contest.id }}')" style="background-color: #6b4f2f;; color: white; border: none; border-radius: 5px; padding: 6.5px 11px;" onclick="redirectToSubmission('{{ contest.id }}')">
                             Join
                         </button>

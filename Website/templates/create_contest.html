@@ -16,13 +16,14 @@
         cursor: pointer;
     }
     p {
-        margin-top: 5px; /* Reduce space above the format text */
-        margin-bottom: 5px; /* Reduce space below */
-        padding: 0px; /* Remove unnecessary padding */
+        margin-top: 5px; 
+        margin-bottom: 5px; 
+        padding: 0px; 
     }
     button {
         font-size: 16px;
     }
+    
 </style>
 <div style="padding-top: 20px; margin-top: 20px;"></div>
 <form action="{{ url_for('contestmanagement.create_contest')}}" method="post" enctype="multipart/form-data" onsubmit="return confirmSubmission();" style="width: 1000px; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9; display:inline-block; align-items: center;">
