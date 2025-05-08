@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Vote for the Most Beautiful Cat{% endblock %}
+
+{% block content %}
+
+<style>
+    body {
+        background-color: #f2eadf;
+        font-family: 'Times New Roman', serif;
+        color: rgb(78, 68, 57);
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        max-width: 600px;
+        margin: 60px auto;
+        padding: 30px;
+        background-color: #fff7ec;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    h2 {
+        margin-bottom: 20px;
+    }
+
+    .poll-option {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: #f2eadf;
+        padding: 12px;
+        border-radius: 8px;
+        margin: 10px auto;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        width: 90%;
+    }
+
+    .poll-option:hover {
+        background-color: rgb(218, 198, 170);
+    }
+
+    .option-label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .vote-count {
+        font-weight: bold;
+    }
+
+    button {
+    font-family: 'Times New Roman';
+    background-color: rgb(176, 148, 119);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+
+  button:hover {
+    background-color: rgb(156, 128, 100);
+  }
+</style>
+
+<div class="container">
+    <h2>Vote for the Most Beautiful Cat! 🐱✨</h2>
+
+    <form method="POST" action="{{ url_for('auth.voting') }}">
+        {% set votes = {"Fluffy": 2, "Sleepy": 0, "Mittens": 3} %} <!-- Example vote counts -->
+
+        {% for cat_name, vote_count in votes.items() %}
+        <div class="poll-option">
+            <div class="option-label">
+                <input type="checkbox" name="vote" value="{{ cat_name }}">
+                <label for="{{ cat_name }}">🐱{{ cat_name }}</label>
+            </div>
+            {% if vote_count > 0 %}
+                <span class="vote-count">{{ vote_count }} Votes</span>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        <button type="submit">🐾Submit Vote🐾</button>
+    </form>
+</div>
+
+{% endblock %}
