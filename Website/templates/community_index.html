@@ -4,11 +4,15 @@
 {% block content %}
 
 <style>
-    body {
-        font-family: 'Times New Roman', Times, serif;
-        background-color: #f2eadf;
+
+
+    html,body {
         margin: 0;
         padding: 0;
+        box-sizing: border-box;
+        font-family: 'Times New Roman', Times, serif;
+        background-color: #f2eadf;
+        
     }
 
     h1 {
@@ -31,65 +35,136 @@
     }
     p {
         text-align: center;
-        color: #5c4430;
+        color: #6b4f2f;
         font-size: 18px;
+        word-wrap: break-word;  
+        white-space: normal;  
+        max-width: 70%;     
+        overflow-wrap: break-word;
     }
 
+    a {
+        text-decoration: none !important;
+        color: inherit;
+    }
+
+    .sort-container label {
+        color: #6b4f2f;
+        font-weight: bold;
+        font-size: 20px;
+    }
+
+    .sort-container select {
+        padding: 5px 40px 5px 10px;
+        cursor: pointer;
+        background-color: #fffbe9;
+        border-radius: 12px;
+        margin-top: 15px;
+        appearance: none;
+        border: 2px solid #94693e;
+        outline: none;
+        background-image: url("/static/cat_paws_icon.png");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        background-size: 20px;
+    }    
+
     .post {
-        width: 80%;
+        width: 100%;
         max-width: 600px;
         background-color: #ffffff;
         border-radius: 10px;
-        padding: 15px;
         margin: 20px auto;
+        overflow: hidden;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         font-family: 'Times New Roman', Times, serif;
+        padding: 30px;
+        cursor: pointer;
+    }
+    
+    .post-info {
+        width: 100%;  
+        display: flex;
+        align-items: center;  
+        justify-content: flex-start; 
+        margin-left: 30px;
     }
 
-    .post img, 
-    .post video {
-        display: block;
+    .post-info img.profile-picture {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%; 
+        margin-right: 25px;
+        border: 1px solid #c8a786; 
+    }
+
+    .media {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .media img,
+    .media video {
+        display: inline-block;
         margin: 10px auto;
-        border-radius: 10px;
-        max-width: 100%;
+        border-radius: 12px;
         height: auto;
+        max-width: 100%;
     }
 
     .post-actions {
         text-align: center;
         margin-top: 10px;
         font-size: 16px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
-    .post-actions a {
-        margin: 0 10px;
-        text-decoration: none;
+    .post-action-button {
+        background: none;
+        border: none;
         color: #6b4f2f;
+        cursor: pointer;
         font-weight: bold;
+        font-size: 18px; 
+        margin: 0 10px;
     }
 
-    button {
-        display: block;
+    .post-action-button:hover {
+        background-color: inherit;
+    }
+    
+    .post-actions .separator {
+        font-size: 30px;
+        color: #6b4f2f;
+    }
+    
+    .button-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 10px;
+    }
+
+    .button-container button, 
+    .modal-content button{
         margin: 10px auto;
         padding: 10px 20px;
-        background-color: #94693e;
-        color: white;
+        background-color: #dccbb7;
+        border-radius: 15px;
         border: none;
-        border-radius: 8px;
+        color: #6b4f2f;
         font-size: 16px;
+        font-weight: bold;
         cursor: pointer;
-        font-family: 'Times New Roman', Times, serif;
-    }
+        transition: transform 0.2s ease;
+    } 
 
-    button:hover {
-        background-color: #7d5732;
-    }
-
-    /* Modal styles */
     .modal {
         position: fixed;
-        top: 0;
-        left: 0;
         width: 100%;
         height: 100%;
         background-color: rgba(0, 0, 0, 0.4);
@@ -100,25 +175,46 @@
     }
 
     .modal-content {
-        background-color: #fff;
-        padding: 20px;
-        border-radius: 10px;
+        background-color: #eae8e6;
+        padding: 40px; 
+        border-radius: 15px;
         width: 90%;
         max-width: 500px;
+        height: 450px; 
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         position: relative;
-        font-family: 'Times New Roman', Times, serif;
     }
 
+    
     .close {
         position: absolute;
-        top: 8px;
-        right: 12px;
-        font-size: 24px;
+        top: 15px;
+        right: 15px;
+        font-size: 30px;
         color: #333;
         cursor: pointer;
     }
-    
+
+    .close:hover {
+        transform: scale(1.2);
+        color: #e74c3c; 
+    }
+    textarea {
+        background-color: #eae8e6;
+        width: 100%;
+        height: 200px;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        border: 1px solid #583838;
+        resize: none;  
+    }
+
+    input[type="file"] {
+        margin-bottom: 10px;
+    }
+
+
     .hidden {
         display: none;
     }
@@ -126,40 +222,58 @@
 </style>
 
 <h1>Meow Meow Community</h1>
-<p>Share the lives of our campus cats</p>
+<h2>Share the lives of our campus cats</h2>
 
 
-<button onclick="openModal()">+ New Post</button>
-
-<div style="text-align: center; margin-top: 10px;">
-    <button onclick="window.location.href='{{ url_for('community.my_posts') }}'" style="background-color: #94693e; color: white; border: none; border-radius: 8px; padding: 10px 20px; font-size: 16px; cursor: pointer;">
-        My Posts
-    </button>
+<div class="button-container">
+    <button onclick ="openModal()" >+ New Post</button>
+    <button onclick="window.location.href='{{ url_for('community.my_posts') }}'" >My Posts</button>
 </div>
 
 <hr>
 
-<h2>Latest Posts</h2>
-
+<h2>All Posts</h2>
+<div class="sort-container" style="text-align: center; margin-bottom: 20px;">
+    <label for="sort-by">Sort By: </label>
+    <select id="sort-by" onchange="sortPosts()">
+        <option value="date_asc" {% if sort_by == 'date_asc' %}selected{% endif %}>Oldest</option>
+        <option value="date_desc" {% if sort_by == 'date_desc' %}selected{% endif %}>Latest</option>
+        <option value="likes_desc" {% if sort_by == 'likes_desc' %}selected{% endif %}>Most Liked</option>
+    </select>
+</div>
 
 {% for post in posts %}
-    <div class="post">
-        <p><strong>{{ post['username'] }}</strong> posted at {{ post['created_at'] }}</p>
-        <p>{{ post['content'] }}</p>
-        {% if post['media_url'] %}
-            {% set ext = post['media_url'].rsplit('.', 1)[1].lower() %}
-            {% if ext in ['jpg', 'jpeg', 'png', 'gif'] %}
-                <img src="{{ url_for('static', filename=post['media_url']) }}" width="300" alt="Image">
-            {% elif ext in ['mp4', 'mov', 'avi'] %}
-                <video width="300" controls>
-                    <source src="{{ url_for('static', filename=post['media_url']) }}" type="video/{{ ext }}">
-                </video>
-            {% endif %}
-        {% endif %}
 
+    <div class="post" onclick="window.location.href='/post/{{ post['post_id'] }}'">
+
+        <div class="post-info">
+            <img class="profile-picture" src="{{ url_for('static', filename='Userprofile/' + (post['profile_picture'] if post['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
+            <p><strong>{{ post['username'] }}</strong> posted at {{ post['created_at'] }}</p>
+          
+        </div>
+        
+        <div class="media"">
+            <p>{{ post['content'] }}</p>
+            {% if post['cat_hashtag'] %}
+                <p><a href="{{ url_for('community.hashtag_posts', hashtag=post['cat_hashtag']) }}">#{{ post['cat_hashtag'] }}</a></p>
+            {% endif %}
+
+            {% if post['media_url'] %}
+                {% set ext = post['media_url'].rsplit('.', 1)[1].lower() %}
+                {% if ext in ['jpg', 'jpeg', 'png', 'gif'] %}
+                    <img src="{{ url_for('static', filename=post['media_url']) }}" width="300" alt="Image">
+                {% elif ext in ['mp4', 'mov', 'avi'] %}
+                    <video width="300" controls>
+                        <source src="{{ url_for('static', filename=post['media_url']) }}" type="video/{{ ext }}">
+                    </video>
+                {% endif %}
+            {% endif %}
+        </div>
+        
         <div class="post-actions">
-            <form action="{{ url_for('community.like_post' if not post['liked_by_current_user'] else 'community.unlike_post', post_id=post['post_id']) }}" method="post" style="display:inline;">
-                <button type="submit" style="background:none; border:none; color:#6b4f2f; cursor:pointer;">
+            <form id="like-form-{{ post['post_id'] }}" action="{{ url_for('community.like_post' if not post['liked_by_current_user'] else 'community.unlike_post', post_id=post['post_id']) }}" method="post" style="display:inline;">
+                <input type="hidden" name="sort" value="{{ sort_by }}">
+                <button type="submit" class="post-action-button">
                     {% if post['liked_by_current_user'] %}
                         ❤️ 
                     {% else %}
@@ -168,14 +282,18 @@
                     {{ post['like_count'] }} Like
                 </button>
             </form>
-            |
-            <a href="/post/{{ post['post_id'] }}">Comments</a>
+            
+            <span class="separator">|</span>
+
+            <button class="post-action-button">
+                💬 Comments
+            </button>
         </div>
     </div>
+
 {% endfor %}
 
 <hr>
-
 
 <div id="postModal" class="modal hidden">
     <div class="modal-content">
@@ -183,6 +301,13 @@
         <h3>New Post</h3>
         <form action="/post/create" method="post" enctype="multipart/form-data">
             <textarea name="content" placeholder="Have a meowment to share?" required></textarea><br>
+            <label for="cat-hashtag">Select Cat Hashtag:</label>
+            <select name="cat_hashtag" id="cat-hashtag">
+                <option value="">None</option>
+                {% for cat_name in cat_names %}
+                    <option value="{{ cat_name }}">#{{ cat_name }}</option>
+                {% endfor %}
+            </select><br>
             <input type="file" name="media"><br>
             <button type="submit">Post</button>
         </form>
@@ -193,12 +318,19 @@
 
 {% block scripts %}
 <script>
-function openModal() {
-    document.getElementById('postModal').classList.remove('hidden');
-}
-function closeModal() {
-    document.getElementById('postModal').classList.add('hidden');
+function sortPosts() {
+    var sortBy = document.getElementById('sort-by').value;
+    window.location.href = "/community_feature?sort=" + sortBy;  // 确保这里的 "sort" 和后端一致
 }
 
+function openModal() {
+    var modal = document.getElementById('postModal');
+    modal.style.display = 'flex'; 
+}
+
+function closeModal() {
+    var modal = document.getElementById('postModal');
+    modal.style.display = 'none';
+}
 </script>
 {% endblock %}
