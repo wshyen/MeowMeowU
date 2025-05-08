@@ -17,8 +17,11 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100vh;
+        height: auto;
+        min-height: 100vh;
         margin: 0;
+        padding-top: 100px;
+        overflow: auto;
     }
 
     .submission-container {
@@ -28,9 +31,10 @@
         border-radius: 10px;
         background-color: #f9f9f9;
         text-align: left;
+        align-items: center;
     }
 
-    label, input, textarea {
+    label, input {
         font-family: 'Times New Roman', Times, serif;
         font-size: 16px;
         display: block;
@@ -42,6 +46,11 @@
         resize: none;  
         height: 120px; 
         overflow: auto;
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 16px;
+        display: block;
+        margin-bottom: 10px;
+        width: 100%;
     }
 
     button {
@@ -69,6 +78,13 @@
         display: none;
     }
 
+    .navbar {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        z-index: 999; /* Ensures navbar stays above other elements */
+    }
+
     #confirmation-message {
         text-align: center;
         font-size: 18px;
@@ -82,14 +98,14 @@
     }
 
     #paw-stamp {
-    width: 80px;
-    opacity: 0;
-    display: none;
-    margin: 10px auto;
-    transform: scale(0.5) rotate(-20deg);
-    transition: opacity 0.5s ease-in-out, transform 0.3s ease-in-out;
-    animation: stampEffect 0.5s ease-in-out forwards;
-    animation-delay: 0.5s;
+        width: 80px;
+        opacity: 0;
+        display: none;
+        margin: 10px auto;
+        transform: scale(0.5) rotate(-20deg);
+        transition: opacity 0.5s ease-in-out, transform 0.3s ease-in-out;
+        animation: stampEffect 0.5s ease-in-out forwards;
+        animation-delay: 0.5s;
     }
 
     @keyframes fadeIn {
@@ -107,17 +123,14 @@
 <div class="submission-container">
     <h2 style="text-align: center; font-family: 'Times New Roman', Times, serif;">Submit Your Entry</h2>
 
-    <form method="POST" enctype="multipart/form-data">
+    <form method="POST" enctype="multipart/form-data" action="{{ url_for('contestmanagement.submit_contest', contest_id=contest.id) }}">
         <label for="username"><strong>Username:</strong></label>
         <!-- Prefills the username field with the logged-in user's username -->
         <!-- The username field is set to readonly to prevent changes by the user -->
-        <input type="text" id="username" name="username" value="{{ request.user.username }}" readonly required> 
-
-        <label for="contest"><strong>Select Contest:</strong></label>
-        <select id="contest" name="contest" required>
-            <option value="">Choose a contest</option>
-            <option value="contest1">Contest 1</option>
-        </select>
+        <input type="text" id="username" name="username" value="{{ user.UserName if user else '' }}" readonly required>
+        <label for="contest_name"><strong>Contest:</strong></label>
+        <input type="text" name="contest_name" value="{{ contest.name }}" readonly>
+        <input type="hidden" name="contest_id" value="{{ contest.id }}">
 
         <label for="description" style="margin-top: 8px;"><strong>Entry description:</strong></label>
         <textarea id="description" name="description" placeholder="Describe your entry (optional)"></textarea>
@@ -125,35 +138,44 @@
         <label for="file"><strong>Upload Your Entry:</strong></label>
         <input type="file" id="file" name="file" accept=".jpg, .jpeg, .png" required>
 
-        <label for="rulesAgree" style="display: flex; align-items: center; gap: 10px;">
+        <label for="rulesAgree" style="display: flex; align-items: center; gap: 10px; font-weight: bold;">
             <input type="checkbox" id="rulesAgree" required>
             I have read and agree to the Rules & Guidelines.
         </label>        
 
-        <button type="submit" style="cursor: pointer;" onclick="validateForm(event)">Submit Entry</button>
+        <button type="submit" style="cursor: pointer; font-family: 'Times New Roman', Times, serif;" onclick="validateForm(event)">Submit Entry</button>
         
     </form>
     
     <div id="confirmation-message" class="hidden">
         <p>Your entry has been submitted successfully!</p>
-        <img id="paw-stamp" src="{{ url_for('static', filename='Images/paw-stamp.png') }}" alt="Paw Stamp" style="width: 50px; height: 50px; margin-top: 10px; display: none;">
+        <img id="paw-stamp" src="{{ url_for('static', filename='Images/paw-stamp.png') }}" alt="Paw Stamp" style="width: 100px; height: 100px; margin-top: 10px; display: none;">
     </div>
 </div>
 <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const joinButton = document.querySelector(".join-button");
+        if (joinButton) {
+            joinButton.addEventListener("click", function(event) {
+                event.stopPropagation(); //Prevent navbar interference
+            });
+        }
+    });
+
     function validateForm(event) {
         event.preventDefault(); // Prevent form submission to validate first
 
         //Get required fields
-        const username = document.getElementById("username").value.trim(); //Check if username is filled
-        const contest = document.getElementById("contest").value; //Check if contest is selected
         const file = document.getElementById("file").value; //Check if file is selected
         const rulesAgree = document.getElementById("rulesAgree").checked; //Check if rules are agreed
 
         //Check if all required fields are filled
-        if (username === "" || contest === "" || file === "" || !rulesAgree) {
+        if (file === "" || !rulesAgree) {
             alert("Please complete all required fields before submitting.");
             return;
         }
+
+        document.body.style.overflow = "auto";
 
         //Show confirmation message
         document.getElementById("confirmation-message").classList.remove("hidden");
@@ -164,6 +186,10 @@
             pawStamp.style.display = "block"; // Make sure it's visible
             pawStamp.style.opacity = "1"; // Fade it in
         }, 500); //Delay for smoother appearance
+
+        setTimeout(() => {
+            document.querySelector("form").submit();
+        }, 10000); //Delay for 10 seconds before send user to the contest page
     }
 </script>
 {% endblock %}
