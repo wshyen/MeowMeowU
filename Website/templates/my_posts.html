@@ -81,16 +81,17 @@
 }
 
   .button-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    display: flex; 
+    flex-direction: row; 
+    align-items: center; 
+    justify-content: center;
     margin-top: 10px;
 }
 
   .button-container button, 
   .modal-content button{
-    margin: 10px auto;
     padding: 10px 20px;
+    margin: 10px 200px;
     background-color: #dccbb7;
     border-radius: 15px;
     border: none;
@@ -136,6 +137,9 @@
   
     <div class="media">
       <p>{{ post['content'] }}</p>
+      {% if post['cat_hashtag'] %}
+        <p><a href="{{ url_for('community.hashtag_posts', hashtag=post['cat_hashtag']) }}">#{{ post['cat_hashtag'] }}</a></p>
+      {% endif %}
       {% if post['media_url'] %}
           {% set ext = post['media_url'].rsplit('.', 1)[1].lower() %}
           {% if ext in ['jpg', 'jpeg', 'png', 'gif'] %}
@@ -155,25 +159,40 @@
           💬Comments
       </span>
 
-      <button class="post-action-button">
-          
-      </button>
     </div>
   </div>
+
+  <div class="button-container">
+    <form action="{{ url_for('community.delete_post', post_id=post.post_id) }}" method="post" style="display:inline;">
+      <button type="submit">Delete</button>
+    </form>
+    <button onclick="openEditModal({{ post.post_id }}, '{{ post.content | escape }}', '{{ post.cat_hashtag | escape }}')">Edit</button>
+  </div>
+
+<hr>
+</div>
 {% endfor %}
 
 <div id="editModal" class="modal" style="display:none;">
-    <div class="modal-content">
+  <div class="modal-content">
       <span class="close" onclick="closeEditModal()">&times;</span>
       <h3>Edit Post</h3>
       <form id="editForm" method="post">
         <textarea name="content" id="editContent" rows="4" style="width:100%;" required></textarea>
         <br>
+        <label for="editCatHashtag">Select Cat Hashtag:</label>
+        <select name="cat_hashtag" id="editCatHashtag">
+            <option value="">None</option>
+            {% for cat_name in cat_names %}
+                <option value="{{ cat_name }}">#{{ cat_name }}</option>
+            {% endfor %}
+        </select>
+        <br>
         <button type="submit">Save</button>
-      </form>
-    </div>
+    </form>
   </div>
-
+</div>
+  
 <div style="text-align: center; margin-top: 30px;">
     <button onclick="window.location.href='{{ url_for('community.community_feature') }}'"
         style="background-color: #dccbb7; color: #6b4f2f; font-weight: bold; border: none; border-radius: 8px; padding: 10px 20px; font-size: 16px; cursor: pointer;">
@@ -185,6 +204,7 @@
     function openEditModal(postId, content) {
       document.getElementById("editContent").value = content;
       document.getElementById("editForm").action = `/post/edit/${postId}`;
+      document.getElementById("editCatHashtag").value = catHashtag || "";
       document.getElementById("editModal").style.display = "block";
     }
   
