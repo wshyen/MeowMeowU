@@ -35,3 +35,5 @@ env/
 *.db-shm
 *.db-wal
 >>>>>>> 17d5177fc74fc30dc358dcc5300b2ac58012ccad
+"__pycache__/" 
+"*.pyc" 

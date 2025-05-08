@@ -38,6 +38,44 @@
     color: rgb(78, 68, 57);
   }
 
+  .suggestion-arrow {
+    font-size: 36px;
+    color: rgb(120, 100, 80);
+    text-decoration: none;
+    padding: 10px;
+  }
+
+  .suggestion-arrow:hover {
+    text-decoration: none;
+    color: rgba(120, 100, 80, 0.3);
+  }
+
+  .suggestion-arrow.disabled {
+    color: rgba(120, 100, 80, 0.3);
+    pointer-events: none;
+    cursor: default;
+  }
+
+  .suggestion-card {
+    width: 700px;
+    border: 1px solid rgb(176, 148, 119);
+    border-radius: 10px;
+    padding: 25px;
+    font-size: 18px;
+    background-color: white;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: left;
+  }
+
+  .suggestion-box-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px;
+    margin-bottom: 50px; /* Adjusted bottom margin */
+    gap: 20px;
+  }
+
 </style>
 
 <h2 style="text-align: center; font-family: 'Times New Roman', serif; padding-top: 35px; color: rgb(78, 68, 57);"><b>Suggestion Box</b></h2>
@@ -61,13 +99,30 @@
 <div style="text-align: center; margin-top: 20px;">
   <h3 style="font-family: 'Times New Roman', serif; color: rgb(78, 68, 57); margin-bottom: 20px;padding-top: 25px;"><b>History of Suggestions</b></h3>
 
-  <ul class="list-group list-group-flush" id="notes" style="align-items: center;">
-    {% for note in user.notes %}
-    <li class="list-group-item">
-      {{ note.data }}
-    </li>
-    {% endfor %}
-  </ul>
+  {% if current_note %}
+  <div class="suggestion-box-wrapper">
+
+    {% if index > 0 %}
+      <a href="{{ url_for('views.suggestion', index=index-1) }}" class="suggestion-arrow">&lt;</a>
+    {% else %}
+      <span class="suggestion-arrow disabled">&lt;</span>
+    {% endif %}
+
+    <div class="suggestion-card">
+      {{ current_note.data }}
+    </div>
+
+    {% if index + 1 < total %}
+      <a href="{{ url_for('views.suggestion', index=index+1) }}" class="suggestion-arrow">&gt;</a>
+    {% else %}
+      <span class="suggestion-arrow disabled">&gt;</span>
+    {% endif %}
+
+  </div>
+
+  {% else %}
+    <p>No suggestions yet.</p>
+  {% endif %}
   
 </div>
 
