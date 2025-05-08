@@ -102,8 +102,8 @@
   <h2><b>Edit Profile 📝</b></h2>
   <form method="POST" action="{{ url_for('auth.update_profile') }}" enctype="multipart/form-data">
 
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" value="{{ user.UserName or '' }}" placeholder="Enter your username">
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" value="{{ user.Name or '' }}" placeholder="Enter your name">
 
     <label for="status">Status:</label>
     <select id="status" name="status">
