@@ -74,7 +74,7 @@
 <div class="container">
     <h2>Vote for the Most Beautiful Cat! 🐱✨</h2>
 
-    <form method="POST" action="{{ url_for('auth.voting') }}">
+    <form method="POST" action="{{ url_for('contestmanagement.voting') }}">
         {% set votes = {"Fluffy": 2, "Sleepy": 0, "Mittens": 3} %} <!-- Example vote counts -->
 
         {% for cat_name, vote_count in votes.items() %}

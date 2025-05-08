@@ -249,8 +249,3 @@ votes = {
     "Whiskers": 0,
     "Mittens": 0
 }
-
-@auth.route("/voting", methods=["GET", "POST"])
-@login_required
-def voting():
-    return render_template("voting.html", user=current_user)

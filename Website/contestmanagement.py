@@ -255,3 +255,8 @@ if __name__ == '__main__':
         conn.commit()
 
     app.run(debug=True)
+
+@contestmanagement_bp.route("/voting", methods=["GET", "POST"])
+@login_required
+def voting():
+    return render_template("voting.html", user=current_user)
