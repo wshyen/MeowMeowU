@@ -97,10 +97,11 @@ def contest_page():
     for c in contests:
         c["start_date"] = datetime.strptime(c["start_date"], "%Y-%m-%d").date()  #Convert string to date
         c["end_date"] = datetime.strptime(c["end_date"], "%Y-%m-%d").date()  #Convert string to date
+        c["voting_end"] = datetime.strptime(c["voting_end"], "%Y-%m-%d").date()
 
     #Categorize contests based on proper date comparisons
     ongoing_contests = sorted(
-        [c for c in contests if c["start_date"] <= today and c["end_date"] >= today], key=lambda x: x["end_date"]
+        [c for c in contests if c["start_date"] <= today and c["voting_end"] >= today], key=lambda x: x["voting_end"]
     )  #Sort ongoing contests so those ending soonest are first
 
     upcoming_contests = sorted(
@@ -108,7 +109,7 @@ def contest_page():
     )  #Sort upcoming contests by start date
 
     completed_contests = sorted(
-        [c for c in contests if c["end_date"] < today], key=lambda x: x["end_date"], reverse=True 
+        [c for c in contests if c["voting_end"] < today], key=lambda x: x["voting_end"], reverse=True 
     )  #Sort completed contests with the latest ended at the top
     
     return render_template("contest.html", contests=contests, user=current_user, user_role=user_role, user_has_submitted=user_has_submitted, ongoing_contests=ongoing_contests, upcoming_contests=upcoming_contests, completed_contests=completed_contests)
