@@ -10,7 +10,7 @@ quiz_bp = Blueprint('quiz', __name__, template_folder='templates', static_folder
 def get_questions_from_db():
     conn = sqlite3.connect('datebase.db')
     cursor = conn.cursor()
-    cursor.execute('SELECT * FROM questions')
+    cursor.execute('SELECT * FROM quiz_questions')
     questions = cursor.fetchall()
     conn.close()
     return questions    
