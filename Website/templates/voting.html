@@ -44,7 +44,6 @@
         border-radius: 8px;
         margin: 10px auto;
         box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-        cursor: pointer;
         width: 90%;
         justify-content: space-between;
     }
@@ -63,13 +62,48 @@
         margin-left: 10px;
     }
 
-    img {
+    .image-container input {
+        display: none;
+    }
+
+    .image-container label {
+        cursor: pointer;
+        display: block;
+    }
+
+    .image-container img {
         width: 200px;
         height: 200px;
         object-fit: cover;
         border-radius: 8px;
         display: block;
         margin-bottom: 8px;
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .image-container input:checked + label::after {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 99;
+    }
+
+    .image-container input:checked + label img {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: auto;
+        height: 60vh;
+        max-width: 80vw;
+        max-height: 60vh;
+        object-fit: contain;
+        border: 10px solid #f2eadf;
+        z-index: 100;
     }
 
     .description {
@@ -111,14 +145,13 @@
 </style>
 
 <div class="container">
-    <h2>Vote for {{ contest_name }}</h2>
+    <h2>📍Vote for {{ contest_name }}</h2>
     <div class="contest-info" style="font-style: italic;">You are voting in the "{{ contest_name }}" contest.</div>
 
     <form method="POST" action="{{ url_for('contestmanagement.submit_vote', contest_id=contest_id) }}">
         {% if participants %}
             {% for participant in participants %}
             <div class="poll-option">
-
                 <div class="description-container">
                     <div class="option-label">
                         <input type="radio" name="vote" value="{{ participant.id }}">
@@ -126,14 +159,19 @@
                     </div>
 
                     {% if participant.description %}
-                        <p class="description"><strong style="font-weight: bold; color: rgb(120, 100, 80);">Description:</strong> {{ participant.description }}</p>
+                        <p class="description"><strong style="color: rgb(120, 100, 80); font-weight: bold;">Description:</strong> {{ participant.description }}</p>
+                    {% else %}
+                        <p class="description"><strong style="color: rgb(120, 100, 80); font-weight: bold;">Description:</strong> No description provided.</p>
                     {% endif %}
                 </div>
 
                 {% if participant.file_path %}
                 <div class="image-container">
-                    <img src="{{ url_for('static', filename=participant.file_path.replace('Website/static/', '')) }}" 
-                         alt="{{ participant.name }}'s submission">
+                    <input type="checkbox" id="img{{ participant.id }}">
+                    <label for="img{{ participant.id }}">
+                        <img src="{{ url_for('static', filename=participant.file_path.replace('Website/static/', '')) }}" 
+                             alt="{{ participant.name }}'s submission">
+                    </label>
                     <span class="vote-count">Votes: {{ participant.votes if participant.votes else 0 }}</span>
                 </div>
                 {% endif %}
