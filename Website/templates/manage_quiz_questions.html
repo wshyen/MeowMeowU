@@ -15,11 +15,131 @@
         color: #94693e; 
         font-weight: bold;
     }
+
+    .container {
+        width: 60%;
+        margin: auto;
+        text-align: center;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    th {
+        background-color: #B4906E;
+        color: white;
+        border: 1px solid black;
+        padding: 10px;
+        text-align: center;
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    td {
+        background-color: #f3eeea;
+        border: 1px solid black;
+        padding: 10px;
+        text-align: center;
+    }
+
+    button {
+        padding: 8px;
+        border-radius: 5px;
+    }
+
+    input[type="text"] {
+        border: 1px solid #ccc;
+        padding:6px;
+        border-radius: 5px;
+        width: 100%;
+    }
+
+    .add-btn {
+        background-color: #AD784E;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+
+    .delete-btn {
+        background-color: red;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+
+    .edit-btn {
+        background-color: #6b4f2f;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
 </style>
 <div style="padding: 20px;">
-    <h1 style="text-align: center; font-family: 'Times New Roman', Times, serif;">Manage Quiz Questions</h1>
+    <h1>Manage Quiz Questions</h1>
 
+    <!--Add New Questions Form -->
+    <form action="{{ url_for('add_question') }}" method="POST">
+        <input type="text" name="question_text" placeholder="Enter new question" required><br><br>
+        <input type="text" name="option_a" placeholder="Option A" required><br><br>
+        <input type="text" name="option_b" placeholder="Option B" required><br><br>
+        <input type="text" name="option_c" placeholder="Option C" required><br><br>
+        <select name="correct_option" required>
+            <option value="" style="font-family: 'Times New Roman', Times, serif;">Select correct answer</option>
+            <option value="option_a">Option A</option>
+            <option value="option_b">Option B</option>
+            <option value="option_c">Option C</option>
+        </select>
+        <br><br>
+        <button type="submit" class="add-btn">Add Question</button>
+    </form>
 
+    <!-- Questions Table-->
+     <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Question</th>
+                <th>Answer choices</th>
+                <th>Correct Answer</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for question in questions %}
+            <tr>
+                <td>{{ question.id }}</td>
+                <td>{{ question.question_text }}</td>
+                <td>
+                    A. {{ question.option_a }}<br><br>
+                    B. {{ question.option_b }}<br><br>
+                    C. {{ question.option_b }}
+                </td>
+                <td>{{ question.correct_option }}</td>
+                <td>
+                    <form action="{{ url_for('edit_question', question_id=question.id) }}" method="POST">
+                        <input type="text" name="new_text" placeholder="Edit question" required><br><br>
+                        <input type="text" name="option_a" placeholder="Option A" required><br><br>
+                        <input type="text" name="option_b" placeholder="Option B" required><br><br>
+                        <input type="text" name="option_c" placeholder="Option C" required><br><br>
+                        <select name="correct_answer" required>
+                            <option value="option_a">Option A</option>
+                            <option value="option_b">Option B</option>
+                            <option value="option_c">Option C</option>
+                        </select>
+                        <br><br>
+                        <button type="submit" class="edit-btn">Edit</button>
+                    </form>
+                    <form action="{{ url_for('delete_question', question_id=question.id) }}" method="POST">
+                        <button type="submit" class="delete-btn" onclick="return confirm('Are you sure?')">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
 </div>
 {% endblock %}
