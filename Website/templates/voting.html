@@ -26,6 +26,7 @@
     h2 {
         margin-bottom: 20px;
         font-weight: bold;
+        font-size: 35px;
     }
 
     .contest-info {
@@ -37,7 +38,7 @@
 
     .poll-option {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         background-color: #f2eadf;
         padding: 15px;
         border-radius: 8px;
@@ -45,36 +46,51 @@
         box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
         cursor: pointer;
         width: 90%;
-        justify-content: space-between; /* Ensures left-to-right alignment */
+        justify-content: space-between;
     }
 
     .image-container {
-        flex: 0 0 150px; /* Fixed width for image */
-        margin-right: 15px; /* Space between image and text */
+        flex: 0 0 200px;
+        text-align: center;
     }
 
     .description-container {
-        flex: 1; /* Allows description to take remaining space */
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
         text-align: left;
+        margin-left: 10px;
     }
 
     img {
-        width: 150px;
-        height: 150px;
+        width: 200px;
+        height: 200px;
         object-fit: cover;
         border-radius: 8px;
+        display: block;
+        margin-bottom: 8px;
     }
 
     .description {
-        font-size: 20px;
+        font-size: 18px;
         color: rgb(78, 68, 57);
-        margin-top: 8px;
-        text-align: left;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        max-width: 400px;
+    }
+
+    .option-label {
+        font-size: 22px;
+        font-weight: bold;
+        margin-bottom: 5px;
     }
 
     .vote-count {
         font-weight: bold;
-        margin-top: 5px;
+        display: block;
+        text-align: center;
+        margin-top: 8px;
     }
 
     button {
@@ -91,39 +107,36 @@
     button:hover {
         background-color: rgb(158, 134, 106);
         transform: scale(1.1);
-        border-radius: 5px;
     }
-    
 </style>
 
 <div class="container">
     <h2>Vote for {{ contest_name }}</h2>
-    <div class="contest-info">You are voting in the "{{ contest_name }}" contest.</div>
+    <div class="contest-info" style="font-style: italic;">You are voting in the "{{ contest_name }}" contest.</div>
 
     <form method="POST" action="{{ url_for('contestmanagement.submit_vote', contest_id=contest_id) }}">
         {% if participants %}
             {% for participant in participants %}
             <div class="poll-option">
 
+                <div class="description-container">
+                    <div class="option-label">
+                        <input type="radio" name="vote" value="{{ participant.id }}">
+                        <label for="{{ participant.id }}">🐱{{ participant.name }}</label>
+                    </div>
+
+                    {% if participant.description %}
+                        <p class="description"><strong style="font-weight: bold; color: rgb(120, 100, 80);">Description:</strong> {{ participant.description }}</p>
+                    {% endif %}
+                </div>
+
                 {% if participant.file_path %}
                 <div class="image-container">
                     <img src="{{ url_for('static', filename=participant.file_path.replace('Website/static/', '')) }}" 
                          alt="{{ participant.name }}'s submission">
-                </div>
-                {% endif %}
-
-                <div class="description-container">
-                    <div class="option-label">
-                        <input type="radio" name="vote" value="{{ participant.id }}">
-                        <label for="{{ participant.id }}" style="font-size: 25px; font-weight: bold;">🐱{{ participant.name }}</label>
-                    </div>
-
-                    {% if participant.description %}
-                        <p class="description">{{ participant.description }}</p>
-                    {% endif %}
-                    
                     <span class="vote-count">Votes: {{ participant.votes if participant.votes else 0 }}</span>
                 </div>
+                {% endif %}
             </div>
             {% endfor %}
         {% else %}
