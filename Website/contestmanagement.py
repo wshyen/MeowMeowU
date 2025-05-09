@@ -252,16 +252,41 @@ if __name__ == '__main__':
 @contestmanagement_bp.route('/voting/<int:contest_id>', methods=['GET', 'POST'])
 def voting(contest_id):
     conn = get_db_connection()
-    
-    #get contest details
-    contest = conn.execute("SELECT name FROM contests WHERE id = ?", (contest_id,)).fetchone()
+
+    contest = conn.execute("SELECT name, voting_start, voting_end FROM contests WHERE id = ?", (contest_id,)).fetchone()
     if not contest:
         flash("Contest not found!", "error")
         return redirect(url_for('contestmanagement.contest_page'))
 
     contest_name = contest["name"]
 
-    #get participants with images
+    #ensure voting times have full date-time format
+    voting_start_str = contest["voting_start"]
+    voting_end_str = contest["voting_end"]
+
+    if len(voting_start_str) == 10:  #if stored as "YYYY-MM-DD"
+        voting_start_str += " 00:00:00"  #add default time
+    if len(voting_end_str) == 10:  #if stored as "YYYY-MM-DD"
+        voting_end_str += " 23:59:59"  #add end-of-day time
+
+    #convert to datetime format
+    voting_start = datetime.strptime(voting_start_str, "%Y-%m-%d %H:%M:%S")
+    voting_end = datetime.strptime(voting_end_str, "%Y-%m-%d %H:%M:%S")
+
+    current_time = datetime.now()
+
+    #redirect to countdown page if voting hasn't started yet
+    if current_time < voting_start:
+        time_left = voting_start - current_time
+        days_left = time_left.days
+        hours_left = time_left.seconds // 3600
+        return render_template("voting_countdown.html", contest_name=contest_name, days_left=days_left, hours_left=hours_left, user=current_user)
+
+    #redirect to contest page if voting has ended
+    if current_time > voting_end:
+        flash("Voting has ended!", "error")
+        return redirect(url_for('contestmanagement.contest_page'))
+
     participants = conn.execute("SELECT id, name, file_path, votes, description FROM submissions WHERE contest_id = ?", (contest_id,)).fetchall()
     conn.close()
 
@@ -277,12 +302,24 @@ def submit_vote(contest_id):
 
     conn = get_db_connection()
 
-    #ensure valid submission
+    #ensure valid participant
     participant = conn.execute("SELECT id FROM submissions WHERE id = ? AND contest_id = ?", (selected_participant_id, contest_id)).fetchone()
     if not participant:
         flash("Invalid participant!", "error")
         return redirect(url_for('contestmanagement.voting', contest_id=contest_id))
 
+    #check if user has already voted
+    user_id = current_user.id 
+    has_voted = conn.execute("SELECT id FROM votes WHERE user_id = ? AND contest_id = ?", (user_id, contest_id)).fetchone()
+
+    if has_voted:
+        flash("You have already voted in this contest!", "error")
+        return redirect(url_for('contestmanagement.voting', contest_id=contest_id))
+
+    #add vote to db
+    conn.execute("INSERT INTO votes (user_id, contest_id, participant_id) VALUES (?, ?, ?)", (user_id, contest_id, selected_participant_id))
+
+    #update votes count
     conn.execute("UPDATE submissions SET votes = COALESCE(votes, 0) + 1 WHERE id = ?", (selected_participant_id,))
     conn.commit()
     conn.close()
