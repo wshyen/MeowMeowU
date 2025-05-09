@@ -49,6 +49,8 @@
         border-radius: 8px;
         width: 100%;
         font-weight: bold;
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 16px;
     }
 
     .add-btn {
@@ -102,6 +104,12 @@
             <option value="option_c">Option C</option>
         </select>
         <br><br>
+        <select name="level" required>
+            <option value="">Select Level</option>
+            <option value="1">Level 1</option>
+            <option value="2">Level 2</option>
+        </select>
+        <br><br>
         <button type="submit" class="add-btn">Add Question</button>
     </form>
 
@@ -149,7 +157,9 @@
                         <br><br>
                         <button type="submit" class="edit-btn">Save Changes</button>
                     </form>
-                    {% if questions|length > 10 %}
+                    {% set level_question_count = questions | selectattr('level', 'equalto', question.level) | list | length %}
+
+                    {% if level_question_count > 10 %}
                     <form action="{{ url_for('delete_question', question_id=question.id) }}" method="POST">
                         <button type="submit" class="delete-btn"
                             onclick="return confirm('Are you sure you want to delete this question?')">Delete</button>
