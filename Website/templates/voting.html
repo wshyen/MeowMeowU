@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Vote for the Most Beautiful Cat{% endblock %}
+{% block title %}Voting{% endblock %}
 
 {% block content %}
 
@@ -25,6 +25,14 @@
 
     h2 {
         margin-bottom: 20px;
+        font-weight: bold;
+    }
+
+    .contest-info {
+        font-size: 18px;
+        font-weight: bold;
+        color: rgb(120, 100, 80);
+        margin-bottom: 15px;
     }
 
     .poll-option {
@@ -55,39 +63,40 @@
     }
 
     button {
-    font-family: 'Times New Roman';
-    background-color: rgb(176, 148, 119);
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    font-size: 16px;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 10px;
-  }
+        font-family: 'Times New Roman';
+        background-color: rgb(176, 148, 119);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+    }
 
-  button:hover {
-    background-color: rgb(156, 128, 100);
-  }
+    button:hover {
+        background-color: rgb(156, 128, 100);
+    }
 </style>
 
 <div class="container">
-    <h2>Vote for the Most Beautiful Cat! 🐱✨</h2>
+    <h2>Vote for {{ contest_name }}</h2>
+    <div class="contest-info">You are voting in the "{{ contest_name }}" contest.</div>
 
-    <form method="POST" action="{{ url_for('contestmanagement.voting') }}">
-        {% set votes = {"Fluffy": 2, "Sleepy": 0, "Mittens": 3} %} <!-- Example vote counts -->
-
-        {% for cat_name, vote_count in votes.items() %}
-        <div class="poll-option">
-            <div class="option-label">
-                <input type="checkbox" name="vote" value="{{ cat_name }}">
-                <label for="{{ cat_name }}">🐱{{ cat_name }}</label>
+    <form method="POST" action="{{ url_for('contestmanagement.submit_vote', contest_id=contest_id) }}">
+        {% if participants %}
+            {% for participant in participants %}
+            <div class="poll-option">
+                <div class="option-label">
+                    <input type="radio" name="vote" value="{{ participant.id }}">
+                    <label for="{{ participant.id }}">🐱 {{ participant.name }}</label>
+                </div>
+                <span class="vote-count">Votes: {{ participant.votes if participant.votes else 0 }}</span>
             </div>
-            {% if vote_count > 0 %}
-                <span class="vote-count">{{ vote_count }} Votes</span>
-            {% endif %}
-        </div>
-        {% endfor %}
+            {% endfor %}
+        {% else %}
+            <p>No participants available for voting.</p>
+        {% endif %}
 
         <button type="submit">🐾Submit Vote🐾</button>
     </form>
