@@ -9,9 +9,9 @@ app = Flask(__name__, static_folder='static')
 app.secret_key = 'your_secret_key'
 contestmanagement_bp = Blueprint('contestmanagement', __name__, template_folder='templates', static_folder='static')
 
-UPLOAD_FOLDER = 'Website/static/uploads'
+UPLOAD_FOLDER = 'Website/static/contest' #Folder to store uploaded files
 ALLOWED_EXTENSIONS = {'png','jpg','jpeg'}
-app.config['UPLOAD_FOLDER'] = 'Website/static/contest' #Folder to store uploaded files
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def get_db_connection():
     db_path = os.path.join(os.path.dirname(__file__), '..', 'instance', 'datebase.db')
@@ -26,21 +26,12 @@ def allowed_file(filename):
 def initialize_database():
     with get_db_connection() as conn:
         #Enable Foreign Key Constraints 
-        conn.execute("PRAGMA foreign_keys = ON;")  #Stops submissions from referencing non-existent contests.
-
-        conn.execute('''
-            CREATE TABLE IF NOT EXISTS user (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                email TEXT NOT NULL UNIQUE,
-                role TEXT NOT NULL CHECK (role IN ('admin', 'user'))
-            )
-        ''')
-        conn.commit()
+        conn.execute("PRAGMA foreign_keys = ON;")  #Stops submissions from referencing non-existent contests
 
         conn.execute('''
             CREATE TABLE IF NOT EXISTS submissions (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                username TEXT NOT NULL,
+                name TEXT NOT NULL,
                 contest_id INTEGER NOT NULL,
                 description TEXT,
                 file_path TEXT NOT NULL,
@@ -51,7 +42,7 @@ def initialize_database():
         ''')
         conn.commit()
 
-        # Check if admins are already inserted
+        #Check if admins are already inserted
         existing_admins = conn.execute("SELECT * FROM user WHERE role='admin'").fetchall()
 
 @app.route('/login', methods=['POST', 'GET'])
@@ -77,7 +68,7 @@ def login():
             print("DEBUG: Logged in user:", user_obj)
 
             session['role'] = user_obj.role
-            session.permanent = True  # Make the session permanent
+            session.permanent = True  #Make the session permanent
             session.modified = True  #Mark session as modified to ensure it is saved
             print(f"DEBUG: session role set to {session['role']}")
 
@@ -173,7 +164,7 @@ def submit_contest(contest_id):
         flash("Invalid contest. You cannot submit an entry.", "error")
         return redirect(url_for('contestmanagement.contest_page'))
     
-    if user_has_submitted(current_user.UserName, contest_id):
+    if user_has_submitted(current_user.Name, contest_id):
         flash("You have already submitted an entry for this contest.", "error")
         return redirect(url_for('contestmanagement.contest_page'))
 
@@ -201,23 +192,23 @@ def submit_contest(contest_id):
         #Save the submission to the database
         with get_db_connection() as conn:
                 conn.execute('''
-                    INSERT INTO submissions (username, contest_id, description, file_path, rules_agree) 
+                    INSERT INTO submissions (name, contest_id, description, file_path, rules_agree) 
                     VALUES (?, ?, ?, ?, ?)
-                ''', (current_user.UserName, contest_id, description, file_path, rules_agree))
+                ''', (current_user.Name, contest_id, description, file_path, rules_agree))
                 conn.commit() #Save changes
 
         return redirect(url_for('contestmanagement.contest_page'))  #Sends user back to the contest page after submission
 
     return render_template("contest_submission.html", contest_id=contest_id, user=current_user, contest=contest)
 
-def user_has_submitted(username, contest_id):
-    if not username or not contest_id:
+def user_has_submitted(name, contest_id):
+    if not name or not contest_id:
         return False
 
     conn = get_db_connection()
     existing_entry = conn.execute(
-        "SELECT * FROM submissions WHERE username = ? AND contest_id = ?",
-        (username, contest_id)
+        "SELECT * FROM submissions WHERE name = ? AND contest_id = ?",
+        (name, contest_id)
     ).fetchone()
     conn.close()
 

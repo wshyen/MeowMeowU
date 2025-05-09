@@ -60,7 +60,7 @@ def logout():
 def sign_up():
     if request.method == "POST":
         email = request.form.get("email").strip().lower()
-        UserName = request.form.get("UserName")
+        Name = request.form.get("Name")
         ps1 = request.form.get("ps1")
         ps2 = request.form.get("ps2")
         secret_answer = request.form.get("secret_answer").strip().lower()
@@ -75,8 +75,8 @@ def sign_up():
         elif not re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email):
             flash("Invalid email address.", category="error")
 
-        elif not re.match(r'^[A-Z][a-zA-Z0-9]{2,14}$', UserName):
-            flash("Username must start with a capital letter and be 3 to 15 characters long.", category="error")
+        elif not re.match(r'^[A-Z][a-zA-Z0-9]{2,14}$',Name):
+            flash("Name must start with a capital letter and be 3 to 15 characters long.", category="error")
 
         elif len(ps1) < 7:
             flash('Password must be at least 7 characters.', category='error')
@@ -89,7 +89,7 @@ def sign_up():
             flash("Secret question answer is required.", category="error")
 
         else: #if all correct
-            new_user = User(email=email,UserName=UserName,ps=generate_password_hash(ps1, method="pbkdf2:sha256"),
+            new_user = User(email=email,Name=Name,ps=generate_password_hash(ps1, method="pbkdf2:sha256"),
                             secret_answer=hashed_secret_answer)
             db.session.add(new_user) #add new user to database
 
@@ -166,13 +166,13 @@ def update_profile():
     if request.method == "POST":
         changes_made = False #track changes
 
-        username = request.form.get("username")
-        if username and username != current_user.UserName:
-            if len(username) < 3 or len(username) > 15 or not username[0].isupper():
-                flash("Username must be 3-15 characters long and start with a capital letter.", category="error")
+        name = request.form.get("name")
+        if name and name != current_user.Name:
+            if len(name) < 3 or len(name) > 15 or not name[0].isupper():
+                flash("Name must be 3-15 characters long and start with a capital letter.", category="error")
                 return redirect(url_for("auth.update_profile"))
             else:
-                current_user.UserName = username
+                current_user.Name = name
                 changes_made = True
 
         bio = request.form.get("bio")

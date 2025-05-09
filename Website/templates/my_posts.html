@@ -5,61 +5,146 @@
 
 <style>
 
-    body {
-        font-family: 'Times New Roman', Times, serif;
-        background-color: #f2eadf;
-        margin: 0;
-        padding: 0;
-    }
+  body {
+    font-family: 'Times New Roman', Times, serif;
+    background-color: #f2eadf;
+    margin: 0;
+    padding: 0;
+}
 
-    h1 {
-        font-weight: bold;
-        color: #94693e;
-        text-align: center;
-        font-size: 36px;
-        margin-bottom: 10px;
-        padding-top: 25px;
-    }
+  h1 {
+    font-weight: bold;
+    color: #94693e;
+    text-align: center;
+    font-size: 36px;
+    margin-bottom: 10px;
+    padding-top: 25px;
+}
 
-    .post {
-        width: 80%;
-        max-width: 600px;
-        background-color: #ffffff;
-        border-radius: 10px;
-        padding: 15px;
-        margin: 20px auto;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        font-family: 'Times New Roman', Times, serif;
-    }
+  .post {
+    width: 100%;
+    max-width: 600px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    margin: 20px auto;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    font-family: 'Times New Roman', Times, serif;
+    padding: 30px;
+    cursor: pointer;
+}
 
-    .post img, 
-    .post video {
-        display: block;
-        margin: 10px auto;
-        border-radius: 10px;
-        max-width: 100%;
-        height: auto;
-    }
+  .post-info {
+    width: 100%;  
+    display: flex;
+    align-items: center;  
+    justify-content: flex-start; 
+    margin-left: 30px;
+}
 
-    .back-button {
-                display: block;
-                margin: 30px auto;
-                padding: 10px 20px;
-                background-color: #dccbb7;
-                color: #6b4f2f;
-                font-weight: bold;
-                border: none;
-                border-radius: 8px;
-                cursor: pointer;
-                text-align: center;
-                text-decoration: none;
-            }
+  .post-info img.profile-picture {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%; 
+    margin-right: 25px;
+    border: 1px solid #c8a786; 
+}
 
-        .back-button:hover {
-                background-color: #d4bfae;
-                transform: scale(1.05);
-                box-shadow: 0px 8px 15px rgba(255, 163, 71, 0.2);
-            }
+  .media {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+  .media img,
+  .media video {
+    display: inline-block;
+    margin: 10px auto;
+    border-radius: 12px;
+    height: auto;
+    max-width: 100%;
+}
+
+  .post-actions {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+  .post-actions .separator {
+    font-size: 30px;
+    color: #6b4f2f;
+}
+
+  .modal {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+    .modal-content {
+    background-color: #eae8e6;
+    left: 35%;
+    top: 20%;
+    padding: 40px; 
+    border-radius: 15px;
+    width: 100%;
+    max-width: 500px;
+    height: 450px; 
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);;
+    position: relative;
+}
+
+  .button-container {
+    display: flex; 
+    flex-direction: row; 
+    align-items: center; 
+    justify-content: center;
+    margin-top: 10px;
+}
+
+  .button-container button, 
+  .modal-content button{
+    padding: 10px 20px;
+    margin: 10px 200px;
+    background-color: #dccbb7;
+    border-radius: 15px;
+    border: none;
+    color: #6b4f2f;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+  .back-button {
+    display: block;
+    margin: 30px auto;
+    padding: 10px 20px;
+    background-color: #dccbb7;
+    color: #6b4f2f;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+  }
+
+  .back-button:hover {
+    background-color: #d4bfae;
+    transform: scale(1.05);
+    box-shadow: 0px 8px 15px rgba(255, 163, 71, 0.2);
+}
 
 </style>
 
@@ -69,40 +154,68 @@
 
 {% for post in posts %}
   <div class="post">
-    <p><strong>{{ post.username }}</strong> @ {{ post.created_at }}</p>
-    <p>{{ post.content }}</p>
-    {% if post['media_url'] %}
-            {% set ext = post['media_url'].rsplit('.', 1)[1].lower() %}
-            {% if ext in ['jpg', 'jpeg', 'png', 'gif'] %}
-                <img src="{{ url_for('static', filename=post['media_url']) }}" width="300" alt="Image">
-            {% elif ext in ['mp4', 'mov', 'avi'] %}
-                <video width="300" controls>
-                    <source src="{{ url_for('static', filename=post['media_url']) }}" type="video/{{ ext }}">
-                </video>
-            {% endif %}
-    {% endif %}
-    <p>❤️ {{ post.like_count }} Like</p>
+    <div class="post-info">
+      <img class="profile-picture" src="{{ url_for('static', filename='Userprofile/' + (post['profile_picture'] if post['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
+      <p><strong>You</strong> posted at {{ post['created_at'] }}</p>
+    </div>
+  
+    <div class="media">
+      <p>{{ post['content'] }}</p>
+      {% if post['cat_hashtag'] %}
+        <p><a href="{{ url_for('community.hashtag_posts', hashtag=post['cat_hashtag']) }}">#{{ post['cat_hashtag'] }}</a></p>
+      {% endif %}
+      {% if post['media_url'] %}
+          {% set ext = post['media_url'].rsplit('.', 1)[1].lower() %}
+          {% if ext in ['jpg', 'jpeg', 'png', 'gif'] %}
+              <img src="{{ url_for('static', filename=post['media_url']) }}" width="300" alt="Image">
+          {% elif ext in ['mp4', 'mov', 'avi'] %}
+              <video width="300" controls>
+                  <source src="{{ url_for('static', filename=post['media_url']) }}" type="video/{{ ext }}">
+              </video>
+          {% endif %}
+      {% endif %}
+    </div>
+  
+    <div class="post-actions">
+      <span class="like-count">
+          {{ post['like_count'] }} ❤️Like
+          |
+          💬Comments
+      </span>
 
-    <form action="{{ url_for('community.delete_post', post_id=post.post_id) }}" method="post" style="display:inline;">
-        <button type="submit">Delete</button>
-    </form>
-    <button onclick="openEditModal({{ post.post_id }}, '{{ post.content | escape }}')">Edit</button>
-    <hr>
+    </div>
   </div>
+
+  <div class="button-container">
+    <form action="{{ url_for('community.delete_post', post_id=post.post_id) }}" method="post" style="display:inline;">
+      <button type="submit">Delete</button>
+    </form>
+    <button onclick="openEditModal({{ post.post_id }}, '{{ post.content | escape }}', '{{ post.cat_hashtag | escape }}')">Edit</button>  </div>
+
+<hr>
+</div>
 {% endfor %}
 
 <div id="editModal" class="modal" style="display:none;">
-    <div class="modal-content">
+  <div class="modal-content">
       <span class="close" onclick="closeEditModal()">&times;</span>
       <h3>Edit Post</h3>
       <form id="editForm" method="post">
         <textarea name="content" id="editContent" rows="4" style="width:100%;" required></textarea>
         <br>
+        <label for="editCatHashtag">Select Cat Hashtag:</label>
+        <select name="cat_hashtag" id="editCatHashtag">
+            <option value="">None</option>
+            {% for cat_name in cat_names %}
+                <option value="{{ cat_name }}">#{{ cat_name }}</option>
+            {% endfor %}
+        </select>
+        <br>
         <button type="submit">Save</button>
-      </form>
-    </div>
+    </form>
   </div>
-
+</div>
+  
 <div style="text-align: center; margin-top: 30px;">
     <button onclick="window.location.href='{{ url_for('community.community_feature') }}'"
         style="background-color: #dccbb7; color: #6b4f2f; font-weight: bold; border: none; border-radius: 8px; padding: 10px 20px; font-size: 16px; cursor: pointer;">
@@ -111,12 +224,13 @@
 </div>
 
   <script>
-    function openEditModal(postId, content) {
+    function openEditModal(postId, content, catHashtag) {
       document.getElementById("editContent").value = content;
       document.getElementById("editForm").action = `/post/edit/${postId}`;
+      document.getElementById("editCatHashtag").value = catHashtag || ""; // Use the passed parameter
       document.getElementById("editModal").style.display = "block";
     }
-  
+
     function closeEditModal() {
       document.getElementById("editModal").style.display = "none";
     }

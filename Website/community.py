@@ -20,40 +20,140 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
-@community_bp.route('/community_feature')
-def community_feature():
-    conn = get_db_connection()
-    posts = conn.execute('''
-    SELECT 
-        post.*, 
-        user.username, 
-        COUNT(likes.id) AS like_count,
-        CASE 
-            WHEN EXISTS (
-                SELECT 1 FROM likes 
-                WHERE likes.post_id = post.post_id AND likes.user_id = ?
-            ) THEN 1
-            ELSE 0
-        END AS liked_by_current_user
-    FROM post 
-    JOIN user ON post.user_id = user.id 
-    LEFT JOIN likes ON post.post_id = likes.post_id
-    GROUP BY post.post_id
-    ORDER BY post.created_at DESC
-''', 
-(current_user.id if current_user.is_authenticated else -1,)
-).fetchall()
+def get_cat_names():
+    db_path = os.path.join(os.path.dirname(__file__), '..', 'instance', 'cat_profiles.db')
+    if not os.path.exists(db_path):
+        return []
+
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    cursor.execute('SELECT name FROM profiles')
+    cat_names = [row['name'] for row in cursor.fetchall()]
 
     conn.close()
-    return render_template("community_index.html", user=current_user, posts=posts)
+    return cat_names
+
+@community_bp.route('/community_feature')
+def community_feature():
+    sort_by = request.args.get('sort', 'date_desc') 
+    user_id = current_user.id if current_user.is_authenticated else -1
+    
+
+    conn = get_db_connection()
+
+    if sort_by == 'date_asc': 
+        query = '''
+            SELECT post.*, user.name, user.profile_picture,
+                COUNT(likes.id) AS like_count,
+                CASE 
+                    WHEN EXISTS (
+                        SELECT 1 FROM likes 
+                        WHERE likes.post_id = post.post_id AND likes.user_id = ?
+                    ) THEN 1
+                    ELSE 0
+                END AS liked_by_current_user
+            FROM post 
+            JOIN user ON post.user_id = user.id 
+            LEFT JOIN likes ON post.post_id = likes.post_id
+            GROUP BY post.post_id
+            ORDER BY post.created_at ASC
+        '''
+
+    elif sort_by == 'date_desc':
+        query = '''
+            SELECT post.*, user.name, user.profile_picture,
+                COUNT(likes.id) AS like_count,
+                CASE 
+                    WHEN EXISTS (
+                        SELECT 1 FROM likes 
+                        WHERE likes.post_id = post.post_id AND likes.user_id = ?
+                    ) THEN 1
+                    ELSE 0
+                END AS liked_by_current_user
+            FROM post 
+            JOIN user ON post.user_id = user.id 
+            LEFT JOIN likes ON post.post_id = likes.post_id
+            GROUP BY post.post_id
+            ORDER BY post.created_at DESC
+        '''
+    elif sort_by == 'likes_desc':
+        query = '''
+            SELECT post.*, user.name, user.profile_picture,
+                COUNT(likes.id) AS like_count,
+                CASE 
+                    WHEN EXISTS (
+                        SELECT 1 FROM likes 
+                        WHERE likes.post_id = post.post_id AND likes.user_id = ?
+                    ) THEN 1
+                    ELSE 0
+                END AS liked_by_current_user
+            FROM post 
+            JOIN user ON post.user_id = user.id 
+            LEFT JOIN likes ON post.post_id = likes.post_id
+            GROUP BY post.post_id
+            ORDER BY like_count DESC
+        '''
+    else:
+        query = '''
+            SELECT post.*, user.name, user.profile_picture,
+                COUNT(likes.id) AS like_count,
+                CASE 
+                    WHEN EXISTS (
+                        SELECT 1 FROM likes 
+                        WHERE likes.post_id = post.post_id AND likes.user_id = ?
+                    ) THEN 1
+                    ELSE 0
+                END AS liked_by_current_user
+            FROM post 
+            JOIN user ON post.user_id = user.id 
+            LEFT JOIN likes ON post.post_id = likes.post_id
+            GROUP BY post.post_id
+            ORDER BY user_id
+        '''
+
+
+    posts = conn.execute(query, (current_user.id if current_user.is_authenticated else -1,)).fetchall()
+
+    conn.close()
+    return render_template("community_index.html", user=current_user, posts=posts, sort_by=sort_by, cat_names=get_cat_names())
+
+@community_bp.route('/post/<int:post_id>')
+def post_detail(post_id):
+    conn = get_db_connection()
+    
+    post = conn.execute('''
+        SELECT 
+            post.*, 
+            user.name,
+            user.profile_picture,
+             (SELECT COUNT(*) FROM likes WHERE likes.post_id = post.post_id) AS like_count,
+            CASE 
+                WHEN EXISTS (
+                    SELECT 1 FROM likes 
+                    WHERE likes.post_id = post.post_id AND likes.user_id = ?
+                ) THEN 1
+                ELSE 0
+            END AS liked_by_current_user
+        FROM post 
+        JOIN user ON post.user_id = user.id
+        WHERE post.post_id = ?
+    ''', (
+        current_user.id if current_user.is_authenticated else -1,
+        post_id
+    )).fetchone()
+
+    conn.close()
+    return render_template("community_detail.html", post=post, user=current_user)
 
 @community_bp.route('/post/create', methods=['POST'])
 @login_required
 def create_post():
     content = request.form['content']
+    cat_hashtag = request.form.get('cat_hashtag')
     user_id = current_user.id
     created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
     media = request.files.get('media')
     media_url = None
 
@@ -66,19 +166,52 @@ def create_post():
 
     conn = get_db_connection()
     conn.execute(
-        'INSERT INTO post (user_id, content, media_url, created_at) VALUES (?, ?, ?, ?)', (user_id, content, media_url, created_at)
+        '''
+        INSERT INTO post (user_id, content, media_url, created_at, cat_hashtag)
+        VALUES (?, ?, ?, ?, ?)
+        ''',
+        (user_id, content, media_url, created_at, cat_hashtag)
     )
     conn.commit()
     conn.close()
 
     return redirect(url_for('community.community_feature'))
 
+@community_bp.route('/hashtag/<string:hashtag>')
+def hashtag_posts(hashtag):
+    conn = get_db_connection()
+    posts = conn.execute(
+        '''
+        SELECT post.*, user.name, user.profile_picture,
+            COUNT(likes.id) AS like_count,
+            CASE 
+                WHEN EXISTS (
+                    SELECT 1 FROM likes 
+                    WHERE likes.post_id = post.post_id AND likes.user_id = ?
+                ) THEN 1
+                ELSE 0
+            END AS liked_by_current_user
+        FROM post
+        JOIN user ON post.user_id = user.id
+        LEFT JOIN likes ON post.post_id = likes.post_id
+        WHERE post.cat_hashtag = ?
+        GROUP BY post.post_id
+        ORDER BY post.created_at DESC
+        ''',
+        (current_user.id if current_user.is_authenticated else -1, hashtag)
+    ).fetchall()
+    conn.close()
+
+    return render_template('community_index.html',user=current_user, posts=posts, sort_by='date_desc', cat_names=get_cat_names())
+
+#My Post
+
 @community_bp.route('/my-posts')
 @login_required
 def my_posts():
     conn = get_db_connection()
     posts = conn.execute('''
-        SELECT post.*, user.username,
+        SELECT post.*, user.name, user.profile_picture,
                COUNT(likes.id) AS like_count
         FROM post
         JOIN user ON post.user_id = user.id
@@ -88,19 +221,25 @@ def my_posts():
         ORDER BY post.created_at DESC
     ''', (current_user.id,)).fetchall()
     conn.close()
-    return render_template("my_posts.html", user=current_user, posts=posts)
+    return render_template("my_posts.html", user=current_user, posts=posts, cat_names=get_cat_names())
 
 @community_bp.route('/post/edit/<int:post_id>', methods=['POST'])
 @login_required
 def edit_post(post_id):
     content = request.form['content']
+    cat_hashtag = request.form.get('cat_hashtag')
     conn = get_db_connection()
     post = conn.execute('SELECT * FROM post WHERE post_id = ?', (post_id,)).fetchone()
 
     if post and post['user_id'] == current_user.id:
-        conn.execute('UPDATE post SET content = ? WHERE post_id = ?', (content, post_id))
+        conn.execute(
+            'UPDATE post SET content = ?, cat_hashtag = ? WHERE post_id = ?',
+            (content, cat_hashtag, post_id)
+        )
         conn.commit()
-
+        
+    print("Request received:", request.form)
+    print("Edit post request received for post_id:", post_id)
     conn.close()
     return redirect(url_for('community.my_posts'))
 
@@ -129,6 +268,7 @@ def delete_post(post_id):
 @login_required
 def like_post(post_id):
     user_id = current_user.id
+    sort_by = request.form.get('sort', 'date_desc')
 
     conn = get_db_connection()
 
@@ -146,12 +286,18 @@ def like_post(post_id):
         conn.commit()
 
     conn.close()
-    return redirect(url_for('community.community_feature'))
+    referer = request.referrer
+
+    if '/community' in referer :
+        return redirect(url_for('community.community_feature', sort=sort_by))
+
+    return redirect(url_for('community.post_detail', post_id=post_id))
 
 @community_bp.route('/post/unlike/<int:post_id>', methods=['POST'])
 @login_required
 def unlike_post(post_id):
     user_id = current_user.id
+    sort_by = request.form.get('sort', 'date_desc')
 
     conn = get_db_connection()
     conn.execute(
@@ -161,4 +307,9 @@ def unlike_post(post_id):
     conn.commit()
     conn.close()
 
-    return redirect(url_for('community.community_feature'))
+    referer = request.referrer
+
+    if '/community' in referer :
+        return redirect(url_for('community.community_feature', sort=sort_by))
+
+    return redirect(url_for('community.post_detail', post_id=post_id))
