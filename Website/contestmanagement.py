@@ -248,7 +248,44 @@ if __name__ == '__main__':
 
     app.run(debug=True)
 
-@contestmanagement_bp.route("/voting", methods=["GET", "POST"])
-@login_required
-def voting():
-    return render_template("voting.html", user=current_user)
+#voting system
+@contestmanagement_bp.route('/voting/<int:contest_id>', methods=['GET', 'POST'])
+def voting(contest_id):
+    conn = get_db_connection()
+    
+    #get contest details
+    contest = conn.execute("SELECT name FROM contests WHERE id = ?", (contest_id,)).fetchone()
+    if not contest:
+        flash("Contest not found!", "error")
+        return redirect(url_for('contestmanagement.contest_page'))
+
+    contest_name = contest["name"]
+
+    #get participants for voting
+    participants = conn.execute("SELECT id, name FROM submissions WHERE contest_id = ?", (contest_id,)).fetchall()
+    conn.close()
+
+    return render_template("voting.html", contest_name=contest_name, contest_id=contest_id, participants=participants, user=current_user)
+
+@contestmanagement_bp.route('/submit_vote/<int:contest_id>', methods=['POST'])
+def submit_vote(contest_id):
+    selected_participant_id = request.form.get("vote")
+
+    if not selected_participant_id:
+        flash("Please select a participant to vote!", "error")
+        return redirect(url_for('contestmanagement.voting', contest_id=contest_id))
+
+    conn = get_db_connection()
+
+    #ensure valid submission
+    participant = conn.execute("SELECT id FROM submissions WHERE id = ? AND contest_id = ?", (selected_participant_id, contest_id)).fetchone()
+    if not participant:
+        flash("Invalid participant!", "error")
+        return redirect(url_for('contestmanagement.voting', contest_id=contest_id))
+
+    conn.execute("UPDATE submissions SET votes = COALESCE(votes, 0) + 1 WHERE id = ?", (selected_participant_id,))
+    conn.commit()
+    conn.close()
+
+    flash("Your vote has been recorded!", "success")
+    return redirect(url_for('contestmanagement.voting', contest_id=contest_id))
