@@ -261,8 +261,8 @@ def voting(contest_id):
 
     contest_name = contest["name"]
 
-    #get participants for voting
-    participants = conn.execute("SELECT id, name FROM submissions WHERE contest_id = ?", (contest_id,)).fetchall()
+    #get participants with images
+    participants = conn.execute("SELECT id, name, file_path, votes, description FROM submissions WHERE contest_id = ?", (contest_id,)).fetchall()
     conn.close()
 
     return render_template("voting.html", contest_name=contest_name, contest_id=contest_id, participants=participants, user=current_user)
