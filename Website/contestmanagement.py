@@ -333,3 +333,33 @@ def submit_vote(contest_id):
 
     flash("Your vote has been recorded!", category="success")
     return redirect(url_for('contestmanagement.voting', contest_id=contest_id))
+
+@contestmanagement_bp.route('/view_result/<int:contest_id>')
+@login_required
+def view_result(contest_id):
+    conn = get_db_connection()
+    contest = conn.execute("SELECT name, voting_end FROM contests WHERE id = ?", (contest_id,)).fetchone()
+    if not contest:
+        flash("Contest not found!", category="error")
+        return redirect(url_for('contestmanagement.contest_page'))
+
+    participants = conn.execute("""
+        SELECT name, description, file_path, votes 
+        FROM submissions 
+        WHERE contest_id = ?
+        ORDER BY votes DESC
+    """, (contest_id,)).fetchall()
+    conn.close()
+
+    if not participants:
+        flash("No submissions found for this contest.", category="error")
+        return redirect(url_for('contestmanagement.contest_page'))
+
+    top_vote = participants[0]['votes']
+    winners = [p for p in participants if p['votes'] == top_vote]
+
+    return render_template("view_result.html", 
+                           contest_name=contest["name"], 
+                           participants=participants, 
+                           winners=winners, 
+                           user=current_user)
