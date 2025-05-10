@@ -97,10 +97,11 @@ def contest_page():
     for c in contests:
         c["start_date"] = datetime.strptime(c["start_date"], "%Y-%m-%d").date()  #Convert string to date
         c["end_date"] = datetime.strptime(c["end_date"], "%Y-%m-%d").date()  #Convert string to date
+        c["voting_end"] = datetime.strptime(c["voting_end"], "%Y-%m-%d").date()
 
     #Categorize contests based on proper date comparisons
     ongoing_contests = sorted(
-        [c for c in contests if c["start_date"] <= today and c["end_date"] >= today], key=lambda x: x["end_date"]
+        [c for c in contests if c["start_date"] <= today and c["voting_end"] >= today], key=lambda x: x["voting_end"]
     )  #Sort ongoing contests so those ending soonest are first
 
     upcoming_contests = sorted(
@@ -108,7 +109,7 @@ def contest_page():
     )  #Sort upcoming contests by start date
 
     completed_contests = sorted(
-        [c for c in contests if c["end_date"] < today], key=lambda x: x["end_date"], reverse=True 
+        [c for c in contests if c["voting_end"] < today], key=lambda x: x["voting_end"], reverse=True 
     )  #Sort completed contests with the latest ended at the top
     
     return render_template("contest.html", contests=contests, user=current_user, user_role=user_role, user_has_submitted=user_has_submitted, ongoing_contests=ongoing_contests, upcoming_contests=upcoming_contests, completed_contests=completed_contests)
@@ -156,10 +157,14 @@ def create_contest():
         return redirect(url_for('contestmanagement.contest_page')) #Send non-admins back to the contest page
         
 @contestmanagement_bp.route('/contest_submission/<int:contest_id>', methods=['GET', 'POST'])
-@login_required
 def submit_contest(contest_id):
     conn = get_db_connection()
     contest = conn.execute("SELECT id, name FROM contests WHERE id = ?", (contest_id,)).fetchone()
+
+    if not current_user.is_authenticated:
+        flash("You must be logged in to join!", category="error")
+        return redirect(url_for('auth.login'))
+    
     if contest is None:
         flash("Invalid contest. You cannot submit an entry.", "error")
         return redirect(url_for('contestmanagement.contest_page'))
@@ -246,3 +251,140 @@ if __name__ == '__main__':
         conn.commit()
 
     app.run(debug=True)
+
+#voting system
+@contestmanagement_bp.route('/voting/<int:contest_id>', methods=['GET', 'POST'])
+def voting(contest_id):
+    conn = get_db_connection()
+
+    #ensure the user is logged in before voting
+    if not current_user.is_authenticated:
+        flash("You must be logged in to vote!", category="error")
+        return redirect(url_for('auth.login'))
+
+    contest = conn.execute("SELECT name, voting_start, voting_end FROM contests WHERE id = ?", (contest_id,)).fetchone()
+    if not contest:
+        flash("Contest not found!", category="error")
+        return redirect(url_for('contestmanagement.contest_page'))
+
+    contest_name = contest["name"]
+
+    #ensure voting times have full date-time format
+    voting_start_str = contest["voting_start"]
+    voting_end_str = contest["voting_end"]
+
+    if len(voting_start_str) == 10:  #if stored as "YYYY-MM-DD"
+        voting_start_str += " 00:00:00"  #add default time
+    if len(voting_end_str) == 10:  #if stored as "YYYY-MM-DD"
+        voting_end_str += " 23:59:59"  #add end-of-day time
+
+    #convert to datetime format
+    voting_start = datetime.strptime(voting_start_str, "%Y-%m-%d %H:%M:%S")
+    voting_end = datetime.strptime(voting_end_str, "%Y-%m-%d %H:%M:%S")
+
+    current_time = datetime.now()
+
+    #redirect to countdown page if voting hasn't started yet
+    if current_time < voting_start:
+        time_left = voting_start - current_time
+        days_left = time_left.days
+        hours_left = time_left.seconds // 3600
+        minutes_left = (time_left.seconds % 3600) // 60
+
+        return render_template("voting_countdown.html", contest_name=contest_name, days_left=days_left, hours_left=hours_left,minutes_left=minutes_left, user=current_user)
+
+    #redirect to contest page if voting has ended
+    if current_time > voting_end:
+        flash("Voting has ended!", category="error")
+        return redirect(url_for('contestmanagement.contest_page'))
+
+    participants = conn.execute("SELECT id, name, file_path, votes, description FROM submissions WHERE contest_id = ?", (contest_id,)).fetchall()
+    conn.close()
+
+    return render_template("voting.html", contest_name=contest_name, contest_id=contest_id, participants=participants, user=current_user)
+
+@contestmanagement_bp.route('/submit_vote/<int:contest_id>', methods=['POST'])
+def submit_vote(contest_id):
+    selected_participant_id = request.form.get("vote")
+
+    if not selected_participant_id:
+        flash("Please select a participant to vote!", category="error")
+        return redirect(url_for('contestmanagement.voting', contest_id=contest_id))
+
+    conn = get_db_connection()
+
+    #ensure valid participant
+    participant = conn.execute("SELECT id FROM submissions WHERE id = ? AND contest_id = ?", (selected_participant_id, contest_id)).fetchone()
+    if not participant:
+        flash("Invalid participant!", category="error")
+        return redirect(url_for('contestmanagement.voting', contest_id=contest_id))
+
+    #check if user has already voted
+    user_id = current_user.id 
+    has_voted = conn.execute("SELECT id FROM votes WHERE user_id = ? AND contest_id = ?", (user_id, contest_id)).fetchone()
+
+    if has_voted:
+        flash("You have already voted in this contest!", category="error")
+        return redirect(url_for('contestmanagement.voting', contest_id=contest_id))
+
+    #add vote to db
+    conn.execute("INSERT INTO votes (user_id, contest_id, participant_id) VALUES (?, ?, ?)", (user_id, contest_id, selected_participant_id))
+
+    #update votes count
+    conn.execute("UPDATE submissions SET votes = COALESCE(votes, 0) + 1 WHERE id = ?", (selected_participant_id,))
+    conn.commit()
+    conn.close()
+
+    flash("Your vote has been recorded!", category="success")
+    return redirect(url_for('contestmanagement.voting', contest_id=contest_id))
+
+@contestmanagement_bp.route('/view_result/<int:contest_id>')
+def view_result(contest_id):
+    conn = get_db_connection()
+
+    if not current_user.is_authenticated:
+        flash("You must be logged in to view result!", category="error")
+        return redirect(url_for('auth.login'))
+    
+    #fetch contest details, including result announcement date
+    contest = conn.execute("SELECT name, result_announcement FROM contests WHERE id = ?", (contest_id,)).fetchone()
+    if not contest:
+        flash("Contest not found!", category="error")
+        return redirect(url_for('contestmanagement.contest_page'))
+
+    #convert stored announcement date to datetime format
+    announcement_date_str = contest["result_announcement"]
+    
+    if len(announcement_date_str) == 10:  #if format is 'YYYY-MM-DD'
+        announcement_date_str += " 00:00:00"  #append default time
+
+    announcement_date = datetime.strptime(announcement_date_str, "%Y-%m-%d %H:%M:%S")
+    current_time = datetime.now()
+
+    if current_time < announcement_date:
+        time_left = announcement_date - current_time
+        days_left = time_left.days
+        hours_left = (time_left.seconds // 3600)
+        minutes_left = (time_left.seconds % 3600) // 60
+
+        return render_template("result_countdown.html", contest_name=contest["name"], 
+                               days_left=days_left, hours_left=hours_left, minutes_left=minutes_left, user=current_user)
+
+    participants = conn.execute("""
+        SELECT name, description, file_path, votes 
+        FROM submissions 
+        WHERE contest_id = ?
+        ORDER BY votes DESC
+    """, (contest_id,)).fetchall()
+    conn.close()
+
+    if not participants:
+        flash("No submissions found for this contest.", category="error")
+        return redirect(url_for('contestmanagement.contest_page'))
+
+    #determine winners
+    top_vote = participants[0]['votes']
+    winners = [p for p in participants if p['votes'] == top_vote]
+
+    return render_template("view_result.html", contest_name=contest["name"], participants=participants, winners=winners, user=current_user)
+

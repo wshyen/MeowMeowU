@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Voting Countdown{% endblock %}
+
+{% block content %}
+
+<style>
+    body {
+        background-color: #f2eadf;
+        font-family: 'Times New Roman', serif;
+        color: rgb(78, 68, 57);
+        margin: 0;
+        padding: 0;
+    }
+
+    .countdown-container {
+        text-align: center;
+        padding: 50px;
+        background-color: #fff7ec;
+        border-radius: 15px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        width: 60%;
+        max-width: 600px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    h2 {
+        font-size: 32px;
+        color: rgb(120, 100, 80);
+        font-weight: bold;
+        margin-bottom: 20px;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .countdown-text {
+        font-size: 22px;
+        font-weight: bold;
+        color: rgb(100, 85, 70);
+        background-color: rgba(242, 234, 223, 0.9);
+        padding: 12px;
+        border-radius: 10px;
+        display: inline-block;
+        margin-top: 15px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    }
+
+    .countdown-container img {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 15px;
+        opacity: 0.9;
+    }
+
+    button {
+        font-family: 'Times New Roman';
+        background-color: rgb(176, 148, 119);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+        font-size: 18px;
+    }
+
+    button:hover {
+        background-color: rgb(158, 134, 106);
+        transform: scale(1.1);
+    }
+</style>
+
+<div class="countdown-container">
+    <img src="{{ url_for('static', filename='Images/Countdown.png') }}" alt="Countdown Icon">
+    <h2>Voting has not started yet!</h2>
+    <p class="countdown-text">
+        ⏳ Time left until voting begins: <br><strong>{{ days_left }} days, {{ hours_left }} hours, {{ minutes_left }} minutes</strong>
+    </p>
+
+    <button onclick="window.location.href='{{ url_for('contestmanagement.contest_page') }}'" class="button">
+        🐾Back to Contests🐾
+    </button>
+</div>
+
+{% endblock %}

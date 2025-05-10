@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Results - {{ contest_name }}{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f2eadf;
+        font-family: 'Times New Roman', serif;
+        color: rgb(78, 68, 57);
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        max-width: 900px;
+        margin: 60px auto;
+        padding: 30px;
+        background-color: #fff7ec;
+        border-radius: 12px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    h2 {
+        font-size: 36px;
+        font-weight: bold;
+        margin-bottom: 25px;
+    }
+
+    .winner-box {
+        font-size: 22px;
+        font-weight: bold;
+        margin-bottom: 30px;
+        background-color: #f9e8d2;
+        padding: 15px;
+        border-radius: 10px;
+        color: rgb(78, 68, 57);
+    }
+
+    .result-entry {
+        display: flex;
+        flex-direction: row;
+        background-color: #fdf3e7;
+        border: 2px solid #e0cdb5;
+        border-radius: 12px;
+        padding: 20px;
+        margin: 20px 0;
+        align-items: center;
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .result-entry:hover {
+        transform: scale(1.02);
+        box-shadow: 0 4px 8px rgba(120, 100, 80, 0.1);
+    }
+
+    .description-container {
+        flex: 1;
+        text-align: left;
+    }
+
+    .image-container {
+        flex: 0 0 200px;
+        text-align: center;
+    }
+
+    .image-container img {
+        width: 200px;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 10px;
+        border: 3px solid #c0a98f;
+        cursor: default; /* Prevent clicking */
+        pointer-events: none; /* Disable interactions */
+    }
+
+    .name-label {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 8px;
+        color: #4a3b2c;
+    }
+
+    .description {
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+
+    .vote-count {
+        font-size: 18px;
+        font-weight: bold;
+        margin-top: 10px;
+        color: #7a6149;
+    }
+
+    button {
+        font-family: 'Times New Roman';
+        background-color: rgb(176, 148, 119);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+        font-size: 18px;
+    }
+
+    button:hover {
+        background-color: rgb(158, 134, 106);
+        transform: scale(1.1);
+    }
+</style>
+
+<div class="container">
+    <h2>🎉 Results for "{{ contest_name }}"</h2>
+
+    {% if winners|length == 1 %}
+        <div class="winner-box">🏆 Winner: {{ winners[0].name }} with {{ winners[0].votes }} votes!</div>
+    {% else %}
+        <div class="winner-box">
+            🏆 It's a tie between:
+            {% for winner in winners %}
+                {{ winner.name }}{% if not loop.last %}, {% endif %}
+            {% endfor %}
+            ({{ winners[0].votes }} votes each)
+        </div>
+    {% endif %}
+
+    {% for p in participants %}
+    <div class="result-entry">
+        <div class="description-container">
+            <div class="name-label">🐱{{ p.name }}</div>
+            {% if p.description %}
+                <p class="description"><strong>Description:</strong> {{ p.description }}</p>
+            {% else %}
+                <p class="description"><strong>Description:</strong> <em>No description provided.</em></p>
+            {% endif %}
+            <div class="vote-count">Votes: {{ p.votes }}</div>
+        </div>
+
+        {% if p.file_path %}
+        <div class="image-container">
+            <img src="{{ url_for('static', filename=p.file_path.replace('Website/static/', '')) }}" 
+                 alt="{{ p.name }}'s submission">
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+
+    <button onclick="window.location.href='{{ url_for('contestmanagement.contest_page') }}'" class="button">
+        🐾Back to Contests🐾
+    </button>
+</div>
+
+{% endblock %}
