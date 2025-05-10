@@ -24,19 +24,25 @@
 
     .container {
         display: flex;
-        justify-content: space-around;
-        align-items: center;
+        justify-content: center;
+        align-items: stretch;
         margin-top: 50px;
+        flex: wrap;
+        gap: 40px;
     }
 
     .quiz-box {
         width: 350px;
-        height: 500px;
+        max-width: 90%;
+        height: auto;
+        min-height: 500px;
         padding: 25px;
         text-align: center;
         background-color: white;
         border: 1px solid #ccc;
         border-radius: 15px;
+        flex-direction: column;
+        justify-content: space-between;
     }
 
     .quiz-box ul {

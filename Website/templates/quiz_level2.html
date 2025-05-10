@@ -38,48 +38,32 @@
     .options input {
         margin: 10px;
         font-size: 18px;
-    }
-
-    #next-button {
-        display: block;
-        margin-left: auto;
-        padding: 10px 16px;
-        font-size: 18px;
-        background-color: #6b4f2f;
-        color: white;
-        border: none;
         cursor: pointer;
-        transition: background-color 0.3s ease-in-out;
-        border-radius: 12px;
-    }
-
-    #next-button:hover {
-        background-color: #533d28;
-        transform: scale(1.05);
     }
 </style>
 <div style="padding: 20px;">
     <h1>Level 2</h1>
+
+    <h2 id="question-counter" style="text-align: center; color: #6b4f2f;"></h2>
 
     <div class="cat-box">
         <h2 id="question-text">Loading...</h2>
     </div>
 
     <div class="options" id="options"></div>
-
-    <button id="next-button" style="font-family: 'Times New Roman', Times, serif;" onclick="nextQuestion()">Next
-        Question</button>
 </div>
-
 
 <script>
     let questions = [];
     let currentIndex = 0;
+    let correctAnswer = ""; //Stores the correct answer temporarily
+    let correctCount = 0; //Count the number of correct answers
 
     async function fetchQuestions() {
         const response = await fetch('/get_questions?level=1');
         questions = await response.json();
         currentIndex = 0;
+        currentCount = 0;
         displayQuestion();
     }
 
@@ -87,26 +71,64 @@
         if (currentIndex < questions.length) {
             let q = questions[currentIndex];
 
+            correctAnswer = q.correct_option; //Store the correct answer
+
             let shuffledOptions = shuffleOptions([
                 { text: q.option_a, value: "A" },
                 { text: q.option_b, value: "B" },
                 { text: q.option_c, value: "C" }
             ]);
 
+            //Update quesion counter
+            document.getElementById("question-counter").innerHTML = `Question ${currentIndex + 1} of ${questions.length}`;
+
+            //Update question text
             document.getElementById("question-text").innerHTML = q.question;
+
+            //Display options
             document.getElementById("options").innerHTML = shuffledOptions.map(option =>
                 `<input type="radio" name="option" value="${option.value}"> ${option.text} <br>`
             ).join("");
         } else {
-            document.getElementById("question-text").innerHTML = "Quiz Complete!";
-            document.getElementById("options").innerHTML = "";
-            document.getElementById("next-button").style.display = "none";
+            checkQuizCompletion();
         }
+    }
+
+    function checkAnswer() {
+        let selectedOption = document.querySelector('input[name="option"]:checked');
+        if (!selectedOption) {
+            alert("Please select an answer.");
+            return;
+        }
+
+        let userAnswer = selectedOption.value;
+
+        if (userAnswer === correctAnswer) {
+            correctCount++; //Increase correct answer count
+            alert("Correct!");
+        } else {
+            alert("Wrong!");
+        }
+
+        setTimeout(() => {
+            nextQuestion();
+        }, 5000); //Delay 5 seconds before moving to the next question
     }
 
     function nextQuestion() {
         currentIndex++;
         displayQuestion();
+    }
+
+    function checkQuizCompletion() {
+        document.getElementById("question-text").innerHTML = "Quiz Complete!";
+        document.getElementById("options").innerHTML = "";
+
+        if (correctCount === questions.length) {
+            document.getElementById("question-text").innerHTML = "Congratulations! <br> You have completed Level 2 and earned your badge! <br> ฅ^•⩊•^ ฅ";
+        } else {
+            document.getElementById("question-text").innerHTML = "This is your final challenge! <br> Get every answer right to complete your journey and earn your badge. <br> Give it another shot!  <br> /ᐠ╥⩊╥ᐟ\\";
+        }
     }
 
     function shuffleOptions(options) {

@@ -38,37 +38,19 @@
     .options input {
         margin: 10px;
         font-size: 18px;
-    }
-
-    #next-button {
-        display: block;
-        margin-left: auto;
-        padding: 10px 16px;
-        font-size: 18px;
-        background-color: #6b4f2f;
-        color: white;
-        border: none;
         cursor: pointer;
-        transition: background-color 0.3s ease-in-out;
-        border-radius: 12px;
-    }
-
-    #next-button:hover {
-        background-color: #533d28;
-        transform: scale(1.05);
     }
 </style>
 <div style="padding: 20px;">
     <h1>Level 1</h1>
+
+    <h2 id="question-counter" style="text-align: center; color: #6b4f2f;"></h2>
 
     <div class="cat-box">
         <h2 id="question-text">Loading...</h2>
     </div>
 
     <div class="options" id="options"></div>
-
-    <button id="next-button" style="font-family: 'Times New Roman', Times, serif;" onclick="nextQuestion()">Next
-        Question</button>
 </div>
 
 <script>
@@ -97,7 +79,13 @@
                 { text: q.option_c, value: "C" }
             ]);
 
+            //Update quesion counter
+            document.getElementById("question-counter").innerHTML = `Question ${currentIndex + 1} of ${questions.length}`;
+
+            //Update question text
             document.getElementById("question-text").innerHTML = q.question;
+
+            //Display options
             document.getElementById("options").innerHTML = shuffledOptions.map(option =>
                 `<input type="radio" name="option" value="${option.value}"> ${option.text} <br>`
             ).join("");
@@ -122,23 +110,24 @@
             alert("Wrong!");
         }
 
-        nextQuestion();
+        setTimeout(() => {
+            nextQuestion();
+        }, 5000); //Delay 5 seconds before moving to the next question
     }
 
     function nextQuestion() {
         currentIndex++;
-        displayQuestion();
+        displayQuestion(); g
     }
 
     function checkQuizCompletion() {
         document.getElementById("question-text").innerHTML = "Quiz Complete!";
         document.getElementById("options").innerHTML = "";
-        document.getElementById("next-button").style.display = "none"; //Hide next button
 
         if (correctCount === questions.length) {
-            document.getElementById("question-text").innerHTML = "Congratulations! <br> You have unlocked level 2! <br> ฅ^•⩊•^ ฅ";
+            document.getElementById("question-text").innerHTML = "Congratulations! <br> You have unlocked level 2 and earned a badge! <br> ฅ^•⩊•^ ฅ";
         } else {
-            document.getElementById("question-text").innerHTML = "You need to answer all correctly to unlock Level 2. <br> Try again! <br> /ᐠ ╥ ˕ ╥マ ";
+            document.getElementById("question-text").innerHTML = "You need to answer all correctly to unlock Level 2 and earn your badge. <br> Try again! <br> /ᐠ ╥ ˕ ╥マ ";
         }
     }
 

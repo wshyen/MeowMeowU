@@ -55,6 +55,8 @@ def quiz_page():
     user_role = getattr(current_user, 'role', 'user')
     print(f"DEBUG: user_role = {user_role}")
 
+    return render_template('quiz.html') 
+
 @quiz_bp.route('/manage-quiz', methods=['GET'])
 @login_required
 def manage_quiz():
