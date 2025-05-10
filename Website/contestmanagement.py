@@ -255,7 +255,7 @@ def voting(contest_id):
 
     contest = conn.execute("SELECT name, voting_start, voting_end FROM contests WHERE id = ?", (contest_id,)).fetchone()
     if not contest:
-        flash("Contest not found!", "error")
+        flash("Contest not found!", category="error")
         return redirect(url_for('contestmanagement.contest_page'))
 
     contest_name = contest["name"]
@@ -280,12 +280,19 @@ def voting(contest_id):
         time_left = voting_start - current_time
         days_left = time_left.days
         hours_left = time_left.seconds // 3600
-        return render_template("voting_countdown.html", contest_name=contest_name, days_left=days_left, hours_left=hours_left, user=current_user)
+        minutes_left = (time_left.seconds % 3600) // 60
+
+        return render_template("voting_countdown.html", contest_name=contest_name, days_left=days_left, hours_left=hours_left,minutes_left=minutes_left, user=current_user)
 
     #redirect to contest page if voting has ended
     if current_time > voting_end:
-        flash("Voting has ended!", "error")
+        flash("Voting has ended!", category="error")
         return redirect(url_for('contestmanagement.contest_page'))
+    
+    #ensure the user is logged in before voting
+    if not current_user.is_authenticated:
+        flash("You must be logged in to vote!", category="error")
+        return redirect(url_for('auth.login'))
 
     participants = conn.execute("SELECT id, name, file_path, votes, description FROM submissions WHERE contest_id = ?", (contest_id,)).fetchall()
     conn.close()
@@ -297,7 +304,7 @@ def submit_vote(contest_id):
     selected_participant_id = request.form.get("vote")
 
     if not selected_participant_id:
-        flash("Please select a participant to vote!", "error")
+        flash("Please select a participant to vote!", category="error")
         return redirect(url_for('contestmanagement.voting', contest_id=contest_id))
 
     conn = get_db_connection()
@@ -305,7 +312,7 @@ def submit_vote(contest_id):
     #ensure valid participant
     participant = conn.execute("SELECT id FROM submissions WHERE id = ? AND contest_id = ?", (selected_participant_id, contest_id)).fetchone()
     if not participant:
-        flash("Invalid participant!", "error")
+        flash("Invalid participant!", category="error")
         return redirect(url_for('contestmanagement.voting', contest_id=contest_id))
 
     #check if user has already voted
@@ -313,7 +320,7 @@ def submit_vote(contest_id):
     has_voted = conn.execute("SELECT id FROM votes WHERE user_id = ? AND contest_id = ?", (user_id, contest_id)).fetchone()
 
     if has_voted:
-        flash("You have already voted in this contest!", "error")
+        flash("You have already voted in this contest!", category="error")
         return redirect(url_for('contestmanagement.voting', contest_id=contest_id))
 
     #add vote to db
@@ -324,5 +331,5 @@ def submit_vote(contest_id):
     conn.commit()
     conn.close()
 
-    flash("Your vote has been recorded!", "success")
+    flash("Your vote has been recorded!", category="success")
     return redirect(url_for('contestmanagement.voting', contest_id=contest_id))
