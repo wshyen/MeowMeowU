@@ -32,6 +32,30 @@
         font-size: 20px;
         font-weight: bold;
         color: white;
+        padding: 20px;
+    }
+
+    .options input {
+        margin: 10px;
+        font-size: 18px;
+    }
+
+    #next-button {
+        display: block;
+        margin-left: auto;
+        padding: 10px 16px;
+        font-size: 18px;
+        background-color: #6b4f2f;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease-in-out;
+        border-radius: 12px;
+    }
+
+    #next-button:hover {
+        background-color: #533d28;
+        transform: scale(1.05);
     }
 </style>
 <div style="padding: 20px;">
@@ -50,17 +74,22 @@
 <script>
     let questions = [];
     let currentIndex = 0;
+    let correctAnswer = ""; //Stores the correct answer temporarily
+    let correctCount = 0; //Count the number of correct answers
 
     async function fetchQuestions() {
         const response = await fetch('/get_questions?level=1');
         questions = await response.json();
         currentIndex = 0;
+        currentCount = 0;
         displayQuestion();
     }
 
     function displayQuestion() {
         if (currentIndex < questions.length) {
             let q = questions[currentIndex];
+
+            correctAnswer = q.correct_option; //Store the correct answer
 
             let shuffledOptions = shuffleOptions([
                 { text: q.option_a, value: "A" },
@@ -73,15 +102,44 @@
                 `<input type="radio" name="option" value="${option.value}"> ${option.text} <br>`
             ).join("");
         } else {
-            document.getElementById("question-text").innerHTML = "Quiz Complete!";
-            document.getElementById("options").innerHTML = "";
-            document.getElementById("next-button").style.display = "none";
+            checkQuizCompletion();
         }
+    }
+
+    function checkAnswer() {
+        let selectedOption = document.querySelector('input[name="option"]:checked');
+        if (!selectedOption) {
+            alert("Please select an answer.");
+            return;
+        }
+
+        let userAnswer = selectedOption.value;
+
+        if (userAnswer === correctAnswer) {
+            correctCount++; //Increase correct answer count
+            alert("Correct!");
+        } else {
+            alert("Wrong!");
+        }
+
+        nextQuestion();
     }
 
     function nextQuestion() {
         currentIndex++;
         displayQuestion();
+    }
+
+    function checkQuizCompletion() {
+        document.getElementById("question-text").innerHTML = "Quiz Complete!";
+        document.getElementById("options").innerHTML = "";
+        document.getElementById("next-button").style.display = "none"; //Hide next button
+
+        if (correctCount === questions.length) {
+            document.getElementById("question-text").innerHTML = "Congratulations! <br> You have unlocked level 2! <br> ฅ^•⩊•^ ฅ";
+        } else {
+            document.getElementById("question-text").innerHTML = "You need to answer all correctly to unlock Level 2. <br> Try again! <br> /ᐠ ╥ ˕ ╥マ ";
+        }
     }
 
     function shuffleOptions(options) {
