@@ -115,9 +115,33 @@
             <button class="start-button" id="level2Button" onclick="startQuiz('level2')" disabled>Start Level 2</button>
         </div>
     </div>
+
+    {% if user_role == 'admin' %}
+    <div style="text-align: right; margin-bottom: 20px; position: fixed; bottom: 20px; right: 20px;">
+        <button id="manage-questions-button" onclick="window.location.href='{{ url_for('quiz.manage_quiz') }}'"
+            style="font-size: 20px; background-color: #94693e; color: white; padding: 10px 15px; border-radius: 5px; cursor: pointer; border: none;">
+            ✎
+        </button>
+    </div>
+    {% endif %}
+
 </div>
 <script>
+    function startQuiz(level) {
+        window.location.href = "/quiz_" + level; //Redirect to quiz level 1 or level 2 page
+    }
+
     document.addEventListener("DOMContentLoaded", function () {
+        const userRole = "{{ user_role|safe }}";
+        console.log("DEBUG: User Role in JavaScript →", userRole);
+
+        if (userRole !== "admin") {
+            const manageButton = document.getElementById("manage-questions-button");
+            if (manageButton) {
+                manageButton.style.display = "none";  //Hide button only if ID exists
+            }
+        }
+
         let level2Button = document.getElementById("level2Button");
         let level2Box = document.getElementById("level2Box");
 
@@ -134,9 +158,5 @@
             level2Button.style.cursor = "not-allowed";
         }
     });
-
-    function startQuiz(level) {
-        window.location.href = level + ".html"; //Redirect to quiz page
-    }
 </script>
 {% endblock %}

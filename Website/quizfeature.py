@@ -55,9 +55,19 @@ def quiz_page():
     user_role = getattr(current_user, 'role', 'user')
     print(f"DEBUG: user_role = {user_role}")
 
-    return render_template('quiz.html') 
+    return render_template("quiz.html", user=current_user, user_role=user_role) 
 
-@quiz_bp.route('/manage-quiz', methods=['GET'])
+@quiz_bp.route('/quiz_level1')
+@login_required
+def quiz_level1():
+    return render_template("quiz_level1.html", user=current_user)
+
+@quiz_bp.route('/quiz_level2')
+@login_required
+def quiz_level2():
+    return render_template("quiz_level2.html", user=current_user)
+
+@quiz_bp.route('/manage_quiz', methods=['GET'])
 @login_required
 def manage_quiz():
     if not hasattr(current_user, 'role') or current_user.role != 'admin':
@@ -68,9 +78,9 @@ def manage_quiz():
     questions = conn.execute("SELECT * FROM quiz_questions").fetchall()
     conn.close()
 
-    return render_template('manage_quiz_questions.html', questions=questions)
+    return render_template('manage_quiz_questions.html', user=current_user, questions=questions)
 
-@quiz_bp.route('/add-question', methods=['POST'])
+@quiz_bp.route('/add_question', methods=['POST'])
 @login_required
 def add_question():
     question = request.form['question']
@@ -89,7 +99,7 @@ def add_question():
     flash("Question added successfully!", "success")
     return redirect(url_for('quiz.manage_quiz'))
 
-@quiz_bp.route('/edit-question/<int:question_id>', methods=['POST'])
+@quiz_bp.route('/edit_question/<int:question_id>', methods=['POST'])
 @login_required
 def edit_question(question_id):
     new_text = request.form['new_text']
@@ -107,7 +117,7 @@ def edit_question(question_id):
     flash("Question updated successfully!", "success")
     return redirect(url_for('quiz.manage_quiz'))
 
-@quiz_bp.route('/delete-question/<int:question_id>', methods=['POST'])
+@quiz_bp.route('/delete_question/<int:question_id>', methods=['POST'])
 @login_required
 def delete_question(question_id):
     conn = get_db_connection()
