@@ -157,10 +157,14 @@ def create_contest():
         return redirect(url_for('contestmanagement.contest_page')) #Send non-admins back to the contest page
         
 @contestmanagement_bp.route('/contest_submission/<int:contest_id>', methods=['GET', 'POST'])
-@login_required
 def submit_contest(contest_id):
     conn = get_db_connection()
     contest = conn.execute("SELECT id, name FROM contests WHERE id = ?", (contest_id,)).fetchone()
+
+    if not current_user.is_authenticated:
+        flash("You must be logged in to join!", category="error")
+        return redirect(url_for('auth.login'))
+    
     if contest is None:
         flash("Invalid contest. You cannot submit an entry.", "error")
         return redirect(url_for('contestmanagement.contest_page'))
@@ -253,6 +257,11 @@ if __name__ == '__main__':
 def voting(contest_id):
     conn = get_db_connection()
 
+    #ensure the user is logged in before voting
+    if not current_user.is_authenticated:
+        flash("You must be logged in to vote!", category="error")
+        return redirect(url_for('auth.login'))
+
     contest = conn.execute("SELECT name, voting_start, voting_end FROM contests WHERE id = ?", (contest_id,)).fetchone()
     if not contest:
         flash("Contest not found!", category="error")
@@ -288,11 +297,6 @@ def voting(contest_id):
     if current_time > voting_end:
         flash("Voting has ended!", category="error")
         return redirect(url_for('contestmanagement.contest_page'))
-    
-    #ensure the user is logged in before voting
-    if not current_user.is_authenticated:
-        flash("You must be logged in to vote!", category="error")
-        return redirect(url_for('auth.login'))
 
     participants = conn.execute("SELECT id, name, file_path, votes, description FROM submissions WHERE contest_id = ?", (contest_id,)).fetchall()
     conn.close()
@@ -335,13 +339,36 @@ def submit_vote(contest_id):
     return redirect(url_for('contestmanagement.voting', contest_id=contest_id))
 
 @contestmanagement_bp.route('/view_result/<int:contest_id>')
-@login_required
 def view_result(contest_id):
     conn = get_db_connection()
-    contest = conn.execute("SELECT name, voting_end FROM contests WHERE id = ?", (contest_id,)).fetchone()
+
+    if not current_user.is_authenticated:
+        flash("You must be logged in to view result!", category="error")
+        return redirect(url_for('auth.login'))
+    
+    #fetch contest details, including result announcement date
+    contest = conn.execute("SELECT name, result_announcement FROM contests WHERE id = ?", (contest_id,)).fetchone()
     if not contest:
         flash("Contest not found!", category="error")
         return redirect(url_for('contestmanagement.contest_page'))
+
+    #convert stored announcement date to datetime format
+    announcement_date_str = contest["result_announcement"]
+    
+    if len(announcement_date_str) == 10:  #if format is 'YYYY-MM-DD'
+        announcement_date_str += " 00:00:00"  #append default time
+
+    announcement_date = datetime.strptime(announcement_date_str, "%Y-%m-%d %H:%M:%S")
+    current_time = datetime.now()
+
+    if current_time < announcement_date:
+        time_left = announcement_date - current_time
+        days_left = time_left.days
+        hours_left = (time_left.seconds // 3600)
+        minutes_left = (time_left.seconds % 3600) // 60
+
+        return render_template("result_countdown.html", contest_name=contest["name"], 
+                               days_left=days_left, hours_left=hours_left, minutes_left=minutes_left, user=current_user)
 
     participants = conn.execute("""
         SELECT name, description, file_path, votes 
@@ -355,11 +382,9 @@ def view_result(contest_id):
         flash("No submissions found for this contest.", category="error")
         return redirect(url_for('contestmanagement.contest_page'))
 
+    #determine winners
     top_vote = participants[0]['votes']
     winners = [p for p in participants if p['votes'] == top_vote]
 
-    return render_template("view_result.html", 
-                           contest_name=contest["name"], 
-                           participants=participants, 
-                           winners=winners, 
-                           user=current_user)
+    return render_template("view_result.html", contest_name=contest["name"], participants=participants, winners=winners, user=current_user)
+
