@@ -134,7 +134,7 @@
                                     onclick="redirectToSubmission('{{ contest.id }}')" style="background-color: #6b4f2f; color: white; border: none; border-radius: 5px; padding: 6.5px 11px;">
                                 Join
                             </button>
-                            <button style="background-color: #ad7b18; color: white; border: none; border-radius: 5px; padding: 6.5px 11px;" onclick="window.location.href='{{ url_for('contestmanagement.voting', contest_id=contest.id) }}'">Vote</button>
+                            <button style="background-color: #c79058; color: white; border: none; border-radius: 5px; padding: 6.5px 11px; margin-left: 10px;" onclick="window.location.href='{{ url_for('contestmanagement.voting', contest_id=contest.id) }}'">Vote</button>
                         </div>
                     </div>
                 </div>
@@ -227,6 +227,7 @@
                                     onclick="redirectToSubmission('{{ contest.id }}')" style="background-color: #6b4f2f; color: white; border: none; border-radius: 5px; padding: 6.5px 11px;">
                                 Join
                             </button>
+                            <button style="background-color: #c79058; color: white; border: none; border-radius: 5px; padding: 6.5px 11px; margin-left: 10px;" onclick="window.location.href='{{ url_for('contestmanagement.view_result', contest_id=contest.id) }}'">View Result</button>
                         </div>
                     </div>
                 </div>
