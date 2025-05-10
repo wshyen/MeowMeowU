@@ -53,12 +53,52 @@
         text-align: left;
     }
 
+    .image-container {
+        position: relative;
+        text-align: center;
+    }
+
+    .image-container input {
+        display: none;
+    }
+
+    .image-container label {
+        cursor: pointer;
+        display: block;
+    }
+
     .image-container img {
         width: 200px;
         height: 200px;
         object-fit: cover;
         border-radius: 8px;
         display: block;
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .image-container input:checked + label::after {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 99;
+    }
+
+    .image-container input:checked + label img {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: auto;
+        height: 60vh;
+        max-width: 80vw;
+        max-height: 60vh;
+        object-fit: contain;
+        border: 10px solid #f2eadf;
+        z-index: 100;
     }
 
     .option-label {
@@ -80,6 +120,19 @@
     button:hover {
         background-color: rgb(158, 134, 106);
         transform: scale(1.1);
+    }
+
+    .back_contest {
+        display: inline-block;
+        font-family: 'Times New Roman';
+        color: rgb(78, 68, 57);
+        text-decoration: none;
+        padding: 10px 20px;
+    }
+
+    .back_contest:hover {
+        text-decoration: underline;
+        color: rgb(62, 55, 48);
     }
 </style>
 
@@ -106,14 +159,17 @@
 
             {% if participant.file_path %}
             <div class="image-container">
-                <img src="{{ url_for('static', filename=participant.file_path.replace('Website/static/', '')) }}" 
-                     alt="{{ participant.name }}'s submission">
+                <input type="checkbox" id="img{{ participant.id }}">
+                <label for="img{{ participant.id }}">
+                    <img src="{{ url_for('static', filename=participant.file_path.replace('Website/static/', '')) }}" 
+                         alt="{{ participant.name }}'s submission">
+                </label>
             </div>
             {% endif %}
         </div>
         {% endfor %}
 
-        <button type="submit">🐾 Submit Vote 🐾</button>
+        <button type="submit">🐾 Submit Vote 🐾</button><a href="{{ url_for('contestmanagement.contest_page') }}" class="back_contest">Back to contest</a>
     </form>
     {% else %}
         <p style="font-size: 20px;">No participants available for voting.</p>
