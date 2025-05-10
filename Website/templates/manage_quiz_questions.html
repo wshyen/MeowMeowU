@@ -85,6 +85,7 @@
         font-family: 'Times New Roman', Times, serif;
         padding: 8px;
         width: 200px;
+        cursor: pointer;
     }
 </style>
 <div style="padding: 20px;">
@@ -116,17 +117,19 @@
     <table>
         <thead>
             <tr>
-                <th style="width: 50px;">ID</th>
-                <th>Question</th>
-                <th>Answer choices</th>
-                <th>Correct Answer</th>
-                <th>Actions</th>
+                <th style="width: 60px;">ID</th>
+                <th style="width: 80px;">Level</th>
+                <th style="width: 300px;">Question</th>
+                <th style="width: 300px">Answer choices</th>
+                <th style="width: 180px">Correct Answer</th>
+                <th style="width: 300px">Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for question in questions %}
             <tr>
                 <td>{{ question.id }}</td>
+                <td>{{ question.level }}</td>
                 <td>{{ question.question_text }}</td>
                 <td>
                     A. {{ question.option_a }}<br><br>
