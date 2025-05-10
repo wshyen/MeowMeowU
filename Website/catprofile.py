@@ -57,9 +57,9 @@ def view_profiles(): #View all cat profiles
 
 @catprofile_bp.route('/profiles/create', methods=['GET', 'POST'])
 def create_profile():
-    if not session.get('user'): #Ensure only logged in users can create profile
-        flash("You must be logged in to create a profile. Please log in.", "error")
-        return redirect(url_for('auth.login')) #Sends user back to login page 
+    if not session.get('user'): #Ensure only logged in users can create profile 
+        flash("You must be logged in to create a profile. Please log in.", "error") 
+        return redirect(url_for('auth.login')) #Sends user back to login page
 
     if request.method == 'GET': 
         return render_template('createprofile.html')
