@@ -93,6 +93,23 @@
         margin-top: 10px;
         color: #7a6149;
     }
+
+    button {
+        font-family: 'Times New Roman';
+        background-color: rgb(176, 148, 119);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+        font-size: 18px;
+    }
+
+    button:hover {
+        background-color: rgb(158, 134, 106);
+        transform: scale(1.1);
+    }
 </style>
 
 <div class="container">
@@ -130,6 +147,10 @@
         {% endif %}
     </div>
     {% endfor %}
+
+    <button onclick="window.location.href='{{ url_for('contestmanagement.contest_page') }}'" class="button">
+        🐾Back to Contests🐾
+    </button>
 </div>
 
 {% endblock %}
