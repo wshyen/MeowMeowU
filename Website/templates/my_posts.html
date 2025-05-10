@@ -104,6 +104,14 @@
     position: relative;
 }
 
+  .textarea-container {
+      border: 2px solid #94693e; /* 边框颜色 */
+      border-radius: 10px; /* 圆角效果 */
+      padding: 10px; /* 内边距，给 textarea 留出空间 */
+      background-color: #fffbe9; /* 背景颜色 */
+      margin-bottom: 15px; /* 下方间距，防止和其他元素靠得太近 */
+  }
+
   .button-container {
     display: flex; 
     flex-direction: row; 
@@ -190,7 +198,9 @@
     <form action="{{ url_for('community.delete_post', post_id=post.post_id) }}" method="post" style="display:inline;">
       <button type="submit">Delete</button>
     </form>
-    <button onclick="openEditModal({{ post.post_id }}, '{{ post.content | escape }}', '{{ post.cat_hashtag | escape }}')">Edit</button>  </div>
+    <button onclick='openEditModal({{ post.post_id }}, {{ post.content | tojson }}, {{ post.cat_hashtag | tojson }})'>Edit</button>
+
+  </div>
 
 <hr>
 </div>
@@ -201,7 +211,11 @@
       <span class="close" onclick="closeEditModal()">&times;</span>
       <h3>Edit Post</h3>
       <form id="editForm" method="post">
-        <textarea name="content" id="editContent" rows="4" style="width:100%;" required></textarea>
+        <div class="textarea-container">
+          <textarea name="content" id="editContent" rows="4" required></textarea>
+        </div>
+  </div>
+
         <br>
         <label for="editCatHashtag">Select Cat Hashtag:</label>
         <select name="cat_hashtag" id="editCatHashtag">
@@ -230,6 +244,7 @@
       document.getElementById("editCatHashtag").value = catHashtag || ""; // Use the passed parameter
       document.getElementById("editModal").style.display = "block";
     }
+
 
     function closeEditModal() {
       document.getElementById("editModal").style.display = "none";

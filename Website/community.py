@@ -1,8 +1,8 @@
 import os
 import sqlite3
 from datetime import datetime
-from flask import Blueprint, Flask, request, redirect, render_template, url_for
-from flask_login import current_user, login_required
+from flask import Blueprint, Flask, request,flash, redirect, render_template, url_for
+from flask_login import current_user
 from werkzeug.utils import secure_filename 
 
 community_bp = Blueprint('community', __name__, template_folder='templates')
@@ -148,7 +148,6 @@ def post_detail(post_id):
     return render_template("community_detail.html", post=post, user=current_user)
 
 @community_bp.route('/post/create', methods=['POST'])
-@login_required
 def create_post():
     content = request.form['content']
     cat_hashtag = request.form.get('cat_hashtag')
@@ -163,6 +162,10 @@ def create_post():
         media.save(os.path.join(UPLOAD_FOLDER, filename))
         media_url = f"posts/{filename}"
         print("File saved to:", os.path.join(UPLOAD_FOLDER, filename))
+
+    if not current_user.is_authenticated:
+        flash("You must be logged in to view result!", category="error")
+        return redirect(url_for('auth.login'))
 
     conn = get_db_connection()
     conn.execute(
@@ -207,8 +210,11 @@ def hashtag_posts(hashtag):
 #My Post
 
 @community_bp.route('/my-posts')
-@login_required
 def my_posts():
+    if not current_user.is_authenticated:
+        flash("You must be logged in to view result!", category="error")
+        return redirect(url_for('auth.login'))
+    
     conn = get_db_connection()
     posts = conn.execute('''
         SELECT post.*, user.name, user.profile_picture,
