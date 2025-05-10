@@ -75,7 +75,9 @@
 <div class="countdown-container">
     <img src="{{ url_for('static', filename='Images/Countdown.png') }}" alt="Countdown Icon">
     <h2>Voting has not started yet!</h2>
-    <p class="countdown-text">⏳ Time left until voting begins: <strong>{{ days_left }} days, {{ hours_left }} hours</strong></p>
+    <p class="countdown-text">
+        ⏳ Time left until voting begins: <br><strong>{{ days_left }} days, {{ hours_left }} hours, {{ minutes_left }} minutes</strong>
+    </p>
 
     <button onclick="window.location.href='{{ url_for('contestmanagement.contest_page') }}'" class="button">
         🐾Back to Contests🐾
