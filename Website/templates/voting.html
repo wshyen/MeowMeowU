@@ -30,7 +30,7 @@
     }
 
     .contest-info {
-        font-size: 18px;
+        font-size: 20px;
         font-weight: bold;
         color: rgb(120, 100, 80);
         margin-bottom: 15px;
@@ -48,27 +48,9 @@
         justify-content: space-between;
     }
 
-    .image-container {
-        flex: 0 0 200px;
-        text-align: center;
-    }
-
     .description-container {
         flex: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
         text-align: left;
-        margin-left: 10px;
-    }
-
-    .image-container input {
-        display: none;
-    }
-
-    .image-container label {
-        cursor: pointer;
-        display: block;
     }
 
     .image-container img {
@@ -77,54 +59,11 @@
         object-fit: cover;
         border-radius: 8px;
         display: block;
-        margin-bottom: 8px;
-        transition: transform 0.3s ease-in-out;
-    }
-
-    .image-container input:checked + label::after {
-        content: "";
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background: rgba(0, 0, 0, 0.6);
-        z-index: 99;
-    }
-
-    .image-container input:checked + label img {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: auto;
-        height: 60vh;
-        max-width: 80vw;
-        max-height: 60vh;
-        object-fit: contain;
-        border: 10px solid #f2eadf;
-        z-index: 100;
-    }
-
-    .description {
-        font-size: 18px;
-        color: rgb(78, 68, 57);
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-        max-width: 400px;
     }
 
     .option-label {
         font-size: 22px;
         font-weight: bold;
-        margin-bottom: 5px;
-    }
-
-    .vote-count {
-        font-weight: bold;
-        display: block;
-        text-align: center;
-        margin-top: 8px;
     }
 
     button {
@@ -135,7 +74,7 @@
         padding: 10px 20px;
         border-radius: 5px;
         cursor: pointer;
-        margin-top: 10px;
+        margin-top: 20px;
     }
 
     button:hover {
@@ -148,41 +87,38 @@
     <h2>📍Vote for {{ contest_name }}</h2>
     <div class="contest-info" style="font-style: italic;">You are voting in the "{{ contest_name }}" contest.</div>
 
+    {% if participants %}
     <form method="POST" action="{{ url_for('contestmanagement.submit_vote', contest_id=contest_id) }}">
-        {% if participants %}
-            {% for participant in participants %}
-            <div class="poll-option">
-                <div class="description-container">
-                    <div class="option-label">
-                        <input type="radio" name="vote" value="{{ participant.id }}">
-                        <label for="{{ participant.id }}">🐱{{ participant.name }}</label>
-                    </div>
-
-                    {% if participant.description %}
-                        <p class="description"><strong style="color: rgb(120, 100, 80);">Description:</strong> {{ participant.description }}</p>
-                    {% else %}
-                        <p class="description"><strong style="color: rgb(120, 100, 80);">Description:</strong> <strong style="font-style: italic; color: rgb(120, 100, 80);">No description provided.</strong></p>
-                    {% endif %}
+        {% for participant in participants %}
+        <div class="poll-option">
+            <div class="description-container">
+                <div class="option-label">
+                    <input type="radio" name="vote" value="{{ participant.id }}">
+                    <label for="{{ participant.id }}">🐱{{ participant.name }}</label>
                 </div>
 
-                {% if participant.file_path %}
-                <div class="image-container">
-                    <input type="checkbox" id="img{{ participant.id }}">
-                    <label for="img{{ participant.id }}">
-                        <img src="{{ url_for('static', filename=participant.file_path.replace('Website/static/', '')) }}" 
-                             alt="{{ participant.name }}'s submission">
-                    </label>
-                    <span class="vote-count">Votes: {{ participant.votes if participant.votes else 0 }}</span>
-                </div>
+                {% if participant.description %}
+                    <p><strong>Description:</strong> {{ participant.description }}</p>
+                {% else %}
+                    <p><strong>Description:</strong> <em>No description provided.</em></p>
                 {% endif %}
             </div>
-            {% endfor %}
-        {% else %}
-            <p>No participants available for voting.</p>
-        {% endif %}
 
-        <button type="submit">🐾Submit Vote🐾</button>
+            {% if participant.file_path %}
+            <div class="image-container">
+                <img src="{{ url_for('static', filename=participant.file_path.replace('Website/static/', '')) }}" 
+                     alt="{{ participant.name }}'s submission">
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        <button type="submit">🐾 Submit Vote 🐾</button>
     </form>
+    {% else %}
+        <p style="font-size: 20px;">No participants available for voting.</p>
+        <button onclick="window.location.href='{{ url_for('contestmanagement.contest_page') }}'">🐾 Back to Contests 🐾</button>
+    {% endif %}
 </div>
 
 {% endblock %}
