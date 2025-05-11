@@ -5,7 +5,6 @@
 
 <style>
 
-
     html,body {
         margin: 0;
         padding: 0;
@@ -38,7 +37,6 @@
         text-align: center;
         color: #6b4f2f;
         font-size: 20px;
-        word-wrap: break-word;  
         white-space: normal;  
         max-width: 70%;     
         overflow-wrap: break-word;
@@ -53,8 +51,8 @@
 
 
     .sort-container {
-    text-align: center;
-    margin-bottom: 20px;
+        text-align: center;
+        margin-bottom: 20px;
     }
 
     .sort-container label {
@@ -110,14 +108,13 @@
     }
 
     .post-content {
-    text-align: left;    
-    margin-left: 90px; 
-    margin-bottom: 0px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;  
-    max-width: 380px;
-    max-height: 230px;        
+        text-align: left;    
+        margin-left: 90px; 
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;  
+        max-width: 380px;
+        max-height: 230px;        
     }
 
 
@@ -130,7 +127,6 @@
 
     .media img,
     .media video {
-        display: inline-block;
         margin: 10px auto;
         border-radius: 12px;
         max-width: 300px;
@@ -139,9 +135,7 @@
     }
 
     .post-actions {
-        text-align: center;
         margin: 10px 0;
-        font-size: 16px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -208,7 +202,6 @@
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         position: relative;
     }
-
     
     .close {
         position: absolute;
@@ -261,9 +254,9 @@
 <div class="sort-container" >
     <label for="sort-by">Sort By: </label>
     <select id="sort-by" onchange="sortPosts()">
-        <option value="date_asc" {% if sort_by == 'date_asc' %}selected{% endif %}>Oldest</option>
-        <option value="date_desc" {% if sort_by == 'date_desc' %}selected{% endif %}>Latest</option>
-        <option value="likes_desc" {% if sort_by == 'likes_desc' %}selected{% endif %}>Most Liked</option>
+        <option value="date_asc" {% if sort == 'date_asc' %}selected{% endif %}>Oldest</option>
+        <option value="date_desc" {% if sort == 'date_desc' %}selected{% endif %}>Latest</option>
+        <option value="likes_desc" {% if sort == 'likes_desc' %}selected{% endif %}>Most Liked</option>
     </select>
 </div>
 
@@ -287,9 +280,9 @@
             {% if post['media_url'] %}
                 {% set ext = post['media_url'].rsplit('.', 1)[1].lower() %}
                 {% if ext in ['jpg', 'jpeg', 'png', 'gif'] %}
-                    <img src="{{ url_for('static', filename=post['media_url']) }}" width="300" alt="Image">
+                    <img src="{{ url_for('static', filename=post['media_url']) }}" alt="Image">
                 {% elif ext in ['mp4', 'mov', 'avi'] %}
-                    <video width="300" controls>
+                    <video controls>
                         <source src="{{ url_for('static', filename=post['media_url']) }}" type="video/{{ ext }}">
                     </video>
                 {% endif %}
@@ -298,7 +291,7 @@
         
         <div class="post-actions">
             <form id="like-form-{{ post['post_id'] }}" action="{{ url_for('community.like_post' if not post['liked_by_current_user'] else 'community.unlike_post', post_id=post['post_id']) }}" method="post" style="display:inline;">
-                <input type="hidden" name="sort" value="{{ sort_by }}">
+                <input type="hidden" name="sort" value="{{ sort }}">
                 <button type="submit" class="post-action-button">
                     {% if post['liked_by_current_user'] %}
                         ❤️ 
@@ -334,7 +327,8 @@
                 {% for cat_name in cat_names %}
                     <option value="{{ cat_name }}">#{{ cat_name }}</option>
                 {% endfor %}
-            </select><br>
+            </select>
+            <br>
             <input type="file" name="media"><br>
             <button type="submit">Post</button>
         </form>
@@ -347,7 +341,14 @@
 <script>
 function sortPosts() {
     var sortBy = document.getElementById('sort-by').value;
-    window.location.href = "/community_feature?sort=" + sortBy;
+    var currentUrl = window.location.href;
+
+    if (currentUrl.includes('/hashtag/')) {
+        var hashtag = currentUrl.split('/hashtag/')[1].split('?')[0];
+        window.location.href = `/hashtag/${hashtag}?sort=` + sortBy;
+    } else {
+        window.location.href = "/community_feature?sort=" + sortBy;
+    }
 }
 
 function openModal() {

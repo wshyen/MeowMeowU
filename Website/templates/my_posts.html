@@ -5,12 +5,13 @@
 
 <style>
 
-  body {
-    font-family: 'Times New Roman', Times, serif;
-    background-color: #f2eadf;
+  html, body {    
     margin: 0;
     padding: 0;
-}
+    box-sizing: border-box;
+    font-family: 'Times New Roman', Times, serif;
+    background-color: #f2eadf;
+  }
 
   h1 {
     font-weight: bold;
@@ -19,66 +20,77 @@
     font-size: 36px;
     margin-bottom: 10px;
     padding-top: 25px;
-}
+  }
 
   .post {
+    display: flex;  
+    flex-direction: column;
     width: 100%;
     max-width: 600px;
+    max-height: 650px;
     background-color: #ffffff;
     border-radius: 10px;
     margin: 20px auto;
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    font-family: 'Times New Roman', Times, serif;
     padding: 30px;
     cursor: pointer;
-}
-
+  }
+    
   .post-info {
     width: 100%;  
     display: flex;
     align-items: center;  
     justify-content: flex-start; 
-    margin-left: 30px;
-}
+    margin-left: 20px;
+  }
 
   .post-info img.profile-picture {
     width: 50px;
     height: 50px;
     border-radius: 50%; 
-    margin-right: 25px;
+    margin-right: 20px;
     border: 1px solid #c8a786; 
-}
+  }
+
+  .post-content {
+    text-align: left;    
+    margin-left: 90px; 
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;  
+    max-width: 380px;
+    max-height: 230px;        
+  }
 
   .media {
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-}
+    margin: 10px 0;
+  }
 
   .media img,
   .media video {
-    display: inline-block;
     margin: 10px auto;
     border-radius: 12px;
-    height: auto;
-    max-width: 100%;
-}
+    max-width: 300px;
+    height: 350px;
+    object-fit: contain; 
+  }
 
   .post-actions {
-    text-align: center;
     margin-top: 10px;
     font-size: 16px;
     display: flex;
     justify-content: center;
     align-items: center;
-}
+  }
 
   .post-actions .separator {
     font-size: 30px;
     color: #6b4f2f;
-}
+  }
 
   .modal {
     position: fixed;
@@ -89,27 +101,46 @@
     justify-content: center;
     align-items: center;
     z-index: 999;
-}
+  }
 
-    .modal-content {
+  .modal-content {
     background-color: #eae8e6;
-    left: 35%;
-    top: 20%;
     padding: 40px; 
     border-radius: 15px;
-    width: 100%;
+    width: 90%;
     max-width: 500px;
     height: 450px; 
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     position: relative;
-}
+  }
 
-  .textarea-container {
-      border: 2px solid #94693e; /* 边框颜色 */
-      border-radius: 10px; /* 圆角效果 */
-      padding: 10px; /* 内边距，给 textarea 留出空间 */
-      background-color: #fffbe9; /* 背景颜色 */
-      margin-bottom: 15px; /* 下方间距，防止和其他元素靠得太近 */
+  .close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 30px;
+    color: #333;
+    cursor: pointer;
+  }
+
+  .close:hover {
+    transform: scale(1.2);
+    color: #2d1310; 
+  }
+    
+  textarea {
+    background-color: #eae8e6;
+    width: 100%;
+    height: 200px;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: 1px solid #583838;
+    resize: none;  
+  }
+
+  .hidden {
+    display: none;
   }
 
   .button-container {
@@ -118,7 +149,7 @@
     align-items: center; 
     justify-content: center;
     margin-top: 10px;
-}
+  }
 
   .button-container button, 
   .modal-content button{
@@ -132,7 +163,7 @@
     font-weight: bold;
     cursor: pointer;
     transition: transform 0.2s ease;
-}
+  }
 
   .back-button {
     display: block;
@@ -152,7 +183,7 @@
     background-color: #d4bfae;
     transform: scale(1.05);
     box-shadow: 0px 8px 15px rgba(255, 163, 71, 0.2);
-}
+  }
 
 </style>
 
@@ -166,32 +197,34 @@
       <img class="profile-picture" src="{{ url_for('static', filename='Userprofile/' + (post['profile_picture'] if post['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
       <p><strong>You</strong> posted at {{ post['created_at'] }}</p>
     </div>
-  
-    <div class="media">
-      <p>{{ post['content'] }}</p>
-      {% if post['cat_hashtag'] %}
-        <p><a href="{{ url_for('community.hashtag_posts', hashtag=post['cat_hashtag']) }}">#{{ post['cat_hashtag'] }}</a></p>
-      {% endif %}
-      {% if post['media_url'] %}
-          {% set ext = post['media_url'].rsplit('.', 1)[1].lower() %}
-          {% if ext in ['jpg', 'jpeg', 'png', 'gif'] %}
-              <img src="{{ url_for('static', filename=post['media_url']) }}" width="300" alt="Image">
-          {% elif ext in ['mp4', 'mov', 'avi'] %}
-              <video width="300" controls>
-                  <source src="{{ url_for('static', filename=post['media_url']) }}" type="video/{{ ext }}">
-              </video>
-          {% endif %}
-      {% endif %}
-    </div>
-  
-    <div class="post-actions">
-      <span class="like-count">
-          {{ post['like_count'] }} ❤️Like
-          |
-          💬Comments
-      </span>
 
+    <p class="post-content">{{ post['content'] }}</p>
+      {% if post['cat_hashtag'] %}
+          <p class="post-content">
+            <a href="{{ url_for('community.hashtag_posts', hashtag=post['cat_hashtag']) }}">#{{ post['cat_hashtag'] }}</a>
+          </p>
+      {% endif %}
+
+    <div class="media">
+        {% if post['media_url'] %}
+            {% set ext = post['media_url'].rsplit('.', 1)[1].lower() %}
+            {% if ext in ['jpg', 'jpeg', 'png', 'gif'] %}
+              <img src="{{ url_for('static', filename=post['media_url']) }}" alt="Image">
+            {% elif ext in ['mp4', 'mov', 'avi'] %}
+                <video controls>
+                  <source src="{{ url_for('static', filename=post['media_url']) }}" type="video/{{ ext }}">
+                </video>
+            {% endif %}
+        {% endif %}
     </div>
+    
+      <div class="post-actions">
+        <span class="like-count">
+            {{ post['like_count'] }} ❤️Like
+            |
+            💬Comments
+        </span>
+      </div>
   </div>
 
   <div class="button-container">
@@ -199,56 +232,48 @@
       <button type="submit">Delete</button>
     </form>
     <button onclick='openEditModal({{ post.post_id }}, {{ post.content | tojson }}, {{ post.cat_hashtag | tojson }})'>Edit</button>
-
   </div>
 
 <hr>
+
 </div>
 {% endfor %}
 
-<div id="editModal" class="modal" style="display:none;">
+<div id="editModal" class="modal hidden">
   <div class="modal-content">
-      <span class="close" onclick="closeEditModal()">&times;</span>
-      <h3>Edit Post</h3>
-      <form id="editForm" method="post">
-        <div class="textarea-container">
-          <textarea name="content" id="editContent" rows="4" required></textarea>
-        </div>
-  </div>
-
-        <br>
-        <label for="editCatHashtag">Select Cat Hashtag:</label>
-        <select name="cat_hashtag" id="editCatHashtag">
-            <option value="">None</option>
-            {% for cat_name in cat_names %}
-                <option value="{{ cat_name }}">#{{ cat_name }}</option>
-            {% endfor %}
-        </select>
-        <br>
-        <button type="submit">Save</button>
+    <span class="close" onclick="closeEditModal()">&times;</span>
+    <h3>Edit Post</h3>
+    <form id="editForm" method="post">
+      <textarea name="content" id="editContent" rows="4" required></textarea>
+      <label for="editCatHashtag">Select Cat Hashtag:</label>
+      <select name="cat_hashtag" id="editCatHashtag">
+        <option value="">None</option>
+          {% for cat_name in cat_names %}
+            <option value="{{ cat_name }}">#{{ cat_name }}</option>
+          {% endfor %}
+      </select>
+      <br>
+      <button type="submit">Save</button>
     </form>
   </div>
 </div>
   
-<div style="text-align: center; margin-top: 30px;">
-    <button onclick="window.location.href='{{ url_for('community.community_feature') }}'"
-        style="background-color: #dccbb7; color: #6b4f2f; font-weight: bold; border: none; border-radius: 8px; padding: 10px 20px; font-size: 16px; cursor: pointer;">
-        Back
-    </button>
-</div>
+<button class="back-button" onclick="window.location.href='{{ url_for('community.community_feature') }}'">
+  Back
+</button>
 
   <script>
-    function openEditModal(postId, content, catHashtag) {
-      document.getElementById("editContent").value = content;
-      document.getElementById("editForm").action = `/post/edit/${postId}`;
-      document.getElementById("editCatHashtag").value = catHashtag || ""; // Use the passed parameter
-      document.getElementById("editModal").style.display = "block";
-    }
 
+  function openEditModal(postId, content, catHashtag) {
+    document.getElementById("editContent").value = content;
+    document.getElementById("editForm").action = `/post/edit/${postId}`;
+    document.getElementById("editCatHashtag").value = catHashtag || "";
+    document.getElementById("editModal").classList.remove("hidden");
+  }
 
-    function closeEditModal() {
-      document.getElementById("editModal").style.display = "none";
-    }
+  function closeEditModal() {
+    document.getElementById("editModal").classList.add("hidden");
+  }
   </script>
 
 {% endblock %}
