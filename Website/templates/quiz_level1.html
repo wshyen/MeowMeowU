@@ -53,8 +53,9 @@
         color: white;
         font-weight: bold;
         font-family: 'Times New Roman', Times, serif;
-        max-width: 80%;
+        max-width: 65%;
         word-wrap: break-word;
+        overflow-wrap: break-word;
         font-size: 24px;
     }
 
@@ -129,7 +130,7 @@
 
             //Display options
             document.getElementById("options").innerHTML = shuffledOptions.map(option =>
-                `<input type="radio" name="option" value="${option.value}"> ${option.text} <br>`
+                `<input type="radio" name="option" value="${option.value}" onchange="checkAnswer()"> ${option.text} <br>`
             ).join("");
         } else {
             checkQuizCompletion();
@@ -154,7 +155,7 @@
 
         setTimeout(() => {
             nextQuestion();
-        }, 5000); //Delay 5 seconds before moving to the next question
+        }, 3000); //Delay 3 seconds before moving to the next question
     }
 
     function nextQuestion() {
