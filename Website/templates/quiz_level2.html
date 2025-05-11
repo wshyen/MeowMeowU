@@ -59,8 +59,27 @@
     let correctAnswer = ""; //Stores the correct answer temporarily
     let correctCount = 0; //Count the number of correct answers
 
+    document.addEventListener("DOMContentLoaded", () => {
+        startCountdown(); // Start countdown immediately when quiz page loads
+    });
+
+    function startCountdown() {
+        let countdownText = document.getElementById("question-text");
+        let count = 3;
+
+        let countdownInterval = setInterval(() => {
+            countdownText.innerHTML = `Starting in ${count}...`;
+            count--;
+
+            if (count < 0) {
+                clearInterval(countdownInterval);
+                fetchQuestions(); //Fetch questions after countdown ends
+            }
+        }, 1000); //Countdown updates every second
+    }
+
     async function fetchQuestions() {
-        const response = await fetch('/get_questions?level=1');
+        const response = await fetch('/get_questions?level=2');
         questions = await response.json();
         currentIndex = 0;
         currentCount = 0;
@@ -138,7 +157,5 @@
         }
         return options;
     }
-
-    document.addEventListener("DOMContentLoaded", fetchQuestions);
 </script>
 {% endblock %}
