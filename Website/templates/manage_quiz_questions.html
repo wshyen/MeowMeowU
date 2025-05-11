@@ -80,12 +80,20 @@
         appearance: none;
         background-image: url('{{ url_for("static", filename="cat_paws_icon.png") }}');
         background-repeat: no-repeat;
-        background-position: right 10px center;
+        background-position: right 8px center;
         background-size: 20px;
         font-family: 'Times New Roman', Times, serif;
-        padding: 8px;
+        padding: 5px 40px 5px 10px;
         width: 200px;
         cursor: pointer;
+        background-color: #fffbe9;
+        border-radius: 12px;
+        border: 2px solid #94693e;
+        outline: none;
+    }
+
+    .option {
+        font-family: 'Times New Roman', Times, serif;
     }
 </style>
 <div style="padding: 20px;">
@@ -98,7 +106,7 @@
         <input type="text" name="option_b" placeholder="Option B" required><br><br>
         <input type="text" name="option_c" placeholder="Option C" required><br><br>
         <select name="correct_option" required>
-            <option value="" style="font-family: 'Times New Roman', Times, serif;">Select correct answer</option>
+            <option value="">Select correct answer</option>
             <option value="option_a">Option A</option>
             <option value="option_b">Option B</option>
             <option value="option_c">Option C</option>
