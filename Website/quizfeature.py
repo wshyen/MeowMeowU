@@ -57,6 +57,16 @@ def quiz_page():
 
     return render_template("quiz.html", user=current_user, user_role=user_role) 
 
+@quiz_bp.route('/get_questions', methods=['GET'])
+@login_required
+def get_questions():
+    level = request.args.get('level')
+
+    with get_db_connection() as conn:
+        questions = conn.execute("SELECT * FROM quiz_questions WHERE level = ?", (level,)).fetchall()
+
+    return jsonify([dict(q) for q in questions])
+
 @quiz_bp.route('/quiz_level1')
 @login_required
 def quiz_level1():
