@@ -68,13 +68,19 @@ def get_questions():
     return jsonify([dict(q) for q in questions])
 
 @quiz_bp.route('/quiz_level1')
-@login_required
 def quiz_level1():
+    if not current_user.is_authenticated:
+        flash("You must be logged in to play the quiz!", category="error")
+        return redirect (url_for('auth.login'))
+
     return render_template("quiz_level1.html", user=current_user)
 
 @quiz_bp.route('/quiz_level2')
-@login_required
 def quiz_level2():
+    if not current_user.is_authenticated:
+        flash("You must be logged in to play the quiz!", category="error")
+        return redirect (url_for('auth.login'))
+    
     return render_template("quiz_level2.html", user=current_user)
 
 @quiz_bp.route('/manage_quiz', methods=['GET'])
