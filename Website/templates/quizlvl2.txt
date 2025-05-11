@@ -5,10 +5,12 @@ What unusual feature does polydactyl cats have?|A. They have more than the usual
 Which system in the cat’s body is mainly responsible for balancing and orientation?|A. Respiratory system|B. Nervous system|C. Vestibular system|C
 Which cats have high chances of deafness?|A. White cats with blue eyes|B. Striped tabby cats|C. Black cats with green eyes|A
 What is the fastest cat breed in the world?|A. Persian|B. Siamese|C. Egyptian Mau|C
-Which smell is so gross to cats that they'll stay away from it?|A. Human sweat|B. Dog breath|C. Orange scent|C
+Which smell is so gross to cats that they'll stay away from it?|A. Human sweat|B. Orange scent|C. Dog breath|B
 What is the name of the magical talking cat in Sailor Moon?|A. Luna|B. Kiki|C. Artemis|A
-What flavor cats cannot taste?|A. Sweet|B. Sour|C. Bitter|A
-What is the extreme fear of cats called?|A. Feliphobia|B. Gatophobia|C.Ailurophobia|C
+What flavour cats cannot taste?|A. Sour|B. Sweet|C. Bitter|B
+What is the extreme fear of cats called?|A. Feliphobia|B. Whiskerphobia|C.Ailurophobia|C
+
+ABOVE DONE
 Among indoor and outdoor cats who can survive longer?|A. Both|B. Indoor|C. Outdoor|B
 What is the correct term for a cat's third eyelid?|A. Nictitating membrane|B. Feline ocular veil|C. Palpebral guard|A
 What famous internet cat was known for her permanent frown?|A. Grumpy Cat|B. Maru|C. Nyan Cat|A

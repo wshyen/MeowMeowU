@@ -65,7 +65,8 @@
         color: white;
         border: none;
         cursor: pointer;
-        margin: 10px;
+        margin: 5px auto;
+        display: block;
     }
 
     .edit-btn {
@@ -73,7 +74,8 @@
         color: white;
         border: none;
         cursor: pointer;
-        margin: 10px;
+        margin: 5px auto;
+        display: block;
     }
 
     select {
@@ -101,7 +103,7 @@
 
     <!--Add New Questions Form -->
     <form action="{{ url_for('quiz.add_question') }}" method="POST">
-        <input type="text" name="question_text" placeholder="Enter new question" required><br><br>
+        <input type="text" name="question" placeholder="Enter new question" required><br><br>
         <input type="text" name="option_a" placeholder="Option A" required><br><br>
         <input type="text" name="option_b" placeholder="Option B" required><br><br>
         <input type="text" name="option_c" placeholder="Option C" required><br><br>
@@ -136,13 +138,13 @@
         <tbody>
             {% for question in questions %}
             <tr>
-                <td>{{ question.id }}</td>
-                <td>{{ question.level }}</td>
-                <td>{{ question.question_text }}</td>
+                <td>{{ question['id'] }}</td>
+                <td>{{ question['level'] }}</td>
+                <td>{{ question['question'] }}</td>
                 <td>
-                    A. {{ question.option_a }}<br><br>
-                    B. {{ question.option_b }}<br><br>
-                    C. {{ question.option_c }}
+                    A. {{ question['option_a'] }}<br><br>
+                    B. {{ question['option_b'] }}<br><br>
+                    C. {{ question['option_c'] }}
                 </td>
                 <td>{{ question.correct_option }}</td>
                 <td>
@@ -152,11 +154,11 @@
                     <!-- Hidden Edit Form - Only Shows When Edit Button is Clicked -->
                     <form action="{{ url_for('quiz.edit_question', question_id=question.id) }}" method="POST"
                         id="edit-form-{{ question.id }}" style="display: none;">
-                        <input type="text" name="new_text" value="{{ question.question_text }}" required><br><br>
+                        <input type="text" name="new_text" value="{{ question.question }}" required><br><br>
                         <input type="text" name="option_a" value="{{ question.option_a }}" required><br><br>
                         <input type="text" name="option_b" value="{{ question.option_b }}" required><br><br>
                         <input type="text" name="option_c" value="{{ question.option_c }}" required><br><br>
-                        <select name="correct_answer" required>
+                        <select name="correct_option" required>
                             <option value="option_a" {% if question.correct_option=="option_a" %}selected{% endif %}>
                                 Option A</option>
                             <option value="option_b" {% if question.correct_option=="option_b" %}selected{% endif %}>

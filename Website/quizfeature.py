@@ -75,15 +75,17 @@ def manage_quiz():
         return redirect(url_for('quiz.quiz_page'))
         
     conn = get_db_connection()
-    questions = conn.execute("SELECT * FROM quiz_questions").fetchall()
+    questions = conn.execute("SELECT * FROM quiz_questions ORDER BY level ASC").fetchall()
     conn.close()
+
+    questions = [dict(q) for q in questions]
 
     return render_template('manage_quiz_questions.html', user=current_user, questions=questions)
 
 @quiz_bp.route('/add_question', methods=['POST'])
 @login_required
 def add_question():
-    question = request.form['question']
+    question = request.form.get('question')
     option_a = request.form['option_a']
     option_b = request.form['option_b']
     option_c = request.form['option_c']
@@ -106,7 +108,7 @@ def edit_question(question_id):
     option_a = request.form['option_a']
     option_b = request.form['option_b']
     option_c = request.form['option_c']
-    correct_option = request.form['correct_option']
+    correct_option = request.form.get('correct_option')
 
     conn = get_db_connection()
     conn.execute("UPDATE quiz_questions SET question = ?, option_a = ?, option_b = ?, option_c = ?, correct_option = ? WHERE id = ?",
@@ -120,31 +122,32 @@ def edit_question(question_id):
 @quiz_bp.route('/delete_question/<int:question_id>', methods=['POST'])
 @login_required
 def delete_question(question_id):
-    conn = get_db_connection()
-    cursor = conn.cursor()
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
 
-    cursor.execute("SELECT level FROM quiz_questions WHERE id = ?", (question_id,)) #Find the level of question being deleted
-    level_result = cursor.fetchone()
+        cursor.execute("SELECT level FROM quiz_questions WHERE id = ?", (question_id,)) #Find the level of question being deleted
+        level_result = cursor.fetchone()
 
-    if not level_result:
-        flash("Question not found!", "error")
-        return redirect(url_for('quiz.manage_quiz'))
+        if not level_result:
+            flash("Question not found!", "error")
+            return redirect(url_for('quiz.manage_quiz'))
     
-    level = level_result[0]
+        level = level_result[0]
 
-    #Count total questions for the specific level
-    cursor.execute("SELECT COUNT(*) FROM quiz_questions WHERE level = ?", (level,))
-    total_questions = cursor.fetchone()[0]
+        #Count total questions for the specific level
+        cursor.execute("SELECT COUNT(*) FROM quiz_questions WHERE level = ?", (level,))
+        total_questions = cursor.fetchone()[0]
 
-    if total_questions <= 10:
-        flash(f"You must have at least 10 questions in Level {level}! Cannot delete.", "error")
-        return redirect(url_for('quiz.manage_quiz'))
+        if total_questions <= 10:
+            flash(f"You must have at least 10 questions in Level {level}! Cannot delete.", "error")
+            print(f"DEBUG: Flash message - Cannot delete question (Level {level})")
+            return redirect(url_for('quiz.manage_quiz'))
 
-    cursor.execute("DELETE FROM quiz_questions WHERE id = ?", (question_id,))
-    conn.commit()
-    conn.close()
+        cursor.execute("DELETE FROM quiz_questions WHERE id = ?", (question_id,))
+        conn.commit()
 
-    flash("Question deleted successfully!", "success")
+        flash("Question deleted successfully!", "success")
+
     return redirect(url_for('quiz.manage_quiz'))
 
 if __name__ == '__main__':
