@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+
+{% block title %}Quiz{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f2eadf;
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 20px;
+        font-family: 'Times New Roman', Times, serif;
+        color: #94693e;
+        font-weight: bold;
+    }
+
+    h2 {
+        font-family: 'Times New Roman', Times, serif;
+        font-weight: bolder;
+        color: #6b4f2f;
+    }
+
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: stretch;
+        margin-top: 50px;
+        flex: wrap;
+        gap: 40px;
+    }
+
+    .quiz-box {
+        width: 350px;
+        max-width: 90%;
+        height: auto;
+        min-height: 500px;
+        padding: 25px;
+        text-align: center;
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 15px;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .quiz-box ul {
+        line-height: 1.6;
+        margin-bottom: 15px;
+    }
+
+    .start-button {
+        background-color: #6b4f2f;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    .start-button.locked {
+        background-color: grey;
+        cursor: not-allowed;
+    }
+
+    .start-button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    ul {
+        text-align: left;
+        font-family: 'Times New Roman', Times, serif;
+    }
+</style>
+<div style="padding: 20px;">
+    <h1>Quiz</h1>
+
+    <div class="container">
+        <div class="quiz-box">
+            <h2>Level 1 🐈</h2>
+            <ul>
+                <li>Introductory stage of the cat quiz, designed to test and teach users basic knowledge about cats in a
+                    fun and approachable way.</li>
+                <li>It focuses on general facts such as common behaviors, simple traits and everyday habits of cats.
+                </li>
+                <li>This level is light-hearted and beginner-friendly, making it suitable for anyone, even those who
+                    don’t know much about cats.</li>
+                <li>The purpose is to help users become more familiar with cats and feel more confident around them,
+                    especially the campus cats.</li>
+                <li>It serves as a foundation for further learning in the next level.</li>
+            </ul>
+            <br>
+            <button class="start-button" onclick="startQuiz('level1')">Start Level 1</button>
+        </div>
+
+        <div class="quiz-box" id="level2Box">
+            <h2>Level 2 🐈‍⬛</h2>
+            <ul>
+                <li>More advanced stage of the quiz that goes deeper into unique, interesting and sometimes surprising
+                    facts about cats.</li>
+                <li>It is designed for users who already have some basic knowledge and are ready to learn more detailed
+                    or uncommon information. </li>
+                <li>This level may include questions related to science, culture, history or even pop culture involving
+                    cats.</li>
+                <li>It aims to challenge users and expand their understanding of cats beyond the basics, while still
+                    keeping the quiz enjoyable and engaging.</li>
+            </ul>
+            <br>
+            <p style="font-family: 'Times New Roman', Times, serif;">Complete Level 1 questions correctly to unlock</p>
+            <button class="start-button" id="level2Button" onclick="startQuiz('level2')" disabled>Start Level 2</button>
+        </div>
+    </div>
+
+    {% if user_role == 'admin' %}
+    <div style="text-align: right; margin-bottom: 20px; position: fixed; bottom: 20px; right: 20px;">
+        <button id="manage-questions-button" onclick="window.location.href='{{ url_for('quiz.manage_quiz') }}'"
+            style="font-size: 20px; background-color: #94693e; color: white; padding: 10px 15px; border-radius: 5px; cursor: pointer; border: none;">
+            ✎
+        </button>
+    </div>
+    {% endif %}
+
+</div>
+<script>
+    function startQuiz(level) {
+        window.location.href = "/quiz_" + level; //Redirect to quiz level 1 or level 2 page
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const userRole = "{{ user_role|safe }}";
+        console.log("DEBUG: User Role in JavaScript →", userRole);
+
+        if (userRole !== "admin") {
+            const manageButton = document.getElementById("manage-questions-button");
+            if (manageButton) {
+                manageButton.style.display = "none";  //Hide button only if ID exists
+            }
+        }
+
+        let level2Button = document.getElementById("level2Button");
+        let level2Box = document.getElementById("level2Box");
+
+        //Check if Level 1 is completed correctly
+        if (localStorage.getItem("level1Completed") === "true") {
+            level2Box.classList.remove("locked");
+            level2Button.classList.remove("locked"); //Restore button color
+            level2Button.removeAttribute("disabled"); //Enable the button
+        } else {
+            //Keep the button locked & add hover effect
+            level2Button.classList.add("locked");
+            level2Button.setAttribute("disabled", true);
+            level2Button.style.backgroundColor = "grey"; //Make the button grey when locked
+            level2Button.style.cursor = "not-allowed";
+        }
+    });
+</script>
+{% endblock %}
