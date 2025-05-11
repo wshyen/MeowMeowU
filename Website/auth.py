@@ -243,3 +243,9 @@ def update_profile():
         return redirect(url_for("auth.user_profile"))
 
     return render_template("update_profile.html", user=current_user)
+
+votes = {
+    "Fluffy": 0,
+    "Whiskers": 0,
+    "Mittens": 0
+}
