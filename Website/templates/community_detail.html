@@ -21,8 +21,17 @@
         margin: 20px 0;
     }
 
-    p {
+    h3 {
+        font-weight: bold;
+        font-size: 25px;
+        color: #6b4f2f;
         text-align: center;
+        font-style: italic;
+        margin-top: 0;
+        margin-bottom: 20px;
+    }
+
+    p {
         color: #6b4f2f;
         font-size: 20px;
         white-space: normal;  
@@ -52,7 +61,8 @@
         margin-left: 20px;
     }
 
-    .post-info img.profile-picture {
+    .post-info img.profile-picture,
+    .comment-profile-picture {
         width: 50px;
         height: 50px;
         border-radius: 50%; 
@@ -108,6 +118,79 @@
         color: #6b4f2f;
     }
 
+    .comment {
+        display: flex;
+        flex-direction: column;
+        margin: 10px 0;
+        padding: 20px;
+        border-radius: 10px;
+        background-color: #ffffff;
+    }
+
+    .comment-info {
+        width: 80%;  
+        display: flex;
+        align-items: center;
+        justify-content: flex-start; 
+    }
+
+    .comment-info p {
+        margin: 0;         
+        line-height: 1.2;
+    }
+
+    .comment-info p{
+        align-items: center;
+    }
+
+    .comment-content {
+        display: flex;
+        justify-content: flex-start; 
+        text-align: left;    
+        margin-left: 70px; 
+        max-width: 75%;    
+    }
+
+    .comment-form-container {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: #f2eadf; /* 背景颜色与页面一致 */
+        padding: 10px;
+        box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* 添加顶部阴影 */
+        z-index: 1000; /* 确保固定在最前面 */
+    }
+
+    .comment-form-container form {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .comment-form-container textarea {
+        flex: 1;
+        margin-right: 10px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        resize: none;
+        height: 50px; /* 固定高度 */
+    }
+
+    .comment-form-container button {
+        padding: 10px 20px;
+        background-color: #6b4f2f;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .comment-form-container button:hover {
+        background-color: #5a3e26;
+    }
+
     .back-button {
         display: block;
         margin: 30px auto;
@@ -131,6 +214,9 @@
 </style>
 
     <h1>Post Details</h1>
+    <button class="back-button" onclick="window.location.href='{{ url_for('community.community_feature') }}'">
+        Back
+    </button>
 
     <div class="post">
 
@@ -180,26 +266,31 @@
         
     </div>
 
-
+    <hr>
+    
     <!-- Comment List -->
 
-    <h3 id= "Comments">Comments</h3>
+    <h3 id= "comments">Comments List</h3>
     {% for comment in comments %}
     <div class="comment">
-        <p><strong>{{ comment['name'] }}</strong> commented at {{ comment['created_at'] }}</p>
-        <p>{{ comment['content'] }}</p>
+        <div class="comment-info">
+            <img class="comment-profile-picture" src="{{ url_for('static', filename='Userprofile/' + (comment['profile_picture'] if comment['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
+            <p><strong>{{ comment['name'] }}</strong> commented at {{ comment['created_at'] }}</p>
+        </div>
+
+        <div class="comment-content">
+            <p>{{ comment['content'] }}</p>
+        </div>
+
+        <a href="/post/like/{{ post['id'] }}" class="like-btn">❤️ Like</a>
     </div>
     {% endfor %}
 
-    <form action="{{ url_for('community.add_comment', post_id=post['post_id']) }}" method="POST">
-        <textarea name="content" placeholder="Write a comment..." required></textarea>
-        <button type="submit">Submit Comment</button>
-        <a href="/post/like/{{ post['id'] }}" class="like-btn">❤️ Like</a
-    </form>
-
-
-    <button class="back-button" onclick="window.location.href='{{ url_for('community.community_feature') }}'">
-        Back
-    </button>
+    <div class="comment-form-container">
+        <form action="{{ url_for('community.add_comment', post_id=post['post_id']) }}" method="POST">
+            <textarea name="content" placeholder="Write a comment..." required></textarea>
+            <button type="submit">Submit Comment</button>
+        </form>
+    </div>
 
 {% endblock %}

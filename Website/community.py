@@ -104,7 +104,7 @@ def post_detail(post_id):
     )).fetchone()
 
     comments = conn.execute('''
-        SELECT comment.*, user.name AS name
+        SELECT comment.*, user.name AS name, user.profile_picture AS profile_picture
            FROM comment
            JOIN user ON comment.user_id = user.id
            WHERE comment.post_id = ?
