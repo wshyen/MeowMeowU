@@ -41,11 +41,12 @@
         text-align: center;
         font-size: 30px;
         font-family: 'Times New Roman', Times, serif;
+        top: -120px;
     }
 
-    .options input {
+    .options, input {
         margin: 10px;
-        font-size: 18px;
+        font-size: 30px;
         cursor: pointer;
     }
 
@@ -64,14 +65,26 @@
         font-weight: bold;
         font-family: 'Times New Roman', Times, serif;
     }
+
+    #countdown-box{
+        font-weight: bolder;
+        font-size: large;
+        font-family: 'Times New Roman', Times, serif;
+        text-align: center;
+        margin-top: 330px;
+    }
 </style>
 <div style="padding: 20px;">
     <h1>Level 1</h1>
 
     <h2 id="question-counter" style="text-align: center; color: #6b4f2f;"></h2>
 
-    <div class="cat-box">
-        <h2 id="question-text">Loading...</h2>
+    <div id="countdown-box">
+        <h2 id="countdown-text">Loading...</h2>
+    </div>
+
+    <div class="cat-box" id="cat-box" style="display: none;">
+        <h2 id="question-text"></h2>
     </div>
 
     <div class="options" id="options"></div>
@@ -88,7 +101,9 @@
     });
 
     function startCountdown() {
-        let countdownText = document.getElementById("question-text");
+        let countdownText = document.getElementById("countdown-text");
+        let countdownBox = document.getElementById("countdown-box");
+        let catBox = document.getElementById("cat-box");
         let count = 3;
 
         let countdownInterval = setInterval(() => {
@@ -97,6 +112,8 @@
 
             if (count < 0) {
                 clearInterval(countdownInterval);
+                countdownBox.style.display = "none", //Hide countdown after it finishes
+                catBox.style.display = "flex"; //Show the cat face shape
                 fetchQuestions(); //Fetch questions after countdown ends
             }
         }, 1000); //Countdown updates every second
