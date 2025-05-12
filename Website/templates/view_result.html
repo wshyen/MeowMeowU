@@ -151,6 +151,13 @@
     <button onclick="window.location.href='{{ url_for('contestmanagement.contest_page') }}'" class="button">
         🐾Back to Contests🐾
     </button>
+
+    {% for winner in winners %}
+        {% if winner.name == current_user.name %}
+            <button onclick="window.location.href='{{ url_for('badge_page', contest_id=contest_id) }}'">🏅Claim Your Badge🏅</button>
+        {% endif %}
+    {% endfor %}
+
 </div>
 
 {% endblock %}
