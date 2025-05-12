@@ -180,7 +180,7 @@
         
     </div>
 
-    <h3>Comments</h3>
+    <h3 id = "Comments"</h3>
 
     <!-- Comment List -->
     {% for comment in comments %}
@@ -189,6 +189,11 @@
         <p>{{ comment['content'] }}</p>
     </div>
     {% endfor %}
+
+    <form action="{{ url_for('community.add_comment', post_id=post['post_id']) }}" method="POST">
+        <textarea name="content" placeholder="Write a comment..." required></textarea>
+        <button type="submit">Submit Comment</button>
+    </form>
 
     <div class="bottom-bar">
         <form action="/post/{{ post['id'] }}/comment" method="post" class="bottom-form">
