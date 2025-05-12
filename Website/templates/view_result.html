@@ -152,12 +152,11 @@
         🐾Back to Contests🐾
     </button>
 
-    {% for winner in winners %}
-        {% if winner.name == current_user.name %}
-            <button onclick="window.location.href='{{ url_for('badge_page', contest_id=contest_id) }}'">🏅Claim Your Badge🏅</button>
-        {% endif %}
-    {% endfor %}
-
+    {% if show_claim_button %}
+        <button onclick="window.location.href='{{ url_for('contestmanagement.badge_page', contest_id=contest_id) }}'">
+            🏅Claim Your Badge🏅
+        </button>
+    {% endif %}
 </div>
 
 {% endblock %}
