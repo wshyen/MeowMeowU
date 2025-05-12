@@ -135,7 +135,7 @@ def edit_question(question_id):
     flash("Question updated successfully!", "success")
     return redirect(url_for('quiz.manage_quiz'))
 
-@quiz_bp.route('/delete_question/<int:question_id>', methods=['POST'])
+@quiz_bp.route('/delete_question/<int:question_id>', methods=['GET', 'POST'])
 @login_required
 def delete_question(question_id):
     with get_db_connection() as conn:
@@ -156,15 +156,13 @@ def delete_question(question_id):
 
         if total_questions <= 10:
             flash(f"You must have at least 10 questions in Level {level}! Cannot delete.", "error")
-            print(f"DEBUG: Flash message - Cannot delete question (Level {level})")
             return redirect(url_for('quiz.manage_quiz'))
 
         cursor.execute("DELETE FROM quiz_questions WHERE id = ?", (question_id,))
         conn.commit()
 
         flash("Question deleted successfully!", "success")
-
-    return redirect(url_for('quiz.manage_quiz'))
+        return redirect(url_for('quiz.manage_quiz'))
 
 if __name__ == '__main__':
     app.run(debug=True)
