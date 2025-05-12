@@ -103,9 +103,18 @@ def post_detail(post_id):
         post_id
     )).fetchone()
 
+    comments = conn.execute('''
+        SELECT comment.*, user.name AS name
+           FROM comment
+           JOIN user ON comment.user_id = user.id
+           WHERE comment.post_id = ?
+           ORDER BY comment.created_at DESC''', 
+        (post_id,)
+    ).fetchall()
+
     conn.close()
 
-    return render_template("community_detail.html", post=post, user=current_user)
+    return render_template("community_detail.html", post=post, comments=comments, user=current_user)
 
 
 # Create Post
@@ -311,44 +320,20 @@ def add_comment(post_id):
         return redirect(url_for('auth.login')) 
     
     content = request.form['content']
-    user_id = current_user.id
-    sort = request.form.get('sort', 'date_desc')
     media = request.files.get('media')
     media_url = None
+    created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    user_id = current_user.id
+    sort = request.form.get('sort', 'date_desc')
+    
 
     conn = get_db_connection()
     conn.execute(
         '''INSERT INTO comment (content, media_url, created_at, post_id, user_id) 
-           VALUES (?, ?, ?, ?)''', 
+           VALUES (?, ?, ?, ?, ?)''', 
         (content, media_url, created_at, post_id, user_id) 
     )
     conn.commit()
     conn.close()
 
     return redirect(f'/post/{post_id}#comments')
-
-@community_bp.route('/post/<int:post_id>', endpoint='post_detail_page')
-def post_detail(post_id):
-    conn = get_db_connection()
-
-    post = conn.execute(
-        '''SELECT post.*, user.name, user.profile_picture, 
-           (SELECT COUNT(*) FROM likes WHERE likes.post_id = post.post_id) AS like_count
-           FROM post
-           JOIN user ON post.user_id = user.id
-           WHERE post.post_id = ?''', 
-        (post_id,)
-    ).fetchone()
-
-    comments = conn.execute(
-        '''SELECT comment.*, user.name AS name
-           FROM comment
-           JOIN user ON comment.user_id = user.id
-           WHERE comment.post_id = ?
-           ORDER BY comment.created_at DESC''', 
-        (post_id,)
-    ).fetchall()
-
-    conn.close()
-
-    return render_template("community_detail.html", post=post, comments=comments)

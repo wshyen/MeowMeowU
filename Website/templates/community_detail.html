@@ -180,12 +180,13 @@
         
     </div>
 
-    <h3 id = "Comments"</h3>
 
     <!-- Comment List -->
+
+    <h3 id= "Comments">Comments</h3>
     {% for comment in comments %}
     <div class="comment">
-        <p><strong>{{ comment['username'] }}</strong> commented at {{ comment['created_at'] }}</p>
+        <p><strong>{{ comment['name'] }}</strong> commented at {{ comment['created_at'] }}</p>
         <p>{{ comment['content'] }}</p>
     </div>
     {% endfor %}
@@ -193,15 +194,8 @@
     <form action="{{ url_for('community.add_comment', post_id=post['post_id']) }}" method="POST">
         <textarea name="content" placeholder="Write a comment..." required></textarea>
         <button type="submit">Submit Comment</button>
+        <a href="/post/like/{{ post['id'] }}" class="like-btn">❤️ Like</a
     </form>
-
-    <div class="bottom-bar">
-        <form action="/post/{{ post['id'] }}/comment" method="post" class="bottom-form">
-            <input type="text" name="content" placeholder="Write a comment..." required>
-            <button type="submit">Comment</button>
-            <a href="/post/like/{{ post['id'] }}" class="like-btn">❤️ Like</a>
-        </form>
-    </div>
 
 
     <button class="back-button" onclick="window.location.href='{{ url_for('community.community_feature') }}'">
