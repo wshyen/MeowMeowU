@@ -283,7 +283,7 @@
         </div>
 
         <div class="comment-actions">
-            <form id="like-form-{{ post['post_id'] }}" action="{{ url_for('community.like_comment' if not comment['liked_by_current_user'] else 'community.unlike_comment', post_id=post['post_id']) }}" method="post" style="display:inline;">
+            <form id="like-form-{{ post['post_id'] }}" action="{{ url_for('community.like_comment' if not comment['liked_by_current_user'] else 'community.unlike_comment', comment_id=comment['id']) }}" method="post" style="display:inline;">
                 <button type="submit" class="post-action-button">
                     {% if comment['liked_by_current_user'] %}
                         ❤️ 

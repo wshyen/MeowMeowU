@@ -337,3 +337,54 @@ def add_comment(post_id):
     conn.close()
 
     return redirect(f'/post/{post_id}#comments')
+
+@community_bp.route('/comment/like/<int:comment_id>', methods=['POST'])
+def like_comment(comment_id):
+    if not current_user.is_authenticated:
+        flash("You must be logged in to like a comment!", category="error")
+        return redirect(url_for('auth.login')) 
+    
+    user_id = current_user.id
+
+    conn = get_db_connection()
+    existing_like = conn.execute(
+        'SELECT 1 FROM comment_like WHERE user_id = ? AND comment_id = ?',
+        (user_id, comment_id)
+    ).fetchone()
+
+    if not existing_like:
+        conn.execute(
+            'INSERT INTO comment_like (user_id, comment_id) VALUES (?, ?)',
+            (user_id, comment_id)
+        )
+        conn.commit()
+
+    post_id = conn.execute(
+        'SELECT post_id FROM comment WHERE id = ?',
+        (comment_id,)
+    ).fetchone()
+
+    conn.close()
+    referer = request.referrer
+    return redirect(url_for('community.post_detail', post_id=post_id))
+
+@community_bp.route('/comment/unlike/<int:comment_id>', methods=['POST'])
+def unlike_comment(comment_id):
+    user_id = current_user.id
+
+    conn = get_db_connection()
+    conn.execute(
+        'DELETE FROM comment_like WHERE user_id = ? AND comment_id = ?',
+        (user_id, comment_id)
+    )
+    conn.commit()
+
+    post_id = conn.execute(
+        'SELECT post_id FROM comment WHERE id = ?',
+        (comment_id,)
+    ).fetchone()
+
+    conn.close()
+
+    referer = request.referrer
+    return redirect(url_for('community.post_detail', post_id=post_id))
