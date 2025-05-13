@@ -179,19 +179,19 @@
 
 <script>
     function toggleModal(imageSrc) {
-        let modal = document.getElementById("imageModal");
-        let modalImage = document.getElementById("modalImage");
+        let modal = document.getElementById("imageModal"); // Get the modal element
+        let modalImage = document.getElementById("modalImage"); // Get the modal image element
 
         if (modal.style.display === "flex") {
-            modal.style.display = "none";
+            modal.style.display = "none"; // Close the modal if it's already open
         } else {
-            modalImage.src = imageSrc;
-            modal.style.display = "flex";
+            modalImage.src = imageSrc; // Set the clicked image inside modal
+            modal.style.display = "flex"; // Show the modal
         }
     }
 
     function closeModal() {
-        document.getElementById("imageModal").style.display = "none";
+        document.getElementById("imageModal").style.display = "none"; // Hide the modal when clicked outside
     }
 </script>
 
