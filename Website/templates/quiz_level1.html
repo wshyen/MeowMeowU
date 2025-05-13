@@ -150,7 +150,7 @@
         if (currentIndex < questions.length) {
             let q = questions[currentIndex];
 
-            correctAnswer = q.correct_option; //Store the correct answer
+            correctAnswer = q.correct_option.toUpperCase().replace("OPTION_", ""); //Store the correct answer
 
             let shuffledOptions = shuffleOptions([
                 { text: q.option_a, value: "A" },
@@ -213,7 +213,9 @@
 
         if (correctCount === questions.length) {
             document.getElementById("question-text").innerHTML = "Congratulations! <br> You have unlocked level 2 and earned a badge! <br> ฅ^•⩊•^ ฅ";
+            localStorage.setItem("level1Completed", "true"); //Store completion status
         } else {
+            localStorage.removeItem("level1Completed");
             document.getElementById("question-text").innerHTML = "You need to answer all correctly to unlock Level 2 and earn your badge. <br> Try again! <br> /ᐠ ╥ ˕ ╥マ ";
         }
     }
