@@ -74,10 +74,11 @@
         border-radius: 8px;
         display: block;
         transition: transform 0.3s ease-in-out;
+        cursor: pointer;
     }
 
-    .image-container input:checked + label::after {
-        content: "";
+    .modal {
+        display: none;
         position: fixed;
         top: 0;
         left: 0;
@@ -85,20 +86,15 @@
         height: 100vh;
         background: rgba(0, 0, 0, 0.6);
         z-index: 99;
+        justify-content: center;
+        align-items: center;
     }
 
-    .image-container input:checked + label img {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: auto;
-        height: 60vh;
+    .modal img {
         max-width: 80vw;
-        max-height: 60vh;
-        object-fit: contain;
+        max-height: 80vh;
         border: 10px solid #f2eadf;
-        z-index: 100;
+        border-radius: 10px;
     }
 
     .option-label {
@@ -159,11 +155,9 @@
 
             {% if participant.file_path %}
             <div class="image-container">
-                <input type="checkbox" id="img{{ participant.id }}">
-                <label for="img{{ participant.id }}">
-                    <img src="{{ url_for('static', filename=participant.file_path.replace('Website/static/', '')) }}" 
-                         alt="{{ participant.name }}'s submission">
-                </label>
+                <img src="{{ url_for('static', filename=participant.file_path.replace('Website/static/', '')) }}" 
+                     alt="{{ participant.name }}'s submission"
+                     onclick="toggleModal('{{ url_for('static', filename=participant.file_path.replace('Website/static/', '')) }}')">
             </div>
             {% endif %}
         </div>
@@ -176,5 +170,27 @@
         <button onclick="window.location.href='{{ url_for('contestmanagement.contest_page') }}'">🐾 Back to Contests 🐾</button>
     {% endif %}
 </div>
+
+<div class="modal" id="imageModal" onclick="closeModal()">
+    <img id="modalImage">
+</div>
+
+<script>
+    function toggleModal(imageSrc) {
+        let modal = document.getElementById("imageModal");
+        let modalImage = document.getElementById("modalImage");
+
+        if (modal.style.display === "flex") {
+            modal.style.display = "none";
+        } else {
+            modalImage.src = imageSrc;
+            modal.style.display = "flex";
+        }
+    }
+
+    function closeModal() {
+        document.getElementById("imageModal").style.display = "none";
+    }
+</script>
 
 {% endblock %}
