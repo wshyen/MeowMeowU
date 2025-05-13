@@ -76,7 +76,7 @@
     <img src="{{ url_for('static', filename='Images/Countdown.png') }}" alt="Countdown Icon">
     <h2>Results have not been announced !</h2>
     <p class="countdown-text">
-        🕒 Time left until results are announced: <br><strong>{{ days_left }} days, {{ hours_left }} hours, {{ minutes_left }} minutes</strong>
+        🕒 Time left until results are announced: <br><strong>{{ days_left }} days, {{ hours_left }} hours, {{ minutes_left }} minutes!</strong>
     </p>
 
     <button onclick="window.location.href='{{ url_for('contestmanagement.contest_page') }}'" class="button">
