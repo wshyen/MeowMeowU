@@ -150,7 +150,7 @@
         if (currentIndex < questions.length) {
             let q = questions[currentIndex];
 
-            correctAnswer = q.correct_option; //Store the correct answer
+            correctAnswer = q.correct_option.toUpperCase().replace("OPTION_", ""); //Store the correct answer
 
             let shuffledOptions = shuffleOptions([
                 { text: q.option_a, value: "A" },
