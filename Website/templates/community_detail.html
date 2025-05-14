@@ -400,6 +400,12 @@
                         🗑️ Delete
                     </button>
                 </form>
+                {%else%}
+                    <button type="submit" class="comment-action-button" onclick="return confirm('Are you sure you want to report this comment?');">
+                        ⚠️ Report
+                    </button>
+                </form>
+
                 {% endif %}                
             </div>
         </div>
