@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Cat Story{% endblock %}
+
+{% block content %}
+
+<style>
+    body {
+        background-color: #f2eadf;
+        color: rgb(78, 68, 57);
+    }
+
+    h2 {
+        font-weight: bold;
+        font-size: 35px;
+        font-family: 'Times New Roman';
+        text-align: center;
+        padding-top: 25px;
+        color: #94693e;
+    }
+
+    .button-container {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .button {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 10px;
+        background-color: #94693e;
+        color: white;
+        text-decoration: none;
+        font-size: 18px;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+    }
+
+    .button:hover {
+        background-color: #754e2e;
+    }
+</style>
+
+<h2>Share Story</h2>
+
+{% endblock %}
