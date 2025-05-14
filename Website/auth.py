@@ -243,3 +243,9 @@ def update_profile():
         return redirect(url_for("auth.user_profile"))
 
     return render_template("update_profile.html", user=current_user)
+
+#cat story
+@auth.route("/cat-story")
+def cat_story():
+
+    return render_template("cat_story.html", user=current_user)
