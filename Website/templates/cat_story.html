@@ -11,13 +11,23 @@
         font-family: "Times New Roman";
     }
 
-    h2 {
+    h1 {
         font-weight: bold;
         font-size: 40px;
         text-align: center;
-        padding-top: 20px;
+        padding-top: 25px;
         color: #94693e;
         font-family: "Times New Roman";
+    }
+
+    h5 {
+        font-weight: bold;
+        font-size: 20px;
+        color: #6b4f2f;
+        text-align: center;
+        font-style: italic;
+        margin-top: 20px;
+        margin-bottom: 20px;
     }
 
     .story-container {
@@ -65,12 +75,13 @@
 
 </style>
 
-<h2>Cat Story🐈‍⬛</h2>
+<h1>Cat Story🐈‍⬛</h1>
+<h5>Share your story with a photo to express something meaningful, funny, or heartwarming that related to cats!</h5>
 
 <div class="story-container">
     <a href="{{ url_for('auth.my_story') }}" class="story-card">
         <h3>My Story</h3>
-        <p>View your personal collection of cat tales.</p>
+        <p>View stories that you shared before.</p>
     </a>
 
     <a href="{{ url_for('auth.share_story') }}" class="story-card">
@@ -78,5 +89,8 @@
         <p>Write and share your cat story with others.</p>
     </a>
 </div>
+
+<br>
+<hr>
 
 {% endblock %}
