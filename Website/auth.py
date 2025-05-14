@@ -249,3 +249,13 @@ def update_profile():
 def cat_story():
 
     return render_template("cat_story.html", user=current_user)
+
+@auth.route('/my-story')
+def my_story():
+
+    return render_template("my_story.html", user=current_user)
+
+@auth.route('/share-story')
+def share_story():
+
+    return render_template("share_story.html", user=current_user)
