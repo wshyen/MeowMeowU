@@ -42,7 +42,7 @@
         overflow-wrap: break-word;
     }
 
-    a {
+    .hashtag {
         display: inline;
         color: #6b4f2f;
         text-decoration: none;
@@ -272,7 +272,7 @@
         <p class="post-content">{{ post['content'] }}</p>
             {% if post['cat_hashtag'] %}
                 <p class="post-content">
-                    <a href="{{ url_for('community.hashtag_posts', hashtag=post['cat_hashtag']) }}">#{{ post['cat_hashtag'] }}</a>
+                    <a class="hashtag" href="{{ url_for('community.hashtag_posts', hashtag=post['cat_hashtag']) }}">#{{ post['cat_hashtag'] }}</a>
                 </p>
             {% endif %}
 
@@ -312,28 +312,6 @@
     </div>
 
 {% endfor %}
-
-<hr>
-
-<div id="postModal" class="modal hidden">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <h3>New Post</h3>
-        <form action="/post/create" method="post" enctype="multipart/form-data">
-            <textarea name="content" placeholder="Have a meowment to share?" required></textarea><br>
-            <label for="cat-hashtag">Select Cat Hashtag:</label>
-            <select name="cat_hashtag" id="cat-hashtag">
-                <option value="">None</option>
-                {% for cat_name in cat_names %}
-                    <option value="{{ cat_name }}">#{{ cat_name }}</option>
-                {% endfor %}
-            </select>
-            <br>
-            <input type="file" name="media"><br>
-            <button type="submit">Post</button>
-        </form>
-    </div>
-</div>
 
 {% endblock %}
 

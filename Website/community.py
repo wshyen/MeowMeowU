@@ -387,7 +387,7 @@ def like_comment(comment_id):
         conn.commit()
 
     conn.close()
-    return redirect(url_for('community.post_detail', post_id=post_id))
+    return redirect(request.referrer)
 
 @community_bp.route('/comment/unlike/<int:comment_id>', methods=['POST'])
 def unlike_comment(comment_id):
@@ -408,4 +408,22 @@ def unlike_comment(comment_id):
     conn.commit()
     conn.close()
 
-    return redirect(url_for('community.post_detail', post_id=post_id))
+    return redirect(request.referrer)
+
+@community_bp.route('/comment/delete/<int:comment_id>', methods=['POST'])
+def delete_comment(comment_id):
+    conn = get_db_connection()
+    comment = conn.execute('SELECT * FROM comment WHERE id = ?', (comment_id,)).fetchone()
+
+    conn.execute('DELETE FROM comment WHERE id = ?', (comment_id,))
+    conn.commit()
+
+    if comment['media_url']:
+        file_path = os.path.join(os.path.dirname(__file__), 'static', comment['media_url'])
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
+    conn.close()
+
+    flash("Comment deleted successfully!", category="success")
+    return redirect(request.referrer)

@@ -393,6 +393,14 @@
                 <button class="comment-action-button">
                     💬 Reply
                 </button>
+
+                {% if comment['user_id'] == user.id %}
+                <form action="{{ url_for('community.delete_comment', comment_id=comment['id']) }}" method="post" style="display:inline;">
+                    <button type="submit" class="comment-action-button" onclick="return confirm('Are you sure you want to delete this comment?');">
+                        🗑️ Delete
+                    </button>
+                </form>
+                {% endif %}                
             </div>
         </div>
 
