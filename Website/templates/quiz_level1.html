@@ -54,7 +54,7 @@
         color: white;
         font-weight: bold;
         font-family: 'Times New Roman', Times, serif;
-        max-width: 65%;
+        max-width: 60%;
         word-wrap: break-word;
         overflow-wrap: break-word;
         font-size: 24px;
@@ -82,6 +82,23 @@
         text-align: center;
         font-family: 'Times New Roman', Times, serif;
     }
+
+    .restart-button {
+        background-color: #94693e;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    .restart-button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
 </style>
 <div style="padding: 20px;">
     <h1>Level 1</h1>
@@ -98,6 +115,11 @@
     </div>
 
     <div class="options" id="options"></div>
+
+    <div id="restart-box" style="display: none; text-align: center; margin-top: 20px;">
+        <button class="restart-button" onclick="restartQuiz()">Restart</button>
+    </div>
+
 </div>
 
 <script>
@@ -207,6 +229,12 @@
         displayQuestion();
     }
 
+    //Function to restart the quiz
+    function restartQuiz() {
+        localStorage.removeItem("level1Completed"); // Reset progress
+        window.location.reload(); // Refresh page to restart
+    }
+
     function checkQuizCompletion() {
         document.getElementById("question-text").innerHTML = "Quiz Complete!";
         document.getElementById("options").innerHTML = "";
@@ -217,6 +245,7 @@
         } else {
             localStorage.removeItem("level1Completed");
             document.getElementById("question-text").innerHTML = "You need to answer all correctly to unlock Level 2 and earn your badge. <br> Try again! <br> /ᐠ ╥ ˕ ╥マ ";
+            document.getElementById("restart-box").style.display = "block"; //Show restart buttons
         }
     }
 
