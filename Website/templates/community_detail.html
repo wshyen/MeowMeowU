@@ -35,7 +35,7 @@
         color: #6b4f2f;
         font-size: 20px;
         white-space: normal;  
-        max-width: 70%;     
+        max-width: 90%;     
         overflow-wrap: break-word;
     }
 
@@ -137,9 +137,6 @@
     .comment-info p {
         margin: 0;         
         line-height: 1.2;
-    }
-
-    .comment-info p{
         align-items: center;
     }
 
@@ -147,8 +144,32 @@
         display: flex;
         justify-content: flex-start; 
         text-align: left;    
-        margin-left: 70px; 
-        max-width: 75%;    
+        margin-left: 70px;   
+    }
+
+    .comment-actions {
+        margin-top: 10px;
+        display: flex;
+        justify-content: flex-start;
+    }
+    
+    .comment-action-button {
+        background: none;
+        border: none;
+        color: #6b4f2f;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 18px; 
+        margin: 0 10px;
+    }
+
+    .comment-action-button:hover {
+        background-color: inherit;
+    }
+
+    .commment-actions .separator {
+        font-size: 30px;
+        color: #6b4f2f;
     }
 
     .comment-form-container {
@@ -156,10 +177,10 @@
         bottom: 0;
         left: 0;
         width: 100%;
-        background-color: #f2eadf; /* 背景颜色与页面一致 */
+        background-color: #f2eadf; 
         padding: 10px;
-        box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* 添加顶部阴影 */
-        z-index: 1000; /* 确保固定在最前面 */
+        box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); 
+        z-index: 1000;
     }
 
     .comment-form-container form {
@@ -176,6 +197,17 @@
         border-radius: 5px;
         resize: none;
         height: 50px; /* 固定高度 */
+    }
+
+    .file-upload-label {
+        cursor: pointer;
+        margin-right: 10px;
+    }
+
+    .paperclip-icon {
+        width: 24px;
+        height: 24px;
+        vertical-align: middle;
     }
 
     .comment-form-container button {
@@ -280,34 +312,47 @@
 
         <div class="comment-content">
             <p>{{ comment['content'] }}</p>
+            {% if comment['media_url'] %}
+                {% if comment['media_url'].endswith(('.png', '.jpg', '.jpeg', '.gif')) %}
+                    <img src="{{ url_for('static', filename=comment['media_url']) }}" alt="Comment Media">
+                {% elif comment['media_url'].endswith(('.mp4', '.mov', '.avi')) %}
+                    <video controls>
+                        <source src="{{ url_for('static', filename=comment['media_url']) }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                {% endif %}
+            {% endif %}
         </div>
 
         <div class="comment-actions">
-            <form id="like-form-{{ post['post_id'] }}" action="{{ url_for('community.like_comment' if not comment['liked_by_current_user'] else 'community.unlike_comment', comment_id=comment['id']) }}" method="post" style="display:inline;">
-                <button type="submit" class="post-action-button">
+            <form id="like-form-{{ comment['id'] }}" action="{{ url_for('community.like_comment' if not comment['liked_by_current_user'] else 'community.unlike_comment', comment_id=comment['id']) }}" method="post" style="display:inline;">
+                <button type="submit" class="comment-action-button">
                     {% if comment['liked_by_current_user'] %}
                         ❤️ 
                     {% else %}
                         🤍 
                     {% endif %}
-                    {{ post['like_count'] }} Like
+                    {{ comment['like_count'] }} Like
                 </button>
             </form>
             
             <span class="separator">|</span>
 
             <button class="comment-action-button">
-                💬 Comments
+                💬 Reply
             </button>
         </div>
 
-        <a href="/post/like/{{ post['id'] }}" class="like-btn">❤️ Like</a>
     </div>
     {% endfor %}
 
     <div class="comment-form-container">
-        <form action="{{ url_for('community.add_comment', post_id=post['post_id']) }}" method="POST">
+        <form action="{{ url_for('community.add_comment', post_id=post['post_id']) }}" method="POST" enctype="multipart/form-data">
             <textarea name="content" placeholder="Write a comment..." required></textarea>
+            <label for="comment-media" class="file-upload-label">
+                <img src="{{ url_for('static', filename='paperclip.png') }}" alt="Attach File" class="paperclip-icon">
+            </label>
+            <input type="file" id="comment-media" name="media" accept="image/*,video/*" style="display: none;">
             <button type="submit">Submit Comment</button>
         </form>
     </div>
