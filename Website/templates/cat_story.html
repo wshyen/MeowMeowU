@@ -19,8 +19,33 @@
         color: #94693e;
     }
 
+    .button-container {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .button {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 10px;
+        background-color: #94693e;
+        color: white;
+        text-decoration: none;
+        font-size: 18px;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+    }
+
+    .button:hover {
+        background-color: #754e2e;
+    }
 </style>
 
 <h2>Cat Story🐈‍⬛</h2>
+
+<div class="button-container">
+    <a href="{{ url_for('auth.my_story') }}" class="button">My Story</a>
+    <a href="{{ url_for('auth.share_story') }}" class="button">Share Story</a>
+</div>
 
 {% endblock %}
