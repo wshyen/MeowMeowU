@@ -337,6 +337,10 @@ def add_comment(post_id):
     user_id = current_user.id
     sort = request.form.get('sort', 'date_desc')
 
+    if not content and not media:
+        flash("You must provide either text or media for your comment!", category="error")
+        return redirect(f'/post/{post_id}#comments')
+
     if media and allowed_file(media.filename):
         os.makedirs(COMMENTS_FOLDER, exist_ok=True)
         filename = secure_filename(media.filename)
