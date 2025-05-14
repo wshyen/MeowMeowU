@@ -8,44 +8,75 @@
     body {
         background-color: #f2eadf;
         color: rgb(78, 68, 57);
+        font-family: "Times New Roman";
     }
 
     h2 {
         font-weight: bold;
-        font-size: 35px;
-        font-family: 'Times New Roman';
+        font-size: 40px;
         text-align: center;
-        padding-top: 25px;
+        padding-top: 20px;
         color: #94693e;
+        font-family: "Times New Roman";
     }
 
-    .button-container {
+    .story-container {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        margin-top: 40px;
+    }
+
+    .story-card {
+        width: 350px;
+        padding: 25px;
+        background-color: #e5d1bb;
+        border-radius: 15px;
         text-align: center;
-        margin-top: 20px;
+        transition: transform 0.3s ease-in-out, background-color 0.3s;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        font-family: "Times New Roman";
     }
 
-    .button {
-        display: inline-block;
-        padding: 10px 20px;
-        margin: 10px;
-        background-color: #94693e;
-        color: white;
+    .story-card:hover {
+        background-color: #e0c3a1;
+        transform: translateY(-5px);
         text-decoration: none;
-        font-size: 18px;
-        border-radius: 5px;
-        transition: background-color 0.3s;
+        font-weight: bold;
     }
 
-    .button:hover {
-        background-color: #754e2e;
+    .story-card:hover h3 {
+        font-weight: bold;
     }
+
+    .story-card h3 {
+        font-size: 26px;
+        color: #754e2e;
+        margin-bottom: 10px;
+        font-family: "Courier";
+    }
+
+    .story-card p {
+        font-size: 16px;
+        font-family: "Times New Roman";
+        font-style: italic;
+        color: rgb(78, 68, 57);
+    }
+
 </style>
 
 <h2>Cat Story🐈‍⬛</h2>
 
-<div class="button-container">
-    <a href="{{ url_for('auth.my_story') }}" class="button">My Story</a>
-    <a href="{{ url_for('auth.share_story') }}" class="button">Share Story</a>
+<div class="story-container">
+    <a href="{{ url_for('auth.my_story') }}" class="story-card">
+        <h3>My Story</h3>
+        <p>View your personal collection of cat tales.</p>
+    </a>
+
+    <a href="{{ url_for('auth.share_story') }}" class="story-card">
+        <h3>Share Story</h3>
+        <p>Write and share your cat story with others.</p>
+    </a>
 </div>
 
 {% endblock %}
