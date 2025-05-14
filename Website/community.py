@@ -123,9 +123,15 @@ def post_detail(post_id):
         ORDER BY comment.created_at DESC
     ''', (current_user.id if current_user.is_authenticated else -1, post_id)).fetchall()
 
+    grouped_comments = {}
+    for comment in comments:
+        parent_id = comment['parent_id']
+        if parent_id not in grouped_comments:
+            grouped_comments[parent_id] = []
+        grouped_comments[parent_id].append(comment)
     conn.close()
 
-    return render_template("community_detail.html", post=post, comments=comments, user=current_user)
+    return render_template("community_detail.html", post=post, comments=comments, grouped_comments=grouped_comments, user=current_user)
 
 
 # Create Post
@@ -335,7 +341,11 @@ def add_comment(post_id):
     media_url = None
     created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     user_id = current_user.id
+    parent_id = request.form.get('parent_id')
     sort = request.form.get('sort', 'date_desc')
+
+    if not parent_id:
+        parent_id = None    
 
     if not content and not media:
         flash("You must provide either text or media for your comment!", category="error")
@@ -350,9 +360,9 @@ def add_comment(post_id):
     
     conn = get_db_connection()
     conn.execute(
-        '''INSERT INTO comment (content, media_url, created_at, post_id, user_id) 
-           VALUES (?, ?, ?, ?, ?)''', 
-        (content, media_url, created_at, post_id, user_id) 
+        '''INSERT INTO comment (content, media_url, created_at, post_id, user_id,parent_id) 
+           VALUES (?, ?, ?, ?, ?, ?)''', 
+        (content, media_url, created_at, post_id, user_id, parent_id) 
     )
     conn.commit()
     conn.close()
@@ -413,16 +423,15 @@ def unlike_comment(comment_id):
 @community_bp.route('/comment/delete/<int:comment_id>', methods=['POST'])
 def delete_comment(comment_id):
     conn = get_db_connection()
-    comment = conn.execute('SELECT * FROM comment WHERE id = ?', (comment_id,)).fetchone()
 
-    conn.execute('DELETE FROM comment WHERE id = ?', (comment_id,))
+    def delete_with_replies(comment_id):
+        child_comments = conn.execute('SELECT id FROM comment WHERE parent_id = ?', (comment_id,)).fetchall()
+        for child in child_comments:
+            delete_with_replies(child['id'])
+        conn.execute('DELETE FROM comment WHERE id = ?', (comment_id,))
+    
+    delete_with_replies(comment_id)
     conn.commit()
-
-    if comment['media_url']:
-        file_path = os.path.join(os.path.dirname(__file__), 'static', comment['media_url'])
-        if os.path.exists(file_path):
-            os.remove(file_path)
-
     conn.close()
 
     flash("Comment deleted successfully!", category="success")
