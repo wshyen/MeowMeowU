@@ -142,15 +142,22 @@
 
     .comment-content {
         display: flex;
+        flex-direction: column;
         justify-content: flex-start; 
         text-align: left;    
         margin-left: 70px;   
     }
 
+    .comment-media {
+        width: 250px;
+        height: auto;
+        border-radius: 4px;
+        object-fit: contain;  
+        margin-top: 5px;
+    }
+
     .comment-actions {
         margin-top: 10px;
-        display: flex;
-        justify-content: flex-start;
     }
     
     .comment-action-button {
@@ -243,6 +250,41 @@
         box-shadow: 0px 8px 15px rgba(255, 163, 71, 0.2);
     }
 
+    .news-item input {
+        display: none;
+    }
+
+    .news-item label {
+        cursor: pointer;
+        display: inline-block;
+    }
+
+    .news-item input:checked + label::after {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 99;
+    }
+
+    .news-item input:checked + label img,
+    .news-item input:checked + label video {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: auto;
+        height: 60vh;
+        max-width: 80vw;
+        max-height: 60vh;
+        object-fit: contain;
+        border: 10px solid #f2eadf;
+        z-index: 100;
+    }    
+
 </style>
 
     <h1>Post Details</h1>
@@ -314,33 +356,44 @@
             <p>{{ comment['content'] }}</p>
             {% if comment['media_url'] %}
                 {% if comment['media_url'].endswith(('.png', '.jpg', '.jpeg', '.gif')) %}
-                    <img src="{{ url_for('static', filename=comment['media_url']) }}" alt="Comment Media">
+                    <div class="news-item">
+                        <input type="checkbox" id="comment-image-{{ comment['id'] }}">
+                        <label for="comment-image-{{ comment['id'] }}">
+                            <img class="comment-media" src="{{ url_for('static', filename=comment['media_url']) }}" alt="Comment Media">
+                        </label>
+                    </div>                
+                    
                 {% elif comment['media_url'].endswith(('.mp4', '.mov', '.avi')) %}
-                    <video controls>
-                        <source src="{{ url_for('static', filename=comment['media_url']) }}" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
+                    <div class="news-item">
+                        <input type="checkbox" id="comment-video-{{ comment['id'] }}">
+                        <label for="comment-video-{{ comment['id'] }}">
+                            <video class="comment-media" src="{{ url_for('static', filename=comment['media_url']) }}" controls>
+                                Your browser does not support the video tag.
+                            </video>
+                        </label>
+                    </div>
                 {% endif %}
             {% endif %}
-        </div>
 
-        <div class="comment-actions">
-            <form id="like-form-{{ comment['id'] }}" action="{{ url_for('community.like_comment' if not comment['liked_by_current_user'] else 'community.unlike_comment', comment_id=comment['id']) }}" method="post" style="display:inline;">
-                <button type="submit" class="comment-action-button">
-                    {% if comment['liked_by_current_user'] %}
-                        ❤️ 
-                    {% else %}
-                        🤍 
-                    {% endif %}
-                    {{ comment['like_count'] }} Like
+
+            <div class="comment-actions">
+                <form id="like-form-{{ comment['id'] }}" action="{{ url_for('community.like_comment' if not comment['liked_by_current_user'] else 'community.unlike_comment', comment_id=comment['id']) }}" method="post" style="display:inline;">
+                    <button type="submit" class="comment-action-button">
+                        {% if comment['liked_by_current_user'] %}
+                            ❤️ 
+                        {% else %}
+                            🤍 
+                        {% endif %}
+                        {{ comment['like_count'] }} Like
+                    </button>
+                </form>
+                
+                <span class="separator">|</span>
+
+                <button class="comment-action-button">
+                    💬 Reply
                 </button>
-            </form>
-            
-            <span class="separator">|</span>
-
-            <button class="comment-action-button">
-                💬 Reply
-            </button>
+            </div>
         </div>
 
     </div>
@@ -348,7 +401,8 @@
 
     <div class="comment-form-container">
         <form action="{{ url_for('community.add_comment', post_id=post['post_id']) }}" method="POST" enctype="multipart/form-data">
-            <textarea name="content" placeholder="Write a comment..." required></textarea>
+            <textarea id="comment-textarea" name="content" placeholder="Write a comment..."></textarea>
+            <span id="file-name-display" style="margin-right: 10px; color: #6b4f2f; font-size: 14px;"></span>
             <label for="comment-media" class="file-upload-label">
                 <img src="{{ url_for('static', filename='paperclip.png') }}" alt="Attach File" class="paperclip-icon">
             </label>
@@ -357,4 +411,21 @@
         </form>
     </div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const fileInput = document.getElementById('comment-media');
+        const fileNameDisplay = document.getElementById('file-name-display');
+
+        fileInput.addEventListener('change', function () {
+            if (fileInput.files.length > 0) {
+                const fileName = fileInput.files[0].name;
+                fileNameDisplay.textContent = `📎 ${fileName}`;
+            } else {
+                fileNameDisplay.textContent = '';
+            }
+        });
+    });
+</script>
+
 {% endblock %}
+
