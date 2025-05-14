@@ -244,8 +244,8 @@ def update_profile():
 
     return render_template("update_profile.html", user=current_user)
 
-votes = {
-    "Fluffy": 0,
-    "Whiskers": 0,
-    "Mittens": 0
-}
+#cat story
+@auth.route("/cat-story")
+def cat_story():
+
+    return render_template("cat_story.html", user=current_user)

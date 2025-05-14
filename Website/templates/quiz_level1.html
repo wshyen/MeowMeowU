@@ -64,14 +64,23 @@
         color: white;
         font-weight: bold;
         font-family: 'Times New Roman', Times, serif;
+        margin-bottom: -60px;
+        font-style: italic;
+        font-size: large;
     }
 
-    #countdown-box{
+    #countdown-box {
         font-weight: bolder;
         font-size: large;
         font-family: 'Times New Roman', Times, serif;
         text-align: center;
-        margin-top: 330px;
+        margin-top: 100px;
+    }
+
+    #feedback {
+        color: white;
+        text-align: center;
+        font-family: 'Times New Roman', Times, serif;
     }
 </style>
 <div style="padding: 20px;">
@@ -85,6 +94,7 @@
 
     <div class="cat-box" id="cat-box" style="display: none;">
         <h2 id="question-text"></h2>
+        <h2 id="feedback"></h2> 
     </div>
 
     <div class="options" id="options"></div>
@@ -121,17 +131,26 @@
 
     async function fetchQuestions() {
         const response = await fetch('/get_questions?level=1');
-        questions = await response.json();
+        let allQuestions = await response.json();
+
+        //Select 10 completely random questions without relying on order
+        questions = getRandomSubset(allQuestions, 10);
         currentIndex = 0;
         currentCount = 0;
         displayQuestion();
+    }
+
+    //Function to randomly select a subset of questions
+    function getRandomSubset(arr, num) {
+        let shuffled = arr.sort(() => Math.random() - 0.5); //Shuffle the array
+        return shuffled.slice(0, num); //Take only 10 random questions
     }
 
     function displayQuestion() {
         if (currentIndex < questions.length) {
             let q = questions[currentIndex];
 
-            correctAnswer = q.correct_option; //Store the correct answer
+            correctAnswer = q.correct_option.toUpperCase().replace("OPTION_", ""); //Store the correct answer
 
             let shuffledOptions = shuffleOptions([
                 { text: q.option_a, value: "A" },
@@ -163,11 +182,14 @@
 
         let userAnswer = selectedOption.value;
 
+        document.getElementById("question-text").style.display = "none"; //Hide question when display feedback
+        document.getElementById("options").style.display = "none"; //Hide options when display feedback
+
         if (userAnswer === correctAnswer) {
             correctCount++; //Increase correct answer count
-            alert("Correct!");
+            document.getElementById("feedback").innerHTML = "✅ Correct!";
         } else {
-            alert("Wrong!");
+            document.getElementById("feedback").innerHTML = "❌ Wrong!";
         }
 
         setTimeout(() => {
@@ -177,6 +199,11 @@
 
     function nextQuestion() {
         currentIndex++;
+        document.getElementById("feedback").innerHTML = ""; //Clear previous feedback
+        
+        //Make question and options visible again for the next question
+        document.getElementById("question-text").style.display = "block";
+        document.getElementById("options").style.display = "block";
         displayQuestion();
     }
 
@@ -186,7 +213,9 @@
 
         if (correctCount === questions.length) {
             document.getElementById("question-text").innerHTML = "Congratulations! <br> You have unlocked level 2 and earned a badge! <br> ฅ^•⩊•^ ฅ";
+            localStorage.setItem("level1Completed", "true"); //Store completion status
         } else {
+            localStorage.removeItem("level1Completed");
             document.getElementById("question-text").innerHTML = "You need to answer all correctly to unlock Level 2 and earn your badge. <br> Try again! <br> /ᐠ ╥ ˕ ╥マ ";
         }
     }
