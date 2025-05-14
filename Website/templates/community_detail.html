@@ -9,7 +9,7 @@
         font-family: 'Times New Roman', Times, serif;
         background-color: #f2eadf;
         margin: 0;
-        padding: 0;
+        padding-bottom: 70px;
     }
 
     h1 {
@@ -203,7 +203,7 @@
         border: 1px solid #ccc;
         border-radius: 5px;
         resize: none;
-        height: 50px; /* 固定高度 */
+        height: 50px;
     }
 
     .file-upload-label {
@@ -250,16 +250,16 @@
         box-shadow: 0px 8px 15px rgba(255, 163, 71, 0.2);
     }
 
-    .news-item input {
+    .media-container input {
         display: none;
     }
 
-    .news-item label {
+    .media-container label {
         cursor: pointer;
         display: inline-block;
     }
 
-    .news-item input:checked + label::after {
+    .media-container input:checked + label::after {
         content: "";
         position: fixed;
         top: 0;
@@ -270,8 +270,8 @@
         z-index: 99;
     }
 
-    .news-item input:checked + label img,
-    .news-item input:checked + label video {
+    .media-container input:checked + label img,
+    .media-container input:checked + label video {
         position: fixed;
         top: 50%;
         left: 50%;
@@ -285,145 +285,161 @@
         z-index: 100;
     }    
 
+    .hidden {
+        display: none;
+    }
 </style>
 
-    <h1>Post Details</h1>
-    <button class="back-button" onclick="window.location.href='{{ url_for('community.community_feature') }}'">
-        Back
-    </button>
+<h1>Post Details</h1>
+<button class="back-button" onclick="window.location.href='{{ url_for('community.community_feature') }}'">
+    Back
+</button>
 
-    <div class="post">
+<div class="post">
 
-        <div class="post-info">
-        <img class="profile-picture" src="{{ url_for('static', filename='Userprofile/' + (post['profile_picture'] if post['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
-        <p><strong>{{ post['name'] }}</strong> posted at {{ post['created_at'] }}</p>
-        </div>
+    <div class="post-info">
+    <img class="profile-picture" src="{{ url_for('static', filename='Userprofile/' + (post['profile_picture'] if post['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
+    <p><strong>{{ post['name'] }}</strong> posted at {{ post['created_at'] }}</p>
+    </div>
 
-        <p class="post-content">{{ post['content'] }}</p>
-        {% if post['cat_hashtag'] %}
-            <p class="post-content">
-                <a href="{{ url_for('community.hashtag_posts', hashtag=post['cat_hashtag']) }}">#{{ post['cat_hashtag'] }}</a>
-            </p>
+    <p class="post-content">{{ post['content'] }}</p>
+    {% if post['cat_hashtag'] %}
+        <p class="post-content">
+            <a href="{{ url_for('community.hashtag_posts', hashtag=post['cat_hashtag']) }}">#{{ post['cat_hashtag'] }}</a>
+        </p>
+    {% endif %}
+
+    <div class="media">
+        {% if post['media_url'] %}
+            {% set ext = post['media_url'].rsplit('.', 1)[1].lower() %}
+            {% if ext in ['jpg', 'jpeg', 'png', 'gif'] %}
+            <img src="{{ url_for('static', filename=post['media_url']) }}" alt="Image">
+            {% elif ext in ['mp4', 'mov', 'avi'] %}
+                <video controls>
+                <source src="{{ url_for('static', filename=post['media_url']) }}" type="video/{{ ext }}">
+                </video>
+            {% endif %}
         {% endif %}
-
-        <div class="media">
-            {% if post['media_url'] %}
-                {% set ext = post['media_url'].rsplit('.', 1)[1].lower() %}
-                {% if ext in ['jpg', 'jpeg', 'png', 'gif'] %}
-                <img src="{{ url_for('static', filename=post['media_url']) }}" alt="Image">
-                {% elif ext in ['mp4', 'mov', 'avi'] %}
-                    <video controls>
-                    <source src="{{ url_for('static', filename=post['media_url']) }}" type="video/{{ ext }}">
-                    </video>
-                {% endif %}
-            {% endif %}
-        </div>
-        
-        <div class="post-actions">
-            <form id="like-form-{{ post['post_id'] }}" action="{{ url_for('community.like_post' if not post['liked_by_current_user'] else 'community.unlike_post', post_id=post['post_id']) }}" method="post" style="display:inline;">
-                <button type="submit" class="post-action-button">
-                    {% if post['liked_by_current_user'] %}
-                        ❤️ 
-                    {% else %}
-                        🤍 
-                    {% endif %}
-                    {{ post['like_count'] }} Like
-                </button>
-            </form>
-            
-            <span class="separator">|</span>
-
-            <button class="post-action-button">
-                💬 Comments
-            </button>
-        </div>
-        
     </div>
-
-    <hr>
     
-    <!-- Comment List -->
-
-    <h3 id= "comments">Comments List</h3>
-    {% for comment in comments %}
-    <div class="comment">
-        <div class="comment-info">
-            <img class="comment-profile-picture" src="{{ url_for('static', filename='Userprofile/' + (comment['profile_picture'] if comment['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
-            <p><strong>{{ comment['name'] }}</strong> commented at {{ comment['created_at'] }}</p>
-        </div>
-
-        <div class="comment-content">
-            <p>{{ comment['content'] }}</p>
-            {% if comment['media_url'] %}
-                {% if comment['media_url'].endswith(('.png', '.jpg', '.jpeg', '.gif')) %}
-                    <div class="news-item">
-                        <input type="checkbox" id="comment-image-{{ comment['id'] }}">
-                        <label for="comment-image-{{ comment['id'] }}">
-                            <img class="comment-media" src="{{ url_for('static', filename=comment['media_url']) }}" alt="Comment Media">
-                        </label>
-                    </div>                
-                    
-                {% elif comment['media_url'].endswith(('.mp4', '.mov', '.avi')) %}
-                    <div class="news-item">
-                        <input type="checkbox" id="comment-video-{{ comment['id'] }}">
-                        <label for="comment-video-{{ comment['id'] }}">
-                            <video class="comment-media" src="{{ url_for('static', filename=comment['media_url']) }}" controls>
-                                Your browser does not support the video tag.
-                            </video>
-                        </label>
-                    </div>
+    <div class="post-actions">
+        <form id="like-form-{{ post['post_id'] }}" action="{{ url_for('community.like_post' if not post['liked_by_current_user'] else 'community.unlike_post', post_id=post['post_id']) }}" method="post" style="display:inline;">
+            <button type="submit" class="post-action-button">
+                {% if post['liked_by_current_user'] %}
+                    ❤️ 
+                {% else %}
+                    🤍 
                 {% endif %}
-            {% endif %}
-
-
-            <div class="comment-actions">
-                <form id="like-form-{{ comment['id'] }}" action="{{ url_for('community.like_comment' if not comment['liked_by_current_user'] else 'community.unlike_comment', comment_id=comment['id']) }}" method="post" style="display:inline;">
-                    <button type="submit" class="comment-action-button">
-                        {% if comment['liked_by_current_user'] %}
-                            ❤️ 
-                        {% else %}
-                            🤍 
-                        {% endif %}
-                        {{ comment['like_count'] }} Like
-                    </button>
-                </form>
-                
-                <span class="separator">|</span>
-
-                <button class="comment-action-button">
-                    💬 Reply
-                </button>
-
-                {% if comment['user_id'] == user.id %}
-                <form action="{{ url_for('community.delete_comment', comment_id=comment['id']) }}" method="post" style="display:inline;">
-                    <button type="submit" class="comment-action-button" onclick="return confirm('Are you sure you want to delete this comment?');">
-                        🗑️ Delete
-                    </button>
-                </form>
-                {%else%}
-                    <button type="submit" class="comment-action-button" onclick="return confirm('Are you sure you want to report this comment?');">
-                        ⚠️ Report
-                    </button>
-                </form>
-
-                {% endif %}                
-            </div>
-        </div>
-
-    </div>
-    {% endfor %}
-
-    <div class="comment-form-container">
-        <form action="{{ url_for('community.add_comment', post_id=post['post_id']) }}" method="POST" enctype="multipart/form-data">
-            <textarea id="comment-textarea" name="content" placeholder="Write a comment..."></textarea>
-            <span id="file-name-display" style="margin-right: 10px; color: #6b4f2f; font-size: 14px;"></span>
-            <label for="comment-media" class="file-upload-label">
-                <img src="{{ url_for('static', filename='paperclip.png') }}" alt="Attach File" class="paperclip-icon">
-            </label>
-            <input type="file" id="comment-media" name="media" accept="image/*,video/*" style="display: none;">
-            <button type="submit">Submit Comment</button>
+                {{ post['like_count'] }} Like
+            </button>
         </form>
+        
+        <span class="separator">|</span>
+
+        <button class="post-action-button" id="comment-button">
+            💬 Comments
+        </button>
     </div>
+    
+</div>
+
+<hr>
+
+<!-- Comment List -->
+
+<h3 id="comments">Comments List</h3>
+{% macro render_comments(comments, grouped_comments) %}
+    {% for comment in comments %}
+        <div class="comment">
+            <div class="comment-info">
+                <img class="comment-profile-picture" src="{{ url_for('static', filename='Userprofile/' + (comment['profile_picture'] if comment['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
+                <p><strong>{{ comment['name'] }}</strong> commented at {{ comment['created_at'] }}</p>
+                <span style="font-size: 20px; margin-left: 10px; color: #6b4f2f;">#{{ comment['id'] }}</span> <!-- 添加评论 ID -->
+
+            </div>
+
+            <div class="comment-content">
+                <p>{{ comment['content'] }}</p>
+                {% if comment['media_url'] %}
+                    {% if comment['media_url'].endswith(('.png', '.jpg', '.jpeg', '.gif')) %}
+                        <div class="media-container">
+                            <input type="checkbox" id="comment-image-{{ comment['id'] }}">
+                            <label for="comment-image-{{ comment['id'] }}">
+                                <img class="comment-media" src="{{ url_for('static', filename=comment['media_url']) }}" alt="Comment Media">
+                            </label>
+                        </div>                
+                    {% elif comment['media_url'].endswith(('.mp4', '.mov', '.avi')) %}
+                        <div class="media-container">
+                            <input type="checkbox" id="comment-video-{{ comment['id'] }}">
+                            <label for="comment-video-{{ comment['id'] }}">
+                                <video class="comment-media" src="{{ url_for('static', filename=comment['media_url']) }}" controls>
+                                    Your browser does not support the video tag.
+                                </video>
+                            </label>
+                        </div>
+                    {% endif %}
+                {% endif %}
+
+                <div class="comment-actions">
+                    <form id="like-form-{{ comment['id'] }}" action="{{ url_for('community.like_comment' if not comment['liked_by_current_user'] else 'community.unlike_comment', comment_id=comment['id']) }}" method="post" style="display:inline;">
+                        <button type="submit" class="comment-action-button">
+                            {% if comment['liked_by_current_user'] %}
+                                ❤️ 
+                            {% else %}
+                                🤍 
+                            {% endif %}
+                            {{ comment['like_count'] }} Like
+                        </button>
+                    </form>
+
+                    <span class="separator">|</span>
+
+                    <button class="comment-action-button reply-button" data-comment-id="{{ comment['id'] }}">
+                        💬 Reply
+                    </button>
+
+                    <span class="separator">|</span>
+
+                    {% if comment['user_id'] == user.id %}
+                        <form action="{{ url_for('community.delete_comment', comment_id=comment['id']) }}" method="post" style="display:inline;">
+                            <button type="submit" class="comment-action-button" onclick="return confirm('Are you sure you want to delete this comment?');">
+                                🗑️ Delete
+                            </button>
+                        </form>
+                    {% else %}
+                        <button type="submit" class="comment-action-button" onclick="return confirm('Are you sure you want to report this comment?');">
+                            ⚠️ Report
+                        </button>
+                    {% endif %} 
+                </div>
+
+                {% if comment['id'] in grouped_comments %}
+                    <div class="replies">
+                        {{ render_comments(grouped_comments[comment['id']], grouped_comments) }}
+                    </div>
+                {% endif %}  
+
+
+            </div>            
+        </div>
+    {% endfor %}
+{% endmacro %}
+
+{{ render_comments(grouped_comments[None], grouped_comments) }}
+
+
+<div class="comment-form-container">
+    <form action="{{ url_for('community.add_comment', post_id=post['post_id']) }}" method="POST" enctype="multipart/form-data">
+        <textarea id="comment-textarea" name="content" placeholder="Write a comment..."></textarea>
+        <input type="hidden" id="parent-id" name="parent_id" value="">
+        <span id="file-name-display" style="margin-right: 10px; color: #6b4f2f; font-size: 14px;"></span>
+        <label for="comment-media" class="file-upload-label">
+            <img src="{{ url_for('static', filename='paperclip.png') }}" alt="Attach File" class="paperclip-icon">
+        </label>
+        <input type="file" id="comment-media" name="media" accept="image/*,video/*" style="display: none;">
+        <button type="submit">Submit Comment</button>
+    </form>
+</div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -436,6 +452,33 @@
                 fileNameDisplay.textContent = `📎 ${fileName}`;
             } else {
                 fileNameDisplay.textContent = '';
+            }
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const commentButton = document.getElementById('comment-button');
+        const replyButtons = document.querySelectorAll('.reply-button');
+        const commentTextarea = document.getElementById('comment-textarea');
+        const parentIdInput = document.getElementById('parent-id');
+
+        commentButton.addEventListener('click', function () {
+            commentTextarea.focus();
+        });        
+
+        replyButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const commentId = button.getAttribute('data-comment-id');
+                parentIdInput.value = commentId; 
+                commentTextarea.value = `#${commentId} `;
+                commentTextarea.focus();
+            });
+        });
+
+        const commentForm = document.getElementById('comment-form');
+        commentForm.addEventListener('submit', function () {
+            if (!commentTextarea.value.trim()) {
+                parentIdInput.value = '';
             }
         });
     });
