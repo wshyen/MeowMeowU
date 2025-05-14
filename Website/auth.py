@@ -245,17 +245,25 @@ def update_profile():
     return render_template("update_profile.html", user=current_user)
 
 #cat story
-@auth.route("/cat-story")
+@auth.route("/cat_story")
 def cat_story():
 
     return render_template("cat_story.html", user=current_user)
 
-@auth.route('/my-story')
+@auth.route('/my_story')
 def my_story():
+
+    if not current_user.is_authenticated:
+        flash("You must be logged in to view your story!", category="error")
+        return redirect(url_for('auth.login'))
 
     return render_template("my_story.html", user=current_user)
 
-@auth.route('/share-story')
+@auth.route('/share_story')
 def share_story():
+
+    if not current_user.is_authenticated:
+        flash("You must be logged in to share story!", category="error")
+        return redirect(url_for('auth.login'))
 
     return render_template("share_story.html", user=current_user)
