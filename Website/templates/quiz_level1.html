@@ -83,7 +83,7 @@
         font-family: 'Times New Roman', Times, serif;
     }
 
-    .restart-button {
+    .button-box .restart-button {
         background-color: #94693e;
         color: white;
         padding: 10px 20px;
@@ -95,9 +95,27 @@
         font-family: 'Times New Roman', Times, serif;
     }
 
-    .restart-button:hover {
+    .button-box .restart-button:hover {
         transform: scale(1.05);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    #restart-box {
+        display: none;
+        text-align: center;
+        margin-top: 0px;
+        position: relative;
+        top: -120px;
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    #back-button-box {
+        display: none;
+        text-align: center;
+        margin-top: 10px;
+        position: relative;
+        top: -120px;
+        font-family: 'Times New Roman', Times, serif;
     }
 </style>
 <div style="padding: 20px;">
@@ -116,8 +134,12 @@
 
     <div class="options" id="options"></div>
 
-    <div id="restart-box" style="display: none; text-align: center; margin-top: 20px;">
+    <div class="button-box" id="restart-box">
         <button class="restart-button" onclick="restartQuiz()">Restart</button>
+    </div>
+
+    <div class="button-box" id="back-button-box">
+        <button class="restart-button" onclick="window.location.href='{{ url_for('quiz.quiz_page') }}'">🐾 Back to Quiz 🐾</button>
     </div>
 
 </div>
@@ -231,7 +253,6 @@
 
     //Function to restart the quiz
     function restartQuiz() {
-        localStorage.removeItem("level1Completed"); // Reset progress
         window.location.reload(); // Refresh page to restart
     }
 
@@ -241,12 +262,12 @@
 
         if (correctCount === questions.length) {
             document.getElementById("question-text").innerHTML = "Congratulations! <br> You have unlocked level 2 and earned a badge! <br> ฅ^•⩊•^ ฅ";
-            localStorage.setItem("level1Completed", "true"); //Store completion status
+            fetch('/complete_level1', {method: 'POST'});
         } else {
-            localStorage.removeItem("level1Completed");
             document.getElementById("question-text").innerHTML = "You need to answer all correctly to unlock Level 2 and earn your badge. <br> Try again! <br> /ᐠ ╥ ˕ ╥マ ";
             document.getElementById("restart-box").style.display = "block"; //Show restart buttons
         }
+        document.getElementById("back-button-box").style.display = "block"; //Show back button
     }
 
     function shuffleOptions(options) {

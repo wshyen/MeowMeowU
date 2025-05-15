@@ -83,7 +83,7 @@
         font-family: 'Times New Roman', Times, serif;
     }
 
-    .restart-button {
+    .button-box .restart-button {
         background-color: #94693e;
         color: white;
         padding: 10px 20px;
@@ -95,10 +95,28 @@
         font-family: 'Times New Roman', Times, serif;
     }
 
-    .restart-button:hover {
+    .button-box .restart-button:hover {
         transform: scale(1.05);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
+
+    #restart-box {
+        display: none;
+        text-align: center;
+        margin-top: 0px;
+        position: relative;
+        top: -120px;
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    #back-button-box {
+        display: none;
+        text-align: center;
+        margin-top: 10px;
+        position: relative;
+        top: -120px;
+        font-family: 'Times New Roman', Times, serif;
+    }   
 </style>
 <div style="padding: 20px;">
     <h1>Level 2</h1>
@@ -116,19 +134,18 @@
 
     <div class="options" id="options"></div>
     
-    <div id="restart-box" style="display: none; text-align: center; margin-top: 20px;">
+    <div class="button-box" id="restart-box">
         <button class="restart-button" onclick="restartQuiz()">Restart</button>
+    </div>
+
+    <div class="button-box" id="back-button-box">
+        <button class="restart-button" onclick="window.location.href='{{ url_for('quiz.quiz_page') }}'">🐾 Back to Quiz 🐾</button>
     </div>
 
 </div>
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {
-        if (localStorage.getItem("level1Completed") !== "true") {
-            alert("You must complete Level 1 before accessing Level 2!");
-            window.location.href = "/quiz_level1";
-            return;
-        }
         startCountdown(); // Start countdown immediately when quiz page loads
     });
 
@@ -249,6 +266,7 @@
             document.getElementById("question-text").innerHTML = "This is your final challenge! <br> Get every answer right to complete your journey and earn your badge. <br> Give it another shot!  <br> /ᐠ╥⩊╥ᐟ\\";
             document.getElementById("restart-box").style.display = "block"; //Show restart buttons
         }
+        document.getElementById("back-button-box").style.display = "block"; //Show back button
     }
 
     function shuffleOptions(options) {
