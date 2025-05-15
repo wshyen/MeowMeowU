@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Cat Story{% endblock %}
+{% block title %}My Story{% endblock %}
 
 {% block content %}
 
@@ -17,6 +17,22 @@
         text-align: center;
         padding-top: 25px;
         color: #94693e;
+    }
+
+    .story-container {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .story-image {
+        width: 100%;
+        height: auto;
+        border-radius: 5px;
+        margin-bottom: 10px;
     }
 
     .button-container {
@@ -42,5 +58,16 @@
 </style>
 
 <h2>My Story</h2>
+
+{% for story in user_stories %}
+    <div class="story-container">
+        <h3>{{ story.caption }}</h3>
+        <img class="story-image" src="{{ url_for('auth.uploaded_file', filename=story.image_filename) }}" alt="Story Image">
+        <p>{{ story.story_text }}</p>
+        <small>Shared on: {{ story.created_at }}</small>
+    </div>
+{% else %}
+    <p style="text-align: center;">You haven't shared any stories yet!</p>
+{% endfor %}
 
 {% endblock %}
