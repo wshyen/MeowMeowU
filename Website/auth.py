@@ -259,7 +259,7 @@ def my_story():
 
     return render_template("my_story.html", user=current_user)
 
-@auth.route('/share_story')
+@auth.route('/share_story', methods=['GET', 'POST'])
 def share_story():
 
     if not current_user.is_authenticated:
@@ -271,22 +271,26 @@ def share_story():
         caption = request.form.get("caption", "").strip()
         story = request.form.get("story", "").strip()
 
+        #validate image file
         if not image or not allowed_file(image.filename):
             flash("Invalid or missing image. Only PNG, JPG, JPEG files are allowed.", category="error")
             return redirect(url_for("auth.share_story"))
 
-        if len(story.split()) < 300:
-            flash("Your story must have more than 300 words.", category="error")
+        #validate story length
+        if len(story.split()) < 250:
+            flash("Your story must have more than 250 words.", category="error")
             return redirect(url_for("auth.share_story"))
 
+        #secure and save image
         filename = secure_filename(image.filename)
         image_path = os.path.join(UPLOAD_FOLDER, filename)
         image.save(image_path)
 
+        #create new story entry
         new_story = Story(
-            image=filename,
+            image_filename=filename,
             caption=caption,
-            content=story,
+            story_text=story,
             user_id=current_user.id
         )
 
