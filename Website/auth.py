@@ -13,6 +13,7 @@ auth = Blueprint("auth", __name__) #a Blueprint for authentication routes, Bluep
 
 #configuration for file uploads
 UPLOAD_FOLDER = 'Website/static/Userprofile'
+UPLOADFOLDER = 'Website/static/story'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 DEFAULT_PROFILE_PICTURE = "default_profilepic.png"
@@ -285,7 +286,7 @@ def share_story():
 
         #secure and save the image
         filename = secure_filename(image.filename)
-        image_path = os.path.join(UPLOAD_FOLDER, filename)
+        image_path = os.path.join(UPLOADFOLDER, filename)
         image.save(image_path)
 
         #create new story entry
