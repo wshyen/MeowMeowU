@@ -107,18 +107,21 @@
             <ul>
                 <li>More advanced stage of the quiz that goes deeper into unique, interesting and sometimes surprising
                     facts about cats.</li>
-                <li>It is designed for users who already have some basic knowledge and are ready to learn more detailed
-                    or uncommon information. </li>
-                <li>This level may include questions related to science, culture, history or even pop culture involving
-                    cats.</li>
+                <li>It is designed for users who already have some basic knowledge and are ready to explore detailed 
+                    scientific insights, unusual cat behaviors and fascinating historical connections.</li>
+                <li>This level may include questions related to biology, genetics, rare breeds, famous cats in history
+                    and even the cultural symbolism of cats in different countries.</li>
                 <li>It aims to challenge users and expand their understanding of cats beyond the basics, while still
                     keeping the quiz enjoyable and engaging.</li>
             </ul>
             <br>
-            <p style="font-family: 'Times New Roman', Times, serif;">Complete Level 1 questions correctly to unlock</p>
             {% if level2_count >= 10 %}
-                <button class="start-button" onclick="window.location.href='{{ url_for('quiz.quiz_level2') }}'">Start Level 2</button>
-            {% else %}
+                {% if current_user.is_authenticated and current_user.level1_completed %}
+                    <a href="{{ url_for('quiz.quiz_level2') }}" class="start-button">Start Level 2</a>
+                {% else %}
+                    <button class="start-button locked" disabled>Complete Level 1 to unlock</button>
+                {% endif %}
+            {% else %}  
                 <p style="color: red; font-weight: bold;">Not enough questions to start Level 2 quiz.</p>
             {% endif %}
         </div>
@@ -148,22 +151,6 @@
             if (manageButton) {
                 manageButton.style.display = "none";  //Hide button only if ID exists
             }
-        }
-
-        let level2Button = document.getElementById("level2Button");
-        let level2Box = document.getElementById("level2Box");
-
-        //Check if Level 1 is completed correctly
-        if (localStorage.getItem("level1Completed") === "true") {
-            level2Box.classList.remove("locked");
-            level2Button.classList.remove("locked"); //Restore button color
-            level2Button.removeAttribute("disabled"); //Enable the button
-        } else {
-            //Keep the button locked & add hover effect
-            level2Button.classList.add("locked");
-            level2Button.setAttribute("disabled", true);
-            level2Button.style.backgroundColor = "grey"; //Make the button grey when locked
-            level2Button.style.cursor = "not-allowed";
         }
     });
 </script>

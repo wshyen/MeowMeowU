@@ -82,11 +82,23 @@ def quiz_level1():
 
     return render_template("quiz_level1.html", user=current_user)
 
+@quiz_bp.route('/complete_level1', methods=['POST'])
+@login_required
+def complete_level1():
+    with get_db_connection() as conn:
+        conn.execute("UPDATE user SET level1_completed = 1 WHERE rowid = ?", (current_user.id,))
+        conn.commit()
+    return jsonify({"success": True})
+
 @quiz_bp.route('/quiz_level2')
 def quiz_level2():
     if not current_user.is_authenticated:
         flash("You must be logged in to play the quiz!", category="error")
         return redirect (url_for('auth.login'))
+    
+    if not current_user.level1_completed:
+        flash("You must complete Level 1 before accessing Level 2!", category="error")
+        return redirect(url_for('quiz.quiz_page'))
     
     return render_template("quiz_level2.html", user=current_user)
 
