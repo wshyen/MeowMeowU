@@ -54,7 +54,7 @@
         color: white;
         font-weight: bold;
         font-family: 'Times New Roman', Times, serif;
-        max-width: 65%;
+        max-width: 60%;
         word-wrap: break-word;
         overflow-wrap: break-word;
         font-size: 24px;
@@ -82,6 +82,23 @@
         text-align: center;
         font-family: 'Times New Roman', Times, serif;
     }
+
+    .restart-button {
+        background-color: #94693e;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    .restart-button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
 </style>
 <div style="padding: 20px;">
     <h1>Level 2</h1>
@@ -98,17 +115,27 @@
     </div>
 
     <div class="options" id="options"></div>
+    
+    <div id="restart-box" style="display: none; text-align: center; margin-top: 20px;">
+        <button class="restart-button" onclick="restartQuiz()">Restart</button>
+    </div>
+
 </div>
 
 <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        if (localStorage.getItem("level1Completed") !== "true") {
+            alert("You must complete Level 1 before accessing Level 2!");
+            window.location.href = "/quiz_level1";
+            return;
+        }
+        startCountdown(); // Start countdown immediately when quiz page loads
+    });
+
     let questions = [];
     let currentIndex = 0;
     let correctAnswer = ""; //Stores the correct answer temporarily
     let correctCount = 0; //Count the number of correct answers
-
-    document.addEventListener("DOMContentLoaded", () => {
-        startCountdown(); // Start countdown immediately when quiz page loads
-    });
 
     function startCountdown() {
         let countdownText = document.getElementById("countdown-text");
@@ -207,6 +234,11 @@
         displayQuestion();
     }
 
+    function restartQuiz() {
+        localStorage.removeItem("level1Completed"); // Reset progress
+        window.location.reload(); // Refresh page to restart
+    }
+
     function checkQuizCompletion() {
         document.getElementById("question-text").innerHTML = "Quiz Complete!";
         document.getElementById("options").innerHTML = "";
@@ -215,6 +247,7 @@
             document.getElementById("question-text").innerHTML = "Congratulations! <br> You have completed Level 2 and earned your badge! <br> ฅ^•⩊•^ ฅ";
         } else {
             document.getElementById("question-text").innerHTML = "This is your final challenge! <br> Get every answer right to complete your journey and earn your badge. <br> Give it another shot!  <br> /ᐠ╥⩊╥ᐟ\\";
+            document.getElementById("restart-box").style.display = "block"; //Show restart buttons
         }
     }
 
