@@ -8,7 +8,8 @@ from werkzeug.utils import secure_filename
 
 community_bp = Blueprint('community', __name__, template_folder='templates')
 
-UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static', 'posts')
+POSTS_FOLDER = os.path.join(os.path.dirname(__file__), 'static', 'posts')
+COMMENTS_FOLDER = os.path.join(os.path.dirname(__file__), 'static', 'comments')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov', 'avi'}
 
 def allowed_file(filename):
@@ -103,9 +104,34 @@ def post_detail(post_id):
         post_id
     )).fetchone()
 
+    comments = conn.execute('''
+        SELECT 
+            comment.*,
+            user.name AS name, 
+            user.profile_picture AS profile_picture,
+            (SELECT COUNT(*) FROM comment_like WHERE comment_like.comment_id = comment.id) AS like_count,
+            CASE 
+                WHEN EXISTS (
+                    SELECT 1 FROM comment_like 
+                    WHERE comment_like.comment_id = comment.id AND comment_like.user_id = ?
+                ) THEN 1
+                ELSE 0
+            END AS liked_by_current_user
+        FROM comment
+        JOIN user ON comment.user_id = user.id
+        WHERE comment.post_id = ?
+        ORDER BY comment.created_at DESC
+    ''', (current_user.id if current_user.is_authenticated else -1, post_id)).fetchall()
+
+    grouped_comments = {}
+    for comment in comments:
+        parent_id = comment['parent_id']
+        if parent_id not in grouped_comments:
+            grouped_comments[parent_id] = []
+        grouped_comments[parent_id].append(comment)
     conn.close()
 
-    return render_template("community_detail.html", post=post, user=current_user)
+    return render_template("community_detail.html", post=post, comments=comments, grouped_comments=grouped_comments, user=current_user)
 
 
 # Create Post
@@ -123,11 +149,11 @@ def create_post():
     media_url = None
 
     if media and allowed_file(media.filename):
-        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+        os.makedirs(POSTS_FOLDER, exist_ok=True)
         filename = secure_filename(media.filename)
-        media.save(os.path.join(UPLOAD_FOLDER, filename))
+        media.save(os.path.join(POSTS_FOLDER, filename))
         media_url = f"posts/{filename}"
-        print("File saved to:", os.path.join(UPLOAD_FOLDER, filename))
+        print("File saved to:", os.path.join(POSTS_FOLDER, filename))
 
     conn = get_db_connection()
     conn.execute(
@@ -255,7 +281,7 @@ def delete_post(post_id):
 @community_bp.route('/post/like/<int:post_id>', methods=['POST'])
 def like_post(post_id):
     if not current_user.is_authenticated:
-        flash("You must be logged in to view result!", category="error")
+        flash("You must be logged in to like post!", category="error")
         return redirect(url_for('auth.login')) 
     
     user_id = current_user.id
@@ -302,3 +328,111 @@ def unlike_post(post_id):
         return redirect(url_for('community.community_feature', sort=sort))
 
     return redirect(url_for('community.post_detail', post_id=post_id))
+
+# comment
+@community_bp.route('/post/<int:post_id>/comment', methods=['POST'])
+def add_comment(post_id):
+    if not current_user.is_authenticated:
+        flash("You must be logged in to comment!", category="error")
+        return redirect(url_for('auth.login')) 
+    
+    content = request.form.get('content', '').strip() 
+    media = request.files.get('media')
+    media_url = None
+    created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    user_id = current_user.id
+    parent_id = request.form.get('parent_id')
+    sort = request.form.get('sort', 'date_desc')
+
+    if not parent_id:
+        parent_id = None    
+
+    if not content and not media:
+        flash("You must provide either text or media for your comment!", category="error")
+        return redirect(f'/post/{post_id}#comments')
+
+    if media and allowed_file(media.filename):
+        os.makedirs(COMMENTS_FOLDER, exist_ok=True)
+        filename = secure_filename(media.filename)
+        media.save(os.path.join(COMMENTS_FOLDER, filename))
+        media_url = f"comments/{filename}"
+        print("File saved to:", os.path.join(COMMENTS_FOLDER, filename))
+    
+    conn = get_db_connection()
+    conn.execute(
+        '''INSERT INTO comment (content, media_url, created_at, post_id, user_id,parent_id) 
+           VALUES (?, ?, ?, ?, ?, ?)''', 
+        (content, media_url, created_at, post_id, user_id, parent_id) 
+    )
+    conn.commit()
+    conn.close()
+
+    return redirect(f'/post/{post_id}#comments')
+
+@community_bp.route('/comment/like/<int:comment_id>', methods=['POST'])
+def like_comment(comment_id):
+    if not current_user.is_authenticated:
+        flash("You must be logged in to like a comment!", category="error")
+        return redirect(url_for('auth.login')) 
+    
+    user_id = current_user.id
+    conn = get_db_connection()
+
+    result = conn.execute(
+        'SELECT post_id FROM comment WHERE id = ?',
+        (comment_id,)
+    ).fetchone()
+    post_id = result['post_id']
+
+    existing_like = conn.execute(
+        'SELECT 1 FROM comment_like WHERE user_id = ? AND comment_id = ?',
+        (user_id, comment_id)
+    ).fetchone()
+
+    if not existing_like:
+        conn.execute(
+            'INSERT INTO comment_like (user_id, comment_id, post_id) VALUES (?, ?, ?)',
+            (user_id, comment_id, post_id)
+        )
+        conn.commit()
+
+    conn.close()
+    return redirect(request.referrer)
+
+@community_bp.route('/comment/unlike/<int:comment_id>', methods=['POST'])
+def unlike_comment(comment_id):
+    user_id = current_user.id
+    conn = get_db_connection()
+
+    result = conn.execute(
+        'SELECT post_id FROM comment WHERE id = ?',
+        (comment_id,)
+    ).fetchone()
+
+    post_id = result['post_id']
+
+    conn.execute(
+        'DELETE FROM comment_like WHERE user_id = ? AND comment_id = ?',
+        (user_id, comment_id)
+    )
+    conn.commit()
+    conn.close()
+
+    return redirect(request.referrer)
+
+@community_bp.route('/comment/delete/<int:comment_id>', methods=['POST'])
+def delete_comment(comment_id):
+    conn = get_db_connection()
+
+    def delete_with_replies(comment_id):
+        child_comments = conn.execute('SELECT id FROM comment WHERE parent_id = ?', (comment_id,)).fetchall()
+        for child in child_comments:
+            delete_with_replies(child['id'])
+        conn.execute('DELETE FROM comment WHERE id = ?', (comment_id,))
+    
+    delete_with_replies(comment_id)
+    conn.commit()
+    conn.close()
+
+    flash("Comment deleted successfully!", category="success")
+    return redirect(request.referrer)
