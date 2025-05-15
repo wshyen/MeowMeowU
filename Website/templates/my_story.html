@@ -8,66 +8,103 @@
     body {
         background-color: #f2eadf;
         color: rgb(78, 68, 57);
+        font-family: 'Times New Roman', serif;
     }
 
     h2 {
         font-weight: bold;
-        font-size: 35px;
-        font-family: 'Times New Roman';
+        font-size: 40px;
         text-align: center;
         padding-top: 25px;
         color: #94693e;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    h5 {
+        font-weight: bold;
+        font-size: 22px;
+        color: #6b4f2f;
+        text-align: center;
+        font-style: italic;
+        margin-bottom: 20px;
     }
 
     .story-container {
-        max-width: 800px;
+        max-width: 750px;
         margin: 20px auto;
         padding: 20px;
-        background-color: white;
-        border-radius: 10px;
-        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s;
+    }
+
+    .story-container:hover {
+        transform: scale(1.02);
     }
 
     .story-image {
-        width: 100%;
+        width: 60%; /* Reduced image size */
         height: auto;
-        border-radius: 5px;
+        border-radius: 8px;
+        display: block;
+        margin: 10px auto;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .story-text {
+        font-size: 18px;
+        line-height: 1.6;
+        text-align: justify;
         margin-bottom: 10px;
+    }
+
+    .timestamp {
+        display: block;
+        font-size: 14px;
+        color: #94693e;
+        text-align: right;
     }
 
     .button-container {
         text-align: center;
-        margin-top: 20px;
+        margin-top: 30px;
     }
 
     .button {
         display: inline-block;
-        padding: 10px 20px;
-        margin: 10px;
+        padding: 12px 25px;
         background-color: #94693e;
         color: white;
+        font-size: 20px;
+        border-radius: 6px;
         text-decoration: none;
-        font-size: 18px;
-        border-radius: 5px;
-        transition: background-color 0.3s;
+        transition: background-color 0.3s, transform 0.2s;
     }
 
     .button:hover {
         background-color: #754e2e;
+        transform: scale(1.05);
     }
 </style>
 
 <h2>My Story</h2>
 
 {% for story in user_stories %}
+    <h5>Your shared story</h5>
     <div class="story-container">
         <h3>{{ story.caption }}</h3>
         <img class="story-image" src="{{ url_for('auth.uploaded_file', filename=story.image_filename) }}" alt="Story Image">
-        <p>{{ story.story_text }}</p>
-        <small>Shared on: {{ story.created_at }}</small>
+        <p class="story-text">{{ story.story_text }}</p>
+        <small class="timestamp">Shared on: {{ story.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</small>
     </div>
 {% else %}
-    <p style="text-align: center;">You haven't shared any stories yet!</p>
+    <h5>You haven't shared any stories yet!</h5>
 {% endfor %}
+
+<div class="button-container">
+    <a href="{{ url_for('auth.share_story') }}" class="button">Share a New Story</a>
+</div>
 
 {% endblock %}

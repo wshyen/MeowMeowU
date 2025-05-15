@@ -280,8 +280,8 @@ def share_story():
             return redirect(url_for("auth.share_story"))
 
         #validate the story length
-        if len(story.split()) < 250:
-            flash("Your story must have more than 250 words.", category="error")
+        if len(story.split()) < 200:
+            flash("Your story must have more than 200 words.", category="error")
             return redirect(url_for("auth.share_story"))
 
         #secure and save the image
@@ -294,7 +294,8 @@ def share_story():
             image_filename=filename,
             caption=caption,
             story_text=story,
-            user_id=current_user.id
+            user_id=current_user.id,
+            created_at=datetime.utcnow()
         )
 
         db.session.add(new_story)
