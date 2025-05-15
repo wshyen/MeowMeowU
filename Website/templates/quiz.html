@@ -117,7 +117,7 @@
             <br>
             {% if level2_count >= 10 %}
                 {% if current_user.is_authenticated and current_user.level1_completed %}
-                    <a href="{{ url_for('quiz.quiz_level2') }}" class="start-button">Start Level 2</a>
+                    <button class="start-button" onclick="window.location.href='{{ url_for('quiz.quiz_level2') }}'">Start Level 2</button>
                 {% else %}
                     <button class="start-button locked" disabled>Complete Level 1 to unlock</button>
                 {% endif %}
