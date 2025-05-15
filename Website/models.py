@@ -1,6 +1,7 @@
 from . import db
 from flask_login import UserMixin
 from sqlalchemy.sql import func
+from datetime import datetime
 
 class Note(db.Model): 
     id = db.Column(db.Integer, primary_key=True)
@@ -32,5 +33,6 @@ class Story(db.Model):
     image_filename = db.Column(db.String(150), nullable=False)
     caption = db.Column(db.String(255), nullable=False)
     story_text = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     user = db.relationship("User", backref="stories")
