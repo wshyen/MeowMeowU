@@ -24,6 +24,7 @@ class User(db.Model, UserMixin):
     profile_picture = db.Column(db.String(255), default="default_profilepic.png")
     cover_photo = db.Column(db.String(255), default="default_cover.png")
     role = db.Column(db.String(50), default='user', nullable=False)
+<<<<<<< HEAD
 
 class Story(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -33,3 +34,6 @@ class Story(db.Model):
     story_text = db.Column(db.Text, nullable=False)
 
     user = db.relationship("User", backref="stories")
+=======
+    level1_completed = db.Column(db.Boolean, default=False)
+>>>>>>> bf752a4f271f610da8a5319db107e9250c2a30d4

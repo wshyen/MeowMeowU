@@ -219,39 +219,6 @@ def user_has_submitted(name, contest_id):
 
     return existing_entry is not None
 
-if __name__ == '__main__':
-    #Ensure the upload folder exists
-    if not os.path.exists(app.config['UPLOAD_FOLDER']):
-        os.makedirs(app.config['UPLOAD_FOLDER'])
-
-    initialize_database() 
-
-    #Creates database table if it doesn't exist
-    with get_db_connection() as conn:
-        conn.execute('''
-            CREATE TABLE IF NOT EXISTS contests ( 
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                start_date TEXT NOT NULL,
-                end_date TEXT NOT NULL,
-                voting_start TEXT NOT NULL,
-                voting_end TEXT NOT NULL,
-                result_announcement TEXT NOT NULL,
-                purpose TEXT NOT NULL,
-                rules TEXT NOT NULL,
-                prizes TEXT NOT NULL,
-                banner_url TEXT NOT NULL
-            )
-        ''')
-        #Create the table if it doesn't exists
-        #Name of the table is contests
-        #id INTEGER PRIMARY KEY AUTOINCREMENT Adds an id to the table
-        #TEXT NOT NULL Adds a column for the banner, name, start_date, end_date, voting_start, voting_end, result_announcement, purpose, rules and prizes which are a must to fill in
-
-        conn.commit()
-
-    app.run(debug=True)
-
 #voting system
 @contestmanagement_bp.route('/voting/<int:contest_id>', methods=['GET', 'POST'])
 def voting(contest_id):
@@ -419,3 +386,36 @@ def badge_page(contest_id):
         return redirect(url_for('contestmanagement.contest_page'))
 
     return render_template("badge.html", winner={"name": Name}, user=current_user)
+
+if __name__ == '__main__':
+    #Ensure the upload folder exists
+    if not os.path.exists(app.config['UPLOAD_FOLDER']):
+        os.makedirs(app.config['UPLOAD_FOLDER'])
+
+    initialize_database() 
+
+    #Creates database table if it doesn't exist
+    with get_db_connection() as conn:
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS contests ( 
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                start_date TEXT NOT NULL,
+                end_date TEXT NOT NULL,
+                voting_start TEXT NOT NULL,
+                voting_end TEXT NOT NULL,
+                result_announcement TEXT NOT NULL,
+                purpose TEXT NOT NULL,
+                rules TEXT NOT NULL,
+                prizes TEXT NOT NULL,
+                banner_url TEXT NOT NULL
+            )
+        ''')
+        #Create the table if it doesn't exists
+        #Name of the table is contests
+        #id INTEGER PRIMARY KEY AUTOINCREMENT Adds an id to the table
+        #TEXT NOT NULL Adds a column for the banner, name, start_date, end_date, voting_start, voting_end, result_announcement, purpose, rules and prizes which are a must to fill in
+
+        conn.commit()
+
+    app.run(debug=True)

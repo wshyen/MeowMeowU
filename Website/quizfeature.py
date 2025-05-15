@@ -55,7 +55,14 @@ def quiz_page():
     user_role = getattr(current_user, 'role', 'user')
     print(f"DEBUG: user_role = {user_role}")
 
-    return render_template("quiz.html", user=current_user, user_role=user_role) 
+    conn = get_db_connection()
+    
+    level1_count = conn.execute("SELECT COUNT(*) FROM quiz_questions WHERE level = 1").fetchone()[0]
+    level2_count = conn.execute("SELECT COUNT(*) FROM quiz_questions WHERE level = 2").fetchone()[0]
+    
+    conn.close()
+
+    return render_template("quiz.html", user=current_user, user_role=user_role, level1_count=level1_count, level2_count=level2_count) 
 
 @quiz_bp.route('/get_questions', methods=['GET'])
 @login_required
@@ -75,11 +82,23 @@ def quiz_level1():
 
     return render_template("quiz_level1.html", user=current_user)
 
+@quiz_bp.route('/complete_level1', methods=['POST'])
+@login_required
+def complete_level1():
+    with get_db_connection() as conn:
+        conn.execute("UPDATE user SET level1_completed = 1 WHERE rowid = ?", (current_user.id,))
+        conn.commit()
+    return jsonify({"success": True})
+
 @quiz_bp.route('/quiz_level2')
 def quiz_level2():
     if not current_user.is_authenticated:
         flash("You must be logged in to play the quiz!", category="error")
         return redirect (url_for('auth.login'))
+    
+    if not current_user.level1_completed:
+        flash("You must complete Level 1 before accessing Level 2!", category="error")
+        return redirect(url_for('quiz.quiz_page'))
     
     return render_template("quiz_level2.html", user=current_user)
 
