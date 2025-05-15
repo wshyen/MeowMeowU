@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for, session #Flask is a web framework that allows developers to build web applications
+from flask import Blueprint, render_template, request, flash, redirect, url_for, send_from_directory #Flask is a web framework that allows developers to build web applications
 import re
 from .models import User, Story
 from . import db
@@ -257,31 +257,33 @@ def my_story():
         flash("You must be logged in to view your story!", category="error")
         return redirect(url_for('auth.login'))
 
-    return render_template("my_story.html", user=current_user)
+    user_stories = Story.query.filter_by(user_id=current_user.id).all()
+
+    return render_template("my_story.html", user=current_user, user_stories=user_stories)
 
 @auth.route('/share_story', methods=['GET', 'POST'])
 def share_story():
 
     if not current_user.is_authenticated:
-        flash("You must be logged in to share story!", category="error")
+        flash("You must be logged in to view your story!", category="error")
         return redirect(url_for('auth.login'))
-
+    
     if request.method == "POST":
         image = request.files.get("image")
         caption = request.form.get("caption", "").strip()
         story = request.form.get("story", "").strip()
 
-        #validate image file
+        #validate the image
         if not image or not allowed_file(image.filename):
             flash("Invalid or missing image. Only PNG, JPG, JPEG files are allowed.", category="error")
             return redirect(url_for("auth.share_story"))
 
-        #validate story length
+        #validate the story length
         if len(story.split()) < 250:
             flash("Your story must have more than 250 words.", category="error")
             return redirect(url_for("auth.share_story"))
 
-        #secure and save image
+        #secure and save the image
         filename = secure_filename(image.filename)
         image_path = os.path.join(UPLOAD_FOLDER, filename)
         image.save(image_path)
@@ -299,9 +301,13 @@ def share_story():
             db.session.commit()
             flash("Your story has been shared successfully!", category="success")
             return redirect(url_for("auth.my_story"))
-        
         except IntegrityError:
             db.session.rollback()
             flash("An error occurred while saving your story. Please try again.", category="error")
 
     return render_template("share_story.html", user=current_user)
+
+#route to serve uploaded images from the static/story folder
+@auth.route('/static/story/<path:filename>')
+def uploaded_file(filename):
+    return send_from_directory('static/story', filename)
