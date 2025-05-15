@@ -42,7 +42,7 @@
         overflow-wrap: break-word;
     }
 
-    a {
+    .hashtag {
         display: inline;
         color: #6b4f2f;
         text-decoration: none;
@@ -272,7 +272,7 @@
         <p class="post-content">{{ post['content'] }}</p>
             {% if post['cat_hashtag'] %}
                 <p class="post-content">
-                    <a href="{{ url_for('community.hashtag_posts', hashtag=post['cat_hashtag']) }}">#{{ post['cat_hashtag'] }}</a>
+                    <a class="hashtag" href="{{ url_for('community.hashtag_posts', hashtag=post['cat_hashtag']) }}">#{{ post['cat_hashtag'] }}</a>
                 </p>
             {% endif %}
 
@@ -304,7 +304,7 @@
             
             <span class="separator">|</span>
 
-            <button class="post-action-button">
+            <button class="post-action-button" onclick="event.stopPropagation(); window.location.href='/post/{{ post['post_id'] }}#comments'">
                 💬 Comments
             </button>
         </div>
@@ -327,13 +327,13 @@
                 {% for cat_name in cat_names %}
                     <option value="{{ cat_name }}">#{{ cat_name }}</option>
                 {% endfor %}
-            </select>
-            <br>
+            </select><br>
             <input type="file" name="media"><br>
             <button type="submit">Post</button>
         </form>
     </div>
 </div>
+
 
 {% endblock %}
 
