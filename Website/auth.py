@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, session #Flask is a web framework that allows developers to build web applications
 import re
-from .models import User
+from .models import User, Story
 from . import db
 from werkzeug.security import generate_password_hash, check_password_hash #for password hashing and verification
 from werkzeug.utils import secure_filename #handling file uploads
@@ -265,5 +265,39 @@ def share_story():
     if not current_user.is_authenticated:
         flash("You must be logged in to share story!", category="error")
         return redirect(url_for('auth.login'))
+
+    if request.method == "POST":
+        image = request.files.get("image")
+        caption = request.form.get("caption", "").strip()
+        story = request.form.get("story", "").strip()
+
+        if not image or not allowed_file(image.filename):
+            flash("Invalid or missing image. Only PNG, JPG, JPEG files are allowed.", category="error")
+            return redirect(url_for("auth.share_story"))
+
+        if len(story.split()) < 300:
+            flash("Your story must have more than 300 words.", category="error")
+            return redirect(url_for("auth.share_story"))
+
+        filename = secure_filename(image.filename)
+        image_path = os.path.join(UPLOAD_FOLDER, filename)
+        image.save(image_path)
+
+        new_story = Story(
+            image=filename,
+            caption=caption,
+            content=story,
+            user_id=current_user.id
+        )
+
+        db.session.add(new_story)
+        try:
+            db.session.commit()
+            flash("Your story has been shared successfully!", category="success")
+            return redirect(url_for("auth.my_story"))
+        
+        except IntegrityError:
+            db.session.rollback()
+            flash("An error occurred while saving your story. Please try again.", category="error")
 
     return render_template("share_story.html", user=current_user)
