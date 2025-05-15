@@ -95,7 +95,11 @@
                 <li>It serves as a foundation for further learning in the next level.</li>
             </ul>
             <br>
-            <button class="start-button" onclick="startQuiz('level1')">Start Level 1</button>
+            {% if level1_count >= 10 %}
+                <button class="start-button" onclick="window.location.href='{{ url_for('quiz.quiz_level1') }}'">Start Level 1</button>
+            {% else %}
+                <p style="color: red; font-weight: bold;">Not enough questions to start Level 1 quiz.</p>
+            {% endif %}
         </div>
 
         <div class="quiz-box" id="level2Box">
@@ -112,7 +116,11 @@
             </ul>
             <br>
             <p style="font-family: 'Times New Roman', Times, serif;">Complete Level 1 questions correctly to unlock</p>
-            <button class="start-button" id="level2Button" onclick="startQuiz('level2')" disabled>Start Level 2</button>
+            {% if level2_count >= 10 %}
+                <button class="start-button" onclick="window.location.href='{{ url_for('quiz.quiz_level2') }}'">Start Level 2</button>
+            {% else %}
+                <p style="color: red; font-weight: bold;">Not enough questions to start Level 2 quiz.</p>
+            {% endif %}
         </div>
     </div>
 

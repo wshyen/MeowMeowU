@@ -55,7 +55,14 @@ def quiz_page():
     user_role = getattr(current_user, 'role', 'user')
     print(f"DEBUG: user_role = {user_role}")
 
-    return render_template("quiz.html", user=current_user, user_role=user_role) 
+    conn = get_db_connection()
+    
+    level1_count = conn.execute("SELECT COUNT(*) FROM quiz_questions WHERE level = 1").fetchone()[0]
+    level2_count = conn.execute("SELECT COUNT(*) FROM quiz_questions WHERE level = 2").fetchone()[0]
+    
+    conn.close()
+
+    return render_template("quiz.html", user=current_user, user_role=user_role, level1_count=level1_count, level2_count=level2_count) 
 
 @quiz_bp.route('/get_questions', methods=['GET'])
 @login_required
