@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Badge{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f2eadf;
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 20px;
+        font-family: 'Times New Roman', Times, serif;
+        color: #94693e;
+        font-weight: bold;
+    }
+
+    .edit-badge-card {
+        margin: 0 auto 30px auto;
+        max-width: 500px;
+        background: #fff8ef;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .edit-badge-card input,
+    .edit-badge-card button {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        font-size: 1em;
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    .edit-badge-card button {
+        background: #94693e;
+        color: white;
+        font-weight: bold;
+        border: none;
+        cursor: pointer;
+        margin-top: 15px;
+        transition: background 0.2s;
+    }
+
+    .edit-badge-card button:hover {
+        background: #b88b4a;
+    }
+
+    #icon-preview {
+        display: block;
+        margin: 0 auto 16px auto;
+        max-width: 90px;
+        max-height: 90px;
+        border-radius: 8px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+        background: #fff;
+    }
+</style>
+<div style="padding: 20px;">
+    <h1>Edit Badge</h1>
+    <div class="edit-badge-card" style="padding: 20px;">
+
+        <form method="POST" enctype="multipart/form-data">
+            <img id="icon-preview" src="{{ url_for('static', filename='badges/' ~ badge.icon) }}" alt="Icon Preview">
+            <input type="text" name="badge_name" value="{{ badge.name }}" required>
+            <input type="text" name="badge_description" value="{{ badge.description }}" required>
+            <input type="text" name="criteria" value="{{ badge.criteria }}" required>
+            <input type="file" name="icon" accept="image/*" onchange="previewIcon(event)">
+            <button type="submit">Save changes</button>
+        </form>
+    </div>
+</div>
+<script>
+    function previewIcon(event) {
+        const [file] = event.target.files;
+        const preview = document.getElementById('icon-preview');
+        if (file) {
+            preview.src = URL.createObjectURL(file);
+        }
+    }
+</script>
+{% endblock %}
