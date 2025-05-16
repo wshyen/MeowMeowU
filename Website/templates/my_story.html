@@ -88,6 +88,7 @@
     }
 
     .image-container {
+        margin-top: 10px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -131,9 +132,8 @@
 
     .modal img {
         width: auto;
-        height: 60vh;
-        max-width: 80vw;
-        max-height: 60vh;
+        height: 80vh;
+        max-width: 90vw;
         border: 10px solid #f2eadf;
         border-radius: 10px;
     }
@@ -201,7 +201,7 @@
                 </p>
             </div>
         </div>
-        <small class="timestamp">Shared on: {{ user_stories[index].created_at.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+        <small class="timestamp">Shared on: {{ user_stories[index].created_at.strftime('%Y-%m-%d') }}</small>
     </div>
 
     {% if index + 1 < total %}
