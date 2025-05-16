@@ -258,9 +258,22 @@ def my_story():
         flash("You must be logged in to view your story!", category="error")
         return redirect(url_for('auth.login'))
 
-    user_stories = Story.query.filter_by(user_id=current_user.id).all()
+    #retrieve user stories sorted by latest first
+    user_stories = Story.query.filter_by(user_id=current_user.id).order_by(Story.created_at.desc()).all()
 
-    return render_template("my_story.html", user_stories=user_stories, user=current_user)
+    total = len(user_stories)
+    index = request.args.get('index', 0, type=int)
+
+    #ensure index remains within valid bounds
+    index = max(0, min(index, total - 1))
+
+    return render_template(
+        "my_story.html",
+        user_stories=user_stories,
+        index=index,
+        total=total,
+        user=current_user
+    )
 
 @auth.route('/share_story', methods=['GET', 'POST'])
 def share_story():
