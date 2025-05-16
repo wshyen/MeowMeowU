@@ -16,7 +16,7 @@
     .container {
         max-width: 800px;
         margin-top: 40px;
-        margin-bottom: 100px;
+        margin-bottom: 20px;
         padding: 30px;
         background-color: #fff7ec;
         border-radius: 10px;
@@ -122,6 +122,25 @@
         border: 10px solid #f2eadf;
         border-radius: 10px;
     }
+
+    button {
+        font-family: 'Times New Roman';
+        background-color: rgb(176, 148, 119);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        display: block;
+        margin: 30px auto;
+        text-align: center;
+    }
+
+    button:hover {
+        background-color: rgb(158, 134, 106);
+        transform: scale(1.1);
+    }
+
 </style>
 
 <h2>My Story</h2>
@@ -152,6 +171,8 @@
 {% else %}
     <h5 style="text-align: center;">You haven't shared any stories yet!</h5>
 {% endif %}
+
+<button onclick="window.location.href='{{ url_for('auth.cat_story') }}'">🐾 Back to Cat Story 🐾</button>
 
 <div class="modal" id="imageModal" onclick="closeModal()">
     <img id="modalImage">
