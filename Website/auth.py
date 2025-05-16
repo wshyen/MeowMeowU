@@ -246,10 +246,41 @@ def update_profile():
     return render_template("update_profile.html", user=current_user)
 
 #cat story
-@auth.route("/cat_story")
+@auth.route("/cat_story", methods=["GET"])
 def cat_story():
-    latest_stories = Story.query.order_by(Story.created_at.desc()).limit(6).all()
-    return render_template("cat_story.html", user=current_user, latest_stories=latest_stories)
+
+    #get the selected month and year from request arguments
+    selected_month = request.args.get("month", None, type=int)
+    selected_year = request.args.get("year", None, type=int)
+    index = request.args.get("index", 0, type=int)
+
+    #retrieve all unique months and years from database
+    unique_dates = Story.query.with_entities(
+        db.func.extract("month", Story.created_at).label("month"),
+        db.func.extract("year", Story.created_at).label("year")
+    ).distinct().order_by(Story.created_at.desc()).all()
+
+    #filter stories by selected month and year
+    if selected_month and selected_year:
+        latest_stories = Story.query.filter(
+            db.func.extract("month", Story.created_at) == selected_month,
+            db.func.extract("year", Story.created_at) == selected_year
+        ).order_by(Story.created_at.desc()).all()
+    else:
+        latest_stories = Story.query.order_by(Story.created_at.desc()).limit(6).all()
+
+    total = len(latest_stories)
+
+    return render_template(
+        "cat_story.html",
+        user=current_user,
+        index=index,
+        total=total,
+        latest_stories=latest_stories,
+        unique_dates=unique_dates,
+        selected_month=selected_month,
+        selected_year=selected_year,
+    )
 
 @auth.route('/view_story/<int:story_id>')
 def view_story(story_id):
@@ -334,7 +365,6 @@ def share_story():
             flash("An error occurred while saving your story. Please try again.", category="error")
 
     return render_template("share_story.html", user=current_user)
-
 
 #route to serve uploaded images from the static/story folder
 @auth.route('/static/story/<path:filename>')
