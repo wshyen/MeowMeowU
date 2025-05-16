@@ -25,3 +25,17 @@ class User(db.Model, UserMixin):
     cover_photo = db.Column(db.String(255), default="default_cover.png")
     role = db.Column(db.String(50), default='user', nullable=False)
     level1_completed = db.Column(db.Boolean, default=False)
+
+class Badge(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.String(255), nullable=False)
+    criteria = db.Column(db.String(255), nullable=True)
+    icon = db.Column(db.String(255), nullable=False)  #filename for badge image
+
+class UserBadge(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    badge_id = db.Column(db.Integer, db.ForeignKey('badge.id'))
+    awarded_at = db.Column(db.DateTime(timezone=True), default=func.now())
+    badge = db.relationship('Badge')

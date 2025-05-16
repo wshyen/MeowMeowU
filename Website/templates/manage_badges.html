@@ -36,8 +36,8 @@
     }
 
     .badge_card img {
-        width: 64px;
-        height: 64px;
+        width: 120px;
+        height: 120px;
         object-fit: contain;
         margin-bottom: 10px;
     }
@@ -75,7 +75,7 @@
         color: white;
         border: none;
         cursor: pointer;
-        margin: 5px auto;
+        margin: 5px;
         display: block;
     }
 
@@ -84,7 +84,7 @@
         color: white;
         border: none;
         cursor: pointer;
-        margin: 5px auto;
+        margin: 5px;
         display: block;
     }
 
@@ -109,8 +109,8 @@
     #icon-preview {
         display: block;
         margin: 0 auto 10px auto;
-        max-width: 80px;
-        max-height: 80px;
+        width: 120px;
+        height: 120px;
     }
 </style>
 <div style="padding: 20px;">
@@ -118,11 +118,11 @@
 
     <!-- Add badge form -->
     <form class="add-badge-form" method="POST" enctype="multipart/form-data" action="{{ url_for('manage_badges') }}">
-        <img id="icon_preview" src="#" alt="Icon Preview" style="display:none;">
+        <img id="icon-preview" src="#" alt="Icon Preview" style="display:none;">
         <input type="text" name="badge_name" placeholder="Badge Name" required>
         <input type="text" name="badge_description" placeholder="Badge Description" required>
         <input type="text" name="criteria" placeholder="Criteria" required>
-        <input type="file" name="icon" accept="image/*" required>
+        <input type="file" name="icon" accept="image/*" required onchange="previewIcon(event)">
         <button type="submit" class="add-btn">Add</button>
     </form>
 

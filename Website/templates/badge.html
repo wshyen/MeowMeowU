@@ -5,15 +5,37 @@
 {% block content %}
 
 <style>
+    body {
+        background-color: #f2eadf;
+        font-family: 'Times New Roman', Times, serif;
+    }
+
     .container {
         text-align: center;
     }
 
+    img {
+        margin-top: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        width: 120px;
+        height: 120px;
+        object-fit: contain;
+    }
 </style>
 <div class="container">
-
+    {% if reason == 'winner' %}
     <h2>🏅 Congratulations {{ winner.name }}! 🏅</h2>
     <p>You are the winner! Here is your exclusive badge:</p>
-
+    {% elif reason == 'quiz_level1' %}
+    <h2>🎉 Well Done, {{ user.name }}! 🎉</h2>
+    <p>You completed Level 1 Quiz and earned a badge!</p>
+    {% elif reason == 'quiz_level2' %}
+    <h2>🌟 Amazing, {{ user.name }}! 🌟</h2>
+    <p>You completed Level 2 Quiz and earned a badge!</p>
+    {% else %}
+    <h2>🏅 Badge Unlocked! 🏅</h2>
+    <p>You've earned a new badge!</p>
+    {% endif %}
+    <img src="{{ url_for('static', filename='badges/' ~ badge.icon) }}">
 </div>
 {% endblock %}
