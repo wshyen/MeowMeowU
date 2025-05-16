@@ -354,7 +354,7 @@
             <div class="comment-info">
                 <img class="comment-profile-picture" src="{{ url_for('static', filename='Userprofile/' + (comment['profile_picture'] if comment['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
                 <p><strong>{{ comment['name'] }}</strong> commented at {{ comment['created_at'] }}</p>
-                <span style="font-size: 20px; margin-left: 10px; color: #6b4f2f;">#{{ comment['id'] }}</span> <!-- 添加评论 ID -->
+                <span style="font-size: 20px; margin-left: 10px; color: #6b4f2f;">#{{ comment['id'] }}</span>
 
             </div>
 
@@ -470,7 +470,7 @@
             button.addEventListener('click', function () {
                 const commentId = button.getAttribute('data-comment-id');
                 parentIdInput.value = commentId; 
-                commentTextarea.value = `#${commentId} `;
+                commentTextarea.value = `Replying to #${commentId} `;
                 commentTextarea.focus();
             });
         });
