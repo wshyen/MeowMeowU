@@ -148,6 +148,10 @@ def create_post():
     media = request.files.get('media')
     media_url = None
 
+    if len(content.split()) > 100:
+        flash("Post content must be 100 words or less!", category="error")
+        return redirect(url_for('community.community_feature'))
+
     if media and allowed_file(media.filename):
         os.makedirs(POSTS_FOLDER, exist_ok=True)
         filename = secure_filename(media.filename)
@@ -242,6 +246,10 @@ def edit_post(post_id):
     conn = get_db_connection()
     post = conn.execute('SELECT * FROM post WHERE post_id = ?', (post_id,)).fetchone()
 
+    if len(content.split()) > 100:
+        flash("Post content must be 100 words or less!", category="error")
+        return redirect(url_for('community.my_posts'))
+    
     if post and post['user_id'] == current_user.id:
         conn.execute(
             'UPDATE post SET content = ?, cat_hashtag = ? WHERE post_id = ?',
