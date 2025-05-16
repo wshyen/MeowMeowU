@@ -260,7 +260,7 @@ def my_story():
 
     user_stories = Story.query.filter_by(user_id=current_user.id).all()
 
-    return render_template("my_story.html", user=current_user, user_stories=user_stories)
+    return render_template("my_story.html", user_stories=user_stories, user=current_user)
 
 @auth.route('/share_story', methods=['GET', 'POST'])
 def share_story():
