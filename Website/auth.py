@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename #handling file uploads
 from flask_login import login_user, login_required, logout_user, current_user
 from sqlalchemy.exc import IntegrityError
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 auth = Blueprint("auth", __name__) #a Blueprint for authentication routes, Blueprint is like a container for related routes and functions
 
@@ -248,8 +248,13 @@ def update_profile():
 #cat story
 @auth.route("/cat_story")
 def cat_story():
+    latest_stories = Story.query.order_by(Story.created_at.desc()).limit(6).all()
+    return render_template("cat_story.html", user=current_user, latest_stories=latest_stories)
 
-    return render_template("cat_story.html", user=current_user)
+@auth.route('/view_story/<int:story_id>')
+def view_story(story_id):
+    story = Story.query.get_or_404(story_id)
+    return render_template("view_story.html", story=story, user=current_user)
 
 @auth.route('/my_story')
 def my_story():
@@ -277,11 +282,20 @@ def my_story():
 
 @auth.route('/share_story', methods=['GET', 'POST'])
 def share_story():
-
     if not current_user.is_authenticated:
-        flash("You must be logged in to view your story!", category="error")
+        flash("You must be logged in to share your story!", category="error")
         return redirect(url_for('auth.login'))
-    
+
+    #get the latest story by the current user
+    latest_story = Story.query.filter_by(user_id=current_user.id).order_by(Story.created_at.desc()).first()
+
+    if latest_story:
+        #calculate the next allowed date for sharing
+        next_allowed_date = latest_story.created_at + timedelta(days=30)
+        if datetime.utcnow() < next_allowed_date:
+            flash(f"You can only share one story per month. Your next allowed story date is {next_allowed_date.strftime('%Y-%m-%d')}.", category="error")
+            return redirect(url_for('auth.cat_story'))
+
     if request.method == "POST":
         image = request.files.get("image")
         caption = request.form.get("caption", "").strip()
@@ -297,12 +311,11 @@ def share_story():
             flash("Your story must have more than 200 words.", category="error")
             return redirect(url_for("auth.share_story"))
 
-        #secure and save the image
+        #save the image
         filename = secure_filename(image.filename)
         image_path = os.path.join(UPLOADFOLDER, filename)
         image.save(image_path)
 
-        #create new story entry
         new_story = Story(
             image_filename=filename,
             caption=caption,
@@ -321,6 +334,7 @@ def share_story():
             flash("An error occurred while saving your story. Please try again.", category="error")
 
     return render_template("share_story.html", user=current_user)
+
 
 #route to serve uploaded images from the static/story folder
 @auth.route('/static/story/<path:filename>')
