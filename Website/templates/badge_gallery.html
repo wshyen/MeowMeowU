@@ -60,6 +60,23 @@
         color: #666;
         margin-bottom: 2px;
     }
+
+    .admin-badge-btn-container {
+        text-align: right;
+        margin-bottom: 20px;
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+    }
+    .admin-badge-btn {
+        font-size: 20px;
+        background-color: #94693e;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        border: none;
+    }
 </style>
 <div style="padding: 20px;">
     <h1>Your Badges</h1>
@@ -79,4 +96,12 @@
         </div>
         {% endfor %}
     </div>
-    {% endblock %}
+    {% if user_role == 'admin' %}
+        <div style="text-align: right; margin-bottom: 20px; position: fixed; bottom: 20px; right: 20px;">
+            <button id="manageBadges" class="admin-badge-btn" onclick="window.location.href='{{ url_for('badge.manage_badges') }}'">
+                🏅
+            </button>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

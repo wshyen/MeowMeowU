@@ -15,7 +15,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 def get_db_connection():
     db_path = os.path.join(os.path.dirname(__file__), '..', 'instance', 'datebase.db')
     db_path = os.path.abspath(db_path) 
-    conn = sqlite3.connect('datebase.db')  
+    conn = sqlite3.connect(db_path)  
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -49,12 +49,13 @@ def initialize_database():
 @badge_bp.route('/badges')
 @login_required
 def badge_gallery():
+    user_role = getattr(current_user, 'role', None)
     conn = get_db_connection()
     badges = conn.execute('SELECT * FROM badge').fetchall()
     user_badges = conn.execute('SELECT badge_id FROM user_badge WHERE user_id = ?', (current_user.id,)).fetchall()
     user_badges_ids = {row['badge_id'] for row in user_badges}
     conn.close()
-    return render_template('badge_gallery.html', all_badges=badges, user_badges_ids=user_badges_ids)
+    return render_template('badge_gallery.html', user_role=user_role, all_badges=badges, user_badges_ids=user_badges_ids, user=current_user)
 
 #Single badge page
 @badge_bp.route('/badge/<int:badge_id>')
@@ -116,7 +117,7 @@ def manage_badges():
                 flash('Invalid file type.', 'error')
         badges = conn.execute('SELECT * FROM badge').fetchall()
         conn.close()
-        return render_template('manage_badges.html', badges=badges)
+        return render_template('manage_badges.html', badges=badges, user=current_user)
     else:
         flash('You are not authorized to manage badges.', 'error')
         return redirect(url_for('badge.badge_gallery'))

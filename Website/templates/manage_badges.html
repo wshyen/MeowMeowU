@@ -117,7 +117,7 @@
     <h1>Manage Badges</h1>
 
     <!-- Add badge form -->
-    <form class="add-badge-form" method="POST" enctype="multipart/form-data" action="{{ url_for('manage_badges') }}">
+    <form class="add-badge-form" method="POST" enctype="multipart/form-data" action="{{ url_for('badge.manage_badges') }}">
         <img id="icon-preview" src="#" alt="Icon Preview" style="display:none;">
         <input type="text" name="badge_name" placeholder="Badge Name" required>
         <input type="text" name="badge_description" placeholder="Badge Description" required>
