@@ -213,7 +213,7 @@
         <form method="GET" action="{{ url_for('auth.cat_story') }}">
             <label for="month">Sort by Month:</label>
             <select name="month" id="month">
-                <option value="">Select Month</option>
+                <option value="">All</option>
                 {% for date in unique_dates %}
                     <option value="{{ date.month|int }}-{{ date.year|int }}" {% if selected_month == date.month and selected_year == date.year %}selected{% endif %}>
                         {{ date.year|int }} - {{ "%02d"|format(date.month|int) }}
