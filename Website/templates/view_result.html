@@ -153,7 +153,7 @@
     </button>
 
     {% if show_claim_button %}
-        <button onclick="window.location.href='{{ url_for('contestmanagement.badge_page', contest_id=contest_id) }}'">
+        <button onclick="window.location.href='{{ url_for('badge.badge', badge_id=badge_id, reason='winner') }}'">
             🏅Claim Your Badge🏅
         </button>
     {% endif %}
