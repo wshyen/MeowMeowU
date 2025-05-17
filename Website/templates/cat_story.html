@@ -72,6 +72,8 @@
         justify-content: center;
         gap: 30px;
         margin-top: 40px;
+        width: auto;
+        margin: 0 auto;
     }
 
     .story-card {
@@ -92,10 +94,6 @@
         font-weight: bold;
     }
 
-    .story-card:hover h3 {
-        font-weight: bold;
-    }
-
     .story-card h3 {
         font-size: 26px;
         color: #754e2e;
@@ -105,18 +103,18 @@
 
     .story-card p {
         font-size: 16px;
-        font-family: "Times New Roman";
         font-style: italic;
         color: rgb(78, 68, 57);
     }
 
-    .latest-stories-container {
-        display: flex;
-        flex-wrap: wrap;
+    .latest-stories-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(2, auto);
+        gap: 15px;
         justify-content: center;
-        gap: 20px;
-        margin-top: 30px;
-        margin-bottom: 60px;
+        max-width: 900px;
+        margin: auto;
     }
 
     .latest-story-box {
@@ -127,6 +125,7 @@
         box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
         text-align: center;
     }
+
 
     .latest-story-box img {
         width: 100%;
@@ -142,11 +141,11 @@
     }
 
     .latest-story-title {
-        font-size: 20px;
+        font-size: 18px;
         font-weight: bold;
         margin-top: 10px;
         color: rgb(78, 68, 57);
-        text-align: center;
+        font-family: "Times New Roman";
     }
 
     .latest-story-title a {
@@ -154,6 +153,32 @@
         color: rgb(120, 100, 80);
     }
 
+    .pagination-arrows {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 20px;
+        margin-bottom: 60px;
+        gap: 20px;
+    }
+
+    .arrow-btn {
+        background-color: #e5d1bb;
+        color: black;
+        font-family: "Courier";
+        border: none;
+        padding: 8px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .arrow-btn:hover {
+        border: none;
+        text-decoration: none;
+        background-color: #e0c3a1;
+        transform: scale(1.05);
+        color: black;
+    }
 </style>
 
 <h1 style="font-size: 40px;">Cat Story🐈‍⬛</h1>
@@ -164,7 +189,6 @@
         <h3>My Story</h3>
         <p>View stories that you shared before.</p>
     </a>
-
     <a href="{{ url_for('auth.share_story') }}" class="story-card">
         <h3>Share Story</h3>
         <p>Write and share your cat story with others.</p>
@@ -174,7 +198,6 @@
 <br>
 <hr>
 
-<!-- Latest Stories Section -->
 <h2 style="font-size: 30px;">Latest Cat Stories</h2>
 
 <!-- Sorting Dropdown -->
@@ -184,18 +207,17 @@
         <select name="month" id="month">
             <option value="">Select Month</option>
             {% for date in unique_dates %}
-            <option value="{{ date.month }}" {% if date.month == selected_month %}selected{% endif %}>
-                {{ date.year }} - {{ date.month }}
-            </option>
+                <option value="{{ date.month|int }}-{{ date.year|int }}" {% if selected_month == date.month and selected_year == date.year %}selected{% endif %}>
+                    {{ date.year|int }} - {{ "%02d"|format(date.month|int) }}
+                </option>
             {% endfor %}
         </select>
-
-        <input type="hidden" name="year" value="{{ selected_year }}">
         <button type="submit">Sort</button>
     </form>
 </div>
 
-<div class="latest-stories-container">
+<!-- Latest Stories Display -->
+<div class="latest-stories-grid">
     {% if latest_stories %}
         {% for story in latest_stories %}
         <div class="latest-story-box">
@@ -209,6 +231,16 @@
         {% endfor %}
     {% else %}
         <h5 style="text-align: center; font-style: italic;">No stories have been shared yet.</h5>
+    {% endif %}
+</div>
+
+<!-- Pagination Arrows -->
+<div class="pagination-arrows">
+    {% if has_prev %}
+        <a class="arrow-btn" href="{{ url_for('auth.cat_story', page=page-1, month=request.args.get('month')) }}">← Latest</a>
+    {% endif %}
+    {% if has_next %}
+        <a class="arrow-btn" href="{{ url_for('auth.cat_story', page=page+1, month=request.args.get('month')) }}">Previous →</a>
     {% endif %}
 </div>
 
