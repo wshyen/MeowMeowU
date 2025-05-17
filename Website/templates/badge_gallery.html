@@ -16,6 +16,16 @@
         font-weight: bold;
     }
 
+    h2{
+        font-weight: bold;
+        font-size: 20px;
+        color: #6b4f2f;
+        text-align: center;
+        font-style: italic;
+        margin-top: 0;
+        margin-bottom: 20px;
+    }
+
     .user-badge-gallery {
         display: flex;
         flex-wrap: wrap;
@@ -68,6 +78,7 @@
         bottom: 20px;
         right: 20px;
     }
+    
     .admin-badge-btn {
         font-size: 20px;
         background-color: #94693e;
@@ -79,8 +90,9 @@
     }
 </style>
 <div style="padding: 20px;">
-    <h1>Your Badges</h1>
+    <h1>{{ user.Name }}'s Badge Collection</h1>
     <div class="user-badge-gallery">
+        <h2> Every badge tells a story—collect them all and let your journey shine! 🐱</h2>
         {% for badge in all_badges %}
         {% set earned = badge.id in user_badge_ids %}
         <div class="user-badge-card">
@@ -99,7 +111,7 @@
     {% if user_role == 'admin' %}
         <div style="text-align: right; margin-bottom: 20px; position: fixed; bottom: 20px; right: 20px;">
             <button id="manageBadges" class="admin-badge-btn" onclick="window.location.href='{{ url_for('badge.manage_badges') }}'">
-                🏅
+                +
             </button>
         </div>
     {% endif %}

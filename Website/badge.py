@@ -32,7 +32,7 @@ def initialize_database():
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
                 description TEXT NOT NULL,
-                criteria TEXT,
+                criteria TEXT NOT NULL,
                 icon TEXT NOT NULL
             )
         ''')
@@ -40,7 +40,9 @@ def initialize_database():
             CREATE TABLE IF NOT EXISTS user_badge (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_id INTEGER NOT NULL,
-                badge_id INTEGER NOT NULL
+                badge_id INTEGER NOT NULL,
+                FOREIGN KEY (user_id) REFERENCES users(id),
+                FOREIGN KEY (badge_id) REFERENCES badge(id)
             )
         ''')
         conn.commit()
@@ -89,6 +91,30 @@ def claim_badge(badge_id):
         flash('Badge claimed successfully!', 'success')
     conn.close()
     return redirect(url_for('badge.badge', badge_id=badge_id, reason=reason))
+
+#Award a badge to the user if they meet the criteria
+def award_badge_if_eligible(user_id, criteria):
+    conn = get_db_connection()
+    badge = conn.execute('SELECT * FROM badge WHERE criteria = ?', (criteria,)).fetchone()
+    if badge:
+        already_claimed = conn.execute(
+            'SELECT 1 FROM user_badge WHERE user_id = ? AND badge_id = ?', (user_id, badge['id'])
+        ).fetchone()
+        if not already_claimed:
+            conn.execute(
+                'INSERT INTO user_badge (user_id, badge_id) VALUES (?, ?)', (user_id, badge['id'])
+            )
+            conn.commit()
+    conn.close()
+
+def check_like_badges(user_id):
+    conn = get_db_connection()
+    count = conn.execute(
+        'SELECT COUNT(*) FROM likes WHERE user_id = ?', (user_id,)).fetchone()[0]
+    for milestone in [10, 50, 100]:
+        if count >= milestone:
+            award_badge_if_eligible(user_id, f'likes_{milestone}_posts')
+    conn.close()
 
 #Admin manage badges
 @badge_bp.route('/admin/badges', methods=['GET', 'POST'])
