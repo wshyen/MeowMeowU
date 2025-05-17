@@ -248,38 +248,52 @@ def update_profile():
 #cat story
 @auth.route("/cat_story", methods=["GET"])
 def cat_story():
+    PER_PAGE = 6
+    page = request.args.get("page", 1, type=int)
+    selected_month = None
+    selected_year = None
 
-    #get the selected month and year from request arguments
-    selected_month = request.args.get("month", None, type=int)
-    selected_year = request.args.get("year", None, type=int)
-    index = request.args.get("index", 0, type=int)
-
-    #retrieve all unique months and years from database
+    #get unique month and year values for the dropdown
     unique_dates = Story.query.with_entities(
         db.func.extract("month", Story.created_at).label("month"),
         db.func.extract("year", Story.created_at).label("year")
     ).distinct().order_by(Story.created_at.desc()).all()
 
-    #filter stories by selected month and year
-    if selected_month and selected_year:
-        latest_stories = Story.query.filter(
-            db.func.extract("month", Story.created_at) == selected_month,
-            db.func.extract("year", Story.created_at) == selected_year
-        ).order_by(Story.created_at.desc()).all()
+    #filtering logic based on selected month and year
+    month_param = request.args.get("month")
+    if month_param:
+        try:
+            month, year = map(int, month_param.split("-"))
+            selected_month = month
+            selected_year = year
+            query = Story.query.filter(
+                db.func.extract("month", Story.created_at) == month,
+                db.func.extract("year", Story.created_at) == year
+            )
+        except ValueError:
+            query = Story.query
     else:
-        latest_stories = Story.query.order_by(Story.created_at.desc()).limit(6).all()
+        query = Story.query
 
-    total = len(latest_stories)
+    #order by newest first
+    query = query.order_by(Story.created_at.desc())
+
+    #paginate the query result
+    pagination = query.paginate(page=page, per_page=PER_PAGE, error_out=False)
+    latest_stories = pagination.items
+    has_next = pagination.has_next
+    has_prev = pagination.has_prev
 
     return render_template(
         "cat_story.html",
         user=current_user,
-        index=index,
-        total=total,
         latest_stories=latest_stories,
         unique_dates=unique_dates,
         selected_month=selected_month,
         selected_year=selected_year,
+        page=page,
+        has_next=has_next,
+        has_prev=has_prev
     )
 
 @auth.route('/view_story/<int:story_id>')
