@@ -1,20 +1,49 @@
 import os
 import sqlite3
-from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, current_app
+from flask import Flask, Blueprint, render_template, request, redirect, url_for, flash, abort, current_app
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 
+app = Flask(__name__, static_folder='static')
+app.secret_key = 'your_secret_key'
 badge_bp = Blueprint('badge', __name__)
 
+UPLOAD_FOLDER = 'Website/static/badge' #Folder to store uploaded files
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def get_db_connection():
+    db_path = os.path.join(os.path.dirname(__file__), '..', 'instance', 'datebase.db')
+    db_path = os.path.abspath(db_path) 
     conn = sqlite3.connect('datebase.db')  
     conn.row_factory = sqlite3.Row
     return conn
+
+def initialize_database():
+    with get_db_connection() as conn:
+        #Enable foreign key constraints
+        conn.execute("PRAGMA foreign_keys = ON;") 
+
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS badge (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                description TEXT NOT NULL,
+                criteria TEXT,
+                icon TEXT NOT NULL
+            )
+        ''')
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS user_badge (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                badge_id INTEGER NOT NULL
+            )
+        ''')
+        conn.commit()
 
 #User badge gallery
 @badge_bp.route('/badges')
