@@ -320,7 +320,12 @@
         <span class="close" onclick="closeModal()">&times;</span>
         <h3>New Post</h3>
         <form action="/post/create" method="post" enctype="multipart/form-data">
-            <textarea name="content" placeholder="Have a meowment to share?" required></textarea><br>
+            <div style="position: relative;">
+                <textarea id="content" name="content" placeholder="Have a meowment to share?" required style="box-sizing: border-box;"></textarea>
+                <div style="position: absolute; right: 10px; bottom: 20px; font-size: 14px; color: #94693e; background: #eae8e6;">
+                    <span id="word-count">0</span> / 100 words
+                </div>
+            </div>
             <label for="cat-hashtag">Select Cat Hashtag:</label>
             <select name="cat_hashtag" id="cat-hashtag">
                 <option value="">None</option>
@@ -361,5 +366,20 @@ function closeModal() {
     modal.style.display = 'none';
 }
 
+document.getElementById('content').addEventListener('input', function() {
+    var content = this.value.trim();
+    var wordCount = content ? content.split(/\s+/).length : 0;
+    document.getElementById('word-count').textContent = wordCount;
+});
+
+function checkWordLimit() {
+    var content = document.getElementById('content').value.trim();
+    var wordCount = content.split(/\s+/).filter(Boolean).length;
+    if (wordCount > 100) {
+        alert("Post content must be 100 words or less!");
+        return false;
+    }
+    return true;
+}
 </script>
 {% endblock %}
