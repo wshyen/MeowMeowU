@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Share Your Story{% endblock %}
+
+{% block content %}
+
+<style>
+  body {
+    background-color: #f2eadf;
+    font-family: 'Times New Roman', serif;
+  }
+
+  h2 {
+    color: rgb(78, 68, 57);
+    margin-top: 10px;
+    color: #94693e;
+    font-family: "Times New Roman";
+  }
+
+  h5 { 
+    font-family: 'Times New Roman'; 
+    font-weight: bold; 
+    font-size: 20px;
+    color: #6b4f2f;
+    text-align: center; 
+    font-style: italic;
+  }
+
+  label {
+    font-size: 20px;
+    color: #6b4f2f;
+    margin-top: 10px;
+    font-weight: bold;
+  }
+
+  .form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin: auto;
+    margin-top: 45px;
+    margin-bottom: 45px;
+    background: #fff7ec;
+    padding: 30px;
+    border-radius: 15px;
+    max-width: 1100px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  input[type="text"], textarea, input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    font-family: 'Times New Roman', serif;
+    background-color: white;
+  }
+
+  textarea {
+    height: 250px;
+    resize: none;
+  }
+
+  .button-container {
+    text-align: center;
+  }
+
+  button {
+    font-family: 'Times New Roman';
+    background-color: rgb(176, 148, 119);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    font-size: 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: 0.3s ease;
+  }
+
+  button:hover {
+    background-color: rgb(156, 128, 100);
+    transform: scale(1.05);
+  }
+
+</style>
+
+<div class="form-container">
+  <h2><b>Share Your Story📑</b></h2>
+  <h5>Share your heartwarming story now!</h5>
+
+  <form method="POST" enctype="multipart/form-data">
+
+    <label for="image">Upload Picture:</label>
+    <input type="file" id="image" name="image" accept="image/*" required>
+
+    <label for="caption">Caption:</label>
+    <input type="text" id="caption" name="caption" placeholder="Add caption" required>
+
+    <label for="story">Your Story:</label>
+    <textarea id="story" name="story" rows="20" placeholder="Share your story with more than 200 words" required></textarea>
+
+    <div class="button-container">
+      <button type="submit">🐾Share Now!🐾</button>
+    </div>
+
+  </form>
+</div>
+
+{% endblock %}

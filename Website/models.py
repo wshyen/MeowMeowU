@@ -1,6 +1,7 @@
 from . import db
 from flask_login import UserMixin
 from sqlalchemy.sql import func
+from datetime import datetime
 
 class Note(db.Model): 
     id = db.Column(db.Integer, primary_key=True)
@@ -25,3 +26,13 @@ class User(db.Model, UserMixin):
     cover_photo = db.Column(db.String(255), default="default_cover.png")
     role = db.Column(db.String(50), default='user', nullable=False)
     level1_completed = db.Column(db.Boolean, default=False)
+
+class Story(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    image_filename = db.Column(db.String(150), nullable=False)
+    caption = db.Column(db.String(255), nullable=False)
+    story_text = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship("User", backref="stories")

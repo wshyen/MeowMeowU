@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}View Story{% endblock %}
+
+{% block content %}
+
+<style>
+    body {
+        background-color: #f2eadf;
+        font-family: "Times New Roman", serif;
+        color: rgb(78, 68, 57);
+        text-align: center;
+    }
+
+    .story-container {
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 30px;
+        background-color: #fff7ec;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+        font-size: 35px;
+        color: #94693e;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    .story-image {
+        width: 500px;
+        height: 300px;
+        object-fit: cover;
+        border-radius: 10px;
+        display: block;
+        margin: 0 auto;
+        transition: transform 0.3s ease-in-out;
+        cursor: pointer;
+    }
+
+    .story-image:hover {
+        transform: scale(1.05);
+    }
+
+    .story-text {
+        font-size: 18px;
+        line-height: 1.6;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        text-align: justify;
+        margin-top: 20px;
+    }
+
+    .timestamp {
+        font-size: 16px;
+        font-style: italic;
+        color: #94693e;
+        margin-top: 10px;
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 99;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal img {
+        width: auto;
+        height: 80vh;
+        max-width: 90vw;
+        border: 10px solid #f2eadf;
+        border-radius: 10px;
+    }
+
+    .back-button {
+        font-family: "Times New Roman";
+        background-color: rgb(176, 148, 119);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        display: block;
+        margin: 30px auto;
+        text-align: center;
+        text-decoration: none;
+    }
+
+    .back-button:hover {
+        background-color: rgb(158, 134, 106);
+        transform: scale(1.1);
+    }
+
+    button { 
+        font-family: 'Times New Roman'; 
+        background-color: rgb(176, 148, 119); 
+        color: white; 
+        border: none; 
+        padding: 10px 20px; 
+        border-radius: 5px; 
+        cursor: pointer; 
+        display: block; 
+        margin: 30px auto; 
+        text-align: center; 
+    } 
+    
+    button:hover { 
+        background-color: rgb(158, 134, 106); 
+        transform: scale(1.1); 
+    }
+
+</style>
+
+<div class="story-container">
+    <h2>{{ story.caption }}</h2>
+
+    <img src="{{ url_for('auth.uploaded_file', filename=story.image_filename) }}" alt="Story Image" class="story-image" onclick="toggleModal('{{ url_for('auth.uploaded_file', filename=story.image_filename) }}')">
+
+    <p class="story-text">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ story.story_text }}</p>
+
+    <small class="timestamp">Shared on: {{ story.created_at.strftime('%Y-%m-%d') }}</small>
+</div>
+
+<button onclick="window.location.href='{{ url_for('auth.cat_story') }}'">🐾 Back to Cat Story 🐾</button>
+
+<!-- Image Modal -->
+<div class="modal" id="imageModal" onclick="closeModal()">
+    <span class="close-modal">&times;</span>
+    <img id="modalImage">
+</div>
+
+<script>
+    function toggleModal(imageSrc) {
+        let modal = document.getElementById("imageModal");
+        let modalImage = document.getElementById("modalImage");
+
+        modalImage.src = imageSrc;
+        modal.style.display = "flex";
+    }
+
+    function closeModal() {
+        document.getElementById("imageModal").style.display = "none";
+    }
+</script>
+
+{% endblock %}
