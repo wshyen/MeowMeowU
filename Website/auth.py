@@ -60,49 +60,65 @@ def logout():
 @auth.route("/sign-up", methods=["GET", "POST"])
 def sign_up():
     if request.method == "POST":
-        email = request.form.get("email").strip().lower()
+        email = request.form.get("email", "").strip().lower()
         Name = request.form.get("Name")
-        ps1 = request.form.get("ps1")
-        ps2 = request.form.get("ps2")
-        secret_answer = request.form.get("secret_answer").strip().lower()
-        hashed_secret_answer = generate_password_hash(secret_answer, method="pbkdf2:sha256")
+        ps1 = request.form.get("ps1", "").strip()
+        ps2 = request.form.get("ps2", "").strip()
+        secret_answer = request.form.get("secret_answer", "").strip().lower()
 
-        existing_user = User.query.filter_by(email=email).first()
-        
-        if existing_user:
-            flash("Email already exist!", category="error")
+        #check if the email is empty
+        if not email:
+            flash("Please enter an email address.", category="error")
             return render_template("sign_up.html", user=current_user)
 
-        elif not re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email):
-            flash("Invalid email address.", category="error")
+        #existing email check
+        existing_user = User.query.filter_by(email=email).first()
+        if existing_user:
+            flash("Email already exists!", category="error")
+            return render_template("sign_up.html", user=current_user)
 
-        elif not re.match(r'^[A-Z][a-zA-Z0-9]{2,14}$',Name):
-            flash("Name must start with a capital letter and be 3 to 15 characters long.", category="error")
+        #validate email format
+        if not re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email):
+            flash("Invalid email address format.", category="error")
+            return render_template("sign_up.html", user=current_user)
 
-        elif len(ps1) < 7:
-            flash('Password must be at least 7 characters.', category='error')
+        #validate Name format (At least 3 characters, first letter uppercase)
+        if not Name or len(Name) < 3 or not Name[0].isupper():
+            flash("Name must be at least 3 characters long and start with a capital letter.", category="error")
+            return render_template("sign_up.html", user=current_user)
 
-        #check ps
-        elif ps1 != ps2:
-            flash("Passwords do not match.", category="error")
-
-        elif not secret_answer:
+        #ensure secret_answer exists before hashing
+        if not secret_answer:
             flash("Secret question answer is required.", category="error")
+            return render_template("sign_up.html", user=current_user)
 
-        else: #if all correct
-            new_user = User(email=email,Name=Name,ps=generate_password_hash(ps1, method="pbkdf2:sha256"),
-                            secret_answer=hashed_secret_answer)
-            db.session.add(new_user) #add new user to database
+        hashed_secret_answer = generate_password_hash(secret_answer, method="pbkdf2:sha256")
 
-            try:
-                db.session.commit()
-                login_user(new_user, remember=True)
-                flash("Account created successfully!", category="success")
-                return redirect(url_for("auth.login"))
-            except IntegrityError:
-                db.session.rollback()
-                flash("An error occurred while creating the account. Please try again.", category="error")
-            
+        #password validation
+        if len(ps1) < 7:
+            flash("Password must be at least 7 characters long.", category="error")
+            return render_template("sign_up.html", user=current_user)
+
+        if ps1 != ps2:
+            flash("Passwords do not match.", category="error")
+            return render_template("sign_up.html", user=current_user)
+
+        #create new user in the database
+        new_user = User(email=email, Name=Name, ps=generate_password_hash(ps1, method="pbkdf2:sha256"),
+                        secret_answer=hashed_secret_answer)
+
+        db.session.add(new_user)
+
+        try:
+            db.session.commit()
+            login_user(new_user, remember=True)
+            flash("Account created successfully!", category="success")
+            return redirect(url_for("auth.login"))
+        except IntegrityError:
+            db.session.rollback()
+            flash("An error occurred while creating the account. Please try again.", category="error")
+            return render_template("sign_up.html", user=current_user)
+
     return render_template("sign_up.html", user=current_user)
 
 @auth.route("/user-profile", methods=["GET", "POST"])
