@@ -30,6 +30,7 @@ def create_app(): #a function to create and configure the Flask app
     from .community import community_bp
     from .contestmanagement import contestmanagement_bp
     from .quizfeature import quiz_bp
+    from .badge import badge_bp
 
     #register Blueprints with the app
     app.register_blueprint(views, urlprefix="/")
@@ -39,6 +40,7 @@ def create_app(): #a function to create and configure the Flask app
     app.register_blueprint(community_bp, urlprefix="/")
     app.register_blueprint(contestmanagement_bp, urlprefix="/")
     app.register_blueprint(quiz_bp, urlprefix="/")
+    app.register_blueprint(badge_bp, urlprefix="/")
 
     from .models import User, Note #import this to make sure models.py file run before we initialize database
 

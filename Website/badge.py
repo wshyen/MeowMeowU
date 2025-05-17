@@ -16,6 +16,7 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
+#User badge gallery
 @badge_bp.route('/badges')
 @login_required
 def badge_gallery():
@@ -26,6 +27,7 @@ def badge_gallery():
     conn.close()
     return render_template('badge_gallery.html', all_badges=badges, user_badges_ids=user_badges_ids)
 
+#Single badge page
 @badge_bp.route('/badge/<int:badge_id>')
 @login_required
 def badge(badge_id):
@@ -38,6 +40,7 @@ def badge(badge_id):
     reason = request.args.get('reason', 'generic')
     return render_template('badge.html', badge=badge, reason=reason, user=current_user, already_claimed=already_claimed)
 
+#Claim badge (quiz/contest)
 @badge_bp.route('/claim_badge/<int:badge_id>', methods=['POST'])
 @login_required
 def claim_badge(badge_id):
@@ -57,3 +60,81 @@ def claim_badge(badge_id):
     conn.close()
     return redirect(url_for('badge.badge', badge_id=badge_id, reason=reason))
 
+#Admin manage badges
+@badge_bp.route('/admin/badges', methods=['GET', 'POST'])
+@login_required
+def manage_badges():
+    if hasattr(current_user, 'role') and current_user.role == 'admin':
+        conn = get_db_connection()
+        if request.method == 'POST':
+            name = request.form['badge_name']
+            description = request.form['badge_description']
+            criteria = request.form['criteria']
+            icon_file = request.files['icon']
+            if icon_file and allowed_file(icon_file.filename):
+                filename = secure_filename(icon_file.filename)
+                icon_path = os.path.join(current_app.static_folder, 'badges', filename)
+                icon_file.save(icon_path)
+                conn.execute(
+                    'INSERT INTO badge (name, description, criteria, icon) VALUES (?, ?, ?, ?)',
+                    (name, description, criteria, filename)
+                )
+                conn.commit()
+                flash('Badge added!', 'success')
+                conn.close()
+                return redirect(url_for('badge.manage_badges'))
+            else:
+                flash('Invalid file type.', 'error')
+        badges = conn.execute('SELECT * FROM badge').fetchall()
+        conn.close()
+        return render_template('manage_badges.html', badges=badges)
+    else:
+        flash('You are not authorized to manage badges.', 'error')
+        return redirect(url_for('badge.badge_gallery'))
+
+@badge_bp.route('/admin/badges/edit/<int:badge_id>', methods=['GET', 'POST'])
+@login_required
+def edit_badge(badge_id):
+    if hasattr(current_user, 'role') and current_user.role == 'admin':
+        conn = get_db_connection()
+        badge = conn.execute('SELECT * FROM badge WHERE id = ?', (badge_id,)).fetchone()
+        if request.method == 'POST':
+            name = request.form['badge_name']
+            description = request.form['badge_description']
+            criteria = request.form['criteria']
+            icon_file = request.files.get('icon')
+            if icon_file and allowed_file(icon_file.filename):
+                filename = secure_filename(icon_file.filename)
+                icon_path = os.path.join(current_app.static_folder, 'badges', filename)
+                icon_file.save(icon_path)
+                conn.execute(
+                    'UPDATE badge SET name=?, description=?, criteria=?, icon=? WHERE id=?',
+                    (name, description, criteria, filename, badge_id)
+                )
+            else:
+                conn.execute(
+                    'UPDATE badge SET name=?, description=?, criteria=? WHERE id=?',
+                    (name, description, criteria, badge_id)
+                )
+            conn.commit()
+            flash('Badge updated!', 'success')
+            conn.close()
+            return redirect(url_for('badge.manage_badges'))
+        conn.close()
+        return render_template('edit_badge.html', badge=badge)
+    else:
+        flash('You are not authorized to edit badges.', 'error')
+        return redirect(url_for('badge.badge_gallery'))
+
+@badge_bp.route('/admin/badges/delete/<int:badge_id>', methods=['POST'])
+@login_required
+def delete_badge(badge_id):
+    if hasattr(current_user, 'role') and current_user.role == 'admin':
+        conn = get_db_connection()
+        conn.execute('DELETE FROM badge WHERE id = ?', (badge_id,))
+        conn.commit()
+        conn.close()
+        flash('Badge deleted!', 'success')
+    else:
+        flash('You are not authorized to delete badges.', 'error')
+        return redirect(url_for('badge.badge_gallery'))
