@@ -12,15 +12,15 @@ UPLOAD_FOLDER = 'Website/static/badge' #Folder to store uploaded files
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
 def get_db_connection():
     db_path = os.path.join(os.path.dirname(__file__), '..', 'instance', 'datebase.db')
     db_path = os.path.abspath(db_path) 
     conn = sqlite3.connect('datebase.db')  
     conn.row_factory = sqlite3.Row
     return conn
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def initialize_database():
     with get_db_connection() as conn:
