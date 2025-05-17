@@ -107,10 +107,16 @@
         color: rgb(78, 68, 57);
     }
 
+    .latest-stories-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+
     .latest-stories-grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        grid-template-rows: repeat(2, auto);
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         gap: 15px;
         justify-content: center;
         max-width: 900px;
@@ -200,48 +206,51 @@
 
 <h2 style="font-size: 30px;">Latest Cat Stories</h2>
 
-<!-- Sorting Dropdown -->
-<div class="filter-container">
-    <form method="GET" action="{{ url_for('auth.cat_story') }}">
-        <label for="month">Sort by Month:</label>
-        <select name="month" id="month">
-            <option value="">Select Month</option>
-            {% for date in unique_dates %}
-                <option value="{{ date.month|int }}-{{ date.year|int }}" {% if selected_month == date.month and selected_year == date.year %}selected{% endif %}>
-                    {{ date.year|int }} - {{ "%02d"|format(date.month|int) }}
-                </option>
+<div class="latest-stories-wrapper">
+
+    <!-- Sorting Dropdown -->
+    <div class="filter-container">
+        <form method="GET" action="{{ url_for('auth.cat_story') }}">
+            <label for="month">Sort by Month:</label>
+            <select name="month" id="month">
+                <option value="">Select Month</option>
+                {% for date in unique_dates %}
+                    <option value="{{ date.month|int }}-{{ date.year|int }}" {% if selected_month == date.month and selected_year == date.year %}selected{% endif %}>
+                        {{ date.year|int }} - {{ "%02d"|format(date.month|int) }}
+                    </option>
+                {% endfor %}
+            </select>
+            <button type="submit">Sort</button>
+        </form>
+    </div>
+
+    <!-- Latest Stories Display -->
+    <div class="latest-stories-grid">
+        {% if latest_stories %}
+            {% for story in latest_stories %}
+            <div class="latest-story-box">
+                <a href="{{ url_for('auth.view_story', story_id=story.id) }}">
+                    <img src="{{ url_for('auth.uploaded_file', filename=story.image_filename) }}" alt="Story Image">
+                </a>
+                <h3 class="latest-story-title">
+                    <a href="{{ url_for('auth.view_story', story_id=story.id) }}">{{ story.caption }}</a>
+                </h3>
+            </div>
             {% endfor %}
-        </select>
-        <button type="submit">Sort</button>
-    </form>
-</div>
+        {% else %}
+            <h5 style="text-align: center; font-style: italic;">No stories have been shared yet.</h5>
+        {% endif %}
+    </div>
 
-<!-- Latest Stories Display -->
-<div class="latest-stories-grid">
-    {% if latest_stories %}
-        {% for story in latest_stories %}
-        <div class="latest-story-box">
-            <a href="{{ url_for('auth.view_story', story_id=story.id) }}">
-                <img src="{{ url_for('auth.uploaded_file', filename=story.image_filename) }}" alt="Story Image">
-            </a>
-            <h3 class="latest-story-title">
-                <a href="{{ url_for('auth.view_story', story_id=story.id) }}">{{ story.caption }}</a>
-            </h3>
-        </div>
-        {% endfor %}
-    {% else %}
-        <h5 style="text-align: center; font-style: italic;">No stories have been shared yet.</h5>
-    {% endif %}
-</div>
-
-<!-- Pagination Arrows -->
-<div class="pagination-arrows">
-    {% if has_prev %}
-        <a class="arrow-btn" href="{{ url_for('auth.cat_story', page=page-1, month=request.args.get('month')) }}">← Latest</a>
-    {% endif %}
-    {% if has_next %}
-        <a class="arrow-btn" href="{{ url_for('auth.cat_story', page=page+1, month=request.args.get('month')) }}">Previous →</a>
-    {% endif %}
+    <!-- Pagination Arrows -->
+    <div class="pagination-arrows">
+        {% if has_prev %}
+            <a class="arrow-btn" href="{{ url_for('auth.cat_story', page=page-1, month=request.args.get('month')) }}">← Latest</a>
+        {% endif %}
+        {% if has_next %}
+            <a class="arrow-btn" href="{{ url_for('auth.cat_story', page=page+1, month=request.args.get('month')) }}">Previous →</a>
+        {% endif %}
+    </div>
 </div>
 
 {% endblock %}
