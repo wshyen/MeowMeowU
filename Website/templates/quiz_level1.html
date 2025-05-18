@@ -117,6 +117,15 @@
         top: -120px;
         font-family: 'Times New Roman', Times, serif;
     }
+
+    #claim-badge-box {
+        display: none;
+        text-align: center;
+        margin-top: 10px;
+        position: relative;
+        top: -120px;
+        font-family: 'Times New Roman', Times, serif;
+    }
 </style>
 <div style="padding: 20px;">
     <h1>Level 1</h1>
@@ -140,6 +149,12 @@
 
     <div class="button-box" id="back-button-box">
         <button class="restart-button" onclick="window.location.href='{{ url_for('quiz.quiz_page') }}'">🐾 Back to Quiz 🐾</button>
+    </div>
+
+    <div class="button-box" id="claim-badge-box" style="display: none;">
+        <form method="get" action="{{ url_for('badge.badge', badge_id=badge_id, reason='quiz_level1') }}">
+            <button class="restart-button" type="submit">🏅 Claim Your Level 1 Badge 🏅</button>
+        </form>
     </div>
 
 </div>
@@ -263,6 +278,7 @@
         if (correctCount === questions.length) {
             document.getElementById("question-text").innerHTML = "Congratulations! <br> You have unlocked level 2 and earned a badge! <br> ฅ^•⩊•^ ฅ";
             fetch('/complete_level1', {method: 'POST'});
+            document.getElementById("claim-badge-box").style.display = "block"; //Show claim badge button
         } else {
             document.getElementById("question-text").innerHTML = "You need to answer all correctly to unlock Level 2 and earn your badge. <br> Try again! <br> /ᐠ ╥ ˕ ╥マ ";
             document.getElementById("restart-box").style.display = "block"; //Show restart buttons

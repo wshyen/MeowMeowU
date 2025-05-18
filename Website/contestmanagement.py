@@ -359,7 +359,7 @@ def view_result(contest_id):
         with  get_db_connection() as conn:
             user = conn.execute("SELECT id FROM user WHERE Name = ?", (winner['name'],)).fetchone()
             if user:
-                award_contest_winner_badge(user['id'])  #Call the badge awarding function
+                award_contest_winner_badge(user['id'], contest_id)  #Call the badge awarding function
 
     winner_names = [w['name'] for w in winners]
     show_claim_button = getattr(current_user, 'Name', None) in winner_names

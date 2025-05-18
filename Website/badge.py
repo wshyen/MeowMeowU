@@ -154,8 +154,8 @@ def award_quiz_badge(user_id, level):
     conn.close()
 
 #Award badge to user based on contest winner
-def award_contest_winner_badge(user_id):
-    criteria = 'contest_winner'
+def award_contest_winner_badge(user_id, contest_id):
+    criteria = f'contest_winner_{contest_id}'
     award_badge_if_eligible(user_id, criteria)
 
 #Admin manage badges

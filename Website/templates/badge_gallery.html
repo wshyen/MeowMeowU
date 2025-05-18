@@ -32,7 +32,7 @@
         gap: 30px;
         justify-content: center;
         margin-top: 30px;
-        flex-direction: column;
+        flex-direction: row;
     }
 
     .user-badge-card {
@@ -107,10 +107,10 @@
     <div class="user-badge-gallery">
         <h2> Every badge tells a story—collect them all and let your journey shine! 🐱</h2>
         {% for badge in all_badges %}
-            {% set earned = badge.id in user_badge_ids %}
+            {% set earned = badge.id in user_badges_ids %}
                 <div class="user-badge-card">
                      <img src="{{ url_for('static', filename='badges/' ~ badge.icon) }}"
-                        style="{% if badge.id not in user_badges_ids and reason != 'winner' %}filter: grayscale(100%); opacity: 0.5;{% endif %}">
+                        style="{% if badge.id not in user_badges_ids %}filter: grayscale(100%); opacity: 0.5;{% endif %}">
                     <div>
                         <strong class="badge-name">{{ badge.name }}</strong>
                     </div>
