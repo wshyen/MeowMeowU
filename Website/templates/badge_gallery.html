@@ -32,6 +32,7 @@
         gap: 30px;
         justify-content: center;
         margin-top: 30px;
+        flex-direction: column;
     }
 
     .user-badge-card {
@@ -40,18 +41,18 @@
         padding: 18px 18px 12px 18px;
         text-align: center;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
-        width: 170px;
+        width: 500px;
+        height: 500px;
         position: relative;
         transition: box-shadow 0.2s;
     }
 
     .user-badge-card img {
-        width: 120px;
-        height: 120px;
+        width: 300px;
+        height: 300px;
         object-fit: contain;
         margin-bottom: 10px;
         border-radius: 8px;
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
     }
 
     .user-badge-card strong {
@@ -66,9 +67,10 @@
     }
 
     .user-badge-card .desc {
-        font-size: 0.92em;
+        font-size: 25px;
         color: #666;
         margin-bottom: 2px;
+        font-family: 'Times New Roman', Times, serif;
     }
 
     .admin-badge-btn-container {
@@ -88,24 +90,39 @@
         cursor: pointer;
         border: none;
     }
+
+    .user-badge-card .locked {
+        font-size: 20px;
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    .user-badge-card .badge-name {
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 30px;
+        font-weight: bold;
+    }
 </style>
 <div style="padding: 20px;">
     <h1>{{ user.Name }}'s Badge Collection</h1>
     <div class="user-badge-gallery">
         <h2> Every badge tells a story—collect them all and let your journey shine! 🐱</h2>
         {% for badge in all_badges %}
-        {% set earned = badge.id in user_badge_ids %}
-        <div class="user-badge-card">
-            <img src="{{ url_for('static', filename='badges/' ~ badge.icon) }}"
-                style="{% if not earned %}filter: grayscale(100%); opacity: 0.5;{% endif %}">
-            <div>
-                <strong>{{ badge.name }}</strong>
-            </div>
-            <div class="desc">{{ badge.description }}</div>
-            {% if not earned %}
-            <div class="locked">Locked</div>
-            {% endif %}
-        </div>
+            {% set earned = badge.id in user_badge_ids %}
+                <div class="user-badge-card">
+                     <img src="{{ url_for('static', filename='badges/' ~ badge.icon) }}"
+                        style="{% if badge.id not in user_badges_ids and reason != 'winner' %}filter: grayscale(100%); opacity: 0.5;{% endif %}">
+                    <div>
+                        <strong class="badge-name">{{ badge.name }}</strong>
+                    </div>
+                    <div class="desc">{{ badge.description }}</div>
+
+                    <!-- Add the badge unlock logic here -->
+                    {% if badge.id in user_badges_ids %}
+                        <div class="badge-unlocked">Unlocked</div>
+                    {% else %}
+                        <div class="locked">Locked</div>
+                    {% endif %}
+                </div>
         {% endfor %}
     </div>
     {% if user_role == 'admin' %}

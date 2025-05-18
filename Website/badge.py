@@ -64,13 +64,14 @@ def badge_gallery():
 @login_required
 def badge(badge_id):
     conn = get_db_connection()
+    winner = conn.execute('SELECT * FROM user WHERE id = ?', (current_user.id,)).fetchone()
     badge = conn.execute('SELECT * FROM badge WHERE id = ?', (badge_id,)).fetchone()
     already_claimed = conn.execute(
         'SELECT 1 FROM user_badge WHERE user_id = ? AND badge_id = ?', (current_user.id, badge_id)
     ).fetchone()
     conn.close()
     reason = request.args.get('reason', 'generic')
-    return render_template('badge.html', badge=badge, reason=reason, user=current_user, already_claimed=already_claimed)
+    return render_template('badge.html', badge=badge, reason=reason, user=current_user, already_claimed=already_claimed, winner= winner)
 
 #Claim badge (quiz/contest)
 @badge_bp.route('/claim_badge/<int:badge_id>', methods=['POST'])
@@ -153,13 +154,9 @@ def award_quiz_badge(user_id, level):
     conn.close()
 
 #Award badge to user based on contest winner
-def award_contest_winner_badge  (user_id, contest_id):
-    conn = get_db_connection()
-    contest = conn.execute('SELECT * FROM contest WHERE id = ?', (contest_id,)).fetchone()
-    if contest and contest['winner_id'] == user_id:
-        criteria = 'contest_winner'
-        award_badge_if_eligible(user_id, criteria)
-    conn.close()
+def award_contest_winner_badge(user_id):
+    criteria = 'contest_winner'
+    award_badge_if_eligible(user_id, criteria)
 
 #Admin manage badges
 @badge_bp.route('/admin/badges', methods=['GET', 'POST'])
@@ -175,13 +172,14 @@ def manage_badges():
             if icon_file and allowed_file(icon_file.filename):
                 filename = secure_filename(icon_file.filename)
                 icon_path = os.path.join(current_app.static_folder, 'badges', filename)
+                os.makedirs(os.path.dirname(icon_path), exist_ok=True)
                 icon_file.save(icon_path)
                 conn.execute(
                     'INSERT INTO badge (name, description, criteria, icon) VALUES (?, ?, ?, ?)',
                     (name, description, criteria, filename)
                 )
                 conn.commit()
-                flash('Badge added!', 'success')
+                flash('Badge added successfully!', 'success')
                 conn.close()
                 return redirect(url_for('badge.manage_badges'))
             else:
@@ -218,11 +216,11 @@ def edit_badge(badge_id):
                     (name, description, criteria, badge_id)
                 )
             conn.commit()
-            flash('Badge updated!', 'success')
+            flash('Badge updated successfully!', 'success')
             conn.close()
             return redirect(url_for('badge.manage_badges'))
         conn.close()
-        return render_template('edit_badge.html', badge=badge)
+        return render_template('edit_badge.html', badge=badge, user=current_user)
     else:
         flash('You are not authorized to edit badges.', 'error')
         return redirect(url_for('badge.badge_gallery'))
@@ -235,7 +233,8 @@ def delete_badge(badge_id):
         conn.execute('DELETE FROM badge WHERE id = ?', (badge_id,))
         conn.commit()
         conn.close()
-        flash('Badge deleted!', 'success')
+        flash('Badge deleted successfully!', 'success')
+        return redirect(url_for('badge.manage_badges'))
     else:
         flash('You are not authorized to delete badges.', 'error')
         return redirect(url_for('badge.badge_gallery'))

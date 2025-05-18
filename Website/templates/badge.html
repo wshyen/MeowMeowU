@@ -7,18 +7,31 @@
 <style>
     body {
         background-color: #f2eadf;
-        font-family: 'Times New Roman', Times, serif;
     }
 
-    .container {
+    h1 {
+        font-family: 'Times New Roman', Times, serif;
+        color: #94693e;
+        font-weight: bold;
+        margin-top: 20px;
+    }
+
+    p {
+        font-family: 'Times New Roman', Times, serif;
+        color: #6b4f2f;
+        font-size: 30px;
+        font-weight: bold;
+        font-style: italic;
+    }
+
+    .badge-container {
         text-align: center;
+        margin-top: 30px;
     }
 
     img {
-        margin-top: 20px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        width: 120px;
-        height: 120px;
+        width: 300px;
+        height: 300px;
         object-fit: contain;
     }
 
@@ -39,7 +52,7 @@
         transform: scale(1.1);
     }
 </style>
-<div class="container">
+<div class="badge-container">
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}
@@ -49,16 +62,16 @@
     {% endwith %}
 
     {% if reason == 'winner' %}
-    <h2>🏅 Congratulations {{ winner.Name }}! 🏅</h2>
+    <h1>🏅 Congratulations {{ winner.Name }}! 🏅</h1>
     <p>You are the winner! Here is your exclusive badge:</p>
     {% elif reason == 'quiz_level1' %}
-    <h2>🎉 Well Done, {{ user.Name }}! 🎉</h2>
+    <h1>🎉 Well Done, {{ user.Name }}! 🎉</h1>
     <p>You completed Level 1 Quiz and earned a badge!</p>
     {% elif reason == 'quiz_level2' %}
-    <h2>🌟 Amazing, {{ user.Name }}! 🌟</h2>
+    <h1>🌟 Amazing, {{ user.Name }}! 🌟</h1>
     <p>You completed Level 2 Quiz and earned a badge!</p>
     {% else %}
-    <h2>🏅 Badge Unlocked! 🏅</h2>
+    <h1>🏅 Badge Unlocked! 🏅</h1>
     <p>You've earned a new badge!</p>
     {% endif %}
 
