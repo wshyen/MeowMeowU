@@ -107,13 +107,58 @@ def award_badge_if_eligible(user_id, criteria):
             conn.commit()
     conn.close()
 
+#Award badge to user based on likes
 def check_like_badges(user_id):
     conn = get_db_connection()
     count = conn.execute(
         'SELECT COUNT(*) FROM likes WHERE user_id = ?', (user_id,)).fetchone()[0]
     for milestone in [10, 50, 100]:
         if count >= milestone:
-            award_badge_if_eligible(user_id, f'likes_{milestone}_posts')
+            award_badge_if_eligible(user_id, f'likes_{milestone}_post')
+    conn.close()
+
+#Award badge to user based on comments
+def check_comment_badges(user_id):
+    conn = get_db_connection()
+    count = conn.execute(
+        'SELECT COUNT(*) FROM comment WHERE user_id = ?', (user_id,)).fetchone()[0]
+    for milestone in [10, 50, 100]:
+        if count >= milestone:
+            award_badge_if_eligible(user_id, f'comment_{milestone}_post')
+    conn.close()
+
+#Award badge to user based on posts
+def check_post_badges(user_id):
+    conn = get_db_connection()
+    count = conn.execute(
+        'SELECT COUNT(*) FROM post WHERE user_id = ?', (user_id,)).fetchone()[0]
+    for milestone in [10, 50, 100]:
+        if count >= milestone:
+            award_badge_if_eligible(user_id, f'post_{milestone}_post')
+    conn.close()
+
+#Award badge to user based on quiz completion
+def award_quiz_badge(user_id, level):
+    conn = get_db_connection()
+    badge = conn.execute('SELECT * FROM badge WHERE criteria = ?', (f'quiz_{level}',)).fetchone()
+    if badge:
+        already_claimed = conn.execute(
+            'SELECT 1 FROM user_badge WHERE user_id = ? AND badge_id = ?', (user_id, badge['id'])
+        ).fetchone()
+        if not already_claimed:
+            conn.execute(
+                'INSERT INTO user_badge (user_id, badge_id) VALUES (?, ?)', (user_id, badge['id'])
+            )
+            conn.commit()
+    conn.close()
+
+#Award badge to user based on contest winner
+def award_contest_winner_badge  (user_id, contest_id):
+    conn = get_db_connection()
+    contest = conn.execute('SELECT * FROM contest WHERE id = ?', (contest_id,)).fetchone()
+    if contest and contest['winner_id'] == user_id:
+        criteria = 'contest_winner'
+        award_badge_if_eligible(user_id, criteria)
     conn.close()
 
 #Admin manage badges
