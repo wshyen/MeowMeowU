@@ -30,6 +30,7 @@ def create_app(): #a function to create and configure the Flask app
     from .community import community_bp
     from .contestmanagement import contestmanagement_bp
     from .quizfeature import quiz_bp
+    from .relationship import relationship_bp
 
     #register Blueprints with the app
     app.register_blueprint(views, urlprefix="/")
