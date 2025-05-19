@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+
+{% block title %} Manage Badges{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f2eadf;
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 20px;
+        font-family: 'Times New Roman', Times, serif;
+        color: #94693e;
+        font-weight: bold;
+        padding-bottom: 20px;
+    }
+
+    .badge_list {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .badge_card {
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        padding: 16px;
+        text-align: center;
+        width: 350px;
+        height: 500px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        position: relative;
+    }
+
+    .badge_card img {
+        width: 300px;
+        height: 300px;
+        object-fit: contain;
+        margin-bottom: 10px;
+    }
+
+    .badge-actions {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+        gap: 10px;
+    }
+
+    .badge-actions form {
+        display: inline;
+    }
+
+    button {
+        padding: 10px 16px;
+        border-radius: 5px;
+        font-family: 'Times New Roman', Times, serif;
+        font-size: medium;
+        font-weight: bold;
+    }
+
+    .add-btn {
+        background-color: #AD784E;
+        color: white;
+        border: none;
+        cursor: pointer;
+        margin: 5px auto;
+        display: block;
+    }
+
+    .delete-btn {
+        background-color: red;
+        color: white;
+        border: none;
+        cursor: pointer;
+        margin: 5px;
+        display: block;
+    }
+
+    .edit-btn {
+        background-color: #6b4f2f;
+        color: white;
+        border: none;
+        cursor: pointer;
+        margin: 5px;
+        display: block;
+    }
+
+    .add-badge-form {
+        margin: 0 auto 30px auto;
+        max-width: 500px;
+        background: #fff8ef;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .add-badge-form input {
+        margin: 8px 0;
+        width: 100%;
+        padding: 8px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        font-family: 'Times New Roman', Times, serif;
+
+    }
+
+    #icon-preview {
+        display: block;
+        margin: 0 auto 10px auto;
+        width: 300px;
+        height: 300px;
+        object-fit: contain;
+    }
+
+    .criteria {
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 16px;
+    }
+
+    select {
+        appearance: none;
+        background-image: url('{{ url_for("static", filename="cat_paws_icon.png") }}');
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        background-size: 20px;
+        font-family: 'Times New Roman', Times, serif;
+        padding: 8px;
+        width: 200px;
+        cursor: pointer;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+    }
+
+    input[type="file"] {
+        background-color: white;
+        padding: 8px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        font-family: 'Times New Roman', Times, serif;
+    }
+</style>
+<div style="padding: 20px;">
+    <h1>Manage Badges</h1>
+
+    <!-- Add badge form -->
+    <form class="add-badge-form" method="POST" enctype="multipart/form-data"
+        action="{{ url_for('badge.manage_badges') }}">
+        <img id="icon-preview" src="#" alt="Icon Preview" style="display:none;">
+        <input type="text" name="badge_name" placeholder="Badge Name" required>
+        <input type="text" name="badge_description" placeholder="Badge Description" required>
+        <div class="criteria">
+            <select name="criteria" id="criteria" required>
+                <option value="">Select criteria</option>
+                <option value="like_10_posts">Like 10 Posts</option>
+                <option value="like_50_posts">Like 50 Posts</option>
+                <option value="like_100_posts">Like 100 Posts</option>
+                <option value="upload_10_posts">Upload 10 Posts</option>
+                <option value="upload_50_posts">Upload 50 Posts</option>
+                <option value="upload_100_posts">Upload 100 Posts</option>
+                <option value="comment_10">Leave 10 Comments</option>
+                <option value="comment_50">Leave 50 Comments</option>
+                <option value="comment_100">Leave 100 Comments</option>
+                <option value="quiz_level1">Quiz Level 1</option>
+                <option value="quiz_level2">Quiz Level 2</option>
+                <option value="contest_winner">Contest Winner</option>
+            </select>
+        </div>
+        <input type="file" name="icon" accept="image/*" required onchange="previewIcon(event)">
+        <button type="submit" class="add-btn">Add</button>
+    </form>
+
+    <div class="badge_list">
+        {% for badge in badges %}
+        <div class="badge_card">
+            <img src="{{ url_for('static', filename='badges/' ~ badge.icon) }}" alt="{{ badge.name }}">
+            <div><strong>{{ badge.name }}</strong></div>
+            <div style="font-size:0.95em;">{{ badge.description }}</div>
+            <div style="font-size:0.9em; color:#888;">Criteria: {{ badge.criteria }}</div>
+            <div class="badge-actions">
+
+                <!-- Edit badge -->
+                <form method="GET" action="{{ url_for('badge.edit_badge', badge_id=badge.id) }}"
+                    style="display:inline;">
+                    <button type="submit" class="edit-btn">Edit</button>
+                </form>
+
+                <!-- Delete badge -->
+                <form method="POST" action="{{ url_for('badge.delete_badge', badge_id=badge.id) }}"
+                    style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this badge?');">
+                    <button type="submit" class="delete-btn">Delete</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+<script>
+    function previewIcon(event) {
+        const [file] = event.target.files;
+        const preview = document.getElementById('icon-preview');
+        if (file) {
+            preview.src = URL.createObjectURL(file);
+            preview.style.display = 'block';
+        } else {
+            preview.src = '#';
+            preview.style.display = 'none';
+        }
+    }
+</script>
+{% endblock %}

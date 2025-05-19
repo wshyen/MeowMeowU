@@ -4,6 +4,7 @@ from flask import Flask, Blueprint, render_template, request, session, redirect,
 from flask_login import current_user, login_required, login_user
 from werkzeug.utils import secure_filename
 from datetime import date, datetime
+from .badge import award_contest_winner_badge
 
 app = Flask(__name__, static_folder='static')
 app.secret_key = 'your_secret_key'
@@ -353,11 +354,23 @@ def view_result(contest_id):
     top_vote = participants[0]['votes']
     winners = [p for p in participants if p['votes'] == top_vote]
 
+    #Award badges to contest winners (badge-system)
+    for winner in winners:
+        with  get_db_connection() as conn:
+            user = conn.execute("SELECT id FROM user WHERE Name = ?", (winner['name'],)).fetchone()
+            if user:
+                award_contest_winner_badge(user['id'], contest_id)  #Call the badge awarding function
+
     winner_names = [w['name'] for w in winners]
     show_claim_button = getattr(current_user, 'Name', None) in winner_names
 
+    # Get the contest winner badge id
+    with get_db_connection() as conn:
+        badge = conn.execute("SELECT id FROM badge WHERE criteria = ?", ('contest_winner',)).fetchone()
+        badge_id = badge['id'] if badge else None
+
     return render_template("view_result.html", contest_name=contest["name"], participants=participants, winners=winners, 
-                           show_claim_button=show_claim_button, contest_id=contest_id, user=current_user)
+                           show_claim_button=show_claim_button, contest_id=contest_id, user=current_user, badge_id=badge_id)
 
 def get_winners(contest_id):
     conn = get_db_connection()

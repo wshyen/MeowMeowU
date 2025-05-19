@@ -2,6 +2,7 @@ import os
 import sqlite3
 from flask import Flask, Blueprint, render_template, request, session, redirect, url_for, jsonify, flash
 from flask_login import current_user, login_required, login_user
+from .badge import award_quiz_badge
 
 app = Flask(__name__, static_folder='static')
 app.secret_key = 'your_secret_key'
@@ -80,14 +81,21 @@ def quiz_level1():
         flash("You must be logged in to play the quiz!", category="error")
         return redirect (url_for('auth.login'))
 
-    return render_template("quiz_level1.html", user=current_user)
+    with get_db_connection() as conn:
+        badge = conn.execute("SELECT id FROM badge WHERE criteria = ?", ('quiz_level1',)).fetchone()
+        badge_id = badge['id'] if badge else None
 
-@quiz_bp.route('/complete_level1', methods=['POST'])
+    return render_template("quiz_level1.html", user=current_user, badge_id=badge_id)
+
+@quiz_bp.route('/complete_level1', methods=['GET','POST'])
 @login_required
 def complete_level1():
     with get_db_connection() as conn:
         conn.execute("UPDATE user SET level1_completed = 1 WHERE rowid = ?", (current_user.id,))
         conn.commit()
+
+    #Award badge for completing level 1
+    award_quiz_badge(current_user.id, 1)
     return jsonify({"success": True})
 
 @quiz_bp.route('/quiz_level2')

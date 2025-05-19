@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Your Badges{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f2eadf;
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 20px;
+        font-family: 'Times New Roman', Times, serif;
+        color: #94693e;
+        font-weight: bold;
+    }
+
+    h2{
+        font-weight: bold;
+        font-size: 20px;
+        color: #6b4f2f;
+        text-align: center;
+        font-style: italic;
+        margin-top: 0;
+        margin-bottom: 20px;
+    }
+
+    .user-badge-gallery {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 30px;
+        justify-content: center;
+        margin-top: 30px;
+        flex-direction: row;
+    }
+
+    .user-badge-card {
+        background: #f8f8f8;
+        border-radius: 10px;
+        padding: 18px 18px 12px 18px;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+        width: 500px;
+        height: 500px;
+        position: relative;
+        transition: box-shadow 0.2s;
+    }
+
+    .user-badge-card img {
+        width: 300px;
+        height: 300px;
+        object-fit: contain;
+        margin-bottom: 10px;
+        border-radius: 8px;
+    }
+
+    .user-badge-card strong {
+        font-size: 1.08em;
+        color: #94693e;
+    }
+
+    .user-badge-card .locked {
+        color: #b0b0b0;
+        font-size: 0.9em;
+        margin-top: 4px;
+    }
+
+    .user-badge-card .desc {
+        font-size: 25px;
+        color: #666;
+        margin-bottom: 2px;
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    .admin-badge-btn-container {
+        text-align: right;
+        margin-bottom: 20px;
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+    }
+    
+    .admin-badge-btn {
+        font-size: 20px;
+        background-color: #94693e;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        border: none;
+    }
+
+    .user-badge-card .locked {
+        font-size: 20px;
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    .user-badge-card .badge-name {
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 30px;
+        font-weight: bold;
+    }
+</style>
+<div style="padding: 20px;">
+    <h1>{{ user.Name }}'s Badge Collection</h1>
+    <div class="user-badge-gallery">
+        <h2> Every badge tells a story—collect them all and let your journey shine! 🐱</h2>
+        {% for badge in all_badges %}
+            {% set earned = badge.id in user_badges_ids %}
+                <div class="user-badge-card">
+                     <img src="{{ url_for('static', filename='badges/' ~ badge.icon) }}"
+                        style="{% if badge.id not in user_badges_ids %}filter: grayscale(100%); opacity: 0.5;{% endif %}">
+                    <div>
+                        <strong class="badge-name">{{ badge.name }}</strong>
+                    </div>
+                    <div class="desc">{{ badge.description }}</div>
+
+                    <!-- Add the badge unlock logic here -->
+                    {% if badge.id in user_badges_ids %}
+                        <div class="badge-unlocked">Unlocked</div>
+                    {% else %}
+                        <div class="locked">Locked</div>
+                    {% endif %}
+                </div>
+        {% endfor %}
+    </div>
+    {% if user_role == 'admin' %}
+        <div style="text-align: right; margin-bottom: 20px; position: fixed; bottom: 20px; right: 20px;">
+            <button id="manageBadges" class="admin-badge-btn" onclick="window.location.href='{{ url_for('badge.manage_badges') }}'">
+                +
+            </button>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

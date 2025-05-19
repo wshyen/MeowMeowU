@@ -1,19 +1,90 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
 {% block title %}Badge{% endblock %}
 
 {% block content %}
 
 <style>
-    .container {
-        text-align: center;
+    body {
+        background-color: #f2eadf;
     }
 
+    h1 {
+        font-family: 'Times New Roman', Times, serif;
+        color: #94693e;
+        font-weight: bold;
+        margin-top: 20px;
+    }
+
+    p {
+        font-family: 'Times New Roman', Times, serif;
+        color: #6b4f2f;
+        font-size: 30px;
+        font-weight: bold;
+        font-style: italic;
+    }
+
+    .badge-container {
+        text-align: center;
+        margin-top: 30px;
+    }
+
+    img {
+        width: 300px;
+        height: 300px;
+        object-fit: contain;
+    }
+
+    .claim-btn {
+        font-family: 'Times New Roman';
+        background-color: rgb(176, 148, 119);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+        font-size: 18px;
+    }
+
+    .claim-btn:hover {
+        background-color: rgb(158, 134, 106);
+        transform: scale(1.1);
+    }
 </style>
-<div class="container">
+<div class="badge-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} mt-2">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
 
-    <h2>🏅 Congratulations {{ winner.name }}! 🏅</h2>
+    {% if reason == 'winner' %}
+    <h1>🏅 Congratulations {{ winner.Name }}! 🏅</h1>
     <p>You are the winner! Here is your exclusive badge:</p>
+    {% elif reason == 'quiz_level1' %}
+    <h1>🎉 Well Done, {{ user.Name }}! 🎉</h1>
+    <p>You completed Level 1 Quiz and earned a badge!</p>
+    {% elif reason == 'quiz_level2' %}
+    <h1>🌟 Amazing, {{ user.Name }}! 🌟</h1>
+    <p>You completed Level 2 Quiz and earned a badge!</p>
+    {% else %}
+    <h1>🏅 Badge Unlocked! 🏅</h1>
+    <p>You've earned a new badge!</p>
+    {% endif %}
 
+    <!-- Show the "Claim Badge" button only for quiz or winner reasons and only if not already claimed -->
+    {% if reason.startswith('quiz') or reason == 'winner' %}
+        {% if not already_claimed %}
+            <!-- Claim Badge form -->
+            <form method="POST" action="{{ url_for('badge.claim_badge', badge_id=badge.id, reason=reason) }}">
+                <button type="submit" class="claim-btn">Claim Badge</button>
+            </form>
+        {% endif %}
+    {% endif %}
+
+    <img src="{{ url_for('static', filename='badges/' ~ badge.icon) }}">
 </div>
 {% endblock %}
