@@ -28,7 +28,7 @@ def login():
     return render_template('login.html')
 
 def get_db_connection():
-    db_path = os.path.join(os.path.dirname(__file__), '..', 'instance', 'cat_profiles.db')
+    db_path = os.path.join(os.path.dirname(__file__), '..', 'instance', 'datebase.db')
     conn = sqlite3.connect(db_path)  #Creates a connection to the database cat_profiles.db
     conn.execute('PRAGMA journal_mode=WAL;')  #Activates Write-Ahead Logging (WAL) in SQLite, enabling simultaneous database reads while a process is writing, improving efficiency and synchronization
     conn.row_factory = sqlite3.Row  #Access rows as dictionaries
