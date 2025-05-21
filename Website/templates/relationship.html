@@ -21,6 +21,63 @@
     gap: 30px;
     margin-top: 20px;
     }
+
+    .cat-card {
+        background-color: #fffbe9;
+        padding: 30px;
+        width: 270px;
+        height: 350px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        text-align:center;
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .cat-card:hover {
+        transform: scale(1.15); 
+        background-color: #fffbe9;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+
+    .cat-card img {
+        width: 150px; 
+        height: 150px;
+        border-radius: 50%;
+        margin-bottom: 40px;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.3s ease;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }       
+    
+    .cat-card:hover img {
+        transform: scale(1.2);
+        filter: brightness(1.1) contrast(1.1);
+    }
+
+    .cat-card p {
+        margin: 10px 0;
+        font-size: larger;
+        color: inherit;
+    }
+
+    .cat-card a {
+        text-decoration: none;
+        color: inherit; 
+    }
+
+    .cat-card a:hover {
+        text-decoration: none;
+        color: inherit;
+        background-color: transparent;
+    }
+
 </style>
 
 <h1>Cat Relationship Tree</h1>
@@ -44,189 +101,49 @@
 </div>
 
 
-<body class="vscode-body vscode-light">
-    <h2 id="范例族譜">范例族譜</h2>
-    <div class="tree">
-        <ul>
-            <li><em><strong>男某〇〇</strong> <strong>女某〇〇</strong></em>
-                <ul>
-                    <li><em><strong>某〇〇</strong></em></li>
-                    <li><em><strong>某〇〇</strong> <strong>某〇〇</strong></em></li>
-                    <li><em><strong>某〇〇</strong> <strong>某〇〇</strong></em></li>
-                    <li><em><strong>男某〇</strong> <strong>女某〇〇</strong></em>
-                        <ul>
-                            <li><em><strong>男某〇</strong> <strong>女某〇〇〇</strong></em>
-                                <ul>
-                                    <li><em><strong>男某〇〇</strong> <strong>女某〇〇〇</strong></em>
-                                        <ul>
-                                            <li><em><strong>男某〇</strong></em></li>
-                                            <li><em><strong>女某〇〇</strong> <strong>男某昭某</strong></em>
-                                                <ul>
-                                                    <li><em><strong>男某〇</strong></em></li>
-                                                    <li><em><strong>女某〇〇</strong></em></li>
-                                                </ul>
-                                            </li>
-                                            <li><em><strong>男某〇〇</strong> <strong>女某〇〇</strong></em>
-                                                <ul>
-                                                    <li><em><strong>男某〇〇</strong></em></li>
-                                                </ul>
-                                            </li>
-                                            <li><em><strong>男某〇〇〇</strong> <strong>女某〇〇</strong></em>
-                                                <ul>
-                                                    <li><em><strong>女某〇〇</strong> <strong>男某〇</strong></em></li>
-                                                    <li><em><strong>男某〇〇</strong> <strong>女某〇〇</strong></em></li>
-                                                    <li><em><strong>男某〇〇</strong></em></li>
-                                                </ul>
-                                            </li>
-                                            <li><em><strong>女某〇〇</strong></em>
-                                                <ul>
-                                                    <li><em><strong>男某〇〇</strong></em></li>
-                                                </ul>
-                                            </li>
-                                            <li><em><strong>女某〇</strong> <strong>男某〇〇</strong></em>
-                                                <ul>
-                                                    <li><em><strong>男某〇〇</strong></em></li>
-                                                    <li><em><strong>女某〇</strong></em></li>
-                                                    <li><em><strong>男某〇〇</strong></em></li>
-                                                </ul>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li><em><strong>男某〇</strong> <strong>女某〇〇</strong></em>
-                                        <ul>
-                                            <li><em><strong>男某〇〇</strong> <strong>女某〇</strong></em>
-                                                <ul>
-                                                    <li><em><strong>某〇〇</strong></em></li>
-                                                    <li><em><strong>某〇〇</strong></em></li>
-                                                </ul>
-                                            </li>
-                                            <li><em><strong>女某〇〇</strong> <strong>男某〇</strong></em>
-                                                <ul>
-                                                    <li><em><strong>某〇〇</strong></em></li>
-                                                    <li><em><strong>某〇〇</strong></em></li>
-                                                </ul>
-                                            </li>
-                                            <li><em><strong>女某〇〇</strong></em></li>
-                                            <li><em><strong>女某〇〇</strong> <strong>男某〇〇</strong></em>
-                                                <ul>
-                                                    <li><em><strong>某〇〇</strong></em></li>
-                                                </ul>
-                                            </li>
-                                            <li><em><strong>女某〇〇</strong> <strong>男某〇〇</strong></em>
-                                                <ul>
-                                                    <li><em><strong>某〇〇</strong></em></li>
-                                                    <li><em><strong>某〇〇</strong></em></li>
-                                                </ul>
-                                            </li>
-                                            <li><em><strong>女某〇〇</strong> <strong>男某〇〇</strong></em>
-                                                <ul>
-                                                    <li><em><strong>女某〇〇</strong> <strong>男某〇〇</strong></em>
-                                                        <ul>
-                                                            <li><em><strong>某〇〇</strong></em></li>
-                                                        </ul>
-                                                    </li>
-                                                    <li><em><strong>男某〇〇</strong> <strong>女某〇〇</strong></em>
-                                                        <ul>
-                                                            <li><em><strong>某〇〇</strong></em></li>
-                                                            <li><em><strong>某〇〇</strong></em></li>
-                                                        </ul>
-                                                    </li>
-                                                    <li><em><strong>男某〇〇</strong> <strong>女某〇〇</strong></em>
-                                                        <ul>
-                                                            <li><em><strong>某〇〇</strong></em></li>
-                                                        </ul>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                            <li><em><strong>女某〇〇</strong> <strong>男某〇〇</strong></em>
-                                                <ul>
-                                                    <li><em><strong>男某〇</strong> <strong>女某〇〇</strong></em>
-                                                        <ul>
-                                                            <li><em><strong>某〇</strong></em></li>
-                                                            <li><em><strong>某〇</strong></em></li>
-                                                        </ul>
-                                                    </li>
-                                                    <li><em><strong>女某〇</strong> <strong>男某〇</strong></em>
-                                                        <ul>
-                                                            <li><em><strong>某〇</strong></em></li>
-                                                            <li><em><strong>某〇</strong></em></li>
-                                                        </ul>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                            <li><em><strong>女某〇</strong> <strong>男某〇</strong></em>
-                                                <ul>
-                                                    <li><em><strong>女某〇</strong> <strong>男某〇</strong></em>
-                                                        <ul>
-                                                            <li><em><strong>某〇</strong></em></li>
-                                                        </ul>
-                                                    </li>
-                                                    <li><em><strong>某〇</strong></em>
-                                                        <ul>
-                                                            <li><em><strong>某〇</strong></em></li>
-                                                        </ul>
-                                                    </li>
-                                                    <li><em><strong>某〇</strong> <strong>某〇</strong></em></li>
-                                                </ul>
-                                            </li>
-                                            <li><em><strong>男某〇</strong> <strong>女某〇</strong></em>
-                                                <ul>
-                                                    <li><em><strong>女某〇</strong> <strong>男某〇</strong></em>
-                                                        <ul>
-                                                            <li><em><strong>某〇</strong></em></li>
-                                                            <li><em><strong>某〇</strong></em></li>
-                                                        </ul>
-                                                    </li>
-                                                    <li><em><strong>男某〇</strong> <strong>女某〇</strong></em>
-                                                        <ul>
-                                                            <li><em><strong>某〇</strong></em></li>
-                                                        </ul>
-                                                    </li>
-                                                    <li><em><strong>女某〇</strong> <strong>男某〇</strong></em>
-                                                        <ul>
-                                                            <li><em><strong>某〇</strong></em></li>
-                                                            <li><em><strong>某〇</strong></em></li>
-                                                        </ul>
-                                                    </li>
-                                                    <li><em><strong>某〇</strong></em></li>
-                                                </ul>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li><em><strong>女某〇〇</strong> <strong>男某〇〇</strong></em></li>
-                                    <li><em><strong>某〇〇</strong> <strong>某〇〇〇</strong></em>
-                                        <ul>
-                                            <li><em><strong>男某〇〇</strong></em></li>
-                                            <li><em><strong>男某〇〇</strong></em></li>
-                                        </ul>
-                                    </li>
-                                    <li><em><strong>男某〇〇</strong> <strong>女某〇〇</strong> <strong>女某〇〇</strong></em>
-                                        <ul>
-                                            <li><em><strong>男某〇〇</strong></em>
-                                                <ul>
-                                                    <li><em><strong>某〇〇</strong></em></li>
-                                                    <li><em><strong>某〇〇</strong></em></li>
-                                                    <li><em><strong>某〇〇</strong></em></li>
-                                                    <li><em><strong>某〇〇</strong></em></li>
-                                                </ul>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li><em><strong>某〇</strong> <strong>某〇</strong></em></li>
-                            <li><em><strong>某〇</strong> <strong>某〇</strong></em></li>
-                            <li><em><strong>某〇</strong> <strong>某〇</strong></em></li>
-                        </ul>
-                    </li>
-                    <li><em><strong>某〇〇</strong> <strong>某〇</strong></em></li>
-                </ul>
-            </li>
-        </ul>
-    </div>
-    <!--CSS JS-->
-    <link rel="stylesheet" type="text/css" href="style.css">
-    <script type="text/javascript" src="family_tree_md2html.js"></script>
+<h2>Add Cat Relationship</h2>
+<form method="POST" action="{{ url_for('relationship.relationship_feature') }}">
+    <input type="hidden" name="action" value="add" />
+    <label>Cat A:
+        <select name="cat1_id" required>
+        {% for cat in profiles %}
+            <option value="{{ cat.id }}">{{ cat.name }}</option>
+        {% endfor %}
+        </select>
+    </label>
+    <label>Cat B:
+        <select name="cat2_id" required>
+        {% for cat in profiles %}
+            <option value="{{ cat.id }}">{{ cat.name }}</option>
+        {% endfor %}
+        </select>
+    </label>
+    <label>Relationship:
+        <select name="relation_type" required>
+        <option value="Friend">Friend</option>
+        <option value="Partner">Partner</option>
+        <option value="Family">Family</option>
+        </select>
+    </label>
+    <button type="submit">Add Relationship</button>
+    </form>
+
+    <h3>Current Relationships</h3>
+    <ul>
+    {% for rel in relations %}
+        <li>
+        {{ rel.cat1_name }} and {{ rel.cat2_name }} are {{ rel.relation_type }}
+        <form method="POST" class="inline" action="{{ url_for('relationship.relationship_feature') }}" onsubmit="return confirm('Are you sure you want to delete this relationship?');">
+            <input type="hidden" name="action" value="delete" />
+            <input type="hidden" name="rel_id" value="{{ rel.id }}" />
+            <button type="submit" class="delete-btn">Delete</button>
+        </form>
+        </li>
+    {% else %}
+        <li>No relationship data available</li>
+    {% endfor %}
+    </ul>
+
 </body>
 
 {% endblock %}
