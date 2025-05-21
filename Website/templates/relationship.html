@@ -105,14 +105,14 @@
 <form method="POST" action="{{ url_for('relationship.relationship_feature') }}">
     <input type="hidden" name="action" value="add" />
     <label>Cat A:
-        <select name="cat1_id" required>
+        <select name="catA_id" required>
         {% for cat in profiles %}
             <option value="{{ cat.id }}">{{ cat.name }}</option>
         {% endfor %}
         </select>
     </label>
     <label>Cat B:
-        <select name="cat2_id" required>
+        <select name="catB_id" required>
         {% for cat in profiles %}
             <option value="{{ cat.id }}">{{ cat.name }}</option>
         {% endfor %}
@@ -132,7 +132,7 @@
     <ul>
     {% for rel in relations %}
         <li>
-        {{ rel.cat1_name }} and {{ rel.cat2_name }} are {{ rel.relation_type }}
+        {{ rel.catA_name }} and {{ rel.catB_name }} are {{ rel.relation_type }}
         <form method="POST" class="inline" action="{{ url_for('relationship.relationship_feature') }}" onsubmit="return confirm('Are you sure you want to delete this relationship?');">
             <input type="hidden" name="action" value="delete" />
             <input type="hidden" name="rel_id" value="{{ rel.id }}" />

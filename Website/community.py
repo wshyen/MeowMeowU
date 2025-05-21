@@ -23,14 +23,10 @@ def get_db_connection():
     return conn
 
 def get_cat_names():
-    db_path = os.path.join(os.path.dirname(__file__), '..', 'instance', 'cat_profiles.db')
-    if not os.path.exists(db_path):
-        return []
-
-    conn = sqlite3.connect(db_path)
-    conn.row_factory = sqlite3.Row
+    
+    conn = get_db_connection()
     cursor = conn.cursor()
-
+    
     cursor.execute('SELECT name FROM profiles')
     cat_names = [row['name'] for row in cursor.fetchall()]
 

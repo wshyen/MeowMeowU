@@ -6,7 +6,7 @@ from flask_login import current_user
 search_bp = Blueprint('search', __name__, template_folder='templates', static_folder='static')
 
 def get_db_connection():
-    db_path = os.path.join(os.path.dirname(__file__), '..', 'instance', 'cat_profiles.db')
+    db_path = os.path.join(os.path.dirname(__file__), '..', 'instance', 'datebase.db')
     db_path = os.path.abspath(db_path) 
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
