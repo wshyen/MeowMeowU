@@ -126,6 +126,26 @@
         top: -120px;
         font-family: 'Times New Roman', Times, serif;
     }
+
+    .quiz-option-btn {
+        background-color: #bc9160;
+        color: whitesmoke;
+        font-weight: bold;
+        border: 2px solid #c79058;
+        border-radius: 8px;
+        padding: 15px 30px;
+        font-size: 22px;
+        font-family: 'Times New Roman', Times, serif;
+        margin: 10px;
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s, transform 0.1s;
+    }
+    
+    .quiz-option-btn:hover {
+        background-color: #d8ae7e;
+        color: #fff;
+        transform: scale(1.05);
+    }
 </style>
 <div style="padding: 20px;">
     <h1>Level 1</h1>
@@ -225,22 +245,15 @@
 
             //Display options
             document.getElementById("options").innerHTML = shuffledOptions.map(option =>
-                `<input type="radio" name="option" value="${option.value}" onchange="checkAnswer()"> ${option.text} <br>`
+                `<button class="quiz-option-btn" onclick="checkAnswer('${option.value}')" type="button">${option.text}</button>`
             ).join("");
         } else {
             checkQuizCompletion();
         }
     }
 
-    function checkAnswer() {
-        let selectedOption = document.querySelector('input[name="option"]:checked');
-        if (!selectedOption) {
-            alert("Please select an answer.");
-            return;
-        }
-
-        let userAnswer = selectedOption.value;
-
+    function checkAnswer(userAnswer) {
+        //Make question and options invisible when checking answer
         document.getElementById("question-text").style.display = "none"; //Hide question when display feedback
         document.getElementById("options").style.display = "none"; //Hide options when display feedback
 
