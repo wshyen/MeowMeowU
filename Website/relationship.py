@@ -25,6 +25,11 @@ def relationship_feature():
             catA_id = request.form.get('catA_id')
             catB_id = request.form.get('catB_id')
             relation_type = request.form.get('relation_type')
+            other_relation = request.form.get('other_relation')
+
+            if relation_type == 'Other' and other_relation and other_relation.strip():
+                relation_type = other_relation.strip()
+
             if catA_id and catB_id and relation_type and catA_id != catB_id:
                 cursor.execute(
                     "INSERT INTO cat_relationship (catA_id, catB_id, relation_type) VALUES (?, ?, ?)",
@@ -44,7 +49,8 @@ def relationship_feature():
     cats = cursor.execute("SELECT id, name, gender, photo FROM profiles").fetchall()
     relations = cursor.execute("""
         SELECT cr.id, cr.catA_id, cr.catB_id, cr.relation_type,
-               p1.name AS catA_name, p2.name AS catB_name
+            p1.name AS catA_name, p1.photo AS catA_photo,
+            p2.name AS catB_name, p2.photo AS catB_photo
         FROM cat_relationship cr
         JOIN profiles p1 ON cr.catA_id = p1.id
         JOIN profiles p2 ON cr.catB_id = p2.id
