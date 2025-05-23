@@ -110,6 +110,17 @@ def quiz_level2():
     
     return render_template("quiz_level2.html", user=current_user)
 
+@quiz_bp.route('/complete_level2', methods=['GET','POST'])
+@login_required
+def complete_level2():
+    with get_db_connection() as conn:
+        conn.execute("UPDATE user SET level2_completed = 1 WHERE rowid = ?", (current_user.id,))
+        conn.commit()
+
+    #Award badge for completing level 2
+    award_quiz_badge(current_user.id, 2)
+    return jsonify({"success": True})
+
 @quiz_bp.route('/manage_quiz', methods=['GET'])
 @login_required
 def manage_quiz():
