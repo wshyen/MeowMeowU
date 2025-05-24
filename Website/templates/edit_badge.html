@@ -57,6 +57,33 @@
         height: 300px;
         object-fit: contain;
     }
+
+    .criteria {
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 16px;
+    }
+
+    select {
+        appearance: none;
+        background-image: url('{{ url_for("static", filename="cat_paws_icon.png") }}');
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        background-size: 20px;
+        font-family: 'Times New Roman', Times, serif;
+        padding: 8px;
+        width: 200px;
+        cursor: pointer;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+    }
+
+    input[type="file"] {
+        background-color: white;
+        padding: 8px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        font-family: 'Times New Roman', Times, serif;
+    }
 </style>
 <div style="padding: 20px;">
     <h1>Edit Badge</h1>
@@ -66,9 +93,16 @@
             <img id="icon-preview" src="{{ url_for('static', filename='badges/' ~ badge.icon) }}" alt="Icon Preview">
             <input type="text" name="badge_name" value="{{ badge.name }}" required>
             <input type="text" name="badge_description" value="{{ badge.description }}" required>
-            <input type="text" name="criteria" value="{{ badge.criteria }}" required>
-            <input type="file" name="icon" accept="image/*" onchange="previewIcon(event)">
-            <button type="submit">Save changes</button>
+            <div class="criteria">
+                <select name="criteria" required>
+                    {% for option in criteria_list %}
+                    <option value="{{ option }}" {% if option==badge.criteria %}selected{% endif %}>
+                        {{ option.replace('_', ' ') | title }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <input type="file" name="icon" accept="image/*" onchange="previewIcon(event)">
+                <button type="submit">Save changes</button>
         </form>
     </div>
 </div>
