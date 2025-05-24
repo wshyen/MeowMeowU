@@ -408,23 +408,39 @@ def report_page(post_id):
     if not current_user.is_authenticated:
         flash("You must be logged in to report!", category="error")
         return redirect(url_for('auth.login'))
-    
-    if request.method == 'POST':
-        reason = request.form.get('reason')
-        other_reason = request.form.get('otherReason', '').strip()
-        details = request.form.get('details', '').strip()
-
-        # Use "Other" reason if provided
-        final_reason = reason if reason != "other" else other_reason
-
-        if not final_reason:
-            flash("Please provide a reason for reporting.", "error")
-        else:
-            new_report = Report(user_id=current_user.id, post_id=post_id, reason=final_reason, details=details)
-            db.session.add(new_report)
-            db.session.commit()
-            flash("Your report has been submitted successfully.", "success")
-
-            return redirect(url_for('community.post_detail', post_id=post_id))  # Redirect as needed
 
     return render_template('report_page.html', post_id=post_id, user=current_user)
+
+@auth.route("/submit_report", methods=["POST"])
+@login_required
+def submit_report():
+    report_type = request.form.get("report_type")
+    post_id = request.form.get("post_id")
+    story_id = request.form.get("story_id")
+    comment_id = request.form.get("comment_id")
+    reason = request.form.get("reason")
+    other_reason = request.form.get("otherReason").strip()
+    details = request.form.get("details")
+
+    #ensure "Other" has a custom reason
+    if reason == "other" and not other_reason:
+        flash("You selected 'Other' but didn't provide a reason. Please enter a valid reason.", category="error")
+        return redirect(url_for("auth.report_page", post_id=post_id))  
+
+    report_reason = other_reason if reason == "other" else reason
+
+    #create a new Report entry
+    new_report = Report(
+        user_id=current_user.id,
+        post_id=post_id if report_type == "post" else None,
+        story_id=story_id if report_type == "story" else None,
+        comment_id=comment_id if report_type == "comment" else None,
+        reason=report_reason,
+        details=details,
+    )
+
+    db.session.add(new_report)
+    db.session.commit()
+    flash("Report submitted successfully! Thank you for your feedback.", category="success")
+
+    return redirect(url_for("auth.report_page",post_id=post_id))
