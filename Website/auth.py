@@ -6,6 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash #for p
 from werkzeug.utils import secure_filename #handling file uploads
 from flask_login import login_user, login_required, logout_user, current_user
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import text
 import os
 from datetime import datetime, timedelta
 
@@ -402,6 +403,22 @@ def uploaded_file(filename):
     return send_from_directory('static/story', filename)
 
 #content moderation
+def get_post(post_id):
+    query = text("SELECT * FROM post WHERE post_id = :post_id")
+    with db.session() as session:
+        result = session.execute(query, {"post_id": post_id}).fetchone()
+    return result
+
+def get_comment(comment_id):
+    query = text("SELECT * FROM comment WHERE id = :comment_id")
+    with db.session() as session:
+        result = session.execute(query, {"comment_id": comment_id}).fetchone()
+    return result
+
+def validate_existence(table, item_id):
+    query = text(f"SELECT EXISTS(SELECT 1 FROM {table} WHERE id = :item_id)")
+    return db.session.execute(query, {"item_id": item_id}).scalar()
+
 @auth.route('/report/<int:post_id>', methods=['GET', 'POST'])
 def report_page(post_id):
 
@@ -413,30 +430,37 @@ def report_page(post_id):
 
 @auth.route("/submit_report", methods=["POST"])
 def submit_report():
-    from sqlalchemy import text
-    from . import db
-
-    def get_post(post_id):
-        query = text("SELECT * FROM post WHERE id = :post_id")
-        result = db.session.execute(query, {"post_id": post_id}).fetchone()
-        return result  #returns tuple with column values
-
     report_type = request.form.get("report_type")
-    post_id = request.form.get("post_id")
-    story_id = request.form.get("story_id")
-    comment_id = request.form.get("comment_id")
+    post_id = int(request.form.get("post_id", 0)) if request.form.get("post_id") else None
+    story_id = int(request.form.get("story_id", 0)) if request.form.get("story_id") else None
+    comment_id = int(request.form.get("comment_id", 0)) if request.form.get("comment_id") else None
     reason = request.form.get("reason")
-    other_reason = request.form.get("otherReason").strip()
+    other_reason = request.form.get("otherReason", "").strip()
     details = request.form.get("details")
 
-    #ensure "Other" has a reason
-    if reason == "other" and not other_reason:
-        flash("You selected 'Other' but didn't provide a reason. Please enter a valid reason.", "error")
-        return redirect(url_for("auth.report_page", post_id=post_id))  
+    #ensure valid report type
+    if report_type not in ["post", "story", "comment"]:
+        flash("Invalid report type. Please select a valid option.", category="error")
+        return redirect(url_for("auth.report_page"))
 
+    #validate "Other" selection with custom reason
     report_reason = other_reason if reason == "other" else reason
+    if reason == "other" and not other_reason:
+        flash("You selected 'Other' but didn't provide a reason.", category="error")
+        return redirect(url_for("auth.report_page", post_id=post_id, comment_id=comment_id, story_id=story_id))
 
-    #create a new Report entry
+    #validate existence of post/story/comment using raw SQL
+    if report_type == "post" and (not post_id or not validate_existence("post", post_id)):
+        flash("The post you're trying to report does not exist.", category="error")
+        return redirect(url_for("auth.report_page", post_id=post_id, comment_id=comment_id, story_id=story_id))
+    elif report_type == "story" and (not story_id or not validate_existence("story", story_id)):
+        flash("The story you're trying to report does not exist.", category="error")
+        return redirect(url_for("auth.report_page", post_id=post_id, comment_id=comment_id, story_id=story_id))
+    elif report_type == "comment" and (not comment_id or not validate_existence("comment", comment_id)):
+        flash("The comment you're trying to report does not exist.", category="error")
+        return redirect(url_for("auth.report_page", post_id=post_id, comment_id=comment_id, story_id=story_id))
+
+    #create new Report entry
     new_report = Report(
         user_id=current_user.id,
         post_id=post_id if report_type == "post" else None,
@@ -448,6 +472,14 @@ def submit_report():
 
     db.session.add(new_report)
     db.session.commit()
-    flash("Report submitted successfully! Thank you for your feedback.", "success")
 
-    return redirect(url_for("auth.report_page", post_id=post_id))
+    flash("Report submitted successfully! Thank you for your feedback.", category="success")
+
+    if report_type == "post":
+        return redirect(url_for("community.post_detail", post_id=post_id))
+    elif report_type == "story":
+        return redirect(url_for("auth.view_story", story_id=story_id))
+    elif report_type == "comment":
+        return redirect(url_for("community.post_detail", comment_id=comment_id))
+
+    return redirect(url_for("community.post_detail"))

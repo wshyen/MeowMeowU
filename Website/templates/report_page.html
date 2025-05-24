@@ -3,7 +3,6 @@
 {% block title %}Report{% endblock %}
 
 {% block content %}
-
 <style>
     body {
         background-color: #f2eadf;
@@ -38,7 +37,6 @@
     }
 
     label {
-        font-family: 'Times New Roman', serif;
         font-weight: bold;
         display: block;
         color: #6b4f2f;
@@ -54,7 +52,18 @@
         border-radius: 8px;
         background: #ffffff;
         font-size: 16px;
-        font-family: 'Times New Roman', serif;
+    }
+
+    select {
+        font-size: 16px;
+        color: #380c0c;
+        cursor: pointer;
+        appearance: none;
+        background-image: url("/static/cat_paws_icon.png");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 20px;
+        padding-right: 35px;
     }
 
     textarea {
@@ -64,7 +73,6 @@
 
     .submit-button {
         text-align: center;
-        font-family: 'Times New Roman', serif;
         background-color: rgb(176, 148, 119);
         color: white;
         border: none;
@@ -83,7 +91,6 @@
 
     .back-button {
         display: inline-block;
-        font-family: 'Times New Roman';
         color: rgb(78, 68, 57);
         text-decoration: none;
         padding: 10px 20px;
@@ -101,6 +108,13 @@
 
 <div class="report-container">
     <form method="post" action="{{ url_for('auth.submit_report') }}">
+        <label for="report_type">Report Type:</label>
+        <select name="report_type" id="report_type" required>
+            <option value="post">Post</option>
+            <option value="story">Story</option>
+            <option value="comment">Comment</option>
+        </select>
+
         <input type="hidden" name="post_id" value="{{ post_id }}">
         <input type="hidden" name="story_id" value="{{ story_id }}">
         <input type="hidden" name="comment_id" value="{{ comment_id }}">
@@ -127,7 +141,17 @@
         </div>
 
         <button type="submit" class="submit-button">🐾Submit Report🐾</button>
-        <a href="{{ url_for('community.post_detail', post_id=post_id) }}" class="back-button">Back</a>
+
+        <!-- Conditionally show back link depending on what is being reported -->
+        {% if report_type == 'post' and post_id %}
+            <a href="{{ url_for('community.post_detail', post_id=post_id) }}" class="back-button">Back</a>
+        {% elif report_type == 'story' and story_id %}
+            <a href="{{ url_for('auth.view_story', story_id=story_id) }}" class="back-button">Back</a>
+        {% elif report_type == 'comment' and comment_id %}
+            <a href="{{ url_for('community.post_detail', comment_id=comment_id) }}" class="back-button">Back</a>
+        {% else %}
+            <a href="{{ url_for('community.post_detail', post_id=post_id, comment_id=comment_id) }}" class="back-button">Back</a>
+        {% endif %}
     </form>
 </div>
 
