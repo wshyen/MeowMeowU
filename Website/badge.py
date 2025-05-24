@@ -56,8 +56,23 @@ def badge_gallery():
     badges = conn.execute('SELECT * FROM badge').fetchall()
     user_badges = conn.execute('SELECT badge_id FROM user_badge WHERE user_id = ?', (current_user.id,)).fetchall()
     user_badges_ids = {row['badge_id'] for row in user_badges}
+    
+    user = conn.execute('SELECT * FROM user WHERE id = ?', (current_user.id,)).fetchone()
+    claimable_badge_ids = set()
+    for badge in badges:
+        #if user has completed level 1 quiz, they can claim the quiz_level1 badge
+        if badge['criteria'] == 'quiz_level1' and user['level1_completed'] and badge['id'] not in user_badges_ids:
+            claimable_badge_ids.add(badge['id'])
+        #if user has completed level 2 quiz, they can claim the quiz_level2 badge
+        if badge['criteria'] == 'quiz_level2' and user['level2_completed'] and badge['id'] not in user_badges_ids:
+            claimable_badge_ids.add(badge['id'])
+        #if user has won contest 1, they can claim the contest_winner_1 badge
+        if badge['criteria'] == 'contest_winner_1' and getattr(user, 'contest1_winner', 0) and badge['id'] not in user_badges_ids:
+            claimable_badge_ids.add(badge['id'])
+        #Add more for other badges as needed
+
     conn.close()
-    return render_template('badge_gallery.html', user_role=user_role, all_badges=badges, user_badges_ids=user_badges_ids, user=current_user)
+    return render_template('badge_gallery.html', user_role=user_role, all_badges=badges, user_badges_ids=user_badges_ids, claimable_badge_ids= claimable_badge_ids, user=current_user)
 
 #Single badge page
 @badge_bp.route('/badge/<int:badge_id>')
@@ -91,7 +106,7 @@ def claim_badge(badge_id):
         conn.commit()
         flash('Badge claimed successfully!', 'success')
     conn.close()
-    return redirect(url_for('badge.badge', badge_id=badge_id, reason=reason))
+    return redirect(url_for('badge.badge_gallery'))
 
 #Award a badge to the user if they meet the criteria
 def award_badge_if_eligible(user_id, criteria):
