@@ -38,7 +38,7 @@ class Story(db.Model):
     story_text = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    user = db.relationship("User", backref="stories")
+    user = db.relationship("User", backref=db.backref("stories", lazy=True, cascade="all, delete-orphan"))
 
 class Report(db.Model):
     id = db.Column(db.Integer, primary_key=True)
