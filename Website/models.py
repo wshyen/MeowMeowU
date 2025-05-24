@@ -36,3 +36,18 @@ class Story(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     user = db.relationship("User", backref="stories")
+
+class Report(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)  #who reported
+    story_id = db.Column(db.Integer, db.ForeignKey("story.id"), nullable=True)  #reported story
+    post_id = db.Column(db.Integer, db.ForeignKey("post.id"), nullable=True)  #reported post
+    comment_id = db.Column(db.Integer, db.ForeignKey("comment.id"), nullable=True)  #reported comment
+    reason = db.Column(db.String(255), nullable=False)
+    details = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship("User", backref="reports", lazy=True)
+    story = db.relationship("Story", backref="reports", lazy=True)
+    post = db.relationship("Post", backref="reports", lazy=True)
+    comment = db.relationship("Comment", backref="reports", lazy=True)
