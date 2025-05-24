@@ -13,24 +13,35 @@
     .report-container {
         max-width: 750px;
         margin: auto;
-        background: #dccbb7;
+        margin-bottom: 50px;
+        background: #e3d9cc;
         padding: 30px;
         border-radius: 12px;
         box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
     }
 
     h2 {
+        font-weight: bold;
+        font-size: 40px;
         text-align: center;
-        font-family: 'Times New Roman', serif;
-        font-size: 26px;
-        padding-bottom: 15px;
-        color: rgb(78, 68, 57);
+        padding-top: 25px;
+        color: #94693e;
+    }
+
+    h5 {
+        font-weight: bold;
+        font-size: 22px;
+        color: #6b4f2f;
+        text-align: center;
+        font-style: italic;
+        margin-bottom: 30px;
     }
 
     label {
         font-family: 'Times New Roman', serif;
         font-weight: bold;
         display: block;
+        color: #6b4f2f;
         margin-top: 12px;
         font-size: 18px;
     }
@@ -62,6 +73,11 @@
         font-family: 'Times New Roman', serif;
     }
 
+    textarea {
+        height: 150px;
+        resize: none;
+    }
+
     .optional {
         font-size: 14px;
         color: #6b4f2f;
@@ -70,15 +86,17 @@
     }
 
     .submit-button {
+        flex: 1;
+        text-align: center;
         font-family: 'Times New Roman', serif;
         background-color: rgb(176, 148, 119);
         color: white;
         border: none;
         padding: 12px 25px;
-        font-size: 18px;
+        font-size: 15px;
         border-radius: 8px;
         cursor: pointer;
-        margin-top: 20px;
+        margin-top: 15px;
         transition: 0.3s ease;
     }
 
@@ -98,11 +116,14 @@
     .back-button:hover {
         text-decoration: underline;
         color: rgb(62, 55, 48);
+        background: #e3d9cc;
     }
 </style>
 
+<h2>Report Post</h2>
+<h5>Report the post here! ✏️</h5>
+
 <div class="report-container">
-    <h2>📍Report Post</h2>
     <form method="post">
         <div class="form-group">
             <label for="reason">Select Reason:</label>
@@ -126,10 +147,13 @@
             <textarea name="details" id="details" rows="4" placeholder="Provide more details if needed..."></textarea>
         </div>
 
-        <button type="submit" class="submit-button">🐾Submit Report🐾</button>
     </form>
 
-    <a href="{{ url_for('community.community_feature') }}" class="back-button">Back</a>
+    <div class="button-container">
+        <button type="submit" class="submit-button">🐾Submit Report🐾</button>
+        <a href="{{ url_for('community.community_feature') }}" class="back-button">Back</a>
+    </div>
+
 </div>
 
 {% endblock %}
