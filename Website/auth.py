@@ -400,3 +400,9 @@ def share_story():
 @auth.route('/static/story/<path:filename>')
 def uploaded_file(filename):
     return send_from_directory('static/story', filename)
+
+#content moderation
+@auth.route('/report/<int:post_id>', methods=['GET', 'POST'])
+def report_page(post_id):
+
+    return render_template('report_page.html', post_id=post_id, user=current_user)
