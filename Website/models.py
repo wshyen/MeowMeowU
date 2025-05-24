@@ -17,7 +17,7 @@ class User(db.Model, UserMixin):
     secret_answer = db.Column(db.String(150), nullable=False) 
 
     notes = db.relationship("Note", backref="user", lazy=True, cascade="all, delete-orphan")
-    stories = db.relationship("Story", backref="user", lazy=True, cascade="all, delete-orphan")
+    stories = db.relationship("Story", backref="owner", lazy=True, cascade="all, delete-orphan")
     reports = db.relationship("Report", backref="user", lazy=True, cascade="all, delete-orphan")
 
     status = db.Column(db.String(100)) #user profile part
