@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Report Post{% endblock %}
+
+{% block content %}
+
+<style>
+    body {
+        background-color: #f2eadf;
+        font-family: 'Times New Roman', serif;
+    }
+
+    .report-container {
+        max-width: 750px;
+        margin: auto;
+        background: #dccbb7;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    h2 {
+        text-align: center;
+        font-family: 'Times New Roman', serif;
+        font-size: 26px;
+        padding-bottom: 15px;
+        color: rgb(78, 68, 57);
+    }
+
+    label {
+        font-family: 'Times New Roman', serif;
+        font-weight: bold;
+        display: block;
+        margin-top: 12px;
+        font-size: 18px;
+    }
+
+    select {
+        width: 100%;
+        padding: 12px;
+        margin-top: 8px;
+        border: 1px solid #c8a786;
+        border-radius: 8px;
+        background: #ffffff;
+        font-size: 16px;
+        font-family: 'Times New Roman', serif;
+        appearance: none;
+        background-image: url('/static/cat_paws_icon.png');
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 22px;
+    }
+
+    textarea, input {
+        width: 100%;
+        padding: 12px;
+        margin-top: 8px;
+        border: 1px solid #c8a786;
+        border-radius: 8px;
+        background: #ffffff;
+        font-size: 16px;
+        font-family: 'Times New Roman', serif;
+    }
+
+    .optional {
+        font-size: 14px;
+        color: #6b4f2f;
+        font-style: italic;
+        margin-top: 5px;
+    }
+
+    .submit-button {
+        font-family: 'Times New Roman', serif;
+        background-color: rgb(176, 148, 119);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        font-size: 18px;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-top: 20px;
+        transition: 0.3s ease;
+    }
+
+    .submit-button:hover {
+        background-color: rgb(156, 128, 100);
+        transform: scale(1.05);
+    }
+
+    .back-button {
+        display: inline-block;
+        font-family: 'Times New Roman';
+        color: rgb(78, 68, 57);
+        text-decoration: none;
+        padding: 10px 20px;
+    }
+
+    .back-button:hover {
+        text-decoration: underline;
+        color: rgb(62, 55, 48);
+    }
+</style>
+
+<div class="report-container">
+    <h2>📍Report Post</h2>
+    <form method="post">
+        <div class="form-group">
+            <label for="reason">Select Reason:</label>
+            <select name="reason" id="reason">
+                <option value="spam">Spam</option>
+                <option value="harassment">False Information</option>
+                <option value="false_info">Offensive language</option>
+                <option value="violence">Inappropriate content</option>
+                <option value="other">Other</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="otherReason">If you selected "Other," please specify:</label>
+            <input type="text" name="otherReason" id="otherReason" placeholder="Enter your reason...">
+            <p class="optional">(Leave blank if selecting a predefined reason.)</p>
+        </div>
+
+        <div class="form-group">
+            <label for="details">Additional Details (Optional):</label>
+            <textarea name="details" id="details" rows="4" placeholder="Provide more details if needed..."></textarea>
+        </div>
+
+        <button type="submit" class="submit-button">🐾Submit Report🐾</button>
+    </form>
+
+    <a href="{{ url_for('community.community_feature') }}" class="back-button">Back</a>
+</div>
+
+{% endblock %}
