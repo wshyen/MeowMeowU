@@ -334,6 +334,11 @@
     .menu-container:hover .menu {
         display: block;
     }
+
+    .menu-container:focus-within .menu {
+        display: block;
+    }
+    
 </style>
 
 <h1>Post Details</h1>
@@ -344,7 +349,7 @@
 <div class="post">
 
     <!-- Three-dot menu positioned at the top-right -->
-    <div class="menu-container">
+    <div class="menu-container" tabindex="0">
         <span class="dots">...</span>
         <div class="menu">
             <a href="{{ url_for('auth.report_page', post_id=post['post_id']) }}">Report</a>
