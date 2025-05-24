@@ -3,6 +3,7 @@ import sqlite3
 from flask import Blueprint, g, render_template
 from flask import request, redirect, url_for
 from flask_login import current_user
+from graphviz import Digraph
 
 
 relationship_bp = Blueprint('relationship', __name__, template_folder='templates')
@@ -13,6 +14,16 @@ def get_db_connection():
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     return conn
+
+def generate_graph(relations):
+    dot = Digraph(comment='Cat Relationship Tree')
+
+    for rel in relations:
+        dot.node(rel['catA_name'], rel['catA_name'])
+        dot.node(rel['catB_name'], rel['catB_name'])
+        dot.edge(rel['catA_name'], rel['catB_name'], label=rel['relation_type'])
+
+    return dot.pipe(format='svg').decode('utf-8')
 
 @relationship_bp.route('/relationship_feature', methods=['GET', 'POST'])
 def relationship_feature():
@@ -56,5 +67,9 @@ def relationship_feature():
         JOIN profiles p2 ON cr.catB_id = p2.id
     """).fetchall()
 
+    graph_svg = generate_graph(relations)
+
     conn.close()
-    return render_template('relationship.html',user=current_user, profiles=cats, relations=relations)
+    return render_template('relationship.html', user=current_user, profiles=cats, relations=relations, tree_img=graph_svg 
+    )
+
