@@ -51,6 +51,7 @@
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         padding: 30px;
         cursor: pointer;
+        position: relative;
     }
         
     .post-info {
@@ -288,6 +289,51 @@
     .hidden {
         display: none;
     }
+
+    .menu-container {
+        position: absolute;
+        top: 10px;
+        right: 25px;
+    }
+
+    .dots {
+        font-size: 24px;
+        cursor: pointer;
+        color: #6b4f2f;
+    }
+
+    .menu {
+        align-items: center;
+        display: none;
+        position: absolute;
+        right: 0;
+        background: #dccbb7;
+        border-radius: 8px;
+        padding: 6px 12px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        min-width: 90px;
+        text-align: center;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .menu a {
+        text-decoration: none;
+        color: #6b4f2f;
+        display: block;
+        padding: 6px 10px;
+        font-weight: bold;
+        border-radius: 6px;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .menu a:hover {
+        background: #dccbb7;
+        transform: scale(1.05);
+    }
+
+    .menu-container:hover .menu {
+        display: block;
+    }
 </style>
 
 <h1>Post Details</h1>
@@ -297,9 +343,17 @@
 
 <div class="post">
 
+    <!-- Three-dot menu positioned at the top-right -->
+    <div class="menu-container">
+        <span class="dots">...</span>
+        <div class="menu">
+            <a href="{{ url_for('auth.report_page', post_id=post['post_id']) }}">Report</a>
+        </div>
+    </div>
+
     <div class="post-info">
-    <img class="profile-picture" src="{{ url_for('static', filename='Userprofile/' + (post['profile_picture'] if post['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
-    <p><strong>{{ post['name'] }}</strong> posted at {{ post['created_at'] }}</p>
+        <img class="profile-picture" src="{{ url_for('static', filename='Userprofile/' + (post['profile_picture'] if post['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
+        <p><strong>{{ post['name'] }}</strong> posted at {{ post['created_at'] }}</p>
     </div>
 
     <p class="post-content">{{ post['content'] }}</p>
