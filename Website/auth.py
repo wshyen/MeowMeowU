@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, send_from_directory #Flask is a web framework that allows developers to build web applications
 import re
-from .models import User, Story
+from .models import User, Story, Report
 from . import db
 from werkzeug.security import generate_password_hash, check_password_hash #for password hashing and verification
 from werkzeug.utils import secure_filename #handling file uploads
@@ -404,5 +404,27 @@ def uploaded_file(filename):
 #content moderation
 @auth.route('/report/<int:post_id>', methods=['GET', 'POST'])
 def report_page(post_id):
+
+    if not current_user.is_authenticated:
+        flash("You must be logged in to report!", category="error")
+        return redirect(url_for('auth.login'))
+    
+    if request.method == 'POST':
+        reason = request.form.get('reason')
+        other_reason = request.form.get('otherReason', '').strip()
+        details = request.form.get('details', '').strip()
+
+        # Use "Other" reason if provided
+        final_reason = reason if reason != "other" else other_reason
+
+        if not final_reason:
+            flash("Please provide a reason for reporting.", "error")
+        else:
+            new_report = Report(user_id=current_user.id, post_id=post_id, reason=final_reason, details=details)
+            db.session.add(new_report)
+            db.session.commit()
+            flash("Your report has been submitted successfully.", "success")
+
+            return redirect(url_for('community.post_detail', post_id=post_id))  # Redirect as needed
 
     return render_template('report_page.html', post_id=post_id, user=current_user)
