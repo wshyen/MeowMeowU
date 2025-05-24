@@ -16,7 +16,7 @@
         font-weight: bold;
     }
 
-    h2{
+    h2 {
         font-weight: bold;
         font-size: 20px;
         color: #6b4f2f;
@@ -80,7 +80,7 @@
         bottom: 20px;
         right: 20px;
     }
-    
+
     .admin-badge-btn {
         font-size: 20px;
         background-color: #94693e;
@@ -96,10 +96,26 @@
         font-family: 'Times New Roman', Times, serif;
     }
 
+    .user-badge-card .badge-unlocked {
+        font-size: 20px;
+        font-family: 'Times New Roman', Times, serif;
+    }
+
     .user-badge-card .badge-name {
         font-family: 'Times New Roman', Times, serif;
         font-size: 30px;
         font-weight: bold;
+    }
+
+    .claim-btn {
+        background-color: #94693e;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+        font-size: 18px;
     }
 </style>
 <div style="padding: 20px;">
@@ -107,30 +123,34 @@
     <div class="user-badge-gallery">
         <h2> Every badge tells a story—collect them all and let your journey shine! 🐱</h2>
         {% for badge in all_badges %}
-            {% set earned = badge.id in user_badges_ids %}
-                <div class="user-badge-card">
-                     <img src="{{ url_for('static', filename='badges/' ~ badge.icon) }}"
-                        style="{% if badge.id not in user_badges_ids %}filter: grayscale(100%); opacity: 0.5;{% endif %}">
-                    <div>
-                        <strong class="badge-name">{{ badge.name }}</strong>
-                    </div>
-                    <div class="desc">{{ badge.description }}</div>
-
-                    <!-- Add the badge unlock logic here -->
-                    {% if badge.id in user_badges_ids %}
-                        <div class="badge-unlocked">Unlocked</div>
-                    {% else %}
-                        <div class="locked">Locked</div>
-                    {% endif %}
+        {% set earned = badge.id in user_badges_ids %}
+            <div class="user-badge-card">
+                <img src="{{ url_for('static', filename='badges/' ~ badge.icon) }}"
+                    style="{% if badge.id not in user_badges_ids %}filter: grayscale(100%); opacity: 0.5;{% endif %}">
+                <div>
+                    <strong class="badge-name">{{ badge.name }}</strong>
                 </div>
+                <div class="desc">{{ badge.description }}</div>
+
+                {% if badge.id in user_badges_ids %}
+                    <div class="badge-unlocked">Unlocked</div>
+                {% elif badge.id in claimable_badge_ids %}
+                    <form method="post" action="{{ url_for('badge.claim_badge', badge_id=badge.id) }}">
+                        <button class="claim-btn" type="submit">Claim</button>
+                    </form>
+                {% else %}
+                    <div class="locked">Locked</div>
+                {% endif %}
+            </div>
         {% endfor %}
     </div>
     {% if user_role == 'admin' %}
-        <div style="text-align: right; margin-bottom: 20px; position: fixed; bottom: 20px; right: 20px;">
-            <button id="manageBadges" class="admin-badge-btn" onclick="window.location.href='{{ url_for('badge.manage_badges') }}'">
-                +
-            </button>
-        </div>
+    <div style="text-align: right; margin-bottom: 20px; position: fixed; bottom: 20px; right: 20px;">
+        <button id="manageBadges" class="admin-badge-btn"
+            onclick="window.location.href='{{ url_for('badge.manage_badges') }}'">
+            +
+        </button>
+    </div>
     {% endif %}
 </div>
 {% endblock %}
