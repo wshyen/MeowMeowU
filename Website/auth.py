@@ -412,8 +412,15 @@ def report_page(post_id):
     return render_template('report_page.html', post_id=post_id, user=current_user)
 
 @auth.route("/submit_report", methods=["POST"])
-@login_required
 def submit_report():
+    from sqlalchemy import text
+    from . import db
+
+    def get_post(post_id):
+        query = text("SELECT * FROM post WHERE id = :post_id")
+        result = db.session.execute(query, {"post_id": post_id}).fetchone()
+        return result  #returns tuple with column values
+
     report_type = request.form.get("report_type")
     post_id = request.form.get("post_id")
     story_id = request.form.get("story_id")
@@ -422,9 +429,9 @@ def submit_report():
     other_reason = request.form.get("otherReason").strip()
     details = request.form.get("details")
 
-    #ensure "Other" has a custom reason
+    #ensure "Other" has a reason
     if reason == "other" and not other_reason:
-        flash("You selected 'Other' but didn't provide a reason. Please enter a valid reason.", category="error")
+        flash("You selected 'Other' but didn't provide a reason. Please enter a valid reason.", "error")
         return redirect(url_for("auth.report_page", post_id=post_id))  
 
     report_reason = other_reason if reason == "other" else reason
@@ -441,6 +448,6 @@ def submit_report():
 
     db.session.add(new_report)
     db.session.commit()
-    flash("Report submitted successfully! Thank you for your feedback.", category="success")
+    flash("Report submitted successfully! Thank you for your feedback.", "success")
 
-    return redirect(url_for("auth.report_page",post_id=post_id))
+    return redirect(url_for("auth.report_page", post_id=post_id))
