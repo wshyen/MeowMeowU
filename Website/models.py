@@ -18,7 +18,7 @@ class User(db.Model, UserMixin):
 
     notes = db.relationship("Note", backref="user", lazy=True, cascade="all, delete-orphan")
     stories = db.relationship("Story", backref="owner", lazy=True, cascade="all, delete-orphan")
-    reports = db.relationship("Report", backref="user", lazy=True, cascade="all, delete-orphan")
+    reports = db.relationship("Report", backref="owner", lazy=True, cascade="all, delete-orphan")
 
     status = db.Column(db.String(100)) #user profile part
     birthday = db.Column(db.Date)
@@ -38,17 +38,17 @@ class Story(db.Model):
     story_text = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    user = db.relationship("User", backref=db.backref("stories", lazy=True, cascade="all, delete-orphan"))
+    user = db.relationship("User", backref=db.backref("user_stories", lazy=True, cascade="all, delete-orphan"))
 
 class Report(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)  # Who reported
-    story_id = db.Column(db.Integer, db.ForeignKey("story.id"), nullable=True)  # Reported story
-    post_id = db.Column(db.Integer, db.ForeignKey("post"), nullable=True)  # Linking to table directly
-    comment_id = db.Column(db.Integer, db.ForeignKey("comment"), nullable=True)  # Linking to table directly
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    story_id = db.Column(db.Integer, db.ForeignKey("story.id"), nullable=True)
+    post_id = db.Column(db.Integer, db.ForeignKey("post"), nullable=True)
+    comment_id = db.Column(db.Integer, db.ForeignKey("comment"), nullable=True)
     reason = db.Column(db.String(255), nullable=False)
     details = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    user = db.relationship("User", backref="reports", lazy=True, cascade="all, delete-orphan")
-    story = db.relationship("Story", backref="reports", lazy=True, cascade="all, delete-orphan")
+    user = db.relationship("User", backref=db.backref("user_reports", lazy=True, cascade="all, delete-orphan"))
+    story = db.relationship("Story", backref="reports", lazy=True)
