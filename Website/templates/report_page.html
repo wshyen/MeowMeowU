@@ -108,13 +108,9 @@
 
 <div class="report-container">
     <form method="post" action="{{ url_for('auth.submit_report') }}">
-        <label for="report_type">Report Type:</label>
-        <select name="report_type" id="report_type" required>
-            <option value="">Select</option>
-            <option value="post">Post</option>
-            <option value="story">Story</option>
-            <option value="comment">Comment</option>
-        </select>
+
+        <input type="hidden" name="report_type" value="{{ report_type }}">
+        <input type="hidden" name="item_id" value="{{ item_id }}">
 
         <div class="form-group">
             <label for="reason">Select Reason:</label>
@@ -137,9 +133,6 @@
             <label for="details">Additional Details (Optional):</label>
             <textarea name="details" id="details" rows="4" placeholder="Provide more details if needed..."></textarea>
         </div>
-
-        <!-- Hidden input field to store the relevant item ID dynamically -->
-        <input type="hidden" name="item_id" value="{{ item_id }}">
 
         <button type="submit" class="submit-button">🐾Submit Report🐾</button>
 
