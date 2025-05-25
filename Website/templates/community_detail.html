@@ -352,13 +352,7 @@
     <div class="menu-container" tabindex="0">
         <span class="dots">...</span>
         <div class="menu">
-            {% if comment %}
-                <a href="{{ url_for('auth.report_page', report_type='comment', item_id=comment['id']) }}">Report Comment</a>
-            {% elif story %}
-                <a href="{{ url_for('auth.report_page', report_type='story', item_id=story['id']) }}">Report Story</a>
-            {% elif post %}
-                <a href="{{ url_for('auth.report_page', report_type='post', item_id=post['post_id']) }}">Report Post</a>
-            {% endif %}
+            <a href="{{ url_for('auth.report_page', report_type='post', item_id=post['post_id']) }}">Report Post</a>
         </div>
     </div>
 
@@ -472,7 +466,7 @@
                             </button>
                         </form>
                     {% else %}
-                        <form action="{{ url_for('auth.report_page', report_type='post', item_id=post['post_id']) }}" method="post" style="display:inline;">
+                        <form action="{{ url_for('auth.report_page', report_type='comment', item_id=comment['id']) }}" method="post" style="display:inline;">
                             <button type="submit" class="comment-action-button" onclick="return confirm('Are you sure you want to report this comment?');">
                                 ⚠️ Report
                             </button>

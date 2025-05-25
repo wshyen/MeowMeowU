@@ -446,15 +446,9 @@ def report_page(report_type, item_id):
         flash("Invalid report ID.", category="error")
         return redirect(url_for('views.home'))
 
-    print(f"Report Type: {report_type}")
-    print(f"Item ID: {item_id}")
-
     post_id = None
     if report_type == "comment":
-        print(f"Looking for comment ID: {item_id}")
         post_id = get_post_id_from_comment(item_id)
-        print(f"Associated post_id: {post_id}")
-        
         if not post_id:
             flash("Could not find the associated post for this comment.", category="error")
             return redirect(url_for('views.home'))
@@ -487,7 +481,7 @@ def submit_report():
     #validate report type
     if report_type not in ["post", "story", "comment"]:
         flash("Invalid report type.", category="error")
-        return redirect(url_for("auth.report_page", report_type=report_type, item_id=item_id))
+        return redirect(url_for("views.home"))
 
     #validate existence of the item
     if not validate_existence(report_type, item_id):
@@ -499,16 +493,20 @@ def submit_report():
         flash("You selected 'Other' but didn't provide a reason. Please fill in the reason before submitting.", category="error")
         return redirect(url_for("auth.report_page", report_type=report_type, item_id=item_id))
 
-    #get post_id if reporting a comment
-    post_id = item_id if report_type == "post" else None
-    story_id = item_id if report_type == "story" else None
-    comment_id = item_id if report_type == "comment" else None
+    post_id = None
+    story_id = None
+    comment_id = None
 
-    if report_type == "comment":
-        post_id = get_post_id_from_comment(comment_id)  #retrieve post ID associated with the comment
+    if report_type == "post":
+        post_id = item_id
+    elif report_type == "story":
+        story_id = item_id
+    elif report_type == "comment":
+        comment_id = item_id
+        post_id = get_post_id_from_comment(comment_id)
         if not post_id:
             flash("Unable to find the post for this comment.", category="error")
-            return redirect(url_for("auth.report_page", report_type=report_type, item_id=item_id))
+            return redirect(url_for("views.home"))
 
     #store report data
     new_report = Report(

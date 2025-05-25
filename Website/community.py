@@ -135,9 +135,10 @@ def post_detail(post_id):
     return render_template("community_detail.html", post=post, comments=comments, grouped_comments=grouped_comments, user=current_user)
 
 def get_post_id_from_comment(comment_id):
-    query = text("SELECT post_id FROM comment WHERE id = :comment_id")
-    result = db.session.execute(query, {"comment_id": comment_id}).fetchone()
-    return result.post_id if result else None
+    query = text("SELECT post_id FROM comment WHERE id = :id")
+    result = db.session.execute(query, {"id": comment_id}).fetchone()
+
+    return result[0] if result else None
 
 # Create Post
 @community_bp.route('/post/create', methods=['POST'])
