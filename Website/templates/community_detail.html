@@ -466,9 +466,11 @@
                             </button>
                         </form>
                     {% else %}
-                        <button type="submit" class="comment-action-button" onclick="return confirm('Are you sure you want to report this comment?');">
-                            ⚠️ Report
-                        </button>
+                        <form action="{{ url_for('auth.report_page', post_id=post['post_id']) }}" method="post" style="display:inline;">
+                            <button type="submit" class="comment-action-button" onclick="return confirm('Are you sure you want to report this comment?');">
+                                ⚠️ Report
+                            </button>
+                        </form>
                     {% endif %} 
                 </div>
 

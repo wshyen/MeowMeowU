@@ -446,7 +446,7 @@ def submit_report():
     #ensure valid report type
     if report_type not in ["post", "story", "comment"]:
         flash("Invalid report type. Please select a valid option.", category="error")
-        return redirect(url_for("auth.report_page"))
+        return redirect(url_for("auth.report_page", post_id=post_id, comment_id=comment_id, story_id=story_id))
 
     #validate "Other" selection with custom reason
     report_reason = other_reason if reason == "other" else reason
