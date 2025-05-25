@@ -57,6 +57,33 @@
         height: 300px;
         object-fit: contain;
     }
+
+    .criteria {
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 16px;
+    }
+
+    select {
+        appearance: none;
+        background-image: url('{{ url_for("static", filename="cat_paws_icon.png") }}');
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        background-size: 20px;
+        font-family: 'Times New Roman', Times, serif;
+        padding: 8px;
+        width: 460px;
+        cursor: pointer;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+    }
+
+    input[type="file"] {
+        background-color: white;
+        padding: 8px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        font-family: 'Times New Roman', Times, serif;
+    }
 </style>
 <div style="padding: 20px;">
     <h1>Edit Badge</h1>
@@ -66,9 +93,39 @@
             <img id="icon-preview" src="{{ url_for('static', filename='badges/' ~ badge.icon) }}" alt="Icon Preview">
             <input type="text" name="badge_name" value="{{ badge.name }}" required>
             <input type="text" name="badge_description" value="{{ badge.description }}" required>
-            <input type="text" name="criteria" value="{{ badge.criteria }}" required>
-            <input type="file" name="icon" accept="image/*" onchange="previewIcon(event)">
-            <button type="submit">Save changes</button>
+            <div class="criteria">
+                <select name="criteria" required>
+                    <option value="like_10_posts" {% if badge.criteria=='like_10_posts' %}selected{% endif %}>Like 10
+                        Posts</option>
+                    <option value="like_50_posts" {% if badge.criteria=='like_50_posts' %}selected{% endif %}>Like 50
+                        Posts</option>
+                    <option value="like_100_posts" {% if badge.criteria=='like_100_posts' %}selected{% endif %}>Like 100
+                        Posts</option>
+                    <option value="upload_10_posts" {% if badge.criteria=='upload_10_posts' %}selected{% endif %}>Upload
+                        10 Posts</option>
+                    <option value="upload_50_posts" {% if badge.criteria=='upload_50_posts' %}selected{% endif %}>Upload
+                        50 Posts</option>
+                    <option value="upload_100_posts" {% if badge.criteria=='upload_100_posts' %}selected{% endif %}>
+                        Upload 100 Posts</option>
+                    <option value="comment_10" {% if badge.criteria=='comment_10' %}selected{% endif %}>Leave 10
+                        Comments</option>
+                    <option value="comment_50" {% if badge.criteria=='comment_50' %}selected{% endif %}>Leave 50
+                        Comments</option>
+                    <option value="comment_100" {% if badge.criteria=='comment_100' %}selected{% endif %}>Leave 100
+                        Comments</option>
+                    <option value="quiz_level1" {% if badge.criteria=='quiz_level1' %}selected{% endif %}>Quiz Level 1
+                    </option>
+                    <option value="quiz_level2" {% if badge.criteria=='quiz_level2' %}selected{% endif %}>Quiz Level 2
+                    </option>
+                    {% for contest in contests %}
+                    {% set contest_value = 'contest_winner_' ~ contest.id %}
+                    <option value="{{ contest_value }}" {% if badge.criteria==contest_value %}selected{% endif %}>
+                        Contest Winner: {{ contest.name }}</option>
+                    {% endfor %}
+
+                </select>
+                <input type="file" name="icon" accept="image/*" onchange="previewIcon(event)">
+                <button type="submit">Save changes</button>
         </form>
     </div>
 </div>
