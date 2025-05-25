@@ -82,7 +82,7 @@ def badge_gallery():
 
             max_votes = highest_votes_row['max_votes'] if highest_votes_row else None
 
-            if max_votes and max_votes > 0:
+            if max_votes and max_votes > 0: 
                 # Get all submissions with max_votes (handle ties)
                 winner_submissions = conn.execute('''
                     SELECT name FROM submissions WHERE contest_id = ? AND votes = ?
