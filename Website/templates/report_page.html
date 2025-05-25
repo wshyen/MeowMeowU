@@ -110,6 +110,7 @@
     <form method="post" action="{{ url_for('auth.submit_report') }}">
         <label for="report_type">Report Type:</label>
         <select name="report_type" id="report_type" required>
+            <option value="none">Select</option>
             <option value="post">Post</option>
             <option value="story">Story</option>
             <option value="comment">Comment</option>
@@ -122,6 +123,7 @@
         <div class="form-group">
             <label for="reason">Select Reason:</label>
             <select name="reason" id="reason" required>
+                <option value="none">Select</option>
                 <option value="spam">Spam</option>
                 <option value="false_info">False Information</option>
                 <option value="offensive">Offensive Language</option>
