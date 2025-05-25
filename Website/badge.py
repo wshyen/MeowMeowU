@@ -60,33 +60,43 @@ def badge_gallery():
     user = conn.execute('SELECT * FROM user WHERE id = ?', (current_user.id,)).fetchone()
     claimable_badge_ids = set()
     for badge in badges:
-        #if user has completed level 1 quiz, they can claim the quiz_level1 badge
-        if badge['criteria'] == 'quiz_level1' and user['level1_completed'] and badge['id'] not in user_badges_ids:
-            claimable_badge_ids.add(badge['id'])
-        #if user has completed level 2 quiz, they can claim the quiz_level2 badge
-        if badge['criteria'] == 'quiz_level2' and user['level2_completed'] and badge['id'] not in user_badges_ids:
-            claimable_badge_ids.add(badge['id'])
-        #if user has won contest 1, they can claim the contest_winner_1 badge
-        if badge['criteria'] == 'contest_winner_1' and getattr(user, 'contest1_winner', 0) and badge['id'] not in user_badges_ids:
-            claimable_badge_ids.add(badge['id'])
+        #Quiz badges
+        if badge['criteria'] == 'quiz_level1':
+            user = conn.execute('SELECT level1_completed FROM user WHERE id = ?', (current_user.id,)).fetchone()
+            if user and user['level1_completed'] and badge['id'] not in user_badges_ids:
+                claimable_badge_ids.add(badge['id'])
+
+        elif badge['criteria'] == 'quiz_level2':
+            user = conn.execute('SELECT level2_completed FROM user WHERE id = ?', (current_user.id,)).fetchone()
+            if user and user['level2_completed'] and badge['id'] not in user_badges_ids:
+                claimable_badge_ids.add(badge['id'])
+
+        #Contest winner badges- check winner from submissions table
+        elif badge['criteria'].startswith('contest_winner_'):
+            contest_id = badge['criteria'].split('_')[-1]  # get contest ID as string or int
+
+            # Get highest votes for the contest
+            highest_votes_row = conn.execute('''
+                SELECT MAX(votes) as max_votes FROM submissions WHERE contest_id = ?
+            ''', (contest_id,)).fetchone()
+
+            max_votes = highest_votes_row['max_votes'] if highest_votes_row else None
+
+            if max_votes and max_votes > 0: 
+                # Get all submissions with max_votes (handle ties)
+                winner_submissions = conn.execute('''
+                    SELECT name FROM submissions WHERE contest_id = ? AND votes = ?
+                ''', (contest_id, max_votes)).fetchall()
+
+                winner_names = {row['name'].strip().lower() for row in winner_submissions}
+                
+                if current_user.Name.strip().lower() in winner_names and badge['id'] not in user_badges_ids:
+                    claimable_badge_ids.add(badge['id'])
+
         #Add more for other badges as needed
 
     conn.close()
     return render_template('badge_gallery.html', user_role=user_role, all_badges=badges, user_badges_ids=user_badges_ids, claimable_badge_ids= claimable_badge_ids, user=current_user)
-
-#Single badge page
-@badge_bp.route('/badge/<int:badge_id>')
-@login_required
-def badge(badge_id):
-    conn = get_db_connection()
-    winner = conn.execute('SELECT * FROM user WHERE id = ?', (current_user.id,)).fetchone()
-    badge = conn.execute('SELECT * FROM badge WHERE id = ?', (badge_id,)).fetchone()
-    already_claimed = conn.execute(
-        'SELECT 1 FROM user_badge WHERE user_id = ? AND badge_id = ?', (current_user.id, badge_id)
-    ).fetchone()
-    conn.close()
-    reason = request.args.get('reason', 'generic')
-    return render_template('badge.html', badge=badge, reason=reason, user=current_user, already_claimed=already_claimed, winner= winner)
 
 #Claim badge (quiz/contest)
 @badge_bp.route('/claim_badge/<int:badge_id>', methods=['POST'])
@@ -179,6 +189,8 @@ def award_contest_winner_badge(user_id, contest_id):
 def manage_badges():
     if hasattr(current_user, 'role') and current_user.role == 'admin':
         conn = get_db_connection()
+        badges = conn.execute('SELECT * FROM badge').fetchall()
+        contests = conn.execute('SELECT id, name FROM contests').fetchall()
         if request.method == 'POST':
             name = request.form['badge_name']
             description = request.form['badge_description']
@@ -201,7 +213,7 @@ def manage_badges():
                 flash('Invalid file type.', 'error')
         badges = conn.execute('SELECT * FROM badge').fetchall()
         conn.close()
-        return render_template('manage_badges.html', badges=badges, user=current_user)
+        return render_template('manage_badges.html', badges=badges, user=current_user, contests=contests)
     else:
         flash('You are not authorized to manage badges.', 'error')
         return redirect(url_for('badge.badge_gallery'))
@@ -211,6 +223,8 @@ def manage_badges():
 def edit_badge(badge_id):
     if hasattr(current_user, 'role') and current_user.role == 'admin':
         conn = get_db_connection()
+        badges = conn.execute('SELECT * FROM badge').fetchall()
+        contests = conn.execute('SELECT id, name FROM contests').fetchall()
         badge = conn.execute('SELECT * FROM badge WHERE id = ?', (badge_id,)).fetchone()
         if request.method == 'POST':
             name = request.form['badge_name']
@@ -235,7 +249,7 @@ def edit_badge(badge_id):
             conn.close()
             return redirect(url_for('badge.manage_badges'))
         conn.close()
-        return render_template('edit_badge.html', badge=badge, user=current_user)
+        return render_template('edit_badge.html', badge=badge, user=current_user, badges=badges, contests=contests)
     else:
         flash('You are not authorized to edit badges.', 'error')
         return redirect(url_for('badge.badge_gallery'))
