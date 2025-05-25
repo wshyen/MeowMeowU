@@ -388,18 +388,6 @@ def get_winners(contest_id):
     winners = [p for p in participants if p['votes'] == top_vote]
     return winners
 
-@contestmanagement_bp.route('/badge_page/<int:contest_id>')
-@login_required
-def badge_page(contest_id):
-    Name = current_user.Name
-    winners = get_winners(contest_id)
-
-    if Name not in [winner['name'] for winner in winners]:
-        flash("You are not a winner!", category="error")
-        return redirect(url_for('contestmanagement.contest_page'))
-
-    return render_template("badge.html", winner={"name": Name}, user=current_user)
-
 if __name__ == '__main__':
     #Ensure the upload folder exists
     if not os.path.exists(app.config['UPLOAD_FOLDER']):

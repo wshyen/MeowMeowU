@@ -171,6 +171,12 @@
         <button class="restart-button" onclick="window.location.href='{{ url_for('quiz.quiz_page') }}'">🐾 Back to Quiz 🐾</button>
     </div>
 
+    <div class="button-box" id="claim-badge-box" style="display: none;">
+        <form method="get" action="{{ url_for('badge.badge_gallery') }}">
+            <button class="restart-button" type="submit">🏅 Claim Your Level 2 Badge 🏅</button>
+        </form>
+    </div>
+
 </div>
 
 <script>
@@ -284,6 +290,8 @@
 
         if (correctCount === questions.length) {
             document.getElementById("question-text").innerHTML = "Congratulations! <br> You have completed Level 2 and earned your badge! <br> ฅ^•⩊•^ ฅ";
+            fetch('/complete_level2', {method: 'POST'});
+            document.getElementById("claim-badge-box").style.display = "block"; //Show claim badge button
         } else {
             document.getElementById("question-text").innerHTML = "This is your final challenge! <br> Get every answer right to complete your journey and earn your badge. <br> Give it another shot!  <br> /ᐠ╥⩊╥ᐟ\\";
             document.getElementById("restart-box").style.display = "block"; //Show restart buttons

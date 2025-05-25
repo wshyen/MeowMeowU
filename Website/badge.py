@@ -8,7 +8,7 @@ app = Flask(__name__, static_folder='static')
 app.secret_key = 'your_secret_key'
 badge_bp = Blueprint('badge', __name__)
 
-UPLOAD_FOLDER = 'Website/static/badge' #Folder to store uploaded files
+UPLOAD_FOLDER = 'Website/static/badges' #Folder to store uploaded files
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -67,7 +67,7 @@ def badge_gallery():
         if badge['criteria'] == 'quiz_level2' and user['level2_completed'] and badge['id'] not in user_badges_ids:
             claimable_badge_ids.add(badge['id'])
         #if user has won contest 1, they can claim the contest_winner_1 badge
-        if badge['criteria'] == 'contest_winner_1' and getattr(user, 'contest1_winner', 0) and badge['id'] not in user_badges_ids:
+        if badge['criteria'] == 'contest_winner_{contest_id}' and getattr(user, 'contest1_winner', 0) and badge['id'] not in user_badges_ids:
             claimable_badge_ids.add(badge['id'])
         #Add more for other badges as needed
 
@@ -179,6 +179,8 @@ def award_contest_winner_badge(user_id, contest_id):
 def manage_badges():
     if hasattr(current_user, 'role') and current_user.role == 'admin':
         conn = get_db_connection()
+        badges = conn.execute('SELECT * FROM badge').fetchall()
+        contests = conn.execute('SELECT id, name FROM contests').fetchall()
         if request.method == 'POST':
             name = request.form['badge_name']
             description = request.form['badge_description']
@@ -201,7 +203,7 @@ def manage_badges():
                 flash('Invalid file type.', 'error')
         badges = conn.execute('SELECT * FROM badge').fetchall()
         conn.close()
-        return render_template('manage_badges.html', badges=badges, user=current_user)
+        return render_template('manage_badges.html', badges=badges, contests=contests, user=current_user)
     else:
         flash('You are not authorized to manage badges.', 'error')
         return redirect(url_for('badge.badge_gallery'))
@@ -211,6 +213,8 @@ def manage_badges():
 def edit_badge(badge_id):
     if hasattr(current_user, 'role') and current_user.role == 'admin':
         conn = get_db_connection()
+        badges = conn.execute('SELECT * FROM badge').fetchall()
+        contests = conn.execute('SELECT id, name FROM contests').fetchall()
         badge = conn.execute('SELECT * FROM badge WHERE id = ?', (badge_id,)).fetchone()
         if request.method == 'POST':
             name = request.form['badge_name']
@@ -235,7 +239,7 @@ def edit_badge(badge_id):
             conn.close()
             return redirect(url_for('badge.manage_badges'))
         conn.close()
-        return render_template('edit_badge.html', badge=badge, user=current_user)
+        return render_template('edit_badge.html', contests=contests, badge=badge, user=current_user)
     else:
         flash('You are not authorized to edit badges.', 'error')
         return redirect(url_for('badge.badge_gallery'))
