@@ -98,20 +98,6 @@ def badge_gallery():
     conn.close()
     return render_template('badge_gallery.html', user_role=user_role, all_badges=badges, user_badges_ids=user_badges_ids, claimable_badge_ids= claimable_badge_ids, user=current_user)
 
-#Single badge page
-@badge_bp.route('/badge/<int:badge_id>')
-@login_required
-def badge(badge_id):
-    conn = get_db_connection()
-    winner = conn.execute('SELECT * FROM user WHERE id = ?', (current_user.id,)).fetchone()
-    badge = conn.execute('SELECT * FROM badge WHERE id = ?', (badge_id,)).fetchone()
-    already_claimed = conn.execute(
-        'SELECT 1 FROM user_badge WHERE user_id = ? AND badge_id = ?', (current_user.id, badge_id)
-    ).fetchone()
-    conn.close()
-    reason = request.args.get('reason', 'generic')
-    return render_template('badge.html', badge=badge, reason=reason, user=current_user, already_claimed=already_claimed, winner= winner)
-
 #Claim badge (quiz/contest)
 @badge_bp.route('/claim_badge/<int:badge_id>', methods=['POST'])
 @login_required
