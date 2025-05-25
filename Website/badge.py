@@ -8,7 +8,7 @@ app = Flask(__name__, static_folder='static')
 app.secret_key = 'your_secret_key'
 badge_bp = Blueprint('badge', __name__)
 
-UPLOAD_FOLDER = 'Website/static/badges' #Folder to store uploaded files
+UPLOAD_FOLDER = 'Website/static/badge' #Folder to store uploaded files
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -213,7 +213,7 @@ def manage_badges():
                 flash('Invalid file type.', 'error')
         badges = conn.execute('SELECT * FROM badge').fetchall()
         conn.close()
-        return render_template('manage_badges.html', badges=badges, contests=contests, user=current_user)
+        return render_template('manage_badges.html', badges=badges, user=current_user, contests=contests)
     else:
         flash('You are not authorized to manage badges.', 'error')
         return redirect(url_for('badge.badge_gallery'))
@@ -249,7 +249,7 @@ def edit_badge(badge_id):
             conn.close()
             return redirect(url_for('badge.manage_badges'))
         conn.close()
-        return render_template('edit_badge.html', contests=contests, badge=badge, user=current_user)
+        return render_template('edit_badge.html', badge=badge, user=current_user, badges=badges, contests=contests)
     else:
         flash('You are not authorized to edit badges.', 'error')
         return redirect(url_for('badge.badge_gallery'))
