@@ -9,6 +9,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy import text
 import os
 from datetime import datetime, timedelta
+from .community import get_post_id_from_comment
 
 auth = Blueprint("auth", __name__) #a Blueprint for authentication routes, Blueprint is like a container for related routes and functions
 
@@ -397,6 +398,11 @@ def share_story():
 
     return render_template("share_story.html", user=current_user)
 
+#route to serve uploaded images from the static/story folder
+@auth.route('/static/story/<path:filename>')
+def uploaded_file(filename):
+    return send_from_directory('static/story', filename)
+
 #content moderation
 def get_post(post_id):
     query = text("SELECT * FROM post WHERE post_id = :post_id")
@@ -411,7 +417,6 @@ def get_comment(comment_id):
     return result
 
 def validate_existence(table, item_id):
-    #map table names to their correct primary key columns
     column_map = {
         "post": "post_id",
         "story": "id",
@@ -425,66 +430,107 @@ def validate_existence(table, item_id):
     query = text(f"SELECT EXISTS(SELECT 1 FROM {table} WHERE {column} = :item_id)")
     return db.session.execute(query, {"item_id": item_id}).scalar()
 
-@auth.route('/report/<int:post_id>', methods=['GET', 'POST'])
-def report_page(post_id):
+@auth.route('/report/<report_type>/<int:item_id>', methods=['GET', 'POST'])
+def report_page(report_type, item_id):
     if not current_user.is_authenticated:
         flash("You must be logged in to report!", category="error")
         return redirect(url_for('auth.login'))
 
-    return render_template('report_page.html', post_id=post_id, user=current_user)
+    #ensure report type is valid (case-insensitive)
+    report_type = report_type.lower()
+    if report_type not in ["post", "story", "comment"]:
+        flash("Invalid report type!", category="error")
+        return redirect(url_for('views.home'))
+
+    if item_id <= 0:
+        flash("Invalid report ID.", category="error")
+        return redirect(url_for('views.home'))
+
+    print(f"Report Type: {report_type}")
+    print(f"Item ID: {item_id}")
+
+    post_id = None
+    if report_type == "comment":
+        print(f"Looking for comment ID: {item_id}")
+        post_id = get_post_id_from_comment(item_id)
+        print(f"Associated post_id: {post_id}")
+        
+        if not post_id:
+            flash("Could not find the associated post for this comment.", category="error")
+            return redirect(url_for('views.home'))
+
+    return render_template(
+        'report_page.html',
+        report_type=report_type,
+        item_id=item_id,
+        post_id=post_id,
+        user=current_user
+    )
 
 @auth.route("/submit_report", methods=["POST"])
 def submit_report():
     report_type = request.form.get("report_type")
-    post_id = int(request.form.get("post_id", 0)) if request.form.get("post_id") else None
-    story_id = int(request.form.get("story_id", 0)) if request.form.get("story_id") else None
-    comment_id = int(request.form.get("comment_id", 0)) if request.form.get("comment_id") else None
+    item_id = request.form.get("item_id")  #universal ID for post, story, or comment
     reason = request.form.get("reason")
     other_reason = request.form.get("otherReason", "").strip()
     details = request.form.get("details")
 
-    #ensure valid report type
+    #ensure item_id is an integer
+    try:
+        item_id = int(item_id)
+        if item_id <= 0:
+            raise ValueError("Invalid item ID.")
+    except (TypeError, ValueError):
+        flash("Invalid report ID.", category="error")
+        return redirect(url_for("auth.report_page", report_type=report_type, item_id=item_id))
+
+    #validate report type
     if report_type not in ["post", "story", "comment"]:
-        flash("Invalid report type. Please select a valid option.", category="error")
-        return redirect(url_for("auth.report_page", post_id=post_id, comment_id=comment_id, story_id=story_id))
+        flash("Invalid report type.", category="error")
+        return redirect(url_for("auth.report_page", report_type=report_type, item_id=item_id))
 
-    #validate "Other" selection with custom reason
-    report_reason = other_reason if reason == "other" else reason
+    #validate existence of the item
+    if not validate_existence(report_type, item_id):
+        flash(f"The {report_type} you're trying to report does not exist.", category="error")
+        return redirect(url_for("auth.report_page", report_type=report_type, item_id=item_id))
+
+    #ensure "Other" requires a filled reason
     if reason == "other" and not other_reason:
-        flash("You selected 'Other' but didn't provide a reason.", category="error")
-        return redirect(url_for("auth.report_page", post_id=post_id, comment_id=comment_id, story_id=story_id))
+        flash("You selected 'Other' but didn't provide a reason. Please fill in the reason before submitting.", category="error")
+        return redirect(url_for("auth.report_page", report_type=report_type, item_id=item_id))
 
-    #validate existence of post/story/comment
-    if report_type == "post" and (not post_id or not validate_existence("post", post_id)):
-        flash("The post you're trying to report does not exist.", category="error")
-        return redirect(url_for("auth.report_page", post_id=post_id, comment_id=comment_id, story_id=story_id))
-    elif report_type == "story" and (not story_id or not validate_existence("story", story_id)):
-        flash("The story you're trying to report does not exist.", category="error")
-        return redirect(url_for("auth.report_page", post_id=post_id, comment_id=comment_id, story_id=story_id))
-    elif report_type == "comment" and (not comment_id or not validate_existence("comment", comment_id)):
-        flash("The comment you're trying to report does not exist.", category="error")
-        return redirect(url_for("auth.report_page", post_id=post_id, comment_id=comment_id, story_id=story_id))
+    #get post_id if reporting a comment
+    post_id = item_id if report_type == "post" else None
+    story_id = item_id if report_type == "story" else None
+    comment_id = item_id if report_type == "comment" else None
 
-    #create new Report entry
+    if report_type == "comment":
+        post_id = get_post_id_from_comment(comment_id)  #retrieve post ID associated with the comment
+        if not post_id:
+            flash("Unable to find the post for this comment.", category="error")
+            return redirect(url_for("auth.report_page", report_type=report_type, item_id=item_id))
+
+    #store report data
     new_report = Report(
         user_id=current_user.id,
-        post_id=post_id if report_type == "post" else None,
-        story_id=story_id if report_type == "story" else None,
-        comment_id=comment_id if report_type == "comment" else None,
-        reason=report_reason,
+        post_id=post_id,
+        story_id=story_id,
+        comment_id=comment_id,
+        reason=other_reason if reason == "other" else reason,
         details=details,
     )
 
     db.session.add(new_report)
     db.session.commit()
 
-    flash("Report submitted successfully! Thank you for your feedback.", category="success")
+    flash("Report submitted successfully!", category="success")
 
+    #redirect user based on report type
     if report_type == "post":
         return redirect(url_for("community.post_detail", post_id=post_id))
     elif report_type == "story":
         return redirect(url_for("auth.view_story", story_id=story_id))
     elif report_type == "comment":
-        return redirect(url_for("community.post_detail", comment_id=comment_id))
+        return redirect(url_for("community.post_detail", post_id=post_id, comment_id=comment_id))
 
-    return redirect(url_for("community.post_detail"))
+    return redirect(url_for("views.home"))

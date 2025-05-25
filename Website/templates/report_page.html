@@ -110,20 +110,16 @@
     <form method="post" action="{{ url_for('auth.submit_report') }}">
         <label for="report_type">Report Type:</label>
         <select name="report_type" id="report_type" required>
-            <option value="none">Select</option>
+            <option value="">Select</option>
             <option value="post">Post</option>
             <option value="story">Story</option>
             <option value="comment">Comment</option>
         </select>
 
-        <input type="hidden" name="post_id" value="{{ post_id }}">
-        <input type="hidden" name="story_id" value="{{ story_id }}">
-        <input type="hidden" name="comment_id" value="{{ comment_id }}">
-
         <div class="form-group">
             <label for="reason">Select Reason:</label>
             <select name="reason" id="reason" required>
-                <option value="none">Select</option>
+                <option value="">Select</option>
                 <option value="spam">Spam</option>
                 <option value="false_info">False Information</option>
                 <option value="offensive">Offensive Language</option>
@@ -142,17 +138,20 @@
             <textarea name="details" id="details" rows="4" placeholder="Provide more details if needed..."></textarea>
         </div>
 
+        <!-- Hidden input field to store the relevant item ID dynamically -->
+        <input type="hidden" name="item_id" value="{{ item_id }}">
+
         <button type="submit" class="submit-button">🐾Submit Report🐾</button>
 
-        <!-- Conditionally show back link depending on what is being reported -->
-        {% if report_type == 'post' and post_id %}
-            <a href="{{ url_for('community.post_detail', post_id=post_id) }}" class="back-button">Back</a>
-        {% elif report_type == 'story' and story_id %}
-            <a href="{{ url_for('auth.view_story', story_id=story_id) }}" class="back-button">Back</a>
-        {% elif report_type == 'comment' and comment_id %}
-            <a href="{{ url_for('community.post_detail', comment_id=comment_id) }}" class="back-button">Back</a>
+        <!-- Back button dynamically adjusted based on report type -->
+        {% if report_type == 'post' %}
+            <a href="{{ url_for('community.post_detail', post_id=item_id) }}" class="back-button">Back</a>
+        {% elif report_type == 'story' %}
+            <a href="{{ url_for('auth.view_story', story_id=item_id) }}" class="back-button">Back</a>
+        {% elif report_type == 'comment' %}
+            <a href="{{ url_for('community.post_detail', post_id=post_id) }}#comment-{{ item_id }}" class="back-button">Back</a>
         {% else %}
-            <a href="{{ url_for('community.post_detail', post_id=post_id, comment_id=comment_id) }}" class="back-button">Back</a>
+            <a href="{{ url_for('views.home') }}" class="back-button">Back</a>
         {% endif %}
     </form>
 </div>
