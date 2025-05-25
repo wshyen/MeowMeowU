@@ -397,11 +397,6 @@ def share_story():
 
     return render_template("share_story.html", user=current_user)
 
-#route to serve uploaded images from the static/story folder
-@auth.route('/static/story/<path:filename>')
-def uploaded_file(filename):
-    return send_from_directory('static/story', filename)
-
 #content moderation
 def get_post(post_id):
     query = text("SELECT * FROM post WHERE post_id = :post_id")
@@ -416,12 +411,22 @@ def get_comment(comment_id):
     return result
 
 def validate_existence(table, item_id):
-    query = text(f"SELECT EXISTS(SELECT 1 FROM {table} WHERE id = :item_id)")
+    #map table names to their correct primary key columns
+    column_map = {
+        "post": "post_id",
+        "story": "id",
+        "comment": "id"
+    }
+
+    column = column_map.get(table)
+    if not column:
+        return False  #prevent unknown table access
+
+    query = text(f"SELECT EXISTS(SELECT 1 FROM {table} WHERE {column} = :item_id)")
     return db.session.execute(query, {"item_id": item_id}).scalar()
 
 @auth.route('/report/<int:post_id>', methods=['GET', 'POST'])
 def report_page(post_id):
-
     if not current_user.is_authenticated:
         flash("You must be logged in to report!", category="error")
         return redirect(url_for('auth.login'))
@@ -449,7 +454,7 @@ def submit_report():
         flash("You selected 'Other' but didn't provide a reason.", category="error")
         return redirect(url_for("auth.report_page", post_id=post_id, comment_id=comment_id, story_id=story_id))
 
-    #validate existence of post/story/comment using raw SQL
+    #validate existence of post/story/comment
     if report_type == "post" and (not post_id or not validate_existence("post", post_id)):
         flash("The post you're trying to report does not exist.", category="error")
         return redirect(url_for("auth.report_page", post_id=post_id, comment_id=comment_id, story_id=story_id))
