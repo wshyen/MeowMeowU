@@ -65,6 +65,8 @@ def badge_gallery():
     claimable_badge_ids.update(check_contest_winner_badges(current_user.id))
 
     conn.close()
+    print("Claimable Badges:", claimable_badge_ids)
+
     return render_template('badge_gallery.html', user_role=user_role, all_badges=badges, user_badges_ids=user_badges_ids, claimable_badge_ids=claimable_badge_ids, user=current_user)
 
 #Claim badge manually
@@ -95,7 +97,7 @@ def check_like_badges(user_id):
     claimable_badges = set()
 
     for milestone in [10, 50, 100]:
-        criteria = f'like_{milestone}_post'
+        criteria = f'like_{milestone}_posts'
         badge = conn.execute('SELECT * FROM badge WHERE criteria = ?', (criteria,)).fetchone()
         if badge:
             already_claimed = conn.execute(
@@ -115,7 +117,7 @@ def check_comment_badges(user_id):
     claimable_badges = set ()
 
     for milestone in [10, 50, 100]:
-        criteria = f'comment_{milestone}_post'
+        criteria = f'comment_{milestone}'
         badge = conn.execute('SELECT * FROM badge WHERE criteria = ?', (criteria,)).fetchone()
         if badge:
             already_claimed = conn.execute(
@@ -135,7 +137,7 @@ def check_post_badges(user_id):
     claimable_badges = set()
 
     for milestone in [10, 50, 100]:
-        criteria = f'post_{milestone}_post'
+        criteria = f'upload_{milestone}_posts'
         badge = conn.execute('SELECT * FROM badge WHERE criteria = ?', (criteria,)).fetchone()
         if badge:
             already_claimed = conn.execute(
