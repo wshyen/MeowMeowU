@@ -85,11 +85,11 @@
                     <form action="{{ url_for('auth.dismiss_report', id=report.id) }}" method="POST">
                         <button type="submit">Dismiss</button>
                     </form>
-                    {% set action_route, params, action_label = report.delete_action %}
-                    {% if action_route %}
-                    <form action="{{ url_for(action_route, **params) }}" method="POST">
-                        <button type="submit" style="background-color: rgb(255, 86, 86);">{{ action_label }}</button>
-                    </form>
+                    {% set view_route, view_params, view_label = report.view_action %}
+                    {% if view_route %}
+                    <a href="{{ url_for(view_route, **view_params) }}">
+                        <button type="button" style="background-color: rgb(255, 86, 86);">{{ view_label }}</button>
+                    </a>
                     {% endif %}
                 </div>
             </td>
