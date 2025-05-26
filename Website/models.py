@@ -52,3 +52,23 @@ class Report(db.Model):
 
     user = db.relationship("User", backref=db.backref("user_reports", lazy=True, cascade="all, delete-orphan"))
     story = db.relationship("Story", backref="reports", lazy=True)
+
+    @property
+    def report_type(self):
+        if self.story_id:
+            return "Story"
+        elif self.comment_id and self.post_id:
+            return "Comment"
+        elif self.post_id:
+            return "Post"
+        return "Unknown"
+
+    @property
+    def delete_action(self):
+        if self.comment_id:
+            return ("auth.delete_comment", {"id": self.comment_id}, "Delete Comment")
+        elif self.post_id and not self.comment_id:
+            return ("auth.delete_post", {"post_id": self.post_id}, "Delete Post")
+        elif self.story_id:
+            return ("auth.delete_story", {"id": self.story_id}, "Delete Story")
+        return (None, {}, "")
