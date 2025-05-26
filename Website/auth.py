@@ -532,3 +532,78 @@ def submit_report():
         return redirect(url_for("community.post_detail", post_id=post_id, comment_id=comment_id))
 
     return redirect(url_for("views.home"))
+
+#admin
+@auth.route('/admin/view_report')
+def view_report():
+
+    reports = Report.query.order_by(Report.created_at.desc()).all()
+
+    return render_template("view_report.html", reports=reports, user=current_user)
+
+@auth.route("/admin/dismiss_report/<int:id>", methods=["POST"])
+def dismiss_report(id):
+
+    #fetch the report using the correct ID field
+    report = Report.query.get(id)
+    if not report:
+        flash("Report not found.", category="error")
+        return redirect(url_for("auth.view_report"))
+
+    #delete the report
+    db.session.delete(report)
+    db.session.commit()
+
+    flash("Report dismissed successfully!", category="success")
+    return redirect(url_for("auth.view_report"))
+
+@auth.route("/admin/delete_story/<int:id>", methods=["POST"])
+def delete_story(id):
+
+    story = Story.query.get(id)
+    if not story:
+        flash("Story not found.", category="error")
+        return redirect(url_for("auth.view_report"))
+
+    #delete the story
+    db.session.delete(story)
+    db.session.commit()
+
+    flash("Story deleted successfully!", category="success")
+    return redirect(url_for("auth.view_report"))
+
+@auth.route("/admin/delete_post/<int:post_id>", methods=["POST"])
+def delete_post(post_id):
+
+    #check if the post exists before deleting
+    query_check = text("SELECT * FROM post WHERE post_id = :post_id")
+    post = db.session.execute(query_check, {"post_id": post_id}).fetchone()
+
+    if not post:
+        flash("Post not found.", category="error")
+        return redirect(url_for("auth.view_report"))
+
+    #delete the post using raw SQL
+    query_delete = text("DELETE FROM post WHERE post_id = :post_id")
+    db.session.execute(query_delete, {"post_id": post_id})
+    db.session.commit()
+
+    flash("Post deleted successfully!", category="success")
+    return redirect(url_for("auth.view_report"))
+
+@auth.route("/admin/delete_comment/<int:id>", methods=["POST"])
+def delete_comment(id):
+
+    query_check = text("SELECT * FROM comment WHERE id = :id")
+    comment = db.session.execute(query_check, {"id": id}).fetchone()
+
+    if not comment:
+        flash("Comment not found.", category="error")
+        return redirect(url_for("auth.view_report"))
+
+    query_delete = text("DELETE FROM comment WHERE id = :id")
+    db.session.execute(query_delete, {"id": id})
+    db.session.commit()
+
+    flash("Comment deleted successfully!", category="success")
+    return redirect(url_for("auth.view_report"))

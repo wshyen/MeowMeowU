@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Reports{% endblock %}
+
+{% block content %}
+
+<style>
+    body {
+        background-color: #f2eadf;
+    }
+
+    h2 {
+        font-weight: bold;
+        text-align: center;
+        padding-top: 25px;
+        color: #94693e;
+        font-family: "Times New Roman";
+    }
+
+    table {
+        width: 100%;
+        table-layout: fixed;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background-color: rgba(255, 255, 255, 0.9);
+    }
+
+    th, td {
+        padding: 10px;
+        border: 1px solid black;
+        width: 20%;
+        text-align: center;
+        font-family: 'Times New Roman';
+    }
+
+    th {
+        background-color: rgb(176, 148, 119);
+        color: white;
+    }
+
+    .action-buttons {
+        justify-content: center;
+        display: flex;
+        gap: 10px;
+    }
+
+    button { 
+        font-family: 'Times New Roman'; 
+        background-color: rgb(176, 148, 119); 
+        color: white; 
+        border: none; 
+        padding: 5px 10px; 
+        border-radius: 5px; 
+        cursor: pointer;
+    } 
+    
+    button:hover { 
+        background-color: rgb(158, 134, 106); 
+        transform: scale(1.1); 
+    }
+
+</style>
+
+<h2><b>View Reports📝</b></h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Report Reason</th>
+            <th>Details</th>
+            <th>Reported By</th>
+            <th>Submission Date</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for report in reports %}
+        <tr>
+            <td>{{ report.reason }}</td>
+            <td>{% if report.details %}{{ report.details }}{% else %}-{% endif %}</td>
+            <td>{{ report.user.Name }}</td>
+            <td>{{ report.created_at.strftime('%Y-%m-%d') }}</td>
+            <td>
+                <div class="action-buttons">
+                    <form action="{{ url_for('auth.dismiss_report', id=report.id) }}" method="POST">
+                        <button type="submit">Dismiss</button>
+                    </form>
+                    {% if report.post_id %}
+                    <form action="{{ url_for('auth.delete_post', post_id=report.post_id) }}" method="POST">
+                        <button type="submit" style="background-color: red;">Delete Post</button>
+                    </form>
+                    {% elif report.story_id %}
+                    <form action="{{ url_for('auth.delete_story', id=report.story_id) }}" method="POST">
+                        <button type="submit" style="background-color: red;">Delete Story</button>
+                    </form>
+                    {% elif report.comment_id %}
+                    <form action="{{ url_for('auth.delete_comment', id=report.comment_id) }}" method="POST">
+                        <button type="submit" style="background-color: red;">Delete Comment</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
