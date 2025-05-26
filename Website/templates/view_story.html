@@ -173,7 +173,11 @@
     <div class="menu-container" tabindex="0">
         <span class="dots">⋮</span>
         <div class="menu">
-            <a href="{{ url_for('auth.report_page', report_type='story', item_id=story['id']) }}">Report Story</a>
+            {% if user.is_authenticated and user.role == 'user' %}
+                <a href="{{ url_for('auth.report_page', report_type='story', item_id=story['id']) }}">Report Story</a>
+            {% elif user.is_authenticated and user.role == 'admin' %}
+                <a href="{{ url_for('auth.delete_story', id=story['id']) }}">Delete Story</a>
+            {% endif %}
         </div>
     </div>
 
