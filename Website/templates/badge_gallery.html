@@ -121,8 +121,8 @@
 </style>
 <div style="padding: 20px;">
     <h1>{{ user.Name }}'s Badge Collection</h1>
+    <h2> Every badge tells a story—collect them all and let your journey shine! 🐱</h2>
     <div class="user-badge-gallery">
-        <h2> Every badge tells a story—collect them all and let your journey shine! 🐱</h2>
         {% for badge in all_badges %}
         {% set earned = badge.id in user_badges_ids %}
             <div class="user-badge-card">

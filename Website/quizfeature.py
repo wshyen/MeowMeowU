@@ -2,7 +2,7 @@ import os
 import sqlite3
 from flask import Flask, Blueprint, render_template, request, session, redirect, url_for, jsonify, flash
 from flask_login import current_user, login_required, login_user
-from .badge import award_quiz_badge
+from .badge import check_quiz_badges
 
 app = Flask(__name__, static_folder='static')
 app.secret_key = 'your_secret_key'
