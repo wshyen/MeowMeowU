@@ -32,7 +32,10 @@ def generate_graph(relations, filename='cat_relationship_tree'):
         ]:
             if cat_name not in added_nodes:
                 label = f'''<
-                [PIC]<BR/>{cat_name}
+                <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" ALIGN="CENTER">
+                <TR><TD>[PIC]</TD></TR>
+                <TR><TD HEIGHT="30">{cat_name}</TD></TR>
+                </TABLE>
                 >'''
                 dot.node(cat_name, label=label)
                 added_nodes.add(cat_name)
