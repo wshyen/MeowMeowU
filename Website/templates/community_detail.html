@@ -339,6 +339,12 @@
     .menu-container:focus-within .menu {
         display: block;
     }
+
+    .comment-info a:hover {
+        text-decoration: none;
+        background-color: #ffffff;
+        color: #795c3a !important;
+    }
     
 </style>
 
@@ -423,17 +429,13 @@
                 <img class="comment-profile-picture" src="{{ url_for('static', filename='Userprofile/' + (comment['profile_picture'] if comment['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
                 <p><strong>{{ comment['name'] }}</strong> commented at {{ comment['created_at'] }}</p>
                 <span style="font-size: 20px; margin-left: 10px; color: #6b4f2f;">
-                    #{{ comment['id'] }}</span>
+                    #{{ comment['id'] }}
 
-                <div class="menu-container" tabindex="0">
-                    <span class="dots">...</span>
-                    <div class="menu">
-                        {% if user.is_authenticated and user.role == 'admin' %}
-                            <a href="{{ url_for('auth.delete_comment', id=comment['id']) }}">Delete Comment</a>
-                        {% endif %}
-                    </div>
-                </div>
-
+                    {% if user.is_authenticated and user.role == 'admin' %}
+                        <a href="{{ url_for('auth.delete_comment', id=comment['id']) }}" style="color: #a58259;">
+                           <strong>&nbsp;&nbsp;&nbsp;Delete Comment</strong>
+                        </a>
+                    {% endif %}
             </div>
 
             <div class="comment-content">
