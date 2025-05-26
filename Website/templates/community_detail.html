@@ -339,12 +339,6 @@
     .menu-container:focus-within .menu {
         display: block;
     }
-
-    .comment-info a:hover {
-        text-decoration: none;
-        background-color: #ffffff;
-        color: #795c3a !important;
-    }
     
 </style>
 
@@ -359,14 +353,14 @@
     <div class="menu-container" tabindex="0">
         <span class="dots">...</span>
         <div class="menu">
-            {% if post %}
-                {% if user.is_authenticated and user.role == 'user' %}
-                    <a href="{{ url_for('auth.report_page', report_type='post', item_id=post['post_id']) }}">Report Post</a>
-                {% elif user.is_authenticated and user.role == 'admin' %}
-                    <a href="{{ url_for('auth.delete_post', post_id=post['post_id']) }}">Delete Post</a>
-                {% endif %}
-            {% else %}
-                <p>Post not found.</p>
+            {% if user.is_authenticated and user.role == 'user' %}
+                <a href="{{ url_for('auth.report_page', report_type='post', item_id=post['post_id']) }}">Report Post</a>
+            {% elif user.is_authenticated and user.role == 'admin' %}
+                <form action="{{ url_for('auth.delete_post', post_id=post['post_id']) }}" method="post" style="display: inline;">
+                    <button type="submit" class="comment-action-button">
+                        Delete Post
+                    </button>
+                </form>
             {% endif %}
         </div>
     </div>
@@ -432,9 +426,11 @@
                     #{{ comment['id'] }}
 
                     {% if user.is_authenticated and user.role == 'admin' %}
-                        <a href="{{ url_for('auth.delete_comment', id=comment['id']) }}" style="color: #a58259;">
-                           <strong>&nbsp;&nbsp;&nbsp;Delete Comment</strong>
-                        </a>
+                        <form action="{{ url_for('auth.delete_comment', id=comment['id']) }}" method="post" style="display:inline;">
+                            <button type="submit" class="comment-action-button" style="border: none; background: none; color: #a58259; font-weight: bold; cursor: pointer;">
+                                Delete Comment
+                            </button>
+                        </form>
                     {% endif %}
             </div>
 

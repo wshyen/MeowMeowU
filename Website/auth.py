@@ -574,39 +574,42 @@ def delete_story(id):
 
 @auth.route("/admin/delete_post/<int:post_id>", methods=["POST"])
 def delete_post(post_id):
+    conn = get_db_connection()
 
-    #check if the post exists before deleting
-    query_check = text("SELECT * FROM post WHERE post_id = :post_id")
-    post = db.session.execute(query_check, {"post_id": post_id}).fetchone()
+    #retrieve the post data from the database
+    post = conn.execute('SELECT * FROM post WHERE post_id = ?', (post_id,)).fetchone()
 
-    if not post:
-        flash("Post not found.", category="error")
-        return redirect(url_for("auth.view_report"))
+    #check if the post exists and belongs to the current user
+    if post and post['user_id'] == current_user.id:
+        #delete the post from the database
+        conn.execute('DELETE FROM post WHERE post_id = ?', (post_id,))
+        conn.commit()
 
-    #delete the post using raw SQL
-    query_delete = text("DELETE FROM post WHERE post_id = :post_id")
-    db.session.execute(query_delete, {"post_id": post_id})
-    db.session.commit()
+    if post['media_url']:
+        file_path = os.path.join(os.path.dirname(__file__), 'static', post['media_url'])
+        if os.path.exists(file_path):
+            os.remove(file_path)
 
+    conn.close()
     flash("Post deleted successfully!", category="success")
-    return redirect(url_for("auth.view_report"))
+    return redirect(url_for('auth.report_page'))
 
 @auth.route("/admin/delete_comment/<int:id>", methods=["POST"])
 def delete_comment(id):
+    conn = get_db_connection()
 
-    query_check = text("SELECT * FROM comment WHERE id = :id")
-    comment = db.session.execute(query_check, {"id": id}).fetchone()
-
-    if not comment:
-        flash("Comment not found.", category="error")
-        return redirect(url_for("auth.view_report"))
-
-    query_delete = text("DELETE FROM comment WHERE id = :id")
-    db.session.execute(query_delete, {"id": id})
-    db.session.commit()
+    def delete_with_replies(comment_id):
+        child_comments = conn.execute('SELECT id FROM comment WHERE parent_id = ?', (comment_id,)).fetchall()
+        for child in child_comments:
+            delete_with_replies(child[0])
+        conn.execute('DELETE FROM comment WHERE id = ?', (comment_id,))
+    
+    delete_with_replies(id)
+    conn.commit()
+    conn.close()
 
     flash("Comment deleted successfully!", category="success")
-    return redirect(url_for("auth.view_report"))
+    return redirect(url_for("auth.report_page"))
 
 @auth.route('/view_post/<int:post_id>')
 def view_post(post_id):

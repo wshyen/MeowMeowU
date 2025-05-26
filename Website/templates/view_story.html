@@ -176,7 +176,11 @@
             {% if user.is_authenticated and user.role == 'user' %}
                 <a href="{{ url_for('auth.report_page', report_type='story', item_id=story['id']) }}">Report Story</a>
             {% elif user.is_authenticated and user.role == 'admin' %}
-                <a href="{{ url_for('auth.delete_story', id=story['id']) }}">Delete Story</a>
+                <form action="{{ url_for('auth.delete_story', id=story['id']) }}" method="post" style="display:inline;">
+                    <button type="submit" class="comment-action-button">
+                        Delete Story
+                    </button>
+                </form>
             {% endif %}
         </div>
     </div>
