@@ -1,7 +1,6 @@
 import os
 import sqlite3
-from flask import Blueprint, g, render_template
-from flask import request, redirect, url_for
+from flask import Blueprint, g, render_template, request, redirect, url_for, current_app
 from flask_login import current_user
 from graphviz import Digraph
 
@@ -15,15 +14,39 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
-def generate_graph(relations):
-    dot = Digraph(comment='Cat Relationship Tree')
+def generate_graph(relations, filename='cat_relationship_tree'):
+    from graphviz import Digraph
+    import os
+    from flask import current_app, url_for
 
+    dot = Digraph(comment='Cat Relationship Tree', format='svg')
+    dot.attr('node', shape= "none", margin='0.2,0.2')
+    dot.attr(pad="0.5", margin="0.5", dpi="80") 
+    dot.attr('edge', arrowsize='0.6', penwidth='1.2')
+
+    added_nodes = set()
     for rel in relations:
-        dot.node(rel['catA_name'], rel['catA_name'])
-        dot.node(rel['catB_name'], rel['catB_name'])
+        for cat_id, cat_name, cat_photo in [
+            (rel['catA_id'], rel['catA_name'], rel['catA_photo']),
+            (rel['catB_id'], rel['catB_name'], rel['catB_photo'])
+        ]:
+            if cat_name not in added_nodes:
+                label = f'''<
+                [PIC]<BR/>{cat_name}
+                >'''
+                dot.node(cat_name, label=label)
+                added_nodes.add(cat_name)
+                # ...existing code...
+
         dot.edge(rel['catA_name'], rel['catB_name'], label=rel['relation_type'])
 
-    return dot.pipe(format='svg').decode('utf-8')
+    output_dir = os.path.join(current_app.static_folder, 'graphs')
+    os.makedirs(output_dir, exist_ok=True)
+    output_path = os.path.join(output_dir, filename)
+    dot.render(output_path, format='svg', cleanup=True)
+
+    return url_for('static', filename=f'graphs/{filename}.svg')
+# ...existing code...
 
 @relationship_bp.route('/relationship_feature', methods=['GET', 'POST'])
 def relationship_feature():
@@ -67,9 +90,15 @@ def relationship_feature():
         JOIN profiles p2 ON cr.catB_id = p2.id
     """).fetchall()
 
-    graph_svg = generate_graph(relations)
+    graph_png = generate_graph(relations)
 
-    conn.close()
-    return render_template('relationship.html', user=current_user, profiles=cats, relations=relations, tree_img=graph_svg 
-    )
+    cat_photos = {cat['name']: url_for('static', filename=f'uploads/{cat["photo"]}') for cat in cats}
+    return render_template(
+        'relationship.html',
+        user=current_user,
+        profiles=cats,
+        relations=relations,
+        tree_img=graph_png,
+        cat_photos=cat_photos
 
+    )    
