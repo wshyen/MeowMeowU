@@ -9,7 +9,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy import text
 import os
 from datetime import datetime, timedelta
-from .community import get_post_id_from_comment
+from .community import get_post_id_from_comment, get_db_connection
 
 auth = Blueprint("auth", __name__) #a Blueprint for authentication routes, Blueprint is like a container for related routes and functions
 
@@ -607,3 +607,60 @@ def delete_comment(id):
 
     flash("Comment deleted successfully!", category="success")
     return redirect(url_for("auth.view_report"))
+
+@auth.route('/view_post/<int:post_id>')
+def view_post(post_id):
+    conn = get_db_connection()
+
+    post = conn.execute('''
+        SELECT 
+            post.*, 
+            user.name,
+            user.profile_picture,
+            (SELECT COUNT(*) FROM likes WHERE likes.post_id = post.post_id) AS like_count,
+            CASE 
+                WHEN EXISTS (
+                    SELECT 1 FROM likes 
+                    WHERE likes.post_id = post.post_id AND likes.user_id = ?
+                ) THEN 1
+                ELSE 0
+            END AS liked_by_current_user
+        FROM post 
+        JOIN user ON post.user_id = user.id
+        WHERE post.post_id = ?
+    ''', (
+        current_user.id if current_user.is_authenticated else -1,
+        post_id
+    )).fetchone()
+
+    comments = conn.execute('''
+        SELECT 
+            comment.*,
+            user.name AS name, 
+            user.profile_picture AS profile_picture,
+            (SELECT COUNT(*) FROM comment_like WHERE comment_like.comment_id = comment.id) AS like_count,
+            CASE 
+                WHEN EXISTS (
+                    SELECT 1 FROM comment_like 
+                    WHERE comment_like.comment_id = comment.id AND comment_like.user_id = ?
+                ) THEN 1
+                ELSE 0
+            END AS liked_by_current_user
+        FROM comment
+        JOIN user ON comment.user_id = user.id
+        WHERE comment.post_id = ?
+        ORDER BY comment.created_at DESC
+    ''', (
+        current_user.id if current_user.is_authenticated else -1,
+        post_id
+    )).fetchall()
+
+    grouped_comments = {}
+    for comment in comments:
+        parent_id = comment['parent_id']
+        if parent_id not in grouped_comments:
+            grouped_comments[parent_id] = []
+        grouped_comments[parent_id].append(comment)
+
+    conn.close()
+    return render_template("community_detail.html", post=post, comments=comments, grouped_comments=grouped_comments, user=current_user, post_id=post_id)

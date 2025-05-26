@@ -352,7 +352,15 @@
     <div class="menu-container" tabindex="0">
         <span class="dots">...</span>
         <div class="menu">
-            <a href="{{ url_for('auth.report_page', report_type='post', item_id=post['post_id']) }}">Report Post</a>
+            {% if post %}
+                {% if user.is_authenticated and user.role == 'user' %}
+                    <a href="{{ url_for('auth.report_page', report_type='post', item_id=post['post_id']) }}">Report Post</a>
+                {% elif user.is_authenticated and user.role == 'admin' %}
+                    <a href="{{ url_for('auth.delete_post', post_id=post['post_id']) }}">Delete Post</a>
+                {% endif %}
+            {% else %}
+                <p>Post not found.</p>
+            {% endif %}
         </div>
     </div>
 
@@ -415,6 +423,13 @@
                 <p><strong>{{ comment['name'] }}</strong> commented at {{ comment['created_at'] }}</p>
                 <span style="font-size: 20px; margin-left: 10px; color: #6b4f2f;">#{{ comment['id'] }}</span>
 
+                <span class="dots">...</span>
+                <div class="menu">
+                    {% if user.is_authenticated and user.role == 'admin' %}
+                        <a href="{{ url_for('auth.delete_comment', comment_id=comment['id']) }}">Delete Comment</a>
+                    {% endif %}
+                </div>
+
             </div>
 
             <div class="comment-content">
@@ -466,11 +481,13 @@
                             </button>
                         </form>
                     {% else %}
-                        <form action="{{ url_for('auth.report_page', report_type='comment', item_id=comment['id']) }}" method="post" style="display:inline;">
-                            <button type="submit" class="comment-action-button" onclick="return confirm('Are you sure you want to report this comment?');">
-                                ⚠️ Report
-                            </button>
-                        </form>
+                        {% if user.is_authenticated and user.role == 'user' %}
+                            <form action="{{ url_for('auth.report_page', report_type='comment', item_id=comment['id']) }}" method="post" style="display:inline;">
+                                <button type="submit" class="comment-action-button" onclick="return confirm('Are you sure you want to report this comment?');">
+                                    ⚠️ Report
+                                </button>
+                            </form>
+                        {% endif %}
                     {% endif %} 
                 </div>
 

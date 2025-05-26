@@ -61,14 +61,14 @@ class Report(db.Model):
             return "Comment"
         elif self.post_id:
             return "Post"
-        return "Unknown"
+        return "Deleted Successfully"
 
     @property
-    def delete_action(self):
-        if self.comment_id:
-            return ("auth.delete_comment", {"id": self.comment_id}, "Delete Comment")
+    def view_action(self):
+        if self.comment_id and self.post_id:
+            return ("auth.view_post", {"post_id": self.post_id}, "View Comment")
         elif self.post_id and not self.comment_id:
-            return ("auth.delete_post", {"post_id": self.post_id}, "Delete Post")
+            return ("auth.view_post", {"post_id": self.post_id}, "View Post")
         elif self.story_id:
-            return ("auth.delete_story", {"id": self.story_id}, "Delete Story")
+            return ("auth.view_story", {"story_id": self.story_id}, "View Story")
         return (None, {}, "")
