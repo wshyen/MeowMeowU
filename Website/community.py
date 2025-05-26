@@ -134,7 +134,7 @@ def post_detail(post_id):
 @community_bp.route('/post/create', methods=['POST'])
 def create_post():
     if not current_user.is_authenticated:
-        flash("You must be logged in to view result!", category="error")
+        flash("You must be logged in to create post!", category="error")
         return redirect(url_for('auth.login'))
     
     content = request.form['content']
@@ -210,13 +210,11 @@ def hashtag_posts(hashtag):
 
     return render_template('community_index.html',user=current_user, posts=posts, sort=sort, cat_names=get_cat_names())
 
-
-
 #My Post
 @community_bp.route('/my-posts')
 def my_posts():
     if not current_user.is_authenticated:
-        flash("You must be logged in to view result!", category="error")
+        flash("You must be logged in to view your posts!", category="error")
         return redirect(url_for('auth.login'))
     
     conn = get_db_connection()

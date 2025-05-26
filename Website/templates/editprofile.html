@@ -3,16 +3,20 @@
 {% block title %}Edit Cat Profile{% endblock %}
 
 {% block content %}
-{% if not session.get('user') %}
-    <div style="text-align: center; padding: 20px;">
-        <h2>Please log in to Edit a profile</h2>
-        <a href="{{ url_for('login') }}" style="padding: 10px 20px; background-color: #94693e; color: white; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px;">Login</a>
-    </div>
-{% else %}
 <style>
+    h1 {
+        font-family: 'Times New Roman', Times, serif;
+        text-align: center;
+        margin-bottom: 20px;
+        color: #94693e;
+        font-weight: bold;
+    }
+
     body {
         background-color: #f2eadf;
+        font-family: 'Times New Roman', Times, serif;
     }
+
     select {
         appearance: none; /*Remove default dropdown arrow*/
         background-image: url('{{ url_for("static", filename="cat_paws_icon.png") }}');
@@ -21,12 +25,13 @@
         background-size: 20px;
         font-family: 'Times New Roman', Times, serif;
     }
+
     .block { display: block; } /*Class for visible elements*/
     .none { display: none; } /*Class for hidden element*/
 </style>
 <div style="display: flex; justify-content: center; align-items: center; height: calc(100vh - 40px);">
-    <form action="{{ url_for('edit_profile', id=profile.id) }}" method="post" enctype="multipart/form-data" onsubmit="return validateProfileForm();" style="width: 500px; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9" onsubmit="return validateProfileForm();">
-        <h1 style="text-align: center; margin-bottom: 20px; font-family: 'Times New Roman', Times, serif;">Edit Cat Profile</h1>
+    <form action="{{ url_for('catprofile.edit_profile', id=profile.id) }}" method="post" enctype="multipart/form-data" onsubmit="return validateProfileForm();" style="width: 600px; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9" onsubmit="return validateProfileForm();">
+        <h1>Edit Cat Profile</h1>
         <div style="margin-bottom: 20px; text-align: center;">
             
             <!-- profile picture section -->
@@ -55,7 +60,7 @@
         <!-- gender select dropdown -->
         <div style="margin-bottom: 15px;">
             <label for="gender" style="display: inline-block; width: 150px; font-weight: bold;">Gender:</label>
-            <select id="gender" name="gender" required style="width: 310px; padding: 5px; border: 1px solid #ccc; border-radius: 5px;">
+            <select id="gender" name="gender" required style="width: 300px; padding: 5px; border: 1px solid #ccc; border-radius: 5px;">
                 <option value="Male" {% if profile.gender == 'Male' %}selected{% endif %}>Male</option>
                 <option value="Female" {% if profile.gender == 'Female' %}selected{% endif %}>Female</option>
                 <option value="Not sure" {% if profile.gender == 'Not sure' %}selected{% endif %}>Not sure</option>
@@ -65,7 +70,7 @@
         <!-- color select dropdown -->
         <div style="margin-bottom: 15px;">
             <label for="color" style="display: inline-block; width: 150px; font-weight: bold; font-family: 'Times New Roman', Times, serif;">Color:</label>
-            <select id="color" name="color" required style="width: 310px; padding: 5px; border: 1px solid #ccc; border-radius: 5px;">
+            <select id="color" name="color" required style="width: 300px; padding: 5px; border: 1px solid #ccc; border-radius: 5px;">
                 <option value="Black" {% if profile.color == 'Black' %}selected{% endif %}>Black</option>
                 <option value="White" {% if profile.color == 'White' %}selected{% endif %}>White</option>
                 <option value="Brown" {% if profile.color == 'Brown' %}selected{% endif %}>Brown</option>
@@ -170,5 +175,4 @@
         });
     }
 </script>
-{% endif %}
 {% endblock %}
