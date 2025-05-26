@@ -10,21 +10,43 @@ app = Flask(__name__, static_folder='static') #Flask app to serve static files
 app.secret_key = 'your_secret_key' #keeps messages and user data safe
 catprofile_bp = Blueprint('catprofile', __name__, template_folder='templates', static_folder='static')
 
-UPLOAD_FOLDER = 'static/uploads'
+UPLOAD_FOLDER = 'Website/static/uploads'
 ALLOWED_EXTENSIONS = {'png','jpg','jpeg'}
-app.config['UPLOAD_FOLDER'] = 'static/uploads' #Folder to store uploaded files
+app.config['UPLOAD_FOLDER'] = 'Website/static/uploads' #Folder to store uploaded files
 app.config['SECRET_KEY'] = 'your_secret_key'  #Ensures session persistence
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        
-        # Assuming user validation is correct
-        session['user'] = username  # Set the session when the user is logged in
-        return redirect(url_for('catprofile.view_profiles'))  # Redirect to the profile page
-    
+        email = request.form.get('email')
+        print(f"DEBUG: login POST hit — email = {email}")
+
+        conn = get_db_connection()
+        user = conn.execute('''
+            SELECT rowid AS id, email, role
+            FROM user
+            WHERE email = ?
+        ''', (email,)).fetchone()
+        conn.close()
+
+        print(f"DEBUG: Raw user query result = {user}") 
+
+        if user:
+            user_obj = CustomUser(id=user['id'], email=user['email'], role=user['role'])
+            login_user(user_obj)
+
+            print("DEBUG: Logged in user:", user_obj)
+
+            session['role'] = user_obj.role
+            session.permanent = True  #Make the session permanent
+            session.modified = True  #Mark session as modified to ensure it is saved
+            print(f"DEBUG: session role set to {session['role']}")
+
+            return redirect(url_for('catprofile.viewprofile'))
+        else:
+            flash("Invalid credentials!", "error")
+            return render_template('login.html')
+
     return render_template('login.html')
 
 def get_db_connection():
@@ -57,12 +79,12 @@ def view_profiles(): #View all cat profiles
 
 @catprofile_bp.route('/profiles/create', methods=['GET', 'POST'])
 def create_profile():
-    if not session.get('user'): #Ensure only logged in users can create profile 
-        flash("You must be logged in to create a profile. Please log in.", "error") 
-        return redirect(url_for('auth.login')) #Sends user back to login page
+    if not current_user.is_authenticated:
+        flash("You must be logged in to create a profile!", category="error")
+        return redirect(url_for('auth.login'))
 
     if request.method == 'GET': 
-        return render_template('createprofile.html')
+        return render_template('createprofile.html', user=current_user)
     
     #Create a new cat profile
     if request.method == 'POST':
@@ -101,52 +123,41 @@ def create_profile():
             flash("File size is too large. Please upload an image under 2MB.", "error") #Display error message to user if file size too big
             return redirect(url_for('catprofile.create_profile')) #Sends user back to the create profile page
 
-        if not allowed_file(file.filename): #Checks if the file was uploaded in the correct format (png,jpg,jpeg)
+        if not file or file.filename == '':
             flash('Invalid file format. Please upload a PNG, JPG, or JPEG image.', 'error')
             return redirect(url_for('catprofile.create_profile')) #Sends user back to the create profile page
-            
-        try: 
-            secure_file = secure_filename(file.filename)
-            filename = f"{name.lower()}_{secure_file}" 
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(filepath) 
-            photo = filename
-        except Exception as e:
-            flash(f"An error occurred while saving the file: {str(e)}", "error")
-            return redirect(url_for('catprofile.create_profile'))
+
+        if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)  #Ensure folder exists
+                file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file.save(file_path)  # Save the actual file
+                photo = filename
 
         #Insert the new profile into the database
-        try:
-            creator = session.get('user')
-            if not creator:  # Handle missing session key gracefully
-                flash("An error occurred while creating the profile. Please log in again.", "error")
-                return redirect(url_for('auth.login'))
+        creator = current_user.id if current_user.is_authenticated else None
+        if not creator:  # Handle missing session key gracefully
+            flash("An error occurred while creating the profile. Please log in again.", "error")
+            return redirect(url_for('auth.login'))
 
-            print(f"DEBUG: session['user'] = {creator}")
+        print(f"DEBUG: session['user'] = {creator}")
             
-            with get_db_connection() as conn:
-                conn.execute( 
-                    'INSERT INTO profiles (name, gender, color, description, photo, creator) VALUES (?, ?, ?, ?, ?, ?)',
-                    (name, gender, color, description, photo, creator) #Automatically assign the logged in user as the creator
-                )
-                conn.commit() #Save changes to the database
-            flash('Cat Profile created successfully!', 'success')
-            return redirect(url_for('catprofile.view_profiles')) #Sends user back to profile list page
-
-        except sqlite3.OperationalError as e:
-            if "database is locked" in str(e):  #Handle database locked error
-                flash("Database is currently busy. Please try again later.", "error")
-            else:
-                flash("An unexpected error occurred while creating the profile.", "error")
-            return redirect(url_for('catprofile.create_profile')) #Sends user back to the profile list page
+        with get_db_connection() as conn:
+            conn.execute( 
+                'INSERT INTO profiles (name, gender, color, description, photo, creator) VALUES (?, ?, ?, ?, ?, ?)',
+                (name, gender, color, description, photo, creator) #Automatically assign the logged in user as the creator
+            )
+            conn.commit() #Save changes to the database
+        flash('Cat Profile created successfully!', 'success')
+        return redirect(url_for('catprofile.view_profiles')) #Sends user back to profile list page
 
     return render_template('createprofile.html')
 
 @catprofile_bp.route('/profiles/<int:id>/edit', methods=['GET', 'POST'])
 def edit_profile(id):
-    if not session.get('user'): #Ensure only logged in users can edit profile
-        flash("You must be logged in to edit a profile. Please log in.", "error")
-        return redirect(url_for('auth.login')) #Sends user back to login page 
+    if not current_user.is_authenticated:
+        flash("You must be logged in to edit a profile!", category="error")
+        return redirect(url_for('auth.login'))
 
     with get_db_connection() as conn: #Connect to the database to retrieve the profile information
         profile = conn.execute('SELECT * FROM profiles WHERE id = ?', (id,)).fetchone() #Get the cat profile with the matching ID
@@ -216,12 +227,12 @@ def edit_profile(id):
         flash('Profile updated successfully!', 'success') #Notify user profile updated successfully
         return redirect(url_for('catprofile.view_profiles', id=id)) #Sends user back to the profile list page
 
-    return render_template('editprofile.html', profile=profile, photo_display=photo_display)
+    return render_template('editprofile.html', profile=profile, photo_display=photo_display, user=current_user)
 
 @catprofile_bp.route('/profiles/remove_picture/<int:id>', methods=['POST'])
 def remove_profile_picture(id):
-    if not session.get('user'): #Ensure only logged in users can remove profile picture of a profile
-        flash("You must be logged in to remove profile picture of a profile. Please log in.", "error")
+    if not current_user.is_authenticated:
+        flash("You must be logged in to remove a profile picture!", category="error")
         return redirect(url_for('auth.login')) #Sends user back to login page 
 
     with get_db_connection() as conn:
@@ -245,8 +256,8 @@ def remove_profile_picture(id):
 
 @catprofile_bp.route('/profiles/<int:id>/delete', methods=['POST'])
 def delete_profile(id):
-    if not session.get('user'): #Ensure only logged in users can delete profile
-        flash("You must be logged in to delete a profile.", "error")
+    if not current_user.is_authenticated:
+        flash("You must be logged in to delete a profile!", category="error")
         return redirect(url_for('auth.login')) #Sends user back to login page
 
     with get_db_connection() as conn:
@@ -257,7 +268,7 @@ def delete_profile(id):
         return redirect(url_for('catprofile.view_profiles')) #Sends user back to the profile list page
 
     #Check if the current user is the creator of the profile
-    if profile['creator'] != session['user']:
+    if int (profile['creator']) != int(current_user.id):
         flash("You are not authorized to delete this profile.", "error")
         return redirect(url_for('catprofile.view_profiles'))  #Sends user back to the profile list page
 
@@ -282,7 +293,7 @@ def confirm_delete(id):
         return redirect(url_for('catprofile.view_profiles')) #Sends user back to the profile list page
 
     #Check if the current user is the creator of the profile
-    if session.get('user') is None or profile['creator'] != session['user']:
+    if int(profile['creator']) != int(current_user.id):
         flash('You are not authorized to delete this profile.', 'error')
         return redirect(url_for('catprofile.view_profiles')) #Sends user back to the profile list page
 
@@ -290,7 +301,7 @@ def confirm_delete(id):
         profile = dict(profile)  
         profile['photo'] = f"uploads/{profile['photo']}" 
 
-    return render_template('confirmdelete.html', profile=profile)
+    return render_template('confirmdelete.html', profile=profile, user=current_user)
 
 if __name__ == '__main__':
     #Ensure the upload folder exists
