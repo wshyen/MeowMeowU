@@ -203,6 +203,22 @@
     ul li form.inline button.delete-btn:hover {
         background-color: #8a3c3c;
     }
+
+    .graph-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: o auto;
+    max-width: 100%;
+    padding: 1rem;
+    border-radius: 12px;
+
+    }
+
+    #cat-graph {
+        max-width: 100%;
+        height: auto;
+    }
 </style>
 
 <h1>Cat Relationship Tree</h1>
@@ -303,8 +319,8 @@
     </ul>
 
     <h2>Relationship Graph</h2>
-    <div style="text-align: center;">
-        {{ tree_img | safe }}
+    <div class="graph-container">
+        <object id="cat-graph" type="image/svg+xml" data="{{ tree_img }}" alt="Cat Relationship Tree"></object>
     </div>
 
 </body>
@@ -322,6 +338,65 @@ function checkOther(select) {
         otherInput.value = '';
     }
 }
+
+const catPhotos = {{ cat_photos|tojson }};
+document.addEventListener('DOMContentLoaded', function () {
+    const object = document.getElementById('cat-graph');
+    object.addEventListener('load', function () {
+        const svgDoc = object.contentDocument;
+        const nodes = svgDoc.querySelectorAll('text');
+        let clipId = 0;
+
+        nodes.forEach(node => {
+            if (node.textContent.trim() === '[PIC]') {
+                let texts = node.parentNode.querySelectorAll('text');
+                let nameNode = texts.length > 1 ? texts[1] : node;
+                let catName = nameNode.textContent.trim();
+                let imgUrl = catPhotos[catName];
+                if (!imgUrl) return;
+
+                let x = parseFloat(nameNode.getAttribute('x')) || 0;
+                let y = parseFloat(nameNode.getAttribute('y')) || 0;
+                let textLength = nameNode.getComputedTextLength ? nameNode.getComputedTextLength() : 0;
+                let centerX = x + textLength / 2;
+
+                const radius = 20;
+                const size = radius * 2;
+                const gap = 12;
+                const cx = centerX;
+                const cy = y - gap - radius;
+
+                const thisClipId = 'catclip' + (clipId++);
+                const clipPath = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
+                clipPath.setAttribute('id', thisClipId);
+
+                const circle = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', cx);
+                circle.setAttribute('cy', cy);
+                circle.setAttribute('r', radius);
+                clipPath.appendChild(circle);
+
+                let defs = svgDoc.querySelector('defs');
+                if (!defs) {
+                    defs = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                    svgDoc.documentElement.insertBefore(defs, svgDoc.documentElement.firstChild);
+                }
+                defs.appendChild(clipPath);
+
+                const img = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'image');
+                img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', imgUrl);
+                img.setAttribute('width', size);
+                img.setAttribute('height', size);
+                img.setAttribute('x', cx - radius);
+                img.setAttribute('y', cy - radius);
+                img.setAttribute('clip-path', `url(#${thisClipId})`);
+                img.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+                node.parentNode.appendChild(img);
+                node.textContent = '';
+            }
+        });
+    });
+});
 </script>
 
 {% endblock %}
