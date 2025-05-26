@@ -4,7 +4,7 @@ from flask import Flask, Blueprint, render_template, request, session, redirect,
 from flask_login import current_user, login_required, login_user
 from werkzeug.utils import secure_filename
 from datetime import date, datetime
-from .badge import award_contest_winner_badge
+from .badge import check_contest_winner_badges
 
 app = Flask(__name__, static_folder='static')
 app.secret_key = 'your_secret_key'
