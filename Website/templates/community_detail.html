@@ -446,7 +446,7 @@
                 <img class="comment-profile-picture" src="{{ url_for('static', filename='Userprofile/' + (comment['profile_picture'] if comment['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
                 <p><strong>{{ comment['name'] }}</strong> commented at {{ comment['created_at'] }}</p>
                 <span style="font-size: 20px; margin-left: 10px; color: #6b4f2f;">
-                    #{{ comment['id'] }}
+                    #{{ comment['floor'] }}
 
                     {% if user.is_authenticated and user.role == 'admin' %}
                         <form action="{{ url_for('auth.delete_comment', id=comment['id']) }}" method="post" style="display:inline;">
@@ -572,8 +572,13 @@
         replyButtons.forEach(button => {
             button.addEventListener('click', function () {
                 const commentId = button.getAttribute('data-comment-id');
+                const floorSpan = button.closest('.comment').querySelector('span');
+                let floorText = '';
+                if (floorSpan) {
+                    floorText = floorSpan.textContent.trim();
+                }
                 parentIdInput.value = commentId; 
-                commentTextarea.value = `Replying to #${commentId} `;
+                commentTextarea.value = `Replying to #${floorText} `;
                 commentTextarea.focus();
             });
         });
