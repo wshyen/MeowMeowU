@@ -3,7 +3,7 @@ import sqlite3 #Connect to SQLite database to store and retrieve cat profile inf
 from flask import Flask, render_template, request, redirect, url_for, flash, session, Blueprint
 #Flask to build web app, request to read data sent by users
 #Redirect to send users to a different page, flash to show quick messages, session to remember things about users
-from flask_login import current_user #To manage user sessions and authentication
+from flask_login import current_user, login_user, CustomUser #To manage user sessions and authentication
 from werkzeug.utils import secure_filename #Helps secure file uploads, preventing unsafe filenames that can cause errors or security issues
 
 app = Flask(__name__, static_folder='static') #Flask app to serve static files
@@ -12,8 +12,7 @@ catprofile_bp = Blueprint('catprofile', __name__, template_folder='templates', s
 
 UPLOAD_FOLDER = 'Website/static/uploads'
 ALLOWED_EXTENSIONS = {'png','jpg','jpeg'}
-app.config['UPLOAD_FOLDER'] = 'Website/static/uploads' #Folder to store uploaded files
-app.config['SECRET_KEY'] = 'your_secret_key'  #Ensures session persistence
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER #Folder to store uploaded files
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
