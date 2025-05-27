@@ -375,10 +375,17 @@ def add_comment(post_id):
         print("File saved to:", os.path.join(COMMENTS_FOLDER, filename))
     
     conn = get_db_connection()
+
+    result = conn.execute(
+        'SELECT MAX(floor) FROM comment WHERE post_id = ?', (post_id,)
+    ).fetchone()
+    max_floor = result[0] if result[0] is not None else 0
+    new_floor = max_floor + 1
+
     conn.execute(
-        '''INSERT INTO comment (content, media_url, created_at, post_id, user_id,parent_id) 
-           VALUES (?, ?, ?, ?, ?, ?)''', 
-        (content, media_url, created_at, post_id, user_id, parent_id) 
+        '''INSERT INTO comment (content, media_url, created_at, post_id, user_id,parent_id, floor) 
+           VALUES (?, ?, ?, ?, ?, ?, ?)''', 
+        (content, media_url, created_at, post_id, user_id, parent_id, new_floor) 
     )
     conn.commit()
     conn.close()
