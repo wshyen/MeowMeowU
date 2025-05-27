@@ -152,7 +152,7 @@
         🐾Back to Contests🐾
     </button>
 
-    {% if show_claim_button %}
+    {% if show_claim_button and winners[0].votes > 0 %}
         <button onclick="window.location.href='{{ url_for('badge.badge_gallery') }}'">
             🏅Claim Your Badge🏅
         </button>

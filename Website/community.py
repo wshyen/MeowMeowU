@@ -24,20 +24,16 @@ def get_db_connection():
     return conn
 
 def get_cat_names():
-    db_path = os.path.join(os.path.dirname(__file__), '..', 'instance', 'cat_profiles.db')
-    if not os.path.exists(db_path):
+    conn = get_db_connection()
+    if conn is None:
         return []
 
-    conn = sqlite3.connect(db_path)
-    conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-
     cursor.execute('SELECT name FROM profiles')
     cat_names = [row['name'] for row in cursor.fetchall()]
 
     conn.close()
     return cat_names
-
 
 # All Posts
 @community_bp.route('/community_feature')
@@ -144,7 +140,7 @@ def get_post_id_from_comment(comment_id):
 @community_bp.route('/post/create', methods=['POST'])
 def create_post():
     if not current_user.is_authenticated:
-        flash("You must be logged in to view result!", category="error")
+        flash("You must be logged in to create post!", category="error")
         return redirect(url_for('auth.login'))
     
     content = request.form['content']
@@ -220,13 +216,11 @@ def hashtag_posts(hashtag):
 
     return render_template('community_index.html',user=current_user, posts=posts, sort=sort, cat_names=get_cat_names())
 
-
-
 #My Post
 @community_bp.route('/my-posts')
 def my_posts():
     if not current_user.is_authenticated:
-        flash("You must be logged in to view result!", category="error")
+        flash("You must be logged in to view your posts!", category="error")
         return redirect(url_for('auth.login'))
     
     conn = get_db_connection()
