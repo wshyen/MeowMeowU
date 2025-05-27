@@ -563,14 +563,14 @@ def delete_story(id):
     story = Story.query.get(id)
     if not story:
         flash("Story not found.", category="error")
-        return redirect(url_for("auth.view_report"))
+        return redirect(url_for("auth.cat_story"))
 
     #delete the story
     db.session.delete(story)
     db.session.commit()
 
     flash("Story deleted successfully!", category="success")
-    return redirect(url_for("auth.view_report"))
+    return redirect(url_for("auth.cat_story"))
 
 @auth.route("/admin/delete_post/<int:post_id>", methods=["POST"])
 def delete_post(post_id):
@@ -579,20 +579,26 @@ def delete_post(post_id):
     #retrieve the post data from the database
     post = conn.execute('SELECT * FROM post WHERE post_id = ?', (post_id,)).fetchone()
 
-    #check if the post exists and belongs to the current user
-    if post and post['user_id'] == current_user.id:
-        #delete the post from the database
-        conn.execute('DELETE FROM post WHERE post_id = ?', (post_id,))
-        conn.commit()
+    #ensure post exists
+    if not post:
+        flash("Post not found!", category="error")
+        conn.close()
+        return redirect(url_for("community.community_feature"))
 
+    #delete post from database
+    conn.execute('DELETE FROM post WHERE post_id = ?', (post_id,))
+    conn.commit()
+
+    #remove media file if applicable
     if post['media_url']:
         file_path = os.path.join(os.path.dirname(__file__), 'static', post['media_url'])
         if os.path.exists(file_path):
             os.remove(file_path)
 
     conn.close()
+
     flash("Post deleted successfully!", category="success")
-    return redirect(url_for('auth.report_page'))
+    return redirect(url_for('community.community_feature', report_type='post', item_id=post_id))
 
 @auth.route("/admin/delete_comment/<int:id>", methods=["POST"])
 def delete_comment(id):
@@ -609,7 +615,7 @@ def delete_comment(id):
     conn.close()
 
     flash("Comment deleted successfully!", category="success")
-    return redirect(url_for("auth.report_page"))
+    return redirect(url_for("community.community_feature", report_type="comment", item_id=id))
 
 @auth.route('/view_post/<int:post_id>')
 def view_post(post_id):
