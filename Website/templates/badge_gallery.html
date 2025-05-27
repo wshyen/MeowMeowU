@@ -118,6 +118,10 @@
         font-size: 18px;
         font-family: 'Times New Roman', Times, serif;
     }
+
+    .claim-btn:focus {
+        outline: none; 
+    }
 </style>
 <div style="padding: 20px;">
     <h1>{{ user.Name }}'s Badge Collection</h1>
@@ -169,4 +173,27 @@
     </div>
     {% endif %}
 </div>
+<!-- Confetti effect -->
+<canvas id="confetti-canvas"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@latest"></script>
+<script>
+    //Select all claim buttons and add click event listeners
+    document.querySelectorAll('.claim-btn').forEach(button => {
+        button.addEventListener('click', (event) => {
+            event.preventDefault(); //Stop the form from submitting immediately
+
+            //Create confetti effect
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 } 
+            });
+
+            //Delay the form submission to allow confetti to show
+            setTimeout(() => {
+                event.target.closest('form').submit(); 
+            }, 1000); 
+        });
+    });
+</script>
 {% endblock %}
