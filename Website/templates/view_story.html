@@ -165,25 +165,49 @@
     .menu-container:focus-within .menu {
         display: block;
     }
+    
+    .delete-btn {
+        background: none;
+        border: none;
+        color: #6b4f2f;
+        display: block;
+        margin: auto;
+        padding: 6px 10px;
+        font-size: 16px;
+        font-weight: bold;
+        border-radius: 6px;
+        cursor: pointer;
+        width: 100%;
+        text-align: center;
+        height: auto;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .delete-btn:hover {
+        background: #dccbb7;
+        transform: scale(1.05);
+    }
 
 </style>
 
 <div class="story-container">
     <!-- Three-dot menu for reporting the story -->
-    <div class="menu-container" tabindex="0">
-        <span class="dots">⋮</span>
-        <div class="menu">
-            {% if user.is_authenticated and user.role == 'user' %}
-                <a href="{{ url_for('auth.report_page', report_type='story', item_id=story['id']) }}">Report Story</a>
-            {% elif user.is_authenticated and user.role == 'admin' %}
-                <form action="{{ url_for('auth.delete_story', id=story['id']) }}" method="post" style="display:inline;">
-                    <button type="submit" class="comment-action-button">
-                        Delete Story
-                    </button>
-                </form>
-            {% endif %}
+    {% if user.is_authenticated %}
+        <div class="menu-container" tabindex="0">
+            <span class="dots">...</span>
+            <div class="menu">
+                {% if user.role == 'user' %}
+                    <a href="{{ url_for('auth.report_page', report_type='story', item_id=story['id']) }}">Report Story</a>
+                {% elif user.role == 'admin' %}
+                    <form action="{{ url_for('auth.delete_story', id=story['id']) }}" method="post" style="display:inline;">
+                        <button type="submit" class="delete-btn">
+                            Delete Story
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
         </div>
-    </div>
+    {% endif %}
 
     <h2>{{ story.caption }}</h2>
 
