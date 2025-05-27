@@ -101,6 +101,11 @@ def post_detail(post_id):
         post_id
     )).fetchone()
 
+    if post is None:
+        conn.close()
+        flash("The post does not exist or has been deleted.", category="error")
+        return redirect(url_for('community.community_feature'))
+
     comments = conn.execute('''
         SELECT 
             comment.*,
@@ -271,6 +276,9 @@ def delete_post(post_id):
 
     # Check if the post exists and belongs to the current user
     if post and post['user_id'] == current_user.id:
+        #delete all comments associated with the post
+        conn.execute('DELETE FROM comment WHERE post_id = ?', (post_id,))
+        conn.commit()
         # Delete the post from the database
         conn.execute('DELETE FROM post WHERE post_id = ?', (post_id,))
         conn.commit()
