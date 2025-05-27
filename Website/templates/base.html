@@ -133,6 +133,12 @@
 
     <div class="ml-auto d-flex align-items-center">
 
+        {% if user.is_authenticated and user.role == 'admin' %}
+        <a class="nav-link" href="{{ url_for('auth.view_report') }}" style="color: white; font-size: 19px;">
+            <i class="fa fa-file-text" aria-hidden="true"></i>
+        </a>
+        {% endif %}
+
         <div class="dropdown">
             <a class="nav-link" href="#" aria-haspopup="true" aria-expanded="false" style="color: white; font-size: 19px;">
                 <i class="fa fa-user" aria-hidden="true"></i>
@@ -145,9 +151,6 @@
                     <a href="{{ url_for('views.suggestion') }}">Suggestion Box</a>
                     <a href="{{ url_for('badge.badge_gallery') }}">Badges</a>
                     <a href="{{ url_for('auth.logout') }}">Logout</a>
-                    {% if user.is_authenticated and user.role == 'admin' %}
-                        <a href="{{ url_for('auth.view_report') }}">View Reports⚠️</a>
-                    {% endif %}
                 {% else %}
                     <a href="{{ url_for('auth.sign_up') }}">Sign Up</a>
                     <a href="{{ url_for('auth.login') }}">Login</a>
