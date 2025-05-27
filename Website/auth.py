@@ -570,7 +570,7 @@ def delete_story(id):
     db.session.commit()
 
     flash("Story deleted successfully!", category="success")
-    return redirect(url_for("auth.cat_story"))
+    return redirect(url_for("auth.view_report"))
 
 @auth.route("/admin/delete_post/<int:post_id>", methods=["POST"])
 def delete_post(post_id):
@@ -589,6 +589,10 @@ def delete_post(post_id):
     conn.execute('DELETE FROM post WHERE post_id = ?', (post_id,))
     conn.commit()
 
+    #delete all comments associated with the post
+    conn.execute('DELETE FROM comment WHERE post_id = ?', (post_id,))
+    conn.commit()
+
     #remove media file if applicable
     if post['media_url']:
         file_path = os.path.join(os.path.dirname(__file__), 'static', post['media_url'])
@@ -598,7 +602,7 @@ def delete_post(post_id):
     conn.close()
 
     flash("Post deleted successfully!", category="success")
-    return redirect(url_for('community.community_feature', report_type='post', item_id=post_id))
+    return redirect(url_for('auth.view_report', report_type='post', item_id=post_id))
 
 @auth.route("/admin/delete_comment/<int:id>", methods=["POST"])
 def delete_comment(id):
@@ -615,7 +619,7 @@ def delete_comment(id):
     conn.close()
 
     flash("Comment deleted successfully!", category="success")
-    return redirect(url_for("community.community_feature", report_type="comment", item_id=id))
+    return redirect(url_for("auth.view_report", report_type="comment", item_id=id))
 
 @auth.route('/view_post/<int:post_id>')
 def view_post(post_id):
