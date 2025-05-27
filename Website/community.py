@@ -3,8 +3,9 @@ import sqlite3
 from datetime import datetime
 from flask import Blueprint, request,flash, redirect, render_template, url_for
 from flask_login import current_user
-from werkzeug.utils import secure_filename 
-
+from werkzeug.utils import secure_filename
+from sqlalchemy import text
+from . import db
 
 community_bp = Blueprint('community', __name__, template_folder='templates')
 
@@ -129,6 +130,11 @@ def post_detail(post_id):
 
     return render_template("community_detail.html", post=post, comments=comments, grouped_comments=grouped_comments, user=current_user)
 
+def get_post_id_from_comment(comment_id):
+    query = text("SELECT post_id FROM comment WHERE id = :id")
+    result = db.session.execute(query, {"id": comment_id}).fetchone()
+
+    return result[0] if result else None
 
 # Create Post
 @community_bp.route('/post/create', methods=['POST'])

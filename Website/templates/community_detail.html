@@ -126,6 +126,7 @@
         padding: 20px;
         border-radius: 10px;
         background-color: #ffffff;
+        position: relative;
     }
 
     .comment-info {
@@ -338,6 +339,27 @@
     .menu-container:focus-within .menu {
         display: block;
     }
+
+    .delete-btn {
+        background: none;
+        border: none;
+        color: #6b4f2f;
+        display: block;
+        padding: 6px 10px;
+        font-size: 16px;
+        font-weight: bold;
+        border-radius: 6px;
+        cursor: pointer;
+        width: 100%;
+        text-align: center;
+        height: auto;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .delete-btn:hover {
+        background: #dccbb7;
+        transform: scale(1.05);
+    }
     
 </style>
 
@@ -349,12 +371,22 @@
 <div class="post">
 
     <!-- Three-dot menu positioned at the top-right -->
-    <div class="menu-container" tabindex="0">
-        <span class="dots">...</span>
-        <div class="menu">
-            <a href="{{ url_for('auth.report_page', post_id=post['post_id']) }}">Report</a>
+    {% if user.is_authenticated %}
+        <div class="menu-container" tabindex="0">
+            <span class="dots">...</span>
+            <div class="menu">
+                {% if user.role == 'user' %}
+                    <a href="{{ url_for('auth.report_page', report_type='post', item_id=post['post_id']) }}">Report Post</a>
+                {% elif user.role == 'admin' %}
+                    <form action="{{ url_for('auth.delete_post', post_id=post['post_id']) }}" method="post" style="display: inline;">
+                        <button type="submit" class="delete-btn">
+                            Delete Post
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
         </div>
-    </div>
+    {% endif %}
 
     <div class="post-info">
         <img class="profile-picture" src="{{ url_for('static', filename='Userprofile/' + (post['profile_picture'] if post['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
@@ -413,8 +445,16 @@
             <div class="comment-info">
                 <img class="comment-profile-picture" src="{{ url_for('static', filename='Userprofile/' + (comment['profile_picture'] if comment['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
                 <p><strong>{{ comment['name'] }}</strong> commented at {{ comment['created_at'] }}</p>
-                <span style="font-size: 20px; margin-left: 10px; color: #6b4f2f;">#{{ comment['id'] }}</span>
+                <span style="font-size: 20px; margin-left: 10px; color: #6b4f2f;">
+                    #{{ comment['id'] }}
 
+                    {% if user.is_authenticated and user.role == 'admin' %}
+                        <form action="{{ url_for('auth.delete_comment', id=comment['id']) }}" method="post" style="display:inline;">
+                            <button type="submit" class="comment-action-button" style="border: none; background: none; color: #a58259; font-weight: bold; cursor: pointer;">
+                                Delete Comment
+                            </button>
+                        </form>
+                    {% endif %}
             </div>
 
             <div class="comment-content">
@@ -466,9 +506,13 @@
                             </button>
                         </form>
                     {% else %}
-                        <button type="submit" class="comment-action-button" onclick="return confirm('Are you sure you want to report this comment?');">
-                            ⚠️ Report
-                        </button>
+                        {% if user.is_authenticated and user.role == 'user' %}
+                            <form action="{{ url_for('auth.report_page', report_type='comment', item_id=comment['id']) }}" method="post" style="display:inline;">
+                                <button type="submit" class="comment-action-button" onclick="return confirm('Are you sure you want to report this comment?');">
+                                    ⚠️ Report
+                                </button>
+                            </form>
+                        {% endif %}
                     {% endif %} 
                 </div>
 
