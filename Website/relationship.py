@@ -60,6 +60,7 @@ def generate_graph(relations, filename='cat_relationship_tree'):
 
     return url_for('static', filename=f'graphs/{filename}.svg')
 
+
 @relationship_bp.route('/relationship_feature', methods=['GET', 'POST'])
 def relationship_feature():
     conn = get_db_connection()
@@ -67,12 +68,13 @@ def relationship_feature():
 
     if request.method == 'POST':
         action = request.form.get('action')
+
         if action == 'add':
             catA_id = request.form.get('catA_id')
             catB_id = request.form.get('catB_id')
             relation_type = request.form.get('relation_type')
             other_relation = request.form.get('other_relation')
-            direction = request.form.get('direction', "both")
+            direction = request.form.get('direction')
 
             if relation_type == 'Other' and other_relation and other_relation.strip():
                 relation_type = other_relation.strip()
@@ -81,6 +83,25 @@ def relationship_feature():
                 cursor.execute(
                     "INSERT INTO cat_relationship (catA_id, catB_id, relation_type, direction) VALUES (?, ?, ?, ?)",
                     (catA_id, catB_id, relation_type, direction)
+                )
+                conn.commit()
+            return redirect(url_for('relationship.relationship_feature'))
+        
+        elif action == 'edit':
+            rel_id = request.form.get('rel_id')
+            catA_id = request.form.get('catA_id')
+            catB_id = request.form.get('catB_id')
+            relation_type = request.form.get('relation_type')
+            other_relation = request.form.get('other_relation')
+            direction = request.form.get('direction')
+
+            if relation_type == 'Other' and other_relation and other_relation.strip():
+                relation_type = other_relation.strip()
+
+            if rel_id and catA_id and catB_id and relation_type and catA_id != catB_id:
+                cursor.execute(
+                    "UPDATE cat_relationship SET catA_id=?, catB_id=?, relation_type=?, direction=? WHERE id=?",
+                    (catA_id, catB_id, relation_type, direction, rel_id)
                 )
                 conn.commit()
             return redirect(url_for('relationship.relationship_feature'))
