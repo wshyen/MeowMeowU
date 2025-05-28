@@ -250,31 +250,35 @@
 
     <label>Cat A:
         <select name="catA_id" required>
-        {% for cat in profiles %}
-            <option value="{{ cat.id }}">{{ cat.name }}</option>
-        {% endfor %}
+            <option value="" disabled selected hidden>-- Please select --</option>
+            {% for cat in profiles %}
+                <option value="{{ cat.id }}">{{ cat.name }}</option>
+            {% endfor %}
         </select>
     </label>
     <label>Cat B:
         <select name="catB_id" required>
-        {% for cat in profiles %}
-            <option value="{{ cat.id }}">{{ cat.name }}</option>
-        {% endfor %}
+            <option value="" disabled selected hidden>-- Please select --</option>
+            {% for cat in profiles %}
+                <option value="{{ cat.id }}">{{ cat.name }}</option>
+            {% endfor %}
         </select>
     </label>
 
     <label>Relationship:
         <select name="relation_type" id="relation_type" required onchange="checkOther(this)">
-        <option value="Friend">Friend</option>
-        <option value="Partner">Partner</option>
-        <option value="Sibling">Sibling</option>
-        <option value="Parent">Parent</option>
-        <option value="Offspring">Offspring</option>
-        <option value="Rival">Rival</option>
-        <option value="Neighbor">Neighbor</option>
-        <option value="Other">Other</option>
+        <option value="" disabled selected hidden>-- Please select --</option>
+            <option value="Friend">Friend</option>
+            <option value="Partner">Partner</option>
+            <option value="Sibling">Sibling</option>
+            <option value="Parent">Parent</option>
+            <option value="Offspring">Offspring</option>
+            <option value="Rival">Rival</option>
+            <option value="Neighbor">Neighbor</option>
+            <option value="Other">Other</option>
         </select>
     </label>
+    
     <label id="other_relation_label" style="display:none; margin-top:10px;">
         Please specify:
         <input type="text" name="other_relation" id="other_relation" />
