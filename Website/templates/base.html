@@ -83,89 +83,157 @@
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
+    #cd-container {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        width: 100px;
+        cursor: pointer;
+        z-index: 9999;
+        /* Ensures this element appears on top of other elements */
+    }
+
+    #cd {
+        width: 100%;
+        animation: spin 4s linear infinite;
+    }
+
+    @keyframes spin {
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    #muteButton {
+        position: fixed;
+        bottom: 35px;
+        left: 130px;
+        background-color: rgb(176, 148, 119);
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+        border-radius: 5px;
+        display: none;
+        opacity: 0;
+        transition: opacity 0.5s ease, transform 0.5s ease;
+        outline: none;
+        z-index: 9999;
+        /* Ensures this element appears on top of other elements */
+    }
+
+    #muteButton:hover {
+        background-color: rgb(158, 134, 106);
+        transform: scale(1.1);
+    }
+
+    #muteButton.show {
+        display: block;
+        opacity: 1;
+        transform: translateX(0);
+    }
 </style>
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewpoint" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-          crossorigin="anonymous" />
+        crossorigin="anonymous" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
-          crossorigin="anonymous" />
+        crossorigin="anonymous" />
 
     <title>{% block title %}Home{% endblock %}</title>
 </head>
 
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgb(176, 148, 119);">
-    <a class="nav-item nav-link" style="font-family: 'Times New Roman'; color: white; font-size: 19px;" href="/">Home</a>
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgb(176, 148, 119);">
+        <a class="nav-item nav-link" style="font-family: 'Times New Roman'; color: white; font-size: 19px;"
+            href="/">Home</a>
 
-    <div class="dropdown nav-item">
-        <a class="nav-link" href="#" id="dropdownMenuLink" aria-haspopup="true" aria-expanded="false"
-           style="font-family: 'Times New Roman'; color: white; font-size: 19px;">
-            Cat Profiles
-        </a>
-        <div class="dropdown-content">
-            <a class="dropdown-item" href="{{ url_for('catprofile.view_profiles') }}">View Cat Profiles</a>
-            <a class="dropdown-item" href="{{ url_for('catprofile.create_profile') }}">Create A New Profile</a>
-        </div>
-    </div>
-
-    <a class="nav-item nav-link" style="font-family: 'Times New Roman'; color: white; font-size: 19px;" href="{{ url_for('community.community_feature') }}">
-        Community
-    </a>
-
-    <div class="dropdown nav-item">
-        <a class="nav-link" href="#" id="dropdownMenuLink" aria-haspopup="true" aria-expanded="false"
-           style="font-family: 'Times New Roman'; color: white; font-size: 19px;">
-            Entertainment
-        </a>
-        <div class="dropdown-content">
-            <a class="dropdown-item" href="{{ url_for('contestmanagement.contest_page') }}">Contest</a>
-            <a class="dropdown-item" href="{{ url_for('quiz.quiz_page') }}">Quiz</a>
-            <a class="dropdown-item" href="{{ url_for('auth.cat_story') }}">Cat Story</a>
-        </div>
-    </div>
-
-    <a class="nav-item nav-link" href="{{ url_for('search.search_feature') }}" style="color: white; font-size: 19px;">
-        <img src="{{ url_for('static', filename='Images/option2.png') }}" alt="Search" style="width: 30px; height: 30px;">
-    </a>
-
-    <div class="ml-auto d-flex align-items-center">
-
-        {% if user.is_authenticated and user.role == 'admin' %}
-        <a class="nav-link" href="{{ url_for('auth.view_report') }}" style="color: white; font-size: 19px;">
-            <i class="fa fa-file-text" aria-hidden="true"></i>
-        </a>
-        {% endif %}
-
-        <div class="dropdown">
-            <a class="nav-link" href="#" aria-haspopup="true" aria-expanded="false" style="color: white; font-size: 19px;">
-                <i class="fa fa-user" aria-hidden="true"></i>
+        <div class="dropdown nav-item">
+            <a class="nav-link" href="#" id="dropdownMenuLink" aria-haspopup="true" aria-expanded="false"
+                style="font-family: 'Times New Roman'; color: white; font-size: 19px;">
+                Cat Profiles
             </a>
-            <div class="dropdown-content" style="margin-left: -100px;">
-                {% if user.is_authenticated %}
+            <div class="dropdown-content">
+                <a class="dropdown-item" href="{{ url_for('catprofile.view_profiles') }}">View Cat Profiles</a>
+                <a class="dropdown-item" href="{{ url_for('catprofile.create_profile') }}">Create A New Profile</a>
+            </div>
+        </div>
+
+        <a class="nav-item nav-link" style="font-family: 'Times New Roman'; color: white; font-size: 19px;"
+            href="{{ url_for('community.community_feature') }}">
+            Community
+        </a>
+
+        <div class="dropdown nav-item">
+            <a class="nav-link" href="#" id="dropdownMenuLink" aria-haspopup="true" aria-expanded="false"
+                style="font-family: 'Times New Roman'; color: white; font-size: 19px;">
+                Entertainment
+            </a>
+            <div class="dropdown-content">
+                <a class="dropdown-item" href="{{ url_for('contestmanagement.contest_page') }}">Contest</a>
+                <a class="dropdown-item" href="{{ url_for('quiz.quiz_page') }}">Quiz</a>
+                <a class="dropdown-item" href="{{ url_for('auth.cat_story') }}">Cat Story</a>
+            </div>
+        </div>
+
+        <a class="nav-item nav-link" href="{{ url_for('search.search_feature') }}"
+            style="color: white; font-size: 19px;">
+            <img src="{{ url_for('static', filename='Images/option2.png') }}" alt="Search"
+                style="width: 30px; height: 30px;">
+        </a>
+
+        <div class="ml-auto d-flex align-items-center">
+
+            {% if user.is_authenticated and user.role == 'admin' %}
+            <a class="nav-link" href="{{ url_for('auth.view_report') }}" style="color: white; font-size: 19px;">
+                <i class="fa fa-file-text" aria-hidden="true"></i>
+            </a>
+            {% endif %}
+
+            <div class="dropdown">
+                <a class="nav-link" href="#" aria-haspopup="true" aria-expanded="false"
+                    style="color: white; font-size: 19px;">
+                    <i class="fa fa-user" aria-hidden="true"></i>
+                </a>
+                <div class="dropdown-content" style="margin-left: -100px;">
+                    {% if user.is_authenticated %}
 
                     <a href="{{ url_for('auth.user_profile') }}">User Profile</a>
                     <a href="{{ url_for('auth.change_password') }}">Change Password</a>
                     <a href="{{ url_for('views.suggestion') }}">Suggestion Box</a>
                     <a href="{{ url_for('badge.badge_gallery') }}">Badges</a>
                     <a href="{{ url_for('auth.logout') }}">Logout</a>
-                {% else %}
+                    {% else %}
                     <a href="{{ url_for('auth.sign_up') }}">Sign Up</a>
                     <a href="{{ url_for('auth.login') }}">Login</a>
-                {% endif %}
+                    {% endif %}
+                </div>
             </div>
         </div>
-    </div>
-</nav>
+    </nav>
 
-<div class="flash-container">
-    {% with messages = get_flashed_messages(with_categories = true) %}
-    {% if messages %}
+    <div id="cd-container">
+        <!-- CD spinning image -->
+        <img id="cd" src="{{ url_for('static', filename='Images/CD_2.png') }}" alt="CD">
+        <!-- Background Music -->
+        <audio id="bgm" autoplay loop preload="auto">
+            <source src="{{ url_for('static', filename='BongoCat_Believer.mp3') }}" type="audio/mpeg">
+        </audio>
+    </div>
+
+    <!-- Mute Button (Only for Logged-in Users) -->
+    {% if user.is_authenticated %}
+    <button id="muteButton">🔇 Mute</button>
+    {% endif %}
+
+    <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories = true) %}
+        {% if messages %}
         {% for category, message in messages %}
         {% if category == "error" %}
-    
+
         <div class="alert alert-danger alert-dismissable fade show" role="alert">
             {{ message }}
         </div>
@@ -178,22 +246,105 @@
 
         {% endif %}
         {% endfor %}
-    {% endif %}
-    {% endwith %}
-</div>
+        {% endif %}
+        {% endwith %}
+    </div>
 
-<div class="container-fluid">{% block content %}{% endblock %}</div>
+    <div class="container-fluid">{% block content %}{% endblock %}</div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
 
-<script>
-    setTimeout(() => {
-        $(".alert").alert("close");
-    }, 5000);
-</script>
+    <script>
+        const audio = document.getElementById("bgm"); //Background music audio element
+        const muteButton = document.getElementById("muteButton"); //Mute/unmute button element
+        const cd = document.getElementById("cd");// The clickable CD icon
 
-{% block scripts %}{% endblock %}
+        //Clear mute state if user is NOT authenticated (logged out)
+        {% if not user.is_authenticated %}
+        localStorage.removeItem("bgmMuted"); //Remove any stored mute preference
+        //Make sure audio plays after logout
+        audio.play().catch(() => { });
+        {% endif %}
+
+        //Ensure music playback and mute state persist across pages
+        window.addEventListener("DOMContentLoaded", () => {
+            const isMuted = localStorage.getItem("bgmMuted") === "true"; //Check if music is muted previously
+            const savedTime = localStorage.getItem("bgmCurrentTime"); //Get last saved playback time
+            const logoutHappened = sessionStorage.getItem("logoutHappened") === "true"; 
+
+            if (savedTime) {
+                audio.currentTime = parseFloat(savedTime); //Resume audio from the last playback time
+            }
+
+            if (isMuted) {
+                audio.pause(); //Keep the music muted
+                if (muteButton) muteButton.textContent = "🔊 Unmute"; //Change button text to "Unmute"
+            } else {
+                audio.play().catch(() => { }); //Continue playing if not muted
+                if (muteButton) muteButton.textContent = "🔇 Mute"; //Change button text to "Mute"
+            }
+        });
+
+        //Save playback time and mute state before leaving the page
+        window.addEventListener("beforeunload", () => {
+            localStorage.setItem("bgmCurrentTime", audio.currentTime); //Save current playback time
+            localStorage.setItem("bgmMuted", audio.paused ? "true" : "false"); // Save whether music is muted
+        });
+
+        //Update playback time in localStorage during playback
+        audio.addEventListener("timeupdate", () => {
+            if (!audio.paused) {
+                localStorage.setItem("bgmCurrentTime", audio.currentTime); //Update current playback time
+            }
+        });
+
+        //Resume music when the user interacts with the page
+        document.addEventListener("click", tryPlayAudioOnce); //Trigger audio play on click
+        document.addEventListener("mousemove", tryPlayAudioOnce); // Trigger audio play on mouse movement
+        document.addEventListener("keypress", tryPlayAudioOnce); // Trigger audio play on keypress
+
+        //Function to try playing audio once when the user interacts with the page
+        function tryPlayAudioOnce() {
+            const isMuted = localStorage.getItem("bgmMuted") === "true"; // Check if music is muted
+
+            if (!isMuted && audio.paused) {
+                audio.play().catch(() => { }); // Resume music only if not muted
+            }
+        }
+
+        //Mute or unmute button only appears when a logged-in user clicks the CD
+        if (muteButton && cd) {
+            cd.addEventListener("click", () => {
+                muteButton.classList.toggle("show"); //Toggle visibility of the mute button
+            });
+        }
+
+        //Mute or unmute button handler (button stays visible for logged-in users)
+        muteButton.addEventListener("click", () => {
+            if (audio.paused) {
+                // If audio is paused, play it 
+                const savedTime = localStorage.getItem("bgmCurrentTime");
+                if (savedTime) {
+                    audio.currentTime = parseFloat(savedTime); //Resume from last saved time
+                }
+                audio.play().catch(() => { }); //Resume playback
+                muteButton.textContent = "🔇 Mute"; //Change the button text to "Mute"
+                localStorage.setItem("bgmMuted", "false"); // Save the unmuted state
+            } else {
+                audio.pause(); // If audio is playing, pause it
+                muteButton.textContent = "🔊 Unmute"; //Change the button text to "Unmute"
+                localStorage.setItem("bgmMuted", "true"); // Save the muted state
+            }
+        });
+
+        setTimeout(() => {
+            $(".alert").alert("close");
+        }, 5000);
+    </script>
+
+    {% block scripts %}{% endblock %}
 
 </body>
+
 </html>
