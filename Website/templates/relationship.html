@@ -246,6 +246,7 @@
 <h2>Add Cat Relationship</h2>
 <form method="POST" action="{{ url_for('relationship.relationship_feature') }}">
     <input type="hidden" name="action" value="add" />
+
     <label>Cat A:
         <select name="catA_id" required>
         {% for cat in profiles %}
@@ -260,6 +261,7 @@
         {% endfor %}
         </select>
     </label>
+
     <label>Relationship:
         <select name="relation_type" id="relation_type" required onchange="checkOther(this)">
         <option value="Friend">Friend</option>
@@ -272,11 +274,15 @@
         <option value="Other">Other</option>
         </select>
     </label>
-
     <label id="other_relation_label" style="display:none; margin-top:10px;">
         Please specify:
         <input type="text" name="other_relation" id="other_relation" />
     </label>
+
+    <label>Arrow Direction:</label>
+        <input type="radio" name="direction" value="forward" checked> A → B<br>
+        <input type="radio" name="direction" value="back"> B → A<br>
+        <input type="radio" name="direction" value="both"> A ↔ B<br>
 
     <button type="submit">Add Relationship</button>
     </form>
