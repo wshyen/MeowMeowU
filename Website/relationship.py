@@ -1,6 +1,6 @@
 import os
 import sqlite3
-from flask import Blueprint, g, render_template, request, redirect, url_for, current_app
+from flask import flash, Blueprint, g, render_template, request, redirect, url_for, current_app
 from flask_login import current_user
 from graphviz import Digraph
 
@@ -19,6 +19,9 @@ def generate_graph(relations, filename='cat_relationship_tree'):
     import os
     from flask import current_app, url_for
 
+    if not relations:
+        return None
+
     dot = Digraph(comment='Cat Relationship Tree', format='svg')
     dot.attr('node', shape= "none", margin='0.2,0.2')
     dot.attr(pad="0.5", margin="0.5", dpi="80") 
@@ -26,7 +29,7 @@ def generate_graph(relations, filename='cat_relationship_tree'):
 
     added_nodes = set()
     for rel in relations:
-        for cat_id, cat_name, cat_photo in [
+        for cat_id, cat_name, cat_photos in [
             (rel['catA_id'], rel['catA_name'], rel['catA_photo']),
             (rel['catB_id'], rel['catB_name'], rel['catB_photo'])
         ]:
@@ -39,9 +42,16 @@ def generate_graph(relations, filename='cat_relationship_tree'):
                 >'''
                 dot.node(cat_name, label=label)
                 added_nodes.add(cat_name)
-                # ...existing code...
 
-        dot.edge(rel['catA_name'], rel['catB_name'], label=rel['relation_type'])
+        edge_attrs = {'label': rel['relation_type']}
+        direction = rel['direction']
+
+        if direction == 'forward':   # Arrow points from A to B (A → B)
+            edge_attrs['dir'] = 'forward'
+            dot.edge(rel['catA_name'], rel['catB_name'], **edge_attrs) 
+        else:
+            edge_attrs['dir'] = 'both'   # Double arrows on both ends (A ↔ B)
+            dot.edge(rel['catA_name'], rel['catB_name'], **edge_attrs)
 
     output_dir = os.path.join(current_app.static_folder, 'graphs')
     os.makedirs(output_dir, exist_ok=True)
@@ -49,7 +59,6 @@ def generate_graph(relations, filename='cat_relationship_tree'):
     dot.render(output_path, format='svg', cleanup=True)
 
     return url_for('static', filename=f'graphs/{filename}.svg')
-# ...existing code...
 
 @relationship_bp.route('/relationship_feature', methods=['GET', 'POST'])
 def relationship_feature():
@@ -63,14 +72,15 @@ def relationship_feature():
             catB_id = request.form.get('catB_id')
             relation_type = request.form.get('relation_type')
             other_relation = request.form.get('other_relation')
+            direction = request.form.get('direction', "both")
 
             if relation_type == 'Other' and other_relation and other_relation.strip():
                 relation_type = other_relation.strip()
 
             if catA_id and catB_id and relation_type and catA_id != catB_id:
                 cursor.execute(
-                    "INSERT INTO cat_relationship (catA_id, catB_id, relation_type) VALUES (?, ?, ?)",
-                    (catA_id, catB_id, relation_type)
+                    "INSERT INTO cat_relationship (catA_id, catB_id, relation_type, direction) VALUES (?, ?, ?, ?)",
+                    (catA_id, catB_id, relation_type, direction)
                 )
                 conn.commit()
             return redirect(url_for('relationship.relationship_feature'))
@@ -85,7 +95,7 @@ def relationship_feature():
 
     cats = cursor.execute("SELECT id, name, gender, photo FROM profiles").fetchall()
     relations = cursor.execute("""
-        SELECT cr.id, cr.catA_id, cr.catB_id, cr.relation_type,
+        SELECT cr.id, cr.catA_id, cr.catB_id, cr.relation_type, cr.direction,
             p1.name AS catA_name, p1.photo AS catA_photo,
             p2.name AS catB_name, p2.photo AS catB_photo
         FROM cat_relationship cr
@@ -93,7 +103,7 @@ def relationship_feature():
         JOIN profiles p2 ON cr.catB_id = p2.id
     """).fetchall()
 
-    graph_png = generate_graph(relations)
+    graph_svg = generate_graph(relations)
 
     cat_photos = {cat['name']: url_for('static', filename=f'uploads/{cat["photo"]}') for cat in cats}
     return render_template(
@@ -101,7 +111,6 @@ def relationship_feature():
         user=current_user,
         profiles=cats,
         relations=relations,
-        tree_img=graph_png,
+        tree_img=graph_svg,
         cat_photos=cat_photos
-
     )    
