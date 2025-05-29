@@ -38,6 +38,57 @@
         padding: 10px;
     }
 
+    .relationship-item {
+        background: #fffbe9;
+        color: #6b4f2f;
+        max-width: 700px;
+        margin: 0 auto 80px auto;
+        font-size: 18px;
+        line-height: 1.6;
+        padding: 15px 160px 15px 20px;
+        border-radius: 12px;        
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);        
+        margin-bottom: 18px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+    }
+
+    .relationship-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+    }
+
+    .cat-info {
+        text-align: center;
+        width: 120px;
+    }
+
+    .cat-info img {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        margin-bottom: 8px;
+    }
+
+    .cat-info div {
+        font-weight: 600;
+        color: #6b4f2f;
+    }
+
+    .relationship-arrow {
+        font-size: 35px;  
+        color: #94693e; 
+        text-align: center;
+        margin-top: 10px;
+        display: block; 
+    }
+
     .back-button-container {
         text-align: center;
         margin-top: 40px;
@@ -70,6 +121,61 @@
 <div class="graph-container">
     <object id="cat-graph" type="image/svg+xml" data="{{ tree_img }}" alt="Cat Relationship Tree"></object>
 </div>
+
+    
+{% if user.is_authenticated and user.role == 'admin' %}
+    <h3>All Relationships:</h3>
+    <ul>
+        {% for rel in relations %}
+            <li class= "relationship-item">
+                <div class="relationship-content">
+
+                    <!-- Cat A -->
+                    <div class="cat-info">
+                        <img src="{{ url_for('static', filename='uploads/' + rel.catA_photo if rel.catA_photo else 'uploads/default.png') }}" alt="{{ rel.catA_name }}">
+                        <div>{{ rel.catA_name }}</div>
+                    </div>
+
+                    <!-- Relationship -->
+                    <div style="font-weight: bold; font-size: 18px; color: #94693e; white-space: nowrap;">
+                        {{ rel.relation_type }}
+                    </div>
+
+                    <!-- Arrow -->
+                    <div class="relationship-arrow">
+                        {% if rel.direction == 'forward' %}
+                            &#8594;  <!-- Right arrow (→) -->
+                        {% elif rel.direction == 'both' %}
+                            &#8596;  <!-- Both sided arrow (↔) -->
+                        {% endif %}
+                    </div>
+
+                    <!-- Cat B -->
+                    <div class="cat-info">
+                        <img src="{{ url_for('static', filename='uploads/' + rel.catB_photo if rel.catB_photo else 'uploads/default.png') }}" alt="{{ rel.catB_name }}">
+                        <div>{{ rel.catB_name }}</div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <!-- Edit Button -->
+                        <button class = "action-button" onclick="openEditModal({{ rel.id }}, '{{ rel.catA_id }}', '{{ rel.catB_id }}', '{{ rel.relation_type }}', '{{ rel.direction }}')">
+                            Edit
+                        </button>
+
+                        <!-- Delete Button -->
+                        <form method="POST"  class="inline" action="{{ url_for('relationship.view_graph') }}" onsubmit="return confirm('Are you sure you want to delete this relationship?');" style="margin-left: 20px;">
+                            <input type="hidden" name="action" value="delete" />
+                            <input type="hidden" name="rel_id" value="{{ rel.id }}" />
+                            <button class = "action-button" type="submit">Delete</button>
+                        </form>
+                    </div>
+
+                </div>
+            </li>
+        {% endfor %}
+    </ul>   
+{% endif %}
+
 
 <div class="back-button-container">
     <a href="{{ url_for('relationship.relationship_feature') }}" class="back-button">←  Back to Relationship Management</a>

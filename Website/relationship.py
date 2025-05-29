@@ -145,10 +145,38 @@ def relationship_feature():
     )    
 
 
-@relationship_bp.route('/graph')
+@relationship_bp.route('/graph', methods=['GET', 'POST'])
 def view_graph():
     conn = get_db_connection()
     cursor = conn.cursor()
+
+    action = request.form.get('action')
+
+    if action == 'edit':
+        rel_id = request.form.get('rel_id')
+        catA_id = request.form.get('catA_id')
+        catB_id = request.form.get('catB_id')
+        relation_type = request.form.get('relation_type')
+        other_relation = request.form.get('other_relation')
+        direction = request.form.get('direction')
+
+        if relation_type == 'Other' and other_relation and other_relation.strip():
+            relation_type = other_relation.strip()
+
+        if rel_id and catA_id and catB_id and relation_type and catA_id != catB_id:
+            cursor.execute(
+                "UPDATE cat_relationship SET catA_id=?, catB_id=?, relation_type=?, direction=? WHERE id=?",
+                (catA_id, catB_id, relation_type, direction, rel_id)
+            )
+            conn.commit()
+        return redirect(url_for('relationship.view_graph'))
+
+    elif action == 'delete':
+        rel_id = request.form.get('rel_id')
+        if rel_id:
+            cursor.execute("DELETE FROM cat_relationship WHERE id = ?", (rel_id,))
+            conn.commit()
+        return redirect(url_for('relationship.view_graph'))
 
     cats = cursor.execute("SELECT id, name, gender, photo FROM profiles").fetchall()
 
@@ -168,6 +196,7 @@ def view_graph():
     return render_template(
         'relationship_viewer.html', 
         user=current_user, 
+        relations=relations,
         tree_img=graph_svg,
         cat_photos=cat_photos
         )
