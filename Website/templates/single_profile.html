@@ -80,7 +80,9 @@
             <p><strong>Description: </strong>{{ cat.description }}</p>
         </div>
 
-        <a href="/cat_list" class="back-button">Back</a>
+        <a href="{{ request.referrer or url_for('search.search_feature') }}" class="back-button">
+            Back
+        </a>
         
     </body>
 </html>
