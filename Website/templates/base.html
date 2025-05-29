@@ -158,8 +158,7 @@
             <div class="dropdown-content">
                 <a class="dropdown-item" href="{{ url_for('catprofile.view_profiles') }}">View Cat Profiles</a>
                 <a class="dropdown-item" href="{{ url_for('catprofile.create_profile') }}">Create A New Profile</a>
-                <a class="dropdown-item" href="{{ url_for('relationship.relationship_feature') }}">Cat Relationship
-                    Tree</a>
+                <a class="dropdown-item" href="{{ url_for('relationship.relationship_feature') }}">Cat Relationship Tree</a>
             </div>
         </div>
 
@@ -192,7 +191,7 @@
             <a class="nav-link" href="{{ url_for('auth.view_report') }}" style="color: white; font-size: 19px;">
                 <i class="fa fa-file-text" aria-hidden="true"></i>
             </a>
-            {% endif %} 
+            {% endif %}
 
             <div class="dropdown">
                 <a class="nav-link" href="#" aria-haspopup="true" aria-expanded="false"
@@ -226,7 +225,6 @@
     {% if user.is_authenticated %}
     <button id="muteButton">🔇 Mute</button>
     {% endif %}
-
 
     <div class="flash-container">
         {% with messages = get_flashed_messages(with_categories = true) %}
