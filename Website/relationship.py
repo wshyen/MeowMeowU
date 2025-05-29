@@ -56,6 +56,7 @@ def generate_graph(relations, filename='cat_relationship_tree'):
     output_dir = os.path.join(current_app.static_folder, 'graphs')
     os.makedirs(output_dir, exist_ok=True)
     output_path = os.path.join(output_dir, filename)
+    print(f"Saving SVG to: {output_path}")
     dot.render(output_path, format='svg', cleanup=True)
 
     return url_for('static', filename=f'graphs/{filename}.svg')
@@ -81,8 +82,8 @@ def relationship_feature():
 
             if catA_id and catB_id and relation_type and catA_id != catB_id:
                 cursor.execute(
-                    "INSERT INTO cat_relationship (catA_id, catB_id, relation_type, direction) VALUES (?, ?, ?, ?)",
-                    (catA_id, catB_id, relation_type, direction)
+                    "INSERT INTO cat_relationship (catA_id, catB_id, relation_type, direction, user_id) VALUES (?, ?, ?, ?, ?)",
+                    (catA_id, catB_id, relation_type, direction, current_user.id)
                 )
                 conn.commit()
             return redirect(url_for('relationship.relationship_feature'))
@@ -122,11 +123,12 @@ def relationship_feature():
         FROM cat_relationship cr
         JOIN profiles p1 ON cr.catA_id = p1.id
         JOIN profiles p2 ON cr.catB_id = p2.id
-    """).fetchall()
+        WHERE cr.user_id = ?
+    """, (current_user.id,)).fetchall()
 
     graph_svg = generate_graph(relations)
-
     cat_photos = {cat['name']: url_for('static', filename=f'uploads/{cat["photo"]}') for cat in cats}
+
     return render_template(
         'relationship.html',
         user=current_user,
@@ -135,3 +137,30 @@ def relationship_feature():
         tree_img=graph_svg,
         cat_photos=cat_photos
     )    
+
+
+@relationship_bp.route('/graph')
+def view_graph():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    #all relationship
+    cats = cursor.execute("SELECT id, name, gender, photo FROM profiles").fetchall()   
+    relations = cursor.execute("""
+        SELECT cr.id, cr.catA_id, cr.catB_id, cr.relation_type, cr.direction,
+               p1.name AS catA_name, p1.photo AS catA_photo,
+               p2.name AS catB_name, p2.photo AS catB_photo
+        FROM cat_relationship cr
+        JOIN profiles p1 ON cr.catA_id = p1.id
+        JOIN profiles p2 ON cr.catB_id = p2.id
+    """).fetchall()
+
+    graph_svg = generate_graph(relations)
+    cat_photos = {cat['name']: url_for('static', filename=f'uploads/{cat["photo"]}') for cat in cats}
+
+    return render_template(
+        'relationship_tree.html', 
+        user=current_user, 
+        tree_img=graph_svg,
+        cat_photos=cat_photos
+        )
