@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Cat Relationship Tree{% endblock %}
+{% block title %}Cat Relationship Graph Manage{% endblock %}
 
 {% block content %}
 
@@ -213,7 +213,6 @@
         margin-top: 10px;
         display: block; 
     }
-
     form.inline {
         display: inline-flex;  
         align-items: center;
@@ -329,9 +328,9 @@
 
 </style>
 
-<h1>Cat Relationship Tree</h1>
+<h1>Manage Cat Relationships</h1>
 
-<h2>All Cat</h2>
+<h2>All Cats</h2>
 
 <div class="cat-grid">
         {% for cat in profiles %}
@@ -351,7 +350,7 @@
 
 <hr>
 
-<h2>Add Cat Relationship</h2>
+<h2>Add New Cat Relationship</h2>
 <form method="POST" action="{{ url_for('relationship.relationship_feature') }}">
     <input type="hidden" name="action" value="add" />
 
@@ -372,7 +371,7 @@
         </select>
     </label>
 
-    <label>Relationship:
+    <label>Relationship Type:
         <select name="relation_type" id="relation_type" required onchange="checkOther(this)">
         <option value="" disabled selected hidden>-- Please select --</option>
             <option value="Friend">Friend</option>
@@ -382,7 +381,7 @@
             <option value="Offspring">Offspring</option>
             <option value="Rival">Rival</option>
             <option value="Neighbouur">Neighbour</option>
-            <option value="Other">Other</option>
+            <option value="Other">Other (Specify)</option>
         </select>
     </label>
 
@@ -391,7 +390,7 @@
         <input type="text" name="other_relation" id="other_relation" />
     </label>
 
-    <label>Arrow Direction:<span style="color:red;">*</span></label>
+    <label>Relationship Direction:<span style="color:red;">*</span></label>
         <input type="radio" name="direction" value="forward" required> A → B<br>
         <input type="radio" name="direction" value="both" required> A ↔ B<br>
 
@@ -399,7 +398,7 @@
 
     </form>
 
-    <h3>Current Relationships</h3>
+    <h3>Relationships You've Added:</h3>
     <ul>
     {% for rel in relations %}
         <li class= "relationship-item">
@@ -449,7 +448,7 @@
         </li>
 
     {% else %}
-        <li>No relationship data available</li>
+        <li>You haven't added any relationships yet.</li>
     {% endfor %}
     </ul>
 
