@@ -158,6 +158,7 @@
             <div class="dropdown-content">
                 <a class="dropdown-item" href="{{ url_for('catprofile.view_profiles') }}">View Cat Profiles</a>
                 <a class="dropdown-item" href="{{ url_for('catprofile.create_profile') }}">Create A New Profile</a>
+                <a class="dropdown-item" href="{{ url_for('relationship.relationship_feature') }}">Cat Relationship Tree</a>
             </div>
         </div>
 
@@ -216,10 +217,10 @@
 
     <div id="cd-container">
         <!-- CD spinning image -->
-        <img id="cd" src="{{ url_for('static', filename='Images/CD_2.png') }}" alt="CD">
+        <img id="cd" src="{{ url_for('static', filename='cd_designs/CD_2.png') }}" alt="CD">
         <!-- Background Music -->
         <audio id="bgm" autoplay loop preload="auto">
-            <source src="{{ url_for('static', filename='BongoCat_Believer.mp3') }}" type="audio/mpeg">
+            <source src="{{ url_for('static', filename='music/BongoCat_Believer.mp3') }}" type="audio/mpeg">
         </audio>
     </div>
 

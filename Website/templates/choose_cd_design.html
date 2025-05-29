@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Choose CD Design{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        font-family: 'Times New Roman', Times, serif;
+        background-color: #f2eadf;
+        margin: 0;
+        padding: 0;
+    }
+
+    h1 {
+        font-weight: bold;
+        color: #94693e;
+        text-align: center;
+        font-size: 36px;
+        margin-bottom: 10px;
+        padding-top: 25px;
+    }
+
+    .design-option {
+        display: inline-block;
+        margin: 15px;
+        text-align: center;
+    }
+
+    .design-option input[type="radio"] {
+        display: none;
+    }
+
+    .design-option label {
+        cursor: pointer;
+        display: inline-block;
+        border: 3px solid transparent;
+        border-radius: 10px;
+        padding: 10px;
+        transition: border 0.3s ease;
+    }
+
+    .design-option input[type="radio"]:checked + label {
+        border: 3px solid #94693e;
+        background-color: #e8d8c0;
+    }
+
+    .design-option img {
+        display: block;
+        width: 150px;
+        height: auto;
+        border-radius: 8px;
+        margin-bottom: 5px;
+    }
+
+    button {
+        font-family: 'Times New Roman';
+        background-color: rgb(176, 148, 119);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 20px;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    button:hover {
+        background-color: rgb(158, 134, 106);
+        transform: scale(1.1);
+    }
+</style>
+
+<h1>Choose Your CD Design</h1>
+<form method="post" action="/choose_cd_design">
+    <div style="text-align:center;">
+        {% for design in designs %}
+            <div class="design-option">
+                <input type="radio" id="design{{ design.id }}" name="cd_design" value="{{ design.id }}" required>
+                <label for="design{{ design.id }}">
+                    <img src="{{ url_for('static', filename='cd_designs/' + design.image_path) }}" alt="{{ design.name }}">
+                    <div>{{ design.name }}</div>
+                </label>
+            </div>
+        {% endfor %}
+    </div>
+    <button type="submit">Save changes</button>
+</form>
+{% endblock %}
