@@ -453,14 +453,6 @@
     {% endfor %}
     </ul>
 
-    <div style="text-align: center; margin-top: 40px;">
-        <a href="{{ url_for('relationship.view_graph') }}">
-            <button style="padding: 12px 24px; font-size: 16px; background-color: #dccbb7; color: #6b4f2f; border: none; border-radius: 12px; cursor: pointer;">
-                View All Users' Cat Graph →
-            </button>
-        </a>
-    </div>
-
     <div id="editModal" class="modal hidden">
         <div class="modal-content">
             <h2>Edit Relationship</h2>
@@ -502,6 +494,13 @@
         <object id="cat-graph" type="image/svg+xml" data="{{ tree_img }}" alt="Cat Relationship Tree"></object>
     </div>
 
+    <div style="text-align: center; margin-top: 40px;">
+        <a href="{{ url_for('relationship.view_graph') }}">
+            <button style="padding: 12px 24px; margin-bottom: 20px; font-size: 16px; background-color: #dccbb7; color: #6b4f2f; border: none; border-radius: 12px; cursor: pointer;">
+                View All Users' Cat Graph →
+            </button>
+        </a>
+    </div>
 </body>
 
 <script>
