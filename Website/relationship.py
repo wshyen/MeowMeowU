@@ -67,7 +67,12 @@ def relationship_feature():
     conn = get_db_connection()
     cursor = conn.cursor()
 
+
+
     if request.method == 'POST':
+        if not current_user.is_authenticated:
+            flash("You must be logged in to add relationship!", category="error")
+            return redirect(url_for('auth.login'))
         action = request.form.get('action')
 
         if action == 'add':
@@ -114,17 +119,20 @@ def relationship_feature():
                 conn.commit()
             return redirect(url_for('relationship.relationship_feature'))
 
-
     cats = cursor.execute("SELECT id, name, gender, photo FROM profiles").fetchall()
-    relations = cursor.execute("""
-        SELECT cr.id, cr.catA_id, cr.catB_id, cr.relation_type, cr.direction,
-            p1.name AS catA_name, p1.photo AS catA_photo,
-            p2.name AS catB_name, p2.photo AS catB_photo
-        FROM cat_relationship cr
-        JOIN profiles p1 ON cr.catA_id = p1.id
-        JOIN profiles p2 ON cr.catB_id = p2.id
-        WHERE cr.user_id = ?
-    """, (current_user.id,)).fetchall()
+
+    if current_user.is_authenticated:
+        relations = cursor.execute("""
+            SELECT cr.id, cr.catA_id, cr.catB_id, cr.relation_type, cr.direction,
+                p1.name AS catA_name, p1.photo AS catA_photo,
+                p2.name AS catB_name, p2.photo AS catB_photo
+            FROM cat_relationship cr
+            JOIN profiles p1 ON cr.catA_id = p1.id
+            JOIN profiles p2 ON cr.catB_id = p2.id
+            WHERE cr.user_id = ?
+        """, (current_user.id,)).fetchall()
+    else:
+        relations = []
 
     graph_svg = generate_graph(relations)
     cat_photos = {cat['name']: url_for('static', filename=f'uploads/{cat["photo"]}') for cat in cats}
@@ -144,12 +152,13 @@ def view_graph():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    #all relationship
-    cats = cursor.execute("SELECT id, name, gender, photo FROM profiles").fetchall()   
+    cats = cursor.execute("SELECT id, name, gender, photo FROM profiles").fetchall()
+
+    #all relationship 
     relations = cursor.execute("""
         SELECT cr.id, cr.catA_id, cr.catB_id, cr.relation_type, cr.direction,
-               p1.name AS catA_name, p1.photo AS catA_photo,
-               p2.name AS catB_name, p2.photo AS catB_photo
+            p1.name AS catA_name, p1.photo AS catA_photo,
+            p2.name AS catB_name, p2.photo AS catB_photo
         FROM cat_relationship cr
         JOIN profiles p1 ON cr.catA_id = p1.id
         JOIN profiles p2 ON cr.catB_id = p2.id
