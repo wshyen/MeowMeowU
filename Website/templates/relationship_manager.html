@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Cat Relationship Graph Manage{% endblock %}
+{% block title %}Manage Cat Relationship Graph{% endblock %}
 
 {% block content %}
 
@@ -400,56 +400,70 @@
 
     <h3>Relationships You've Added:</h3>
     <ul>
-    {% for rel in relations %}
-        <li class= "relationship-item">
-            <div class="relationship-content">
+    {% if user.is_authenticated%}
 
-                <!-- Cat A -->
-                <div class="cat-info">
-                    <img src="{{ url_for('static', filename='uploads/' + rel.catA_photo if rel.catA_photo else 'uploads/default.png') }}" alt="{{ rel.catA_name }}">
-                    <div>{{ rel.catA_name }}</div>
+        {% if relations|length == 0 %}
+            <li class="relationship-item">
+                <div class="relationship-content">
+                    <p>You haven't added any relationships yet.</p>
                 </div>
+            </li>
+        {% else %}
+            {% for rel in relations %}
+                <li class= "relationship-item">
+                    <div class="relationship-content">
 
-                <!-- Relationship -->
-                <div style="font-weight: bold; font-size: 18px; color: #94693e; white-space: nowrap;">
-                    {{ rel.relation_type }}
-                </div>
+                        <!-- Cat A -->
+                        <div class="cat-info">
+                            <img src="{{ url_for('static', filename='uploads/' + rel.catA_photo if rel.catA_photo else 'uploads/default.png') }}" alt="{{ rel.catA_name }}">
+                            <div>{{ rel.catA_name }}</div>
+                        </div>
 
-                <!-- Arrow -->
-                <div class="relationship-arrow">
-                    {% if rel.direction == 'forward' %}
-                        &#8594;  <!-- Right arrow (→) -->
-                    {% elif rel.direction == 'both' %}
-                        &#8596;  <!-- Both sided arrow (↔) -->
-                    {% endif %}
-                </div>
+                        <!-- Relationship -->
+                        <div style="font-weight: bold; font-size: 18px; color: #94693e; white-space: nowrap;">
+                            {{ rel.relation_type }}
+                        </div>
 
-                <!-- Cat B -->
-                <div class="cat-info">
-                    <img src="{{ url_for('static', filename='uploads/' + rel.catB_photo if rel.catB_photo else 'uploads/default.png') }}" alt="{{ rel.catB_name }}">
-                    <div>{{ rel.catB_name }}</div>
-                </div>
+                        <!-- Arrow -->
+                        <div class="relationship-arrow">
+                            {% if rel.direction == 'forward' %}
+                                &#8594;  <!-- Right arrow (→) -->
+                            {% elif rel.direction == 'both' %}
+                                &#8596;  <!-- Both sided arrow (↔) -->
+                            {% endif %}
+                        </div>
 
-                <div class="action-buttons">
-                    <!-- Edit Button -->
-                    <button class = "action-button" onclick="openEditModal({{ rel.id }}, '{{ rel.catA_id }}', '{{ rel.catB_id }}', '{{ rel.relation_type }}', '{{ rel.direction }}')">
-                        Edit
-                    </button>
+                        <!-- Cat B -->
+                        <div class="cat-info">
+                            <img src="{{ url_for('static', filename='uploads/' + rel.catB_photo if rel.catB_photo else 'uploads/default.png') }}" alt="{{ rel.catB_name }}">
+                            <div>{{ rel.catB_name }}</div>
+                        </div>
 
-                    <!-- Delete Button -->
-                    <form method="POST"  class="inline" action="{{ url_for('relationship.relationship_feature') }}" onsubmit="return confirm('Are you sure you want to delete this relationship?');" style="margin-left: 20px;">
-                        <input type="hidden" name="action" value="delete" />
-                        <input type="hidden" name="rel_id" value="{{ rel.id }}" />
-                        <button class = "action-button" type="submit">Delete</button>
-                    </form>
-                </div>
+                        <div class="action-buttons">
+                            <!-- Edit Button -->
+                            <button class = "action-button" onclick="openEditModal({{ rel.id }}, '{{ rel.catA_id }}', '{{ rel.catB_id }}', '{{ rel.relation_type }}', '{{ rel.direction }}')">
+                                Edit
+                            </button>
 
-            </div>
-        </li>
+                            <!-- Delete Button -->
+                            <form method="POST"  class="inline" action="{{ url_for('relationship.relationship_feature') }}" onsubmit="return confirm('Are you sure you want to delete this relationship?');" style="margin-left: 20px;">
+                                <input type="hidden" name="action" value="delete" />
+                                <input type="hidden" name="rel_id" value="{{ rel.id }}" />
+                                <button class = "action-button" type="submit">Delete</button>
+                            </form>
+                        </div>
 
-    {% else %}
-        <li>You haven't added any relationships yet.</li>
-    {% endfor %}
+                    </div>
+                </li>
+        {% endfor %}
+    {% endif %}
+{% else %}
+    <li class="relationship-item">
+        <div class="relationship-content">
+            <p>Please log in to view cat relationships.</p>
+        </div>
+    </li>
+{% endif %}
     </ul>
 
     <div id="editModal" class="modal hidden">
