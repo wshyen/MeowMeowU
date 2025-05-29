@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Cat Relationship Graph{% endblock %}
+{% block title %}Cat Relationship Graph View{% endblock %}
 
 {% block content %}
 <style>
@@ -11,11 +11,12 @@
     }
 
     h1 {
-        font-size: 36px;
+        font-weight: bold;
         color: #94693e;
         text-align: center;
-        margin-top: 30px;
-        margin-bottom: 40px;
+        font-size: 36px;
+        margin-bottom: 10px;
+        padding-top: 25px;
     }
 
     .graph-container {
@@ -64,14 +65,14 @@
     }
 </style>
 
-<h1>Cat Relationship Graph</h1>
+<h1>All Cat Relationship Graph</h1>
 
 <div class="graph-container">
     <object id="cat-graph" type="image/svg+xml" data="{{ tree_img }}" alt="Cat Relationship Tree"></object>
 </div>
 
 <div class="back-button-container">
-    <a href="{{ url_for('relationship.relationship_feature') }}" class="back-button">← Back to Relationship Manager</a>
+    <a href="{{ url_for('relationship.relationship_feature') }}" class="back-button">←  Back to Relationship Management</a>
 </div>
 
 <script>
