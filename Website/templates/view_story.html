@@ -19,6 +19,7 @@
         background-color: #fff7ec;
         border-radius: 10px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        position: relative;
     }
 
     h2 {
@@ -116,9 +117,98 @@
         transform: scale(1.1); 
     }
 
+    .menu-container {
+        position: absolute;
+        top: 10px;
+        right: 25px;
+    }
+
+    .dots {
+        font-size: 24px;
+        cursor: pointer;
+        color: #6b4f2f;
+    }
+
+    .menu {
+        align-items: center;
+        display: none;
+        position: absolute;
+        right: 0;
+        background: #dccbb7;
+        border-radius: 8px;
+        padding: 6px 12px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        min-width: 90px;
+        text-align: center;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .menu a {
+        text-decoration: none;
+        color: #6b4f2f;
+        display: block;
+        padding: 6px 10px;
+        font-weight: bold;
+        border-radius: 6px;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .menu a:hover {
+        background: #dccbb7;
+        transform: scale(1.05);
+    }
+
+    .menu-container:hover .menu {
+        display: block;
+    }
+
+    .menu-container:focus-within .menu {
+        display: block;
+    }
+    
+    .delete-btn {
+        background: none;
+        border: none;
+        color: #6b4f2f;
+        display: block;
+        margin: auto;
+        padding: 6px 10px;
+        font-size: 16px;
+        font-weight: bold;
+        border-radius: 6px;
+        cursor: pointer;
+        width: 100%;
+        text-align: center;
+        height: auto;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .delete-btn:hover {
+        background: #dccbb7;
+        transform: scale(1.05);
+    }
+
 </style>
 
 <div class="story-container">
+    <!-- Three-dot menu for reporting the story -->
+    {% if user.is_authenticated %}
+        <div class="menu-container" tabindex="0">
+            <span class="dots">...</span>
+            <div class="menu">
+                {% if user.role == 'user' %}
+                    <a href="{{ url_for('auth.report_page', report_type='story', item_id=story['id']) }}">Report Story</a>
+                {% elif user.role == 'admin' %}
+                    <form action="{{ url_for('auth.delete_story', id=story['id']) }}" method="post" style="display:inline;">
+                        <button type="submit" class="delete-btn">
+                            Delete Story
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+
     <h2>{{ story.caption }}</h2>
 
     <img src="{{ url_for('auth.uploaded_file', filename=story.image_filename) }}" alt="Story Image" class="story-image" onclick="toggleModal('{{ url_for('auth.uploaded_file', filename=story.image_filename) }}')">

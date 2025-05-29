@@ -1,13 +1,15 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, send_from_directory #Flask is a web framework that allows developers to build web applications
 import re
-from .models import User, Story
+from .models import User, Story, Report
 from . import db
 from werkzeug.security import generate_password_hash, check_password_hash #for password hashing and verification
 from werkzeug.utils import secure_filename #handling file uploads
 from flask_login import login_user, login_required, logout_user, current_user
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import text
 import os
 from datetime import datetime, timedelta
+from .community import get_post_id_from_comment, get_db_connection
 
 auth = Blueprint("auth", __name__) #a Blueprint for authentication routes, Blueprint is like a container for related routes and functions
 
@@ -400,3 +402,278 @@ def share_story():
 @auth.route('/static/story/<path:filename>')
 def uploaded_file(filename):
     return send_from_directory('static/story', filename)
+
+#content moderation
+def get_post(post_id):
+    query = text("SELECT * FROM post WHERE post_id = :post_id")
+    with db.session() as session:
+        result = session.execute(query, {"post_id": post_id}).fetchone()
+    return result
+
+def get_comment(comment_id):
+    query = text("SELECT * FROM comment WHERE id = :comment_id")
+    with db.session() as session:
+        result = session.execute(query, {"comment_id": comment_id}).fetchone()
+    return result
+
+def validate_existence(table, item_id):
+    column_map = {
+        "post": "post_id",
+        "story": "id",
+        "comment": "id"
+    }
+
+    column = column_map.get(table)
+    if not column:
+        return False  #prevent unknown table access
+
+    query = text(f"SELECT EXISTS(SELECT 1 FROM {table} WHERE {column} = :item_id)")
+    return db.session.execute(query, {"item_id": item_id}).scalar()
+
+@auth.route('/report/<report_type>/<int:item_id>', methods=['GET', 'POST'])
+def report_page(report_type, item_id):
+    if not current_user.is_authenticated:
+        flash("You must be logged in to report!", category="error")
+        return redirect(url_for('auth.login'))
+
+    #ensure report type is valid (case-insensitive)
+    report_type = report_type.lower()
+    if report_type not in ["post", "story", "comment"]:
+        flash("Invalid report type!", category="error")
+        return redirect(url_for('views.home'))
+
+    if item_id <= 0:
+        flash("Invalid report ID.", category="error")
+        return redirect(url_for('views.home'))
+
+    post_id = None
+    if report_type == "comment":
+        post_id = get_post_id_from_comment(item_id)
+        if not post_id:
+            flash("Could not find the associated post for this comment.", category="error")
+            return redirect(url_for('views.home'))
+
+    return render_template(
+        'report_page.html',
+        report_type=report_type,
+        item_id=item_id,
+        post_id=post_id,
+        user=current_user
+    )
+
+@auth.route("/submit_report", methods=["POST"])
+def submit_report():
+    report_type = request.form.get("report_type")
+    item_id = request.form.get("item_id")  #universal ID for post, story, or comment
+    reason = request.form.get("reason")
+    other_reason = request.form.get("otherReason", "").strip()
+    details = request.form.get("details")
+
+    #ensure item_id is an integer
+    try:
+        item_id = int(item_id)
+        if item_id <= 0:
+            raise ValueError("Invalid item ID.")
+    except (TypeError, ValueError):
+        flash("Invalid report ID.", category="error")
+        return redirect(url_for("auth.report_page", report_type=report_type, item_id=item_id))
+
+    #validate report type
+    if report_type not in ["post", "story", "comment"]:
+        flash("Invalid report type.", category="error")
+        return redirect(url_for("views.home"))
+
+    #validate existence of the item
+    if not validate_existence(report_type, item_id):
+        flash(f"The {report_type} you're trying to report does not exist.", category="error")
+        return redirect(url_for("auth.report_page", report_type=report_type, item_id=item_id))
+
+    #ensure "Other" requires a filled reason
+    if reason == "other" and not other_reason:
+        flash("You selected 'Other' but didn't provide a reason. Please fill in the reason before submitting.", category="error")
+        return redirect(url_for("auth.report_page", report_type=report_type, item_id=item_id))
+
+    post_id = None
+    story_id = None
+    comment_id = None
+
+    if report_type == "post":
+        post_id = item_id
+    elif report_type == "story":
+        story_id = item_id
+    elif report_type == "comment":
+        comment_id = item_id
+        post_id = get_post_id_from_comment(comment_id)
+        if not post_id:
+            flash("Unable to find the post for this comment.", category="error")
+            return redirect(url_for("views.home"))
+
+    #store report data
+    new_report = Report(
+        user_id=current_user.id,
+        post_id=post_id,
+        story_id=story_id,
+        comment_id=comment_id,
+        reason=other_reason if reason == "other" else reason,
+        details=details,
+    )
+
+    db.session.add(new_report)
+    db.session.commit()
+
+    flash("Report submitted successfully!", category="success")
+
+    #redirect user based on report type
+    if report_type == "post":
+        return redirect(url_for("community.post_detail", post_id=post_id))
+    elif report_type == "story":
+        return redirect(url_for("auth.view_story", story_id=story_id))
+    elif report_type == "comment":
+        return redirect(url_for("community.post_detail", post_id=post_id, comment_id=comment_id))
+
+    return redirect(url_for("views.home"))
+
+#admin
+@auth.route('/admin/view_report')
+def view_report():
+
+    reports = Report.query.order_by(Report.created_at.desc()).all()
+
+    return render_template("view_report.html", reports=reports, user=current_user)
+
+@auth.route("/admin/dismiss_report/<int:id>", methods=["POST"])
+def dismiss_report(id):
+
+    #fetch the report using the correct ID field
+    report = Report.query.get(id)
+    if not report:
+        flash("Report not found.", category="error")
+        return redirect(url_for("auth.view_report"))
+
+    #delete the report
+    db.session.delete(report)
+    db.session.commit()
+
+    flash("Report dismissed successfully!", category="success")
+    return redirect(url_for("auth.view_report"))
+
+@auth.route("/admin/delete_story/<int:id>", methods=["POST"])
+def delete_story(id):
+
+    story = Story.query.get(id)
+    if not story:
+        flash("Story not found.", category="error")
+        return redirect(url_for("auth.cat_story"))
+
+    #delete the story
+    db.session.delete(story)
+    db.session.commit()
+
+    flash("Story deleted successfully!", category="success")
+    return redirect(url_for("auth.view_report"))
+
+@auth.route("/admin/delete_post/<int:post_id>", methods=["POST"])
+def delete_post(post_id):
+    conn = get_db_connection()
+
+    #retrieve the post data from the database
+    post = conn.execute('SELECT * FROM post WHERE post_id = ?', (post_id,)).fetchone()
+
+    #ensure post exists
+    if not post:
+        flash("Post not found!", category="error")
+        conn.close()
+        return redirect(url_for("community.community_feature"))
+
+    #delete post from database
+    conn.execute('DELETE FROM post WHERE post_id = ?', (post_id,))
+    conn.commit()
+
+    #delete all comments associated with the post
+    conn.execute('DELETE FROM comment WHERE post_id = ?', (post_id,))
+    conn.commit()
+
+    #remove media file if applicable
+    if post['media_url']:
+        file_path = os.path.join(os.path.dirname(__file__), 'static', post['media_url'])
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
+    conn.close()
+
+    flash("Post deleted successfully!", category="success")
+    return redirect(url_for('auth.view_report', report_type='post', item_id=post_id))
+
+@auth.route("/admin/delete_comment/<int:id>", methods=["POST"])
+def delete_comment(id):
+    conn = get_db_connection()
+
+    def delete_with_replies(comment_id):
+        child_comments = conn.execute('SELECT id FROM comment WHERE parent_id = ?', (comment_id,)).fetchall()
+        for child in child_comments:
+            delete_with_replies(child[0])
+        conn.execute('DELETE FROM comment WHERE id = ?', (comment_id,))
+    
+    delete_with_replies(id)
+    conn.commit()
+    conn.close()
+
+    flash("Comment deleted successfully!", category="success")
+    return redirect(url_for("auth.view_report", report_type="comment", item_id=id))
+
+@auth.route('/view_post/<int:post_id>')
+def view_post(post_id):
+    conn = get_db_connection()
+
+    post = conn.execute('''
+        SELECT 
+            post.*, 
+            user.name,
+            user.profile_picture,
+            (SELECT COUNT(*) FROM likes WHERE likes.post_id = post.post_id) AS like_count,
+            CASE 
+                WHEN EXISTS (
+                    SELECT 1 FROM likes 
+                    WHERE likes.post_id = post.post_id AND likes.user_id = ?
+                ) THEN 1
+                ELSE 0
+            END AS liked_by_current_user
+        FROM post 
+        JOIN user ON post.user_id = user.id
+        WHERE post.post_id = ?
+    ''', (
+        current_user.id if current_user.is_authenticated else -1,
+        post_id
+    )).fetchone()
+
+    comments = conn.execute('''
+        SELECT 
+            comment.*,
+            user.name AS name, 
+            user.profile_picture AS profile_picture,
+            (SELECT COUNT(*) FROM comment_like WHERE comment_like.comment_id = comment.id) AS like_count,
+            CASE 
+                WHEN EXISTS (
+                    SELECT 1 FROM comment_like 
+                    WHERE comment_like.comment_id = comment.id AND comment_like.user_id = ?
+                ) THEN 1
+                ELSE 0
+            END AS liked_by_current_user
+        FROM comment
+        JOIN user ON comment.user_id = user.id
+        WHERE comment.post_id = ?
+        ORDER BY comment.created_at DESC
+    ''', (
+        current_user.id if current_user.is_authenticated else -1,
+        post_id
+    )).fetchall()
+
+    grouped_comments = {}
+    for comment in comments:
+        parent_id = comment['parent_id']
+        if parent_id not in grouped_comments:
+            grouped_comments[parent_id] = []
+        grouped_comments[parent_id].append(comment)
+
+    conn.close()
+    return render_template("community_detail.html", post=post, comments=comments, grouped_comments=grouped_comments, user=current_user, post_id=post_id)

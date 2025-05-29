@@ -3,8 +3,9 @@ import sqlite3
 from datetime import datetime
 from flask import Blueprint, request,flash, redirect, render_template, url_for
 from flask_login import current_user
-from werkzeug.utils import secure_filename 
-
+from werkzeug.utils import secure_filename
+from sqlalchemy import text
+from . import db
 
 community_bp = Blueprint('community', __name__, template_folder='templates')
 
@@ -23,16 +24,15 @@ def get_db_connection():
     return conn
 
 def get_cat_names():
-    
     conn = get_db_connection()
+    if conn is None:
+        return []
     cursor = conn.cursor()
-    
     cursor.execute('SELECT name FROM profiles')
     cat_names = [row['name'] for row in cursor.fetchall()]
 
     conn.close()
     return cat_names
-
 
 # All Posts
 @community_bp.route('/community_feature')
@@ -100,6 +100,11 @@ def post_detail(post_id):
         post_id
     )).fetchone()
 
+    if post is None:
+        conn.close()
+        flash("The post does not exist or has been deleted.", category="error")
+        return redirect(url_for('community.community_feature'))
+
     comments = conn.execute('''
         SELECT 
             comment.*,
@@ -129,12 +134,17 @@ def post_detail(post_id):
 
     return render_template("community_detail.html", post=post, comments=comments, grouped_comments=grouped_comments, user=current_user)
 
+def get_post_id_from_comment(comment_id):
+    query = text("SELECT post_id FROM comment WHERE id = :id")
+    result = db.session.execute(query, {"id": comment_id}).fetchone()
+
+    return result[0] if result else None
 
 # Create Post
 @community_bp.route('/post/create', methods=['POST'])
 def create_post():
     if not current_user.is_authenticated:
-        flash("You must be logged in to view result!", category="error")
+        flash("You must be logged in to create post!", category="error")
         return redirect(url_for('auth.login'))
     
     content = request.form['content']
@@ -210,13 +220,11 @@ def hashtag_posts(hashtag):
 
     return render_template('community_index.html',user=current_user, posts=posts, sort=sort, cat_names=get_cat_names())
 
-
-
 #My Post
 @community_bp.route('/my-posts')
 def my_posts():
     if not current_user.is_authenticated:
-        flash("You must be logged in to view result!", category="error")
+        flash("You must be logged in to view your posts!", category="error")
         return redirect(url_for('auth.login'))
     
     conn = get_db_connection()
@@ -267,6 +275,9 @@ def delete_post(post_id):
 
     # Check if the post exists and belongs to the current user
     if post and post['user_id'] == current_user.id:
+        #delete all comments associated with the post
+        conn.execute('DELETE FROM comment WHERE post_id = ?', (post_id,))
+        conn.commit()
         # Delete the post from the database
         conn.execute('DELETE FROM post WHERE post_id = ?', (post_id,))
         conn.commit()
@@ -363,10 +374,17 @@ def add_comment(post_id):
         print("File saved to:", os.path.join(COMMENTS_FOLDER, filename))
     
     conn = get_db_connection()
+
+    result = conn.execute(
+        'SELECT MAX(floor) FROM comment WHERE post_id = ?', (post_id,)
+    ).fetchone()
+    max_floor = result[0] if result[0] is not None else 0
+    new_floor = max_floor + 1
+
     conn.execute(
-        '''INSERT INTO comment (content, media_url, created_at, post_id, user_id,parent_id) 
-           VALUES (?, ?, ?, ?, ?, ?)''', 
-        (content, media_url, created_at, post_id, user_id, parent_id) 
+        '''INSERT INTO comment (content, media_url, created_at, post_id, user_id,parent_id, floor) 
+           VALUES (?, ?, ?, ?, ?, ?, ?)''', 
+        (content, media_url, created_at, post_id, user_id, parent_id, new_floor) 
     )
     conn.commit()
     conn.close()

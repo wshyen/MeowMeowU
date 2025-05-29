@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+
+{% block title %}Your Badges{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f2eadf;
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 20px;
+        font-family: 'Times New Roman', Times, serif;
+        color: #94693e;
+        font-weight: bold;
+    }
+
+    h2 {
+        font-weight: bold;
+        font-size: 20px;
+        color: #6b4f2f;
+        text-align: center;
+        font-style: italic;
+        margin-top: 0;
+        margin-bottom: 20px;
+    }
+
+    .user-badge-gallery {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 30px;
+        justify-content: center;
+        margin-top: 30px;
+        flex-direction: row;
+    }
+
+    .user-badge-card {
+        background: #f8f8f8;
+        border-radius: 10px;
+        padding: 18px 18px 12px 18px;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+        width: 500px;
+        height: 500px;
+        position: relative;
+        transition: box-shadow 0.2s;
+    }
+
+    .user-badge-card img {
+        width: 300px;
+        height: 300px;
+        object-fit: contain;
+        margin-bottom: 10px;
+        border-radius: 8px;
+    }
+
+    .user-badge-card strong {
+        font-size: 1.08em;
+        color: #94693e;
+    }
+
+    .user-badge-card .locked {
+        color: #b0b0b0;
+        font-size: 0.9em;
+        margin-top: 4px;
+    }
+
+    .user-badge-card .desc {
+        font-size: 25px;
+        color: #666;
+        margin-bottom: 2px;
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    .admin-badge-btn-container {
+        text-align: right;
+        margin-bottom: 20px;
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+    }
+
+    .admin-badge-btn {
+        font-size: 20px;
+        background-color: #94693e;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        border: none;
+    }
+
+    .user-badge-card .locked {
+        font-size: 20px;
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    .user-badge-card .badge-unlocked {
+        font-size: 20px;
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    .user-badge-card .badge-name {
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 30px;
+        font-weight: bold;
+    }
+
+    .claim-btn {
+        background-color: #94693e;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+        font-size: 18px;
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    .claim-btn:focus {
+        outline: none; 
+    }
+</style>
+<div style="padding: 20px;">
+    <h1>{{ user.Name }}'s Badge Collection</h1>
+    <h2> Every badge tells a story—collect them all and let your journey shine! 🐱</h2>
+
+    {% set unlocked_badges = all_badges | selectattr("id", "in", user_badges_ids) | list %}
+    {% set claimable_badges = all_badges | selectattr("id", "in", claimable_badge_ids) | list %}
+    {% set locked_badges = all_badges | rejectattr("id", "in", user_badges_ids) | rejectattr("id", "in", claimable_badge_ids) | list %}
+
+    <div class="user-badge-gallery">
+        <!-- Unlocked Badges -->
+        {% for badge in unlocked_badges %}
+        <div class="user-badge-card">
+            <img src="{{ url_for('static', filename='badges/' ~ badge.icon) }}">
+            <div><strong class="badge-name">{{ badge.name }}</strong></div>
+            <div class="desc">{{ badge.description }}</div>
+            <div class="badge-unlocked">Unlocked</div>
+        </div>
+        {% endfor %}
+
+        <!-- Claimable Badges -->
+        {% for badge in claimable_badges %}
+        <div class="user-badge-card">
+            <img src="{{ url_for('static', filename='badges/' ~ badge.icon) }}" style="filter: grayscale(100%); opacity: 0.5;">
+            <div><strong class="badge-name">{{ badge.name }}</strong></div>
+            <div class="desc">{{ badge.description }}</div>
+            <form method="post" action="{{ url_for('badge.claim_badge', badge_id=badge.id) }}">
+                <button class="claim-btn" type="submit">Claim</button>
+            </form>
+        </div>
+        {% endfor %}
+
+        <!-- Locked Badges -->
+        {% for badge in locked_badges %}
+        <div class="user-badge-card">
+            <img src="{{ url_for('static', filename='badges/' ~ badge.icon) }}" style="filter: grayscale(100%); opacity: 0.5;">
+            <div><strong class="badge-name">{{ badge.name }}</strong></div>
+            <div class="desc">{{ badge.description }}</div>
+            <div class="locked">Locked</div>
+        </div>
+        {% endfor %}
+    </div>
+    {% if user_role == 'admin' %}
+    <div style="text-align: right; margin-bottom: 20px; position: fixed; bottom: 20px; right: 20px;">
+        <button id="manageBadges" class="admin-badge-btn"
+            onclick="window.location.href='{{ url_for('badge.manage_badges') }}'">
+            +
+        </button>
+    </div>
+    {% endif %}
+</div>
+<!-- Confetti effect -->
+<canvas id="confetti-canvas"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@latest"></script>
+<script>
+    //Select all claim buttons and add click event listeners
+    document.querySelectorAll('.claim-btn').forEach(button => {
+        button.addEventListener('click', (event) => {
+            event.preventDefault(); //Stop the form from submitting immediately
+
+            //Create confetti effect
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 } 
+            });
+
+            //Delay the form submission to allow confetti to show
+            setTimeout(() => {
+                event.target.closest('form').submit(); 
+            }, 1000); 
+        });
+    });
+</script>
+{% endblock %}

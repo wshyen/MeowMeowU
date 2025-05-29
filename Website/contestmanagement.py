@@ -4,6 +4,7 @@ from flask import Flask, Blueprint, render_template, request, session, redirect,
 from flask_login import current_user, login_required, login_user
 from werkzeug.utils import secure_filename
 from datetime import date, datetime
+from .badge import check_contest_winner_badges
 
 app = Flask(__name__, static_folder='static')
 app.secret_key = 'your_secret_key'
@@ -356,8 +357,13 @@ def view_result(contest_id):
     winner_names = [w['name'] for w in winners]
     show_claim_button = getattr(current_user, 'Name', None) in winner_names
 
+    # Get the contest winner badge id
+    with get_db_connection() as conn:
+        badge = conn.execute("SELECT id FROM badge WHERE criteria = ?", ('contest_winner',)).fetchone()
+        badge_id = badge['id'] if badge else None
+
     return render_template("view_result.html", contest_name=contest["name"], participants=participants, winners=winners, 
-                           show_claim_button=show_claim_button, contest_id=contest_id, user=current_user)
+                           show_claim_button=show_claim_button, contest_id=contest_id, user=current_user, badge_id=badge_id)
 
 def get_winners(contest_id):
     conn = get_db_connection()
@@ -374,18 +380,6 @@ def get_winners(contest_id):
     top_vote = participants[0]['votes']
     winners = [p for p in participants if p['votes'] == top_vote]
     return winners
-
-@contestmanagement_bp.route('/badge_page/<int:contest_id>')
-@login_required
-def badge_page(contest_id):
-    Name = current_user.Name
-    winners = get_winners(contest_id)
-
-    if Name not in [winner['name'] for winner in winners]:
-        flash("You are not a winner!", category="error")
-        return redirect(url_for('contestmanagement.contest_page'))
-
-    return render_template("badge.html", winner={"name": Name}, user=current_user)
 
 if __name__ == '__main__':
     #Ensure the upload folder exists

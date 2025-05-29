@@ -51,6 +51,7 @@
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         padding: 30px;
         cursor: pointer;
+        position: relative;
     }
         
     .post-info {
@@ -125,6 +126,7 @@
         padding: 20px;
         border-radius: 10px;
         background-color: #ffffff;
+        position: relative;
     }
 
     .comment-info {
@@ -288,6 +290,77 @@
     .hidden {
         display: none;
     }
+
+    .menu-container {
+        position: absolute;
+        top: 10px;
+        right: 25px;
+    }
+
+    .dots {
+        font-size: 24px;
+        cursor: pointer;
+        color: #6b4f2f;
+    }
+
+    .menu {
+        align-items: center;
+        display: none;
+        position: absolute;
+        right: 0;
+        background: #dccbb7;
+        border-radius: 8px;
+        padding: 6px 12px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        min-width: 90px;
+        text-align: center;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .menu a {
+        text-decoration: none;
+        color: #6b4f2f;
+        display: block;
+        padding: 6px 10px;
+        font-weight: bold;
+        border-radius: 6px;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .menu a:hover {
+        background: #dccbb7;
+        transform: scale(1.05);
+    }
+
+    .menu-container:hover .menu {
+        display: block;
+    }
+
+    .menu-container:focus-within .menu {
+        display: block;
+    }
+
+    .delete-btn {
+        background: none;
+        border: none;
+        color: #6b4f2f;
+        display: block;
+        padding: 6px 10px;
+        font-size: 16px;
+        font-weight: bold;
+        border-radius: 6px;
+        cursor: pointer;
+        width: 100%;
+        text-align: center;
+        height: auto;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .delete-btn:hover {
+        background: #dccbb7;
+        transform: scale(1.05);
+    }
+    
 </style>
 
 <h1>Post Details</h1>
@@ -297,9 +370,27 @@
 
 <div class="post">
 
+    <!-- Three-dot menu positioned at the top-right -->
+    {% if user.is_authenticated %}
+        <div class="menu-container" tabindex="0">
+            <span class="dots">...</span>
+            <div class="menu">
+                {% if user.role == 'user' %}
+                    <a href="{{ url_for('auth.report_page', report_type='post', item_id=post['post_id']) }}">Report Post</a>
+                {% elif user.role == 'admin' %}
+                    <form action="{{ url_for('auth.delete_post', post_id=post['post_id']) }}" method="post" style="display: inline;">
+                        <button type="submit" class="delete-btn">
+                            Delete Post
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+
     <div class="post-info">
-    <img class="profile-picture" src="{{ url_for('static', filename='Userprofile/' + (post['profile_picture'] if post['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
-    <p><strong>{{ post['name'] }}</strong> posted at {{ post['created_at'] }}</p>
+        <img class="profile-picture" src="{{ url_for('static', filename='Userprofile/' + (post['profile_picture'] if post['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
+        <p><strong>{{ post['name'] }}</strong> posted at {{ post['created_at'] }}</p>
     </div>
 
     <p class="post-content">{{ post['content'] }}</p>
@@ -354,8 +445,17 @@
             <div class="comment-info">
                 <img class="comment-profile-picture" src="{{ url_for('static', filename='Userprofile/' + (comment['profile_picture'] if comment['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
                 <p><strong>{{ comment['name'] }}</strong> commented at {{ comment['created_at'] }}</p>
-                <span style="font-size: 20px; margin-left: 10px; color: #6b4f2f;">#{{ comment['id'] }}</span>
+                <span class="floor-number" style="font-size: 20px; margin-left: 10px; color: #6b4f2f;">
+                    #{{ comment['floor'] }}
+                </span>
 
+                    {% if user.is_authenticated and user.role == 'admin' %}
+                        <form action="{{ url_for('auth.delete_comment', id=comment['id']) }}" method="post" style="display:inline;">
+                            <button type="submit" class="comment-action-button" style="border: none; background: none; color: #a58259; font-weight: bold; cursor: pointer;">
+                                Delete Comment
+                            </button>
+                        </form>
+                    {% endif %}
             </div>
 
             <div class="comment-content">
@@ -407,9 +507,13 @@
                             </button>
                         </form>
                     {% else %}
-                        <button type="submit" class="comment-action-button" onclick="return confirm('Are you sure you want to report this comment?');">
-                            ⚠️ Report
-                        </button>
+                        {% if user.is_authenticated and user.role == 'user' %}
+                            <form action="{{ url_for('auth.report_page', report_type='comment', item_id=comment['id']) }}" method="post" style="display:inline;">
+                                <button type="submit" class="comment-action-button" onclick="return confirm('Are you sure you want to report this comment?');">
+                                    ⚠️ Report
+                                </button>
+                            </form>
+                        {% endif %}
                     {% endif %} 
                 </div>
 
@@ -469,8 +573,13 @@
         replyButtons.forEach(button => {
             button.addEventListener('click', function () {
                 const commentId = button.getAttribute('data-comment-id');
+                const floorSpan = button.closest('.comment').querySelector('.floor-number');
+                let floorText = '';
+                if (floorSpan) {
+                    floorText = floorSpan.textContent.trim();
+                }
                 parentIdInput.value = commentId; 
-                commentTextarea.value = `Replying to #${commentId} `;
+                commentTextarea.value = `Replying to ${floorText} `;
                 commentTextarea.focus();
             });
         });

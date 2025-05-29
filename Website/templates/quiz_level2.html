@@ -116,7 +116,36 @@
         position: relative;
         top: -120px;
         font-family: 'Times New Roman', Times, serif;
-    }   
+    }  
+
+    #claim-badge-box {
+        display: none;
+        text-align: center;
+        margin-top: 10px;
+        position: relative;
+        top: -120px;
+        font-family: 'Times New Roman', Times, serif;
+    }
+    
+    .quiz-option-btn {
+        background-color: #bc9160;
+        color: whitesmoke;
+        font-weight: bold;
+        border: 2px solid #c79058;
+        border-radius: 8px;
+        padding: 15px 30px;
+        font-size: 22px;
+        font-family: 'Times New Roman', Times, serif;
+        margin: 10px;
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s, transform 0.1s;
+    }
+
+    .quiz-option-btn:hover {
+        background-color: #d8ae7e;
+        color: #fff;
+        transform: scale(1.05);
+    }
 </style>
 <div style="padding: 20px;">
     <h1>Level 2</h1>
@@ -140,6 +169,12 @@
 
     <div class="button-box" id="back-button-box">
         <button class="restart-button" onclick="window.location.href='{{ url_for('quiz.quiz_page') }}'">🐾 Back to Quiz 🐾</button>
+    </div>
+
+    <div class="button-box" id="claim-badge-box" style="display: none;">
+        <form method="get" action="{{ url_for('badge.badge_gallery') }}">
+            <button class="restart-button" type="submit">🏅 Claim Your Level 2 Badge 🏅</button>
+        </form>
     </div>
 
 </div>
@@ -210,22 +245,15 @@
 
             //Display options
             document.getElementById("options").innerHTML = shuffledOptions.map(option =>
-                `<input type="radio" name="option" value="${option.value}" onchange="checkAnswer()"> ${option.text} <br>`
+                `<button class="quiz-option-btn" onclick="checkAnswer('${option.value}')" type="button">${option.text}</button>`
             ).join("");
         } else {
             checkQuizCompletion();
         }
     }
 
-    function checkAnswer() {
-        let selectedOption = document.querySelector('input[name="option"]:checked');
-        if (!selectedOption) {
-            alert("Please select an answer.");
-            return;
-        }
-
-        let userAnswer = selectedOption.value;
-
+    function checkAnswer(userAnswer) {
+        //Make question and options invisible when display feedback
         document.getElementById("question-text").style.display = "none"; //Hide question when display feedback
         document.getElementById("options").style.display = "none"; //Hide options when display feedback
 
@@ -262,6 +290,8 @@
 
         if (correctCount === questions.length) {
             document.getElementById("question-text").innerHTML = "Congratulations! <br> You have completed Level 2 and earned your badge! <br> ฅ^•⩊•^ ฅ";
+            fetch('/complete_level2', {method: 'POST'});
+            document.getElementById("claim-badge-box").style.display = "block"; //Show claim badge button
         } else {
             document.getElementById("question-text").innerHTML = "This is your final challenge! <br> Get every answer right to complete your journey and earn your badge. <br> Give it another shot!  <br> /ᐠ╥⩊╥ᐟ\\";
             document.getElementById("restart-box").style.display = "block"; //Show restart buttons

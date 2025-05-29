@@ -78,19 +78,6 @@
 <div style="padding: 20px;">
     <h1 style="text-align: center; margin-bottom: 20px; font-family: 'Times New Roman', Times, serif; color: #94693e; font-weight: bold;">Cat Profiles</h1>
 
-    <!-- display flash message -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <div class="flashes" style="text-align: center; margin-bottom: 20px;">
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}" style="padding: 10px; margin-bottom: 10px; border-radius: 5px; background-color: #d4edda; color: #155724; font-size: 1rem;">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-    {% endwith %}
-
     <!-- container for profile cards -->
     <div class="profile-container">
         {% for profile in profiles %}
@@ -111,13 +98,13 @@
                 </p>
 
                 <!-- edit and delete buttons -->
-                {% if current_user %}
+                {% if current_user.is_authenticated %}
                     <div class="actions">
                         <a href="{{ url_for('catprofile.edit_profile', id=profile.id) }}" 
                         style="padding: 10px 15px; background: #94693e; color: white; text-decoration: none; border-radius: 5px; font-size: 0.9rem; cursor: pointer; font-weight: bold;">Edit</a>
 
-                        {% if profile.creator == current_user %}
-                        <a href="{{ url_for('catprofile.confirm_delete', id=profile.id) }}" 
+                        {% if profile.creator|int == current_user.id|int %}
+                        <a href="{{ url_for('catprofile.confirm_delete', id=profile.id) }}""
                             style="padding: 10px 15px; background: #ff0000; color: white; text-decoration: none; border-radius: 5px; font-size: 0.9; cursor: pointer; font-weight: bold; margin-right: 10px;">Delete</a>
                         {% endif %}
                     </div>
