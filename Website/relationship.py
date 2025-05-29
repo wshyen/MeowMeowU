@@ -67,8 +67,6 @@ def relationship_feature():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-
-
     if request.method == 'POST':
         if not current_user.is_authenticated:
             flash("You must be logged in to add relationship!", category="error")
@@ -138,7 +136,7 @@ def relationship_feature():
     cat_photos = {cat['name']: url_for('static', filename=f'uploads/{cat["photo"]}') for cat in cats}
 
     return render_template(
-        'relationship.html',
+        'relationship_manager.html',
         user=current_user,
         profiles=cats,
         relations=relations,
@@ -168,7 +166,7 @@ def view_graph():
     cat_photos = {cat['name']: url_for('static', filename=f'uploads/{cat["photo"]}') for cat in cats}
 
     return render_template(
-        'relationship_tree.html', 
+        'relationship_viewer.html', 
         user=current_user, 
         tree_img=graph_svg,
         cat_photos=cat_photos
