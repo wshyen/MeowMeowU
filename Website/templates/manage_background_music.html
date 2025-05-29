@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %} Manage Background Music {% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f2eadf;
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 20px;
+        font-family: 'Times New Roman', Times, serif;
+        color: #94693e;
+        font-weight: bold;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    th {
+        background-color: #B4906E;
+        color: white;
+        border: 1px solid black;
+        padding: 10px;
+        text-align: center;
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    td {
+        background-color: #f3eeea;
+        border: 1px solid black;
+        padding: 10px;
+        text-align: center;
+    }
+
+    button {
+        padding: 10px 16px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    input[type="file"],
+    input[type="text"] {
+        background-color: white;
+        padding: 8px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        font-family: 'Times New Roman', Times, serif;
+        width: 450px;
+    }
+
+    .add-btn {
+        background-color: #AD784E;
+        color: white;
+        border: none;
+        margin-top: 10px;
+    }
+
+    .delete-btn {
+        background-color: red;
+        color: white;
+        border: none;
+        margin: 5px auto;
+        display: block;
+    }
+
+</style>
+
+<div style="padding: 20px;">
+    <h1>Manage Background Music</h1>
+
+    <!-- Upload New Background Music Form -->
+    <form action="{{ url_for('music.upload') }}" method="POST" enctype="multipart/form-data">
+        <label for="music_name"><b>Music Name</b></label><br>
+        <input type="text" name="music_name" id="music_name" placeholder="Enter music name" required><br><br>
+
+        <label for="music_file"><b>Upload File (.mp3 or .ogg)</b></label><br>
+        <input type="file" name="music_file" id="music_file" accept=".mp3,.ogg" required><br><br>
+
+        <button type="submit" class="add-btn">Upload Music</button>
+    </form>
+
+    <!-- List of Background Music Files -->
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 50px;">ID</th>
+                <th>Music Name</th>
+                <th>Filename</th>
+                <th>Audio Preview</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for music in music_list %}
+            <tr>
+                <td>{{ music.id }}</td>
+                <td>{{ music.name }}</td>
+                <td>{{ music.filename }}</td>
+                <td>
+                    <audio controls>
+                        <source src="{{ url_for('static', filename='music/' ~ music.filename) }}" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                </td>
+                <td>
+                    <form action="{{ url_for('music.delete', music_id=music.id) }}" method="POST">
+                        <button type="submit" class="delete-btn" onclick="return confirm('Delete this music file?')">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
