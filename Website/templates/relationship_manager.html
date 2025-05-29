@@ -1,0 +1,593 @@
+{% extends 'base.html' %}
+
+{% block title %}Cat Relationship Tree{% endblock %}
+
+{% block content %}
+
+<style>
+    html, body {
+        margin: 0; 
+        padding: 0; 
+        box-sizing: border-box;
+        font-family: 'Times New Roman', Times, serif;
+        background-color: #f2eadf;
+        color: #6b4f2f;
+    }
+
+    h1 {
+        font-weight: bold;
+        color: #94693e;
+        text-align: center;
+        font-size: 36px;
+        margin-bottom: 10px;
+        padding-top: 25px;
+    }
+
+    h2 {
+        font-weight: bold;
+        font-size: 25px;
+        color: #6b4f2f;
+        text-align: center;
+        font-style: italic;
+        margin-top: 50px;
+        margin-bottom: 20px;
+    }
+
+    h3 {
+        font-weight: bold;
+        font-size: 25px;
+        color: #6b4f2f;
+        text-align: center;
+        font-style: italic;
+        margin-top: 50px;
+        margin-bottom: 20px;
+    }
+
+    .cat-grid {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 30px;
+        margin-top: 20px;
+        max-width: 90%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .cat-card {
+        background-color: #ffffff;
+        padding: 30px;
+        width: 230px;
+        height: 350px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+        cursor: pointer;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        color: #6b4f2f;
+    }
+
+    .cat-card:hover {
+        transform: scale(1.15);
+        background-color: #fcfaed;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .cat-card img {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        margin-bottom: 40px;
+        object-fit: cover;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        transition: transform 0.3s ease;
+    }
+
+    .cat-card:hover img {
+        transform: scale(1.2);
+        filter: brightness(1.1) contrast(1.1);
+    }
+
+    .cat-card p {
+        margin: 10px 0;
+    }
+
+    .cat-card a {
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .cat-card a:hover {
+        text-decoration: none;
+        background-color: transparent;
+        color: inherit;
+    }
+
+    form {
+        max-width: 600px;
+        margin: 40px auto 60px auto;
+        background-color: #fffaf3;
+        border-radius: 15px;
+        padding: 25px 40px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+        color: #6b4f2f;
+        font-weight: bold;
+        font-size: 18px;
+    }
+
+    form label {
+        display: block;
+        margin-bottom: 15px;
+    }
+
+    form select {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 2px solid #94693e;
+        background-color: #fffbe9;
+        font-size: 16px;
+        outline: none;
+        cursor: pointer;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-image: url("/static/cat_paws_icon.png");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 24px;
+        margin-top: 5px;
+    }
+
+    form button{
+        width: 100%;
+        padding: 12px;
+        background-color: #dccbb7;
+        border-radius: 15px;
+        border: none;
+        color: #6b4f2f;
+        font-size: 20px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+        margin-top: 25px;
+    }    
+        
+    form button:hover {
+        background-color: #d4bfae;
+        border-radius: 15px;
+        transform: scale(1.05);
+        box-shadow: 0px 8px 15px rgba(255, 163, 71, 0.2);
+    }
+
+    .relationship-item {
+        background: #fffbe9;
+        color: #6b4f2f;
+        max-width: 700px;
+        margin: 0 auto 80px auto;
+        font-size: 18px;
+        line-height: 1.6;
+        padding: 15px 160px 15px 20px;
+        border-radius: 12px;        
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);        
+        margin-bottom: 18px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+    }
+
+    .relationship-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+    }
+
+    .cat-info {
+        text-align: center;
+        width: 120px;
+    }
+
+    .cat-info img {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        margin-bottom: 8px;
+    }
+
+    .cat-info div {
+        font-weight: 600;
+        color: #6b4f2f;
+    }
+
+    .relationship-arrow {
+        font-size: 35px;  
+        color: #94693e; 
+        text-align: center;
+        margin-top: 10px;
+        display: block; 
+    }
+
+    form.inline {
+        display: inline-flex;  
+        align-items: center;
+        margin: 0;
+        padding: 0;
+        box-shadow: none;
+        vertical-align: middle;
+    }
+
+    .action-buttons {
+        position: absolute;
+        top: 50%; 
+        right: 30px;
+        transform: translateY(-50%); 
+        display: flex;
+        gap: 10px; 
+        white-space: nowrap;
+    }
+    .action-button {
+        border: none;
+        background-color: #bb5a5a;
+        color: white;
+        margin: 0;
+        height: 36px;
+        padding: 0 16px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+    }
+
+    .action-button:hover {
+        background-color: #d24141;
+        border-radius: 12px;
+    }
+
+    .graph-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0 auto;
+        max-width: 100%;
+        padding: 1rem;
+        border-radius: 12px;
+    }
+
+    #cat-graph {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .modal {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(6px);
+        z-index: 999;
+    }
+
+    .modal-content {
+        background-color: #faf9f7;
+        padding: 50px; 
+        border-radius: 20px;
+        max-width: 600px;
+        height: auto; 
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        position: relative;
+        border: 2px solid #94693e;
+    }
+
+    .modal-content h2 {
+        margin: 0 25px;
+        }
+
+    .modal-content label {
+        margin-bottom: 5px;
+    }
+
+        
+    .modal-content input,
+    .modal-content select {
+        margin-bottom: 15px;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .edit-form {
+        max-width: none;
+        margin: 0; 
+        padding: 0;         
+        background-color: transparent;
+        box-shadow: none;
+        font-size: 16px;
+    }
+
+    .edit-form button {
+        padding: 10px 20px;
+        background-color: #dccbb7;
+        color: #6b4f2f;
+        border-radius: 15px;
+        border: none;
+        font-size: 20px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+    }
+
+</style>
+
+<h1>Cat Relationship Tree</h1>
+
+<h2>All Cat</h2>
+
+<div class="cat-grid">
+        {% for cat in profiles %}
+            <div class="cat-card">
+                <a href="/single_profile?name={{ cat.name | lower }}">
+                    {% if cat.photo %}
+                        <img class="profile-picture" src="{{ url_for('static', filename='uploads/' + cat['photo']) }}" alt="{{ cat['name'] }}">
+                    {% else %}
+                        <img class="profile-picture" src="{{ url_for('static', filename='uploads/default.png') }}" alt="Default Placeholder">
+                    {% endif %}
+                    <p><strong>Name: </strong>{{ cat.name }}</p>
+                    <p><strong>Gender: </strong>{{ cat.gender }}</p>
+                </a>    
+            </div>
+        {% endfor %}
+</div>
+
+<hr>
+
+<h2>Add Cat Relationship</h2>
+<form method="POST" action="{{ url_for('relationship.relationship_feature') }}">
+    <input type="hidden" name="action" value="add" />
+
+    <label>Cat A:
+        <select name="catA_id" required>
+            <option value="" disabled selected hidden>-- Please select --</option>
+            {% for cat in profiles %}
+                <option value="{{ cat.id }}">{{ cat.name }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <label>Cat B:
+        <select name="catB_id" required>
+            <option value="" disabled selected hidden>-- Please select --</option>
+            {% for cat in profiles %}
+                <option value="{{ cat.id }}">{{ cat.name }}</option>
+            {% endfor %}
+        </select>
+    </label>
+
+    <label>Relationship:
+        <select name="relation_type" id="relation_type" required onchange="checkOther(this)">
+        <option value="" disabled selected hidden>-- Please select --</option>
+            <option value="Friend">Friend</option>
+            <option value="Partner">Partner</option>
+            <option value="Sibling">Sibling</option>
+            <option value="Parent">Parent</option>
+            <option value="Offspring">Offspring</option>
+            <option value="Rival">Rival</option>
+            <option value="Neighbouur">Neighbour</option>
+            <option value="Other">Other</option>
+        </select>
+    </label>
+
+    <label id="other_relation_label" style="display:none; margin-top:10px;">
+        Please specify:
+        <input type="text" name="other_relation" id="other_relation" />
+    </label>
+
+    <label>Arrow Direction:<span style="color:red;">*</span></label>
+        <input type="radio" name="direction" value="forward" required> A → B<br>
+        <input type="radio" name="direction" value="both" required> A ↔ B<br>
+
+        <button type="submit">Add Relationship</button>
+
+    </form>
+
+    <h3>Current Relationships</h3>
+    <ul>
+    {% for rel in relations %}
+        <li class= "relationship-item">
+            <div class="relationship-content">
+
+                <!-- Cat A -->
+                <div class="cat-info">
+                    <img src="{{ url_for('static', filename='uploads/' + rel.catA_photo if rel.catA_photo else 'uploads/default.png') }}" alt="{{ rel.catA_name }}">
+                    <div>{{ rel.catA_name }}</div>
+                </div>
+
+                <!-- Relationship -->
+                <div style="font-weight: bold; font-size: 18px; color: #94693e; white-space: nowrap;">
+                    {{ rel.relation_type }}
+                </div>
+
+                <!-- Arrow -->
+                <div class="relationship-arrow">
+                    {% if rel.direction == 'forward' %}
+                        &#8594;  <!-- Right arrow (→) -->
+                    {% elif rel.direction == 'both' %}
+                        &#8596;  <!-- Both sided arrow (↔) -->
+                    {% endif %}
+                </div>
+
+                <!-- Cat B -->
+                <div class="cat-info">
+                    <img src="{{ url_for('static', filename='uploads/' + rel.catB_photo if rel.catB_photo else 'uploads/default.png') }}" alt="{{ rel.catB_name }}">
+                    <div>{{ rel.catB_name }}</div>
+                </div>
+
+                <div class="action-buttons">
+                    <!-- Edit Button -->
+                    <button class = "action-button" onclick="openEditModal({{ rel.id }}, '{{ rel.catA_id }}', '{{ rel.catB_id }}', '{{ rel.relation_type }}', '{{ rel.direction }}')">
+                        Edit
+                    </button>
+
+                    <!-- Delete Button -->
+                    <form method="POST"  class="inline" action="{{ url_for('relationship.relationship_feature') }}" onsubmit="return confirm('Are you sure you want to delete this relationship?');" style="margin-left: 20px;">
+                        <input type="hidden" name="action" value="delete" />
+                        <input type="hidden" name="rel_id" value="{{ rel.id }}" />
+                        <button class = "action-button" type="submit">Delete</button>
+                    </form>
+                </div>
+
+            </div>
+        </li>
+
+    {% else %}
+        <li>No relationship data available</li>
+    {% endfor %}
+    </ul>
+
+    <div id="editModal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Edit Relationship</h2>
+            <form method="POST" class="edit-form">
+                <input type="hidden" name="action" value="edit">
+                <input type="hidden" name="rel_id" id="edit_rel_id">
+                
+                <label>Cat A:</label>
+                <select name="catA_id" id="edit_catA_id">
+                {% for cat in profiles %}
+                    <option value="{{ cat.id }}">{{ cat.name }}</option>
+                {% endfor %}
+                </select><br>
+
+                <label>Cat B:</label>
+                <select name="catB_id" id="edit_catB_id">
+                {% for cat in profiles %}
+                    <option value="{{ cat.id }}">{{ cat.name }}</option>
+                {% endfor %}
+                </select><br>
+
+                <label>Relation Type:</label>
+                <input type="text" name="relation_type" id="edit_relation_type"><br>
+
+                <label>Direction:</label>
+                <select name="direction" id="edit_direction">
+                <option value="both">↔ Both</option>
+                <option value="forward">→ Forward</option>
+                </select><br><br>
+
+                <button type="submit">Save Changes</button>
+                <button type="button" onclick="closeEditModal()">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <h2>Relationship Graph</h2>
+    <div class="graph-container">
+        <object id="cat-graph" type="image/svg+xml" data="{{ tree_img }}" alt="Cat Relationship Tree"></object>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+        <a href="{{ url_for('relationship.view_graph') }}">
+            <button style="padding: 12px 24px; margin-bottom: 20px; font-size: 16px; background-color: #dccbb7; color: #6b4f2f; border: none; border-radius: 12px; cursor: pointer;">
+                View All Users' Cat Graph →
+            </button>
+        </a>
+    </div>
+</body>
+
+<script>
+function checkOther(select) {
+    const otherLabel = document.getElementById('other_relation_label');
+    const otherInput = document.getElementById('other_relation');
+    if (select.value === 'Other') {
+        otherLabel.style.display = 'block';
+        otherInput.setAttribute('required', 'required');
+    } else {
+        otherLabel.style.display = 'none';
+        otherInput.removeAttribute('required');
+        otherInput.value = '';
+    }
+}
+
+function openEditModal(id, catA, catB, relation, direction) {
+  document.getElementById('edit_rel_id').value = id;
+  document.getElementById('edit_catA_id').value = catA;
+  document.getElementById('edit_catB_id').value = catB;
+  document.getElementById('edit_relation_type').value = relation;
+  document.getElementById('edit_direction').value = direction;
+  document.getElementById('editModal').style.display = 'flex';
+}
+
+function closeEditModal() {
+  document.getElementById('editModal').style.display = 'none';
+}
+
+const catPhotos = {{ cat_photos|tojson }};
+document.addEventListener('DOMContentLoaded', function () {
+    const object = document.getElementById('cat-graph');
+    object.addEventListener('load', function () {
+        const svgDoc = object.contentDocument;
+        const nodes = svgDoc.querySelectorAll('text');
+        let clipId = 0;
+
+        nodes.forEach(node => {
+            if (node.textContent.trim() === '[PIC]') {
+                let texts = node.parentNode.querySelectorAll('text');
+                let nameNode = texts.length > 1 ? texts[1] : node;
+                let catName = nameNode.textContent.trim();
+                let imgUrl = catPhotos[catName];
+                if (!imgUrl) return;
+
+                let x = parseFloat(nameNode.getAttribute('x')) || 0;
+                let y = parseFloat(nameNode.getAttribute('y')) || 0;
+                let textLength = nameNode.getComputedTextLength ? nameNode.getComputedTextLength() : 0;
+                let centerX = x + textLength / 2;
+
+                const radius = 20;
+                const size = radius * 2;
+                const gap = 12;
+                const cx = centerX;
+                const cy = y - gap - radius;
+
+                const thisClipId = 'catclip' + (clipId++);
+                const clipPath = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
+                clipPath.setAttribute('id', thisClipId);
+
+                const circle = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', cx);
+                circle.setAttribute('cy', cy);
+                circle.setAttribute('r', radius);
+                clipPath.appendChild(circle);
+
+                let defs = svgDoc.querySelector('defs');
+                if (!defs) {
+                    defs = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                    svgDoc.documentElement.insertBefore(defs, svgDoc.documentElement.firstChild);
+                }
+                defs.appendChild(clipPath);
+
+                const img = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'image');
+                img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', imgUrl);
+                img.setAttribute('width', size);
+                img.setAttribute('height', size);
+                img.setAttribute('x', cx - radius);
+                img.setAttribute('y', cy - radius);
+                img.setAttribute('clip-path', `url(#${thisClipId})`);
+                img.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+                node.parentNode.appendChild(img);
+                node.textContent = '';
+            }
+        });
+    });
+});
+</script>
+
+{% endblock %}
