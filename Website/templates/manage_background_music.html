@@ -76,10 +76,10 @@
 
     <!-- Upload New Background Music Form -->
     <form action="{{ url_for('music.upload') }}" method="POST" enctype="multipart/form-data">
-        <label for="music_name"><b>Music Name</b></label><br>
-        <input type="text" name="music_name" id="music_name" placeholder="Enter music name" required><br><br>
+        <label for="music_title"><b>Music Title</b></label><br>
+        <input type="text" name="music_title" id="music_title" placeholder="Enter music title" required><br><br>
 
-        <label for="music_file"><b>Upload File (.mp3 or .ogg)</b></label><br>
+        <label for="music_file"><b>Upload File (.mp3)</b></label><br>
         <input type="file" name="music_file" id="music_file" accept=".mp3,.ogg" required><br><br>
 
         <button type="submit" class="add-btn">Upload Music</button>
@@ -90,7 +90,7 @@
         <thead>
             <tr>
                 <th style="width: 50px;">ID</th>
-                <th>Music Name</th>
+                <th>Music Title</th>
                 <th>Filename</th>
                 <th>Audio Preview</th>
                 <th>Actions</th>
@@ -100,7 +100,7 @@
             {% for music in music_list %}
             <tr>
                 <td>{{ music.id }}</td>
-                <td>{{ music.name }}</td>
+                <td>{{ music.title}}</td>
                 <td>{{ music.filename }}</td>
                 <td>
                     <audio controls>
