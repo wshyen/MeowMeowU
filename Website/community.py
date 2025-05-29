@@ -27,7 +27,6 @@ def get_cat_names():
     conn = get_db_connection()
     if conn is None:
         return []
-
     cursor = conn.cursor()
     cursor.execute('SELECT name FROM profiles')
     cat_names = [row['name'] for row in cursor.fetchall()]
