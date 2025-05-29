@@ -196,6 +196,7 @@ def view_graph():
     return render_template(
         'relationship_viewer.html', 
         user=current_user, 
+        profiles=cats,
         relations=relations,
         tree_img=graph_svg,
         cat_photos=cat_photos

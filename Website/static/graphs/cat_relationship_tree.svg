@@ -67,7 +67,7 @@
 <path fill="none" stroke="black" stroke-width="1.2" d="M133.28,-256.04C133.28,-243.73 133.28,-230.45 133.28,-218.17"/>
 <polygon fill="black" stroke="black" stroke-width="1.2" points="131.18,-255.84 133.28,-261.84 135.38,-255.84 131.18,-255.84"/>
 <polygon fill="black" stroke="black" stroke-width="1.2" points="135.38,-218.49 133.28,-212.49 131.18,-218.49 135.38,-218.49"/>
-<text text-anchor="middle" x="150.9" y="-232.3" font-family="Times New Roman,serif" font-size="14.00">Friend</text>
+<text text-anchor="middle" x="150.53" y="-232.3" font-family="Times New Roman,serif" font-size="14.00">Parent</text>
 </g>
 </g>
 </svg>
