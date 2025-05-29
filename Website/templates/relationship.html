@@ -240,7 +240,7 @@
     }
 
     .action-button:hover {
-        background-color: #8a3c3c;
+        background-color: #d24141;
         border-radius: 12px;
     }
 
@@ -258,6 +258,58 @@
         max-width: 100%;
         height: auto;
     }
+
+    .modal {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(6px);
+        z-index: 999;
+    }
+
+    .modal-content {
+        background-color: #faf9f7;
+        padding: 50px; 
+        border-radius: 20px;
+        max-width: 600px;
+        height: auto; 
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        position: relative;
+        border: 2px solid #94693e;
+    }
+
+    .modal-content h2 {
+        margin: 0 25px;
+        }
+
+    .hidden {
+        display: none;
+    }
+
+    .edit-form {
+        max-width: none;
+        margin: 0; 
+        padding: 0;         
+        background-color: transparent;
+        box-shadow: none;
+        font-size: 16px;
+    }
+
+    .edit-form button {
+        padding: 10px 20px;
+        background-color: #dccbb7;
+        color: #6b4f2f;
+        border-radius: 15px;
+        border: none;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+    }
+
 </style>
 
 <h1>Cat Relationship Tree</h1>
@@ -312,7 +364,7 @@
             <option value="Parent">Parent</option>
             <option value="Offspring">Offspring</option>
             <option value="Rival">Rival</option>
-            <option value="Neighbor">Neighbor</option>
+            <option value="Neighbouur">Neighbour</option>
             <option value="Other">Other</option>
         </select>
     </label>
@@ -375,38 +427,40 @@
     {% endfor %}
     </ul>
 
-    <div id="editModal" style="display:none; position:fixed; top:20%; left:35%; background:white; padding:20px; border:1px solid blaborderck; z-index:9999;">
-    <h3>Edit Relationship</h3>
-    <form method="POST">
-        <input type="hidden" name="action" value="edit">
-        <input type="hidden" name="rel_id" id="edit_rel_id">
-        
-        <label>Cat A:</label>
-        <select name="catA_id" id="edit_catA_id">
-        {% for cat in profiles %}
-            <option value="{{ cat.id }}">{{ cat.name }}</option>
-        {% endfor %}
-        </select><br>
+    <div id="editModal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Edit Relationship</h2>
+            <form method="POST" class="edit-form">
+                <input type="hidden" name="action" value="edit">
+                <input type="hidden" name="rel_id" id="edit_rel_id">
+                
+                <label>Cat A:</label>
+                <select name="catA_id" id="edit_catA_id">
+                {% for cat in profiles %}
+                    <option value="{{ cat.id }}">{{ cat.name }}</option>
+                {% endfor %}
+                </select><br>
 
-        <label>Cat B:</label>
-        <select name="catB_id" id="edit_catB_id">
-        {% for cat in profiles %}
-            <option value="{{ cat.id }}">{{ cat.name }}</option>
-        {% endfor %}
-        </select><br>
+                <label>Cat B:</label>
+                <select name="catB_id" id="edit_catB_id">
+                {% for cat in profiles %}
+                    <option value="{{ cat.id }}">{{ cat.name }}</option>
+                {% endfor %}
+                </select><br>
 
-        <label>Relation Type:</label>
-        <input type="text" name="relation_type" id="edit_relation_type"><br>
+                <label>Relation Type:</label>
+                <input type="text" name="relation_type" id="edit_relation_type"><br>
 
-        <label>Direction:</label>
-        <select name="direction" id="edit_direction">
-        <option value="both">↔ Both</option>
-        <option value="forward">→ Forward</option>
-        </select><br><br>
+                <label>Direction:</label>
+                <select name="direction" id="edit_direction">
+                <option value="both">↔ Both</option>
+                <option value="forward">→ Forward</option>
+                </select><br><br>
 
-        <button type="submit">Save Changes</button>
-        <button type="button" onclick="closeEditModal()">Cancel</button>
-    </form>
+                <button type="submit">Save Changes</button>
+                <button type="button" onclick="closeEditModal()">Cancel</button>
+            </form>
+        </div>
     </div>
 
     <h2>Relationship Graph</h2>
@@ -436,7 +490,7 @@ function openEditModal(id, catA, catB, relation, direction) {
   document.getElementById('edit_catB_id').value = catB;
   document.getElementById('edit_relation_type').value = relation;
   document.getElementById('edit_direction').value = direction;
-  document.getElementById('editModal').style.display = 'block';
+  document.getElementById('editModal').style.display = 'flex';
 }
 
 function closeEditModal() {
