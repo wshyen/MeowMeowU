@@ -6,50 +6,144 @@
 <style>
     body {
         background-color: #f2eadf;
-        }
+    }
+
     /* Container for profile picture (circular with shadow) */
     .profile-picture-container {
         width: 120px;
         height: 120px;
-        border-radius: 50%;  /* Ensures a circular shape */
-        background-color: #e0e0e0;  
-        display: flex;  /* Use flexbox for centering content */
-        align-items: center;  /* Vertical alignment */
-        justify-content: center;  /* Horizontal alignment */
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);  /* Adds a shadow for styling */
-        margin: 0 auto 15px;  /* Centers the circle and adds spacing below */
-        overflow: hidden;  /* Ensures no content overflows the circle */
+        border-radius: 50%;
+        /* Ensures a circular shape */
+        background-color: #e0e0e0;
+        display: flex;
+        /* Use flexbox for centering content */
+        align-items: center;
+        /* Vertical alignment */
+        justify-content: center;
+        /* Horizontal alignment */
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        /* Adds a shadow for styling */
+        margin: 0 auto 15px;
+        /* Centers the circle and adds spacing below */
+        overflow: hidden;
+        /* Ensures no content overflows the circle */
     }
 
-    /* Ensure the image fills the container properly */
     .profile-picture-container img {
-        width: 100%;  
-        height: 100%;  
-        object-fit: cover;  /* Maintain aspect ratio while filling the circle */
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        /* Maintain aspect ratio while filling the circle */
     }
 
-    /* Style for the placeholder text */
     .profile-placeholder {
-        color: #888;  
-        font-size: 14px;  
+        color: #888;
+        font-size: 14px;
+    }
+
+    .confirmation-container {
+        text-align: center;
+        margin-top: 50px;
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    .warning-message {
+        color: red;
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    .profile-card {
+        border: 1px solid #ddd;
+        padding: 20px;
+        margin: 0 auto 20px;
+        width: 400px;
+        text-align: center;
+        border-radius: 10px;
+        background-color: #f9f9f9;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .button-group {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .cancel-button {
+        padding: 10px 0;
+        width: 150px;
+        height: 40px;
+        background-color: gray;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 16px;
+        font-family: 'Times New Roman', Times, serif;
+        box-sizing: border-box;
+    }
+
+    .cancel-button:hover {
+        text-decoration: none;
+        color: white;
+        background-color: darkgray;
+        transform: scale(1.05);
+        cursor: pointer;
+    }
+
+    .confirm-button {
+        padding: 10px 0;
+        width: 150px;
+        height: 40px;
+        background-color: red;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 16px;
+        font-family: 'Times New Roman', Times, serif;
+        box-sizing: border-box;
+        outline: none;
+        cursor: pointer;
+    }
+
+    .confirm-button:hover {
+        text-decoration: none;
+        color: white;
+        background-color: darkred;
+        transform: scale(1.05);
+        cursor: pointer;
+    }
+
+    form {
+        margin: 0;
     }
 </style>
 <!-- confirmation box -->
-<div style="text-align: center; margin-top: 50px; font-family: 'Times New Roman', Times, serif;">
+<div class="confirmation-container">
     <h1>Are you sure you want to delete the profile for "{{ profile.name }}"?</h1>
-    
+
     <!-- warning message -->
-    <p style="color: red; font-size: 15px; font-weight: bold; margin-bottom: 20px;">This action cannot be undone.</p>
-    
+    <p class="warning-message">This action cannot be undone.</p>
+
     <!-- display profile details inside a styled card -->
-    <div style="border: 1px solid #ddd; padding: 20px; margin: 0 auto 20px; width: 400px; text-align: center; border-radius: 10px; background-color: #f9f9f9; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+    <div class="profile-card">
         <div class="profile-picture-container">
             {% if profile.photo %}
             <!-- show profile picture if there is one-->
-                <img src="{{ url_for('static', filename=profile.photo) }}" alt="Profile Picture">
+            <img src="{{ url_for('static', filename=profile.photo) }}" alt="Profile Picture">
             {% else %}
-                <!-- placeholder if no photo -->
-                <span class="profile-placeholder">Profile Picture</span>
+            <!-- placeholder if no photo -->
+            <span class="profile-placeholder">Profile Picture</span>
             {% endif %}
         </div>
 
@@ -61,17 +155,15 @@
     </div>
 
     <!-- buttons to confirm or cancel -->
-    <div style="display: flex; justify-content: center; gap: 20px; margin-top: 20px;">
+    <div class="button-group">
         <!-- if cancel, go back to view profile page -->
-        <a href="{{ url_for('catprofile.view_profiles') }}" 
-           style="padding: 10px 0; width: 150px; height: 40px; background-color: gray; color: white; text-decoration: none; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; font-family: 'Times New Roman', Times, serif; box-sizing: border-box;">
+        <a href="{{ url_for('catprofile.view_profiles') }}" class="cancel-button">
             Cancel
         </a>
 
         <!-- confirm deletion form -->
-        <form action="{{ url_for('catprofile.delete_profile', id=profile.id) }}" method="POST" style="margin: 0;">
-            <button type="submit" 
-                    style="padding: 10px 0; width: 150px; height: 40px; background-color: red; color: white; border: none; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; font-family: 'Times New Roman', Times, serif; box-sizing: border-box; outline: none; cursor: pointer;">
+        <form action="{{ url_for('catprofile.delete_profile', id=profile.id) }}" method="POST">
+            <button type="submit" class="confirm-button">
                 Confirm
             </button>
         </form>
