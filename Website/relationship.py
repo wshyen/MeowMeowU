@@ -68,6 +68,9 @@ def relationship_feature():
     cursor = conn.cursor()
 
     if request.method == 'POST':
+        if not current_user.is_authenticated:
+            flash("You must be logged in to add relationship!", category="error")
+            return redirect(url_for('auth.login'))
         action = request.form.get('action')
 
         if action == 'add':
@@ -114,23 +117,26 @@ def relationship_feature():
                 conn.commit()
             return redirect(url_for('relationship.relationship_feature'))
 
-
     cats = cursor.execute("SELECT id, name, gender, photo FROM profiles").fetchall()
-    relations = cursor.execute("""
-        SELECT cr.id, cr.catA_id, cr.catB_id, cr.relation_type, cr.direction,
-            p1.name AS catA_name, p1.photo AS catA_photo,
-            p2.name AS catB_name, p2.photo AS catB_photo
-        FROM cat_relationship cr
-        JOIN profiles p1 ON cr.catA_id = p1.id
-        JOIN profiles p2 ON cr.catB_id = p2.id
-        WHERE cr.user_id = ?
-    """, (current_user.id,)).fetchall()
+
+    if current_user.is_authenticated:
+        relations = cursor.execute("""
+            SELECT cr.id, cr.catA_id, cr.catB_id, cr.relation_type, cr.direction,
+                p1.name AS catA_name, p1.photo AS catA_photo,
+                p2.name AS catB_name, p2.photo AS catB_photo
+            FROM cat_relationship cr
+            JOIN profiles p1 ON cr.catA_id = p1.id
+            JOIN profiles p2 ON cr.catB_id = p2.id
+            WHERE cr.user_id = ?
+        """, (current_user.id,)).fetchall()
+    else:
+        relations = []
 
     graph_svg = generate_graph(relations)
     cat_photos = {cat['name']: url_for('static', filename=f'uploads/{cat["photo"]}') for cat in cats}
 
     return render_template(
-        'relationship.html',
+        'relationship_manager.html',
         user=current_user,
         profiles=cats,
         relations=relations,
@@ -139,17 +145,46 @@ def relationship_feature():
     )    
 
 
-@relationship_bp.route('/graph')
+@relationship_bp.route('/graph', methods=['GET', 'POST'])
 def view_graph():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    #all relationship
-    cats = cursor.execute("SELECT id, name, gender, photo FROM profiles").fetchall()   
+    action = request.form.get('action')
+
+    if action == 'edit':
+        rel_id = request.form.get('rel_id')
+        catA_id = request.form.get('catA_id')
+        catB_id = request.form.get('catB_id')
+        relation_type = request.form.get('relation_type')
+        other_relation = request.form.get('other_relation')
+        direction = request.form.get('direction')
+
+        if relation_type == 'Other' and other_relation and other_relation.strip():
+            relation_type = other_relation.strip()
+
+        if rel_id and catA_id and catB_id and relation_type and catA_id != catB_id:
+            cursor.execute(
+                "UPDATE cat_relationship SET catA_id=?, catB_id=?, relation_type=?, direction=? WHERE id=?",
+                (catA_id, catB_id, relation_type, direction, rel_id)
+            )
+            conn.commit()
+        return redirect(url_for('relationship.view_graph'))
+
+    elif action == 'delete':
+        rel_id = request.form.get('rel_id')
+        if rel_id:
+            cursor.execute("DELETE FROM cat_relationship WHERE id = ?", (rel_id,))
+            conn.commit()
+        return redirect(url_for('relationship.view_graph'))
+
+    cats = cursor.execute("SELECT id, name, gender, photo FROM profiles").fetchall()
+
+    #all relationship 
     relations = cursor.execute("""
         SELECT cr.id, cr.catA_id, cr.catB_id, cr.relation_type, cr.direction,
-               p1.name AS catA_name, p1.photo AS catA_photo,
-               p2.name AS catB_name, p2.photo AS catB_photo
+            p1.name AS catA_name, p1.photo AS catA_photo,
+            p2.name AS catB_name, p2.photo AS catB_photo
         FROM cat_relationship cr
         JOIN profiles p1 ON cr.catA_id = p1.id
         JOIN profiles p2 ON cr.catB_id = p2.id
@@ -159,8 +194,10 @@ def view_graph():
     cat_photos = {cat['name']: url_for('static', filename=f'uploads/{cat["photo"]}') for cat in cats}
 
     return render_template(
-        'relationship_tree.html', 
+        'relationship_viewer.html', 
         user=current_user, 
+        profiles=cats,
+        relations=relations,
         tree_img=graph_svg,
         cat_photos=cat_photos
         )
