@@ -1,4 +1,4 @@
-{% extends 'base.html' %} 
+{% extends 'base.html' %}
 
 {% block title %}View Cat Profiles{% endblock %}
 
@@ -7,57 +7,87 @@
     body {
         background-color: #f2eadf;
     }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 20px;
+        font-family: 'Times New Roman', Times, serif;
+        color: #94693e;
+        font-weight: bold;
+    }
+
     .profile-picture {
-        width: 100px; 
-        height: 100px;
-        border-radius: 50%; 
-        object-fit: cover;
-        display: block;
-    }
-    .profile-card p {
-        word-wrap: break-word;  /*Ensures long words break properly*/
-        overflow-wrap: anywhere;  /*Handles text wrapping more effectively*/
-        line-height: 1.5;  /*Improves readability of description text*/
-    }
-    .profile-card {
-        border-radius: 12px;
-        background: #fff;
-        overflow: hidden;
-        padding: 20px;
-        text-align: left;
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-        flex-direction: column;
-        justify-content: flex-start;
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        border: 2px solid #ddd;
+        margin: 0 auto;
         position: relative;
+        overflow: hidden;
+        display: block;
+        object-fit: cover;
     }
-    .profile-card p.description {
-        text-align:center;
+
+    .profile-card h2 {
+        margin: 0 0 10px;
+        font-size: 1.5rem;
+        color: #333;
+    }
+
+    .profile-card p {
+        margin: 0 0 5px;
+        font-size: 0.9rem;
+        color: #333;
+        word-wrap: break-word;
+        overflow-wrap: anywhere;
+        line-height: 1.5;
+    }
+
+    .description {
+        text-align: center;
         flex-grow: 1;
         overflow: visible;
         margin-top: 10px;
-    }
-    .profile-container {
-        display: flex;  /*Use flexbox for consistent alignment*/
-        flex-wrap: wrap;  /* Wrap cards to the next row if they exceed the container width*/
-        gap: 15px;  /*Add spacing between profile cards*/
-        justify-content: center;  /*Center-align profile cards*/
-    }
-    .description {
-        flex-grow: 1;  /* Allows the description to take up available space */
-        overflow: visible;
         white-space: normal;
     }
+
+    .profile-card {
+        width: 300px;
+        height: 470px;
+        border-radius: 12px;
+        background: #fff;
+        overflow: hidden;
+        padding: 18px;
+        text-align: center;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        font-family: 'Times New Roman', Times, serif;
+        position: relative;
+    }
+
+    .profile-container {
+        display: flex;
+        /*Use flexbox for consistent alignment*/
+        flex-wrap: wrap;
+        /* Wrap cards to the next row if they exceed the container width*/
+        gap: 15px;
+        /*Add spacing between profile cards*/
+        justify-content: center;
+        /*Center-align profile cards*/
+    }
+
     .actions {
         position: absolute;
         bottom: 10px;
         left: 10px;
         width: calc(100% - 20px);
         display: flex;
-        justify-content: space-between; /* Space between edit and delete button */
+        justify-content: space-between;
+        /* Space between edit and delete button */
         align-items: center;
         padding: 0 10px;
         box-sizing: border-box;
     }
+
     .action-btn {
         padding: 10px 15px;
         background: #94693e;
@@ -67,54 +97,86 @@
         font-size: 0.9rem;
         cursor: pointer;
         font-weight: bold;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
     }
+
+    .action-btn:hover {
+        text-decoration: none;
+        /* prevent underline on hover */
+        color: white;
+        /* keep text white on hover */
+        background-color: #7a5730;
+        /* optionally darken button on hover */
+    }
+
     .action-btn.delete {
-        background: #ff0000;  
-        margin-right: 10px;  
+        background: #ff0000;
+        margin-right: 5px;
+    }
+
+    .action-btn.delete:hover {
+        background-color: #cc0000;
+        /* darker red on hover */
+        color: white;
+        text-decoration: none;
+    }
+
+    .empty-message {
+        margin-top: 20px;
+        font-size: 1.2rem;
+        color: #555;
+        text-align: center;
+    }
+
+    .empty-message a {
+        color: #007bff;
+        text-decoration: none;
     }
 </style>
 
 <!-- main content container -->
 <div style="padding: 20px;">
-    <h1 style="text-align: center; margin-bottom: 20px; font-family: 'Times New Roman', Times, serif; color: #94693e; font-weight: bold;">Cat Profiles</h1>
+    <h1>Cat Profiles</h1>
 
     <!-- container for profile cards -->
     <div class="profile-container">
         {% for profile in profiles %}
-            {% if not profile.deleted %}
+        {% if not profile.deleted %}
 
         <!-- profile card box -->
-            <div class="profile-card" style="display: inline-block; width: 300px; height: 470px; border-radius: 12px; background: #fff; overflow: hidden; padding: 18px; text-align: center; margin-right: 15px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); font-family: 'Times New Roman', Times, serif;">
-                {% if profile.photo %}
-                    <img class="profile-picture" src="{{ url_for('static', filename='uploads/' + profile.photo) }}" alt="{{ profile.name }}" style="width: 150px; height: 150px; border-radius: 50%; border: 2px solid #ddd; margin: 0 auto; position: relative; overflow: hidden; display: block; object-fit: cover;">
-                {% else %}
-                    <img class="profile-picture" src="{{ url_for('static', filename='uploads/default.png') }}" alt="Default Placeholder">
-                {% endif %}
-                <h2 style="margin: 0 0 10px; font-size: 1.5rem; color: #333;">{{ profile.name }}</h2>
-                <p style="margin: 0 0 5px; font-size: 0.9rem; color: #333"><strong>Gender:</strong> {{ profile.gender }}</p>
-                <p style="margin: 0 0 5px; font-size: 0.9rem; color: #333"><strong>Color:</strong> {{ profile.color }}</p>
-                <p class="description" style="margin: 0 0 10px; font-size: 0.9rem; color: #333;">
-                    <strong>Description:</strong> {{ profile.description or 'No description available.' }}
-                </p>
+        <div class="profile-card">
+            {% if profile.photo %}
+            <img class="profile-picture" src="{{ url_for('static', filename='uploads/' + profile.photo) }}"
+                alt="{{ profile.name }}">
+            {% else %}
+            <img class="profile-picture" src="{{ url_for('static', filename='uploads/default.png') }}"
+                alt="Default Placeholder">
+            {% endif %}
+            <h2>{{ profile.name }}</h2>
+            <p><strong>Gender:</strong> {{ profile.gender }}</p>
+            <p><strong>Color:</strong> {{ profile.color }}</p>
+            <p class="description">
+                <strong>Description:</strong> {{ profile.description or 'No description available.' }}
+            </p>
 
-                <!-- edit and delete buttons -->
-                {% if current_user.is_authenticated %}
-                    <div class="actions">
-                        <a href="{{ url_for('catprofile.edit_profile', id=profile.id) }}" 
-                        style="padding: 10px 15px; background: #94693e; color: white; text-decoration: none; border-radius: 5px; font-size: 0.9rem; cursor: pointer; font-weight: bold;">Edit</a>
+            <!-- edit and delete buttons -->
+            {% if current_user.is_authenticated %}
+            <div class="actions">
+                <a href="{{ url_for('catprofile.edit_profile', id=profile.id) }}" class="action-btn">Edit</a>
 
-                        {% if profile.creator|int == current_user.id|int %}
-                        <a href="{{ url_for('catprofile.confirm_delete', id=profile.id) }}""
-                            style="padding: 10px 15px; background: #ff0000; color: white; text-decoration: none; border-radius: 5px; font-size: 0.9; cursor: pointer; font-weight: bold; margin-right: 10px;">Delete</a>
-                        {% endif %}
-                    </div>
+                {% if profile.creator|int == current_user.id|int %}
+                <a href="{{ url_for('catprofile.confirm_delete', id=profile.id) }}" class="action-btn delete">Delete</a>
                 {% endif %}
             </div>
+            {% endif %}
+        </div>
         {% endif %}
-    {% endfor %}
+        {% endfor %}
     </div>
     {% if profiles|length == 0 %}
-    <p style="margin-top: 20px; font-size: 1.2rem; color: #555; text-align: center;">No profiles found. Create one by clicking <a href="{{ url_for('auth.create_profiles') }}" style="color: #007bff; text-decoration: none;">here</a>.</p>
+    <p class="empty-message">No profiles found. Create one by clicking <a
+            href="{{ url_for('auth.create_profiles') }}">here</a>.</p>
     {% endif %}
 </div>
 {% endblock %}
