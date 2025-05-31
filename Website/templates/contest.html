@@ -1,4 +1,4 @@
-{% extends 'base.html' %} 
+{% extends 'base.html' %}
 
 {% block title %}Contest{% endblock %}
 
@@ -9,6 +9,14 @@
         color: #94693e;
         text-align: center;
         margin-bottom: 20px;
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    h2 {
+        color: #6b4f2f;
+        font-family: 'Times New Roman', Times, serif;
+        font-weight: bolder;
+        margin-bottom: 20px;
     }
 
     body {
@@ -17,55 +25,59 @@
 
     .banner {
         width: 100%;
-        max-width: 800px; /* Limits banner size */
-        height: auto; /* Keeps aspect ratio */
+        max-width: 800px;
+        /* Limits banner size */
+        height: auto;
+        /* Keeps aspect ratio */
         display: block;
-        margin: 0 auto; /* Centers the banner */
+        margin: 0 auto;
+        /* Centers the banner */
     }
 
-    .details{
-        width: 500px; 
-        padding: 15px; 
-        border: 1px solid #ccc; 
-        border-radius: 5px; 
-        background-color: #fff; 
-        visibility: hidden; 
+    .details {
+        width: 500px;
+        padding: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #fff;
+        visibility: hidden;
         font-family: 'Times New Roman', Times, serif;
         transition: opacity 0.3s ease-in-out;
     }
 
-    .toggle-button{
+    .toggle-button {
         cursor: pointer;
-        color: #6b4f2f; 
+        color: #6b4f2f;
         font-weight: bold;
         transition: color 0.3s ease-in-out;
     }
 
     .toggle-button:hover {
-        color: #c79058; /* Change color slightly on hover */
+        color: #c79058;
+        /* Change color slightly on hover */
     }
 
     .banner {
         width: 800px;
         height: 400px;
-        object-fit: cover; 
+        object-fit: cover;
         border-radius: 10px;
-        float: left; 
+        float: left;
         margin-left: 0;
-        margin-right: auto; 
+        margin-right: auto;
         align-self: flex-start;
     }
 
     .contest-card {
         display: flex;
         align-items: flex-start;
-        flex-direction: column; 
-        gap: 15px; 
+        flex-direction: column;
+        gap: 15px;
         margin-bottom: 50px;
     }
 
     .contest-header {
-        display:block;
+        display: block;
         font-size: 24px;
         font-weight: bolder;
         text-align: left;
@@ -75,31 +87,145 @@
 
     .contest-layout {
         display: flex;
-        flex-direction: row; 
+        flex-direction: row;
         align-items: center;
-        gap: 20px; 
+        gap: 20px;
         justify-content: flex-start;
         max-width: 100%;
     }
 
     .section p:first-of-type {
-        margin-bottom: 0px; /* Removes extra space below Purpose heading */
-        margin-top: 0px; /* Ensures no space above the text */
+        margin-bottom: 0px;
+        /* Removes extra space below Purpose heading */
+        margin-top: 0px;
+        /* Ensures no space above the text */
     }
 
     .container {
         max-width: 100%;
     }
+
+    .individual-contest-container {
+        background-color: #fff8ef;
+        border-radius: 20px;
+        padding: 20px;
+        margin-bottom: 50px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .join-button {
+        background-color: #6b4f2f;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 6.5px 11px;
+        font-family: 'Times New Roman', Times, serif;
+        outline: none;
+    }
+
+    .join-button[disabled] {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+
+    .vote-button,
+    .result-button {
+        background-color: #c79058;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 6.5px 11px;
+        margin-left: 10px;
+    }
+
+    button:focus {
+        outline: none;
+    }
+
+    .admin-button-container {
+        text-align: right;
+        margin-bottom: 20px;
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+    }
+
+    #addContest {
+        font-size: 20px;
+        background-color: #94693e;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        border: none;
+    }
+
+    .nav-bar-contest {
+        text-align: center;
+        margin-bottom: 20px;
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    .tab-button {
+        border: none;
+        font-size: 25px;
+        color: #ad784e;
+        font-weight: bolder;
+        padding: 10px 20px;
+        background: none;
+        cursor: pointer;
+        transition: color 0.3s;
+    }
+
+    .tab-button.active {
+        border-bottom: 2px solid #94693e;
+    }
+
+    .tab-button:hover {
+        background: none;
+        border: none;
+    }
+
+    .tab-button:focus {
+        outline: none;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .text-no-contest {
+        text-align: center;
+        font-style: italic;
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 18px;
+        color: #6b4f2f;
+        font-weight: 600;
+    }
+
+    span {
+        font-family: 'Times New Roman', Times, serif;
+        font-weight: bolder;
+        margin-right: 10px;
+        margin-left: 10px;
+    }
 </style>
 
 <div style="padding: 20px;">
-    <h1 style="text-align: center; font-family: 'Times New Roman', Times, serif;">Contest</h1>
+    <h1>Contest</h1>
+
+    <div class="nav-bar-contest">
+        <button class="tab-button active" onclick="showContest('ongoing')">Ongoing</button>
+        <button class="tab-button" onclick="showContest('comingsoon')">Coming Soon</button>
+        <button class="tab-button" onclick="showContest('past')">Past</button>
+    </div>
 
     <!-- Ongoing Contests -->
-    {% if ongoing_contests %}
-        <h2 style="color: #6b4f2f; font-family: 'Times New Roman', Times, serif; font-weight: bolder; margin-bottom: 20px;">🐾 Ongoing Contests 🐾</h2>
-        {% for contest in ongoing_contests %}
-            <div class="individual-contest-container" style="background-color: #fff8ef; border-radius: 20px; padding: 20px; margin-bottom: 50px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+    <div id="ongoing" class="contest-section">
+        {% if ongoing_contests %}
+            <h2>🐾 Ongoing Contests 🐾</h2>
+            {% for contest in ongoing_contests %}
+            <div class="individual-contest-container">
                 <div class="contest-card">
                     <div class="contest-header">
                         <h2 onclick="toggleDetails('{{contest.name}}')" class="toggle-button">{{ contest.name }}</h2>
@@ -107,7 +233,8 @@
 
                     <div class="contest-layout">
                         {% if contest.banner_url and contest.banner_url != '' %}
-                            <img src="{{ url_for('static', filename='contest/' + contest.banner_url.split('/')[-1]) }}" alt="Contest Banner" class="banner">
+                        <img src="{{ url_for('static', filename='contest/' + contest.banner_url.split('/')[-1]) }}"
+                            alt="Contest Banner" class="banner">
                         {% endif %}
 
                         <div class="details" id="{{ contest.name }}">
@@ -127,26 +254,45 @@
                             </div>
 
                             <p><strong>Prizes:</strong> {{ contest.prizes }}</p>
-                            <button class="join-button" id="joinButton-{{ contest.id }}" 
-                                    data-start="{{ contest.start_date }}" 
-                                    data-end="{{ contest.end_date }}"
-                                    {% if user_has_submitted(current_user.name, contest.id) %}disabled style="background-color: #ccc; cursor: not-allowed;"{% endif %}
-                                    onclick="redirectToSubmission('{{ contest.id }}')" style="background-color: #6b4f2f; color: white; border: none; border-radius: 5px; padding: 6.5px 11px;">
+                            <button class="join-button" id="joinButton-{{ contest.id }}"
+                                data-start="{{ contest.start_date }}" data-end="{{ contest.end_date }}" {% if
+                                user_has_submitted(current_user.name, contest.id) %}disabled{% endif %}
+                                onclick="redirectToSubmission('{{ contest.id }}')">
                                 Join
                             </button>
-                            <button style="background-color: #c79058; color: white; border: none; border-radius: 5px; padding: 6.5px 11px; margin-left: 10px;" onclick="window.location.href='{{ url_for('contestmanagement.voting', contest_id=contest.id) }}'">Vote</button>
+                            <button class="vote-button"
+                                onclick="window.location.href='{{ url_for('contestmanagement.voting', contest_id=contest.id) }}'">Vote</button>
                         </div>
                     </div>
                 </div>
             </div>
-        {% endfor %}
-    {% endif %}
+            {% endfor %}
+        {% else %}
+            <p class="text-no-contest"> No ongoing contests at the moment. Please check back later! </p>
+        {% endif %}
+        {% if ongoing_total_pages > 1 %}
+        <div style="text-align: center; margin-top: 20px;">
+            {% if ongoing_page > 1 %}
+            <a href="{{ url_for('contestmanagement.contest_page', page_ongoing=ongoing_page-1, page_upcoming=upcoming_page, page_completed=completed_page, section='ongoing') }}#ongoing">
+                <button class="join-button">Previous</button>
+            </a>
+            {% endif %}
+            <span>Page {{ ongoing_page }} of {{ ongoing_total_pages }}</span>
+            {% if ongoing_page < ongoing_total_pages %}
+            <a href="{{ url_for('contestmanagement.contest_page', page_ongoing=ongoing_page+1, page_upcoming=upcoming_page, page_completed=completed_page, section='ongoing') }}#ongoing">
+                <button class="join-button">Next</button>
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
 
     <!-- Upcoming Contests -->
-    {% if upcoming_contests %}
-        <h2 style="color: #6b4f2f; font-family: 'Times New Roman', Times, serif; font-weight: bolder; margin-bottom: 20px;">⏳ Coming Soon ⏳</h2>
-        {% for contest in upcoming_contests %}
-            <div class="individual-contest-container" style="background-color: #fff8ef; border-radius: 20px; padding: 20px; margin-bottom: 50px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+    <div id="comingsoon" class="contest-section hidden">
+        {% if upcoming_contests %}
+            <h2>⏳ Coming Soon ⏳</h2>
+            {% for contest in upcoming_contests %}
+            <div class="individual-contest-container">
                 <div class="contest-card">
                     <div class="contest-header">
                         <h2 onclick="toggleDetails('{{contest.name}}')" class="toggle-button">{{ contest.name }}</h2>
@@ -154,7 +300,8 @@
 
                     <div class="contest-layout">
                         {% if contest.banner_url and contest.banner_url != '' %}
-                            <img src="{{ url_for('static', filename='contest/' + contest.banner_url.split('/')[-1]) }}" alt="Contest Banner" class="banner">
+                        <img src="{{ url_for('static', filename='contest/' + contest.banner_url.split('/')[-1]) }}"
+                            alt="Contest Banner" class="banner">
                         {% endif %}
 
                         <div class="details" id="{{ contest.name }}">
@@ -174,25 +321,43 @@
                             </div>
 
                             <p><strong>Prizes:</strong> {{ contest.prizes }}</p>
-                            <button class="join-button" id="joinButton-{{ contest.id }}" 
-                                    data-start="{{ contest.start_date }}" 
-                                    data-end="{{ contest.end_date }}"
-                                    {% if user_has_submitted(current_user.name, contest.id) %}disabled style="background-color: #ccc; cursor: not-allowed;"{% endif %}
-                                    onclick="redirectToSubmission('{{ contest.id }}')" style="background-color: #6b4f2f; color: white; border: none; border-radius: 5px; padding: 6.5px 11px;">
+                            <button class="join-button" id="joinButton-{{ contest.id }}"
+                                data-start="{{ contest.start_date }}" data-end="{{ contest.end_date }}" {% if
+                                user_has_submitted(current_user.name, contest.id) %}disabled{% endif %}
+                                onclick="redirectToSubmission('{{ contest.id }}')">
                                 Join
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
-        {% endfor %}
-    {% endif %}
+            {% endfor %}
+        {% else %}
+            <p class="text-no-contest"> No upcoming contests at the moment. Stay tuned for future events! </p>
+        {% endif %}
+        {% if upcoming_total_pages > 1 %}
+        <div style="text-align: center; margin-top: 20px;">
+            {% if upcoming_page > 1 %}
+            <a href="{{ url_for('contestmanagement.contest_page', page_ongoing=ongoing_page, page_upcoming=upcoming_page-1, page_completed=completed_page, section='upcoming') }}#comingsoon">
+                <button class="join-button">Previous</button>
+            </a>
+            {% endif %}
+            <span>Page {{ upcoming_page }} of {{ upcoming_total_pages }}</span>
+            {% if upcoming_page < upcoming_total_pages %}
+            <a href="{{ url_for('contestmanagement.contest_page', page_ongoing=ongoing_page, page_upcoming=upcoming_page+1, page_completed=completed_page, section='upcoming') }}#comingsoon">
+                <button class="join-button">Next</button>
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
 
     <!-- Completed Contests -->
-    {% if completed_contests %}
-        <h2 style="color: #6b4f2f; font-family: 'Times New Roman', Times, serif; font-weight: bolder; margin-bottom: 20px;">🎉 Past Contest 🎉</h2>
-        {% for contest in completed_contests %}
-            <div class="individual-contest-container" style="background-color: #fff8ef; border-radius: 20px; padding: 20px; margin-bottom: 50px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+    <div id="past" class="contest-section hidden">
+        {% if completed_contests %}
+            <h2>🎉 Past Contest 🎉</h2>
+            {% for contest in completed_contests %}
+            <div class="individual-contest-container">
                 <div class="contest-card">
                     <div class="contest-header">
                         <h2 onclick="toggleDetails('{{contest.name}}')" class="toggle-button">{{ contest.name }}</h2>
@@ -200,7 +365,8 @@
 
                     <div class="contest-layout">
                         {% if contest.banner_url and contest.banner_url != '' %}
-                            <img src="{{ url_for('static', filename='contest/' + contest.banner_url.split('/')[-1]) }}" alt="Contest Banner" class="banner">
+                        <img src="{{ url_for('static', filename='contest/' + contest.banner_url.split('/')[-1]) }}"
+                            alt="Contest Banner" class="banner">
                         {% endif %}
 
                         <div class="details" id="{{ contest.name }}">
@@ -220,29 +386,47 @@
                             </div>
 
                             <p><strong>Prizes:</strong> {{ contest.prizes }}</p>
-                            <button class="join-button" id="joinButton-{{ contest.id }}" 
-                                    data-start="{{ contest.start_date }}" 
-                                    data-end="{{ contest.end_date }}"
-                                    {% if user_has_submitted(current_user.name, contest.id) %}disabled style="background-color: #ccc; cursor: not-allowed;"{% endif %}
-                                    onclick="redirectToSubmission('{{ contest.id }}')" style="background-color: #6b4f2f; color: white; border: none; border-radius: 5px; padding: 6.5px 11px;">
+                            <button class="join-button" id="joinButton-{{ contest.id }}"
+                                data-start="{{ contest.start_date }}" data-end="{{ contest.end_date }}" {% if
+                                user_has_submitted(current_user.name, contest.id) %}disabled{% endif %}
+                                onclick="redirectToSubmission('{{ contest.id }}')">
                                 Join
                             </button>
-                            <button style="background-color: #c79058; color: white; border: none; border-radius: 5px; padding: 6.5px 11px; margin-left: 10px;" onclick="window.location.href='{{ url_for('contestmanagement.view_result', contest_id=contest.id) }}'">View Result</button>
+                            <button class="result-button"
+                                onclick="window.location.href='{{ url_for('contestmanagement.view_result', contest_id=contest.id) }}'">View
+                                Result</button>
                         </div>
                     </div>
                 </div>
             </div>
-        {% endfor %}
-    {% endif %}
+            {% endfor %}
+        {% else %}
+            <p class="text-no-contest"> No past contests available right now. Check back later for updates! </p>
+        {% endif %}
+        {% if completed_total_pages > 1 %}
+        <div style="text-align: center; margin-top: 20px;">
+            {% if completed_page > 1 %}
+            <a href="{{ url_for('contestmanagement.contest_page', page_ongoing=ongoing_page, page_upcoming=upcoming_page, page_completed=completed_page-1, section='completed') }}#past">
+                <button class="join-button">Previous</button>
+            </a>
+            {% endif %}
+            <span>Page {{ completed_page }} of {{ completed_total_pages }}</span>
+            {% if completed_page < completed_total_pages %}
+            <a href="{{ url_for('contestmanagement.contest_page', page_ongoing=ongoing_page, page_upcoming=upcoming_page, page_completed=completed_page+1, section='completed') }}#past">
+                <button class="join-button">Next</button>
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
 
     <!-- Admin Button -->
     {% if user_role == 'admin' %}
-        <div style="text-align: right; margin-bottom: 20px; position: fixed; bottom: 20px; right: 20px;">
-            <button id="addContest" onclick="window.location.href='{{ url_for('contestmanagement.create_contest') }}'"
-                style="font-size: 20px; background-color: #94693e; color: white; padding: 10px 15px; border-radius: 5px; cursor: pointer; border: none;">
-                + 
-            </button>
-        </div>
+    <div class="admin-button-container">
+        <button id="addContest"
+            onclick="window.location.href='{{ url_for('contestmanagement.create_contest') }}'">+</button>
+    </div>
     {% endif %}
 </div>
 
@@ -251,19 +435,24 @@
         window.location.href = "/contest_submission/" + contestId; //Sends user to the contest submission page
     }
 
-    
+
     function toggleDetails(contestName) {
         const details = document.getElementById(contestName);
-        if (details.style.opacity === "0") {
-            details.style.visibility = "visible"; 
-            details.style.opacity = "1"; //Fade details in
+        if (!details) return;
+
+        // Toggle visibility and opacity smoothly
+        if (details.style.visibility === "visible") {
+            details.style.opacity = "0";
+            setTimeout(() => {
+                details.style.visibility = "hidden";
+            }, 300);  // match CSS transition duration
         } else {
-            details.style.visibility = "hidden";
-            details.style.opacity = "0"; //Fade details out
+            details.style.visibility = "visible";
+            details.style.opacity = "1";
         }
     }
-
-    document.addEventListener("DOMContentLoaded", function() {
+    
+    document.addEventListener("DOMContentLoaded", function () {
         const userRole = "{{ user_role|safe }}";
         console.log("DEBUG: User Role in JavaScript →", userRole);
 
@@ -275,7 +464,7 @@
         }
     });
 
-    window.onload = function() {
+    window.onload = function () {
         const today = new Date();
         const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
@@ -302,5 +491,41 @@
             }
         });
     };
+
+    function showContest(category) {
+        // Hide all contest sections by setting display none
+        const sections = document.querySelectorAll(".contest-section");
+        sections.forEach(section => {
+            section.style.display = "none";
+        });
+
+        // Show only the selected section by setting display block
+        const activeSection = document.getElementById(category);
+        if (activeSection) {
+            activeSection.style.display = "block";
+        }
+
+        // Remove active class from all buttons
+        const buttons = document.querySelectorAll(".tab-button");
+        buttons.forEach(button => button.classList.remove("active"));
+
+        // Add active class to the clicked button
+        const activeButton = document.querySelector(`.tab-button[onclick="showContest('${category}')"]`);
+        if (activeButton) {
+            activeButton.classList.add("active");
+        }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        const section = "{{ section }}";
+
+        if (section === 'upcoming') {
+            showContest('comingsoon');
+        } else if (section === 'completed') {
+            showContest('past');
+        } else {
+            showContest('ongoing');
+        }
+    });
 </script>
 {% endblock %}
