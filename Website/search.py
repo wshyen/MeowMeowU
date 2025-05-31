@@ -70,9 +70,4 @@ def single_profile():
     conn.close()
 
     if selected_cat:
-<<<<<<< HEAD
         return render_template("single_profile.html", cat=selected_cat, user=current_user)
-=======
-        return render_template("single_profile.html", cat=selected_cat, user=current_user)
-    
->>>>>>> 624e28f0cfc293b54a74f7b7b3961bf2236c2ae1
