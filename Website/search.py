@@ -74,5 +74,4 @@ def single_profile():
     if selected_cat:
         return render_template("single_profile.html", cat=selected_cat, profile=profile, user=current_user)
     
-    flash("Profile not found!", category="error")
     return redirect(url_for("views.home"))

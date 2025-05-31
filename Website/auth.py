@@ -710,21 +710,16 @@ def view_post(post_id):
 @auth.route('/admin/view_profile/<int:profile_id>')
 def view_profile(profile_id):
     conn = get_db_connection()
+    cursor = conn.cursor()
 
-    profile = conn.execute('''
-        SELECT 
-            profiles.*, 
-            user.name AS user_name,
-            user.profile_picture AS user_profile_picture
-        FROM profiles
-        LEFT JOIN user ON profiles.user_id = user.id  -- Ensure `profiles.user_id` exists
-        WHERE profiles.id = ?
-    ''', (profile_id,)).fetchone()
-
+    cursor.execute("SELECT * FROM profiles WHERE id = ?", (profile_id,))
+    selected_cat = cursor.fetchone()
     conn.close()
 
-    if not profile:
-        flash("Profile not found.", category="error")
-        return redirect(url_for("auth.view_report"))
+    profile = selected_cat
 
-    return render_template("single_profile.html", profile=profile, user=current_user)
+    if selected_cat:
+        return render_template("single_profile.html", cat=selected_cat, profile=profile, user=current_user)
+    
+    flash("Profile not found!", category="error")
+    return redirect(url_for("auth.view_report"))
