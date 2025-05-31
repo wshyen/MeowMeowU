@@ -37,6 +37,7 @@
         min-height: 700px;
         max-height: 800px;
         text-align: center;
+        position: relative;
     }
 
     .profile-picture {
@@ -77,11 +78,96 @@
         box-shadow: 0px 8px 15px rgba(255, 163, 71, 0.2);
     }
 
+    .menu-container {
+        position: absolute;
+        top: 10px;
+        right: 25px;
+    }
+
+    .dots {
+        font-size: 24px;
+        cursor: pointer;
+        color: #6b4f2f;
+    }
+
+    .menu {
+        align-items: center;
+        display: none;
+        position: absolute;
+        right: 0;
+        background: #dccbb7;
+        border-radius: 8px;
+        padding: 6px 12px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        min-width: 90px;
+        text-align: center;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .menu a {
+        text-decoration: none;
+        color: #6b4f2f;
+        display: block;
+        padding: 6px 10px;
+        font-weight: bold;
+        border-radius: 6px;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .menu a:hover {
+        background: #dccbb7;
+        transform: scale(1.05);
+    }
+
+    .menu-container:hover .menu {
+        display: block;
+    }
+
+    .menu-container:focus-within .menu {
+        display: block;
+    }
+
+    .delete-btn {
+        background: none;
+        border: none;
+        color: #6b4f2f;
+        display: block;
+        padding: 6px 10px;
+        font-size: 16px;
+        font-weight: bold;
+        border-radius: 6px;
+        cursor: pointer;
+        width: 100%;
+        text-align: center;
+        height: auto;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .delete-btn:hover {
+        background: #dccbb7;
+        transform: scale(1.05);
+    }
+
 </style>
 
 <h1>{{ cat['name'] }}'s Profile</h1>
 
 <div class="profile-container">
+
+    <!-- Three-dot menu positioned at the top-right -->
+    {% if user.is_authenticated %}
+        <div class="menu-container" tabindex="0">
+            <span class="dots">...</span>
+            <div class="menu">
+                {% if user.role == 'user' %}
+                    <a>Report Profile</a>
+                {% elif user.role == 'admin' %}
+                    <a>Delete Profile</a>                          
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+
     <img class="profile-picture" src="{{ url_for('static', filename='uploads/' + cat['photo']) if cat['photo'] else url_for('static', filename='uploads/default.png') }}" alt="{{ cat['name'] }}">
     <h2>Personal information</h2>
     <p><strong>Name: </strong>{{ cat.name }}</p>
