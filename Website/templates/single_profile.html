@@ -161,9 +161,13 @@
             <span class="dots">...</span>
             <div class="menu">
                 {% if user.role == 'user' %}
-                    <a>Report Profile</a>
+                    <a href="{{ url_for('auth.report_page', report_type='profiles', item_id=profile.id) }}">Report Profile</a>
                 {% elif user.role == 'admin' %}
-                    <a>Delete Profile</a>                          
+                    <form action="{{ url_for('auth.delete_profile', profile_id=profile.id) }}" method="POST">
+                        <button type="submit" class="delete-btn">
+                            Delete Profile
+                        </button>
+                    </form>                         
                 {% endif %}
             </div>
         </div>

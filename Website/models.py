@@ -63,12 +63,16 @@ class Report(db.Model):
             return "Deleted Successfully"
         elif self.comment_id and not db.session.execute(text("SELECT id FROM comment WHERE id = :comment_id"), {"comment_id": self.comment_id}).fetchone():
             return "Deleted Successfully"
+        elif self.profile_id and not db.session.execute(text("SELECT id FROM profiles WHERE id = :profile_id"), {"profile_id": self.profile_id}).fetchone():
+            return "Deleted Successfully"
         elif self.story_id:
             return "Story"
         elif self.comment_id and self.post_id:
             return "Comment"
         elif self.post_id:
             return "Post"
+        elif self.profile_id:
+            return "Profile"
         return "Deleted Successfully"
 
     @property
@@ -79,4 +83,6 @@ class Report(db.Model):
             return ("auth.view_post", {"post_id": self.post_id}, "View Post") if db.session.execute(text("SELECT post_id FROM post WHERE post_id = :post_id"), {"post_id": self.post_id}).fetchone() else (None, {}, "Deleted Successfully")
         elif self.story_id:
             return ("auth.view_story", {"story_id": self.story_id}, "View Story") if db.session.execute(text("SELECT id FROM story WHERE id = :story_id"), {"story_id": self.story_id}).fetchone() else (None, {}, "Deleted Successfully")
+        elif self.profile_id:
+            return ("auth.view_profile", {"profile_id": self.profile_id}, "View Profile") if db.session.execute(text("SELECT id FROM profiles WHERE id = :profile_id"), {"profile_id": self.profile_id}).fetchone() else (None, {}, "Deleted Successfully")
         return (None, {}, "")

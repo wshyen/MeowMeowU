@@ -1,6 +1,6 @@
 import sqlite3
 import os
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, flash, url_for, redirect
 from flask_login import current_user
 
 search_bp = Blueprint('search', __name__, template_folder='templates', static_folder='static')
@@ -69,5 +69,10 @@ def single_profile():
     selected_cat = cursor.fetchone()
     conn.close()
 
+    profile = selected_cat
+
     if selected_cat:
-        return render_template("single_profile.html", cat=selected_cat, user=current_user)
+        return render_template("single_profile.html", cat=selected_cat, profile=profile, user=current_user)
+    
+    flash("Profile not found!", category="error")
+    return redirect(url_for("views.home"))

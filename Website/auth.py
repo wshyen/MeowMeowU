@@ -416,11 +416,17 @@ def get_comment(comment_id):
         result = session.execute(query, {"comment_id": comment_id}).fetchone()
     return result
 
+def get_profile(profile_id):
+    query = text("SELECT * FROM profiles WHERE id = :profile_id")
+    result = db.session.execute(query, {"profile_id": profile_id}).fetchone()
+    return result
+
 def validate_existence(table, item_id):
     column_map = {
         "post": "post_id",
         "story": "id",
-        "comment": "id"
+        "comment": "id",
+        "profiles": "id"
     }
 
     column = column_map.get(table)
@@ -438,7 +444,7 @@ def report_page(report_type, item_id):
 
     #ensure report type is valid (case-insensitive)
     report_type = report_type.lower()
-    if report_type not in ["post", "story", "comment"]:
+    if report_type not in ["post", "story", "comment", "profiles"]:
         flash("Invalid report type!", category="error")
         return redirect(url_for('views.home'))
 
@@ -479,7 +485,7 @@ def submit_report():
         return redirect(url_for("auth.report_page", report_type=report_type, item_id=item_id))
 
     #validate report type
-    if report_type not in ["post", "story", "comment"]:
+    if report_type not in ["post", "story", "comment", "profiles"]:
         flash("Invalid report type.", category="error")
         return redirect(url_for("views.home"))
 
@@ -496,6 +502,7 @@ def submit_report():
     post_id = None
     story_id = None
     comment_id = None
+    profile_id = None
 
     if report_type == "post":
         post_id = item_id
@@ -507,6 +514,8 @@ def submit_report():
         if not post_id:
             flash("Unable to find the post for this comment.", category="error")
             return redirect(url_for("views.home"))
+    elif report_type == "profiles":
+        profile_id = item_id
 
     #store report data
     new_report = Report(
@@ -514,6 +523,7 @@ def submit_report():
         post_id=post_id,
         story_id=story_id,
         comment_id=comment_id,
+        profile_id=profile_id,
         reason=other_reason if reason == "other" else reason,
         details=details,
     )
@@ -530,6 +540,8 @@ def submit_report():
         return redirect(url_for("auth.view_story", story_id=story_id))
     elif report_type == "comment":
         return redirect(url_for("community.post_detail", post_id=post_id, comment_id=comment_id))
+    elif report_type == "profiles":
+        return redirect(url_for("search.single_profile", profile_id=profile_id))
 
     return redirect(url_for("views.home"))
 
@@ -621,6 +633,23 @@ def delete_comment(id):
     flash("Comment deleted successfully!", category="success")
     return redirect(url_for("auth.view_report", report_type="comment", item_id=id))
 
+@auth.route("/admin/delete_profile/<int:profile_id>", methods=["POST"])
+def delete_profile(profile_id):
+    conn = get_db_connection()
+
+    profile = conn.execute('SELECT id FROM profiles WHERE id = ?', (profile_id,)).fetchone()
+    if not profile:
+        flash("Profile not found.", category="error")
+        conn.close()
+        return redirect(url_for("auth.view_report"))
+    
+    conn.execute('DELETE FROM profiles WHERE id = ?', (profile_id,))
+    conn.commit()
+    conn.close()
+
+    flash("Profile deleted successfully!", category="success")
+    return redirect(url_for("auth.view_report", report_type="profiles", item_id=profile_id))
+
 @auth.route('/view_post/<int:post_id>')
 def view_post(post_id):
     conn = get_db_connection()
@@ -677,3 +706,25 @@ def view_post(post_id):
 
     conn.close()
     return render_template("community_detail.html", post=post, comments=comments, grouped_comments=grouped_comments, user=current_user, post_id=post_id)
+
+@auth.route('/admin/view_profile/<int:profile_id>')
+def view_profile(profile_id):
+    conn = get_db_connection()
+
+    profile = conn.execute('''
+        SELECT 
+            profiles.*, 
+            user.name AS user_name,
+            user.profile_picture AS user_profile_picture
+        FROM profiles
+        LEFT JOIN user ON profiles.user_id = user.id  -- Ensure `profiles.user_id` exists
+        WHERE profiles.id = ?
+    ''', (profile_id,)).fetchone()
+
+    conn.close()
+
+    if not profile:
+        flash("Profile not found.", category="error")
+        return redirect(url_for("auth.view_report"))
+
+    return render_template("single_profile.html", profile=profile, user=current_user)
