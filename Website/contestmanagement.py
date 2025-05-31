@@ -112,8 +112,28 @@ def contest_page():
     completed_contests = sorted(
         [c for c in contests if c["voting_end"] < today], key=lambda x: x["voting_end"], reverse=True 
     )  #Sort completed contests with the latest ended at the top
+
+    PER_PAGE = 3
+
+    page_ongoing = request.args.get('page_ongoing', 1, type=int)
+    page_upcoming = request.args.get('page_upcoming', 1, type=int)
+    page_completed = request.args.get('page_completed', 1, type=int)
+
+    section = request.args.get('section', 'ongoing')
+
+    def paginate(items, page):
+        start = (page - 1) * PER_PAGE
+        end = start + PER_PAGE
+        total_pages = (len(items) + PER_PAGE - 1) // PER_PAGE
+        return items[start:end], total_pages
     
-    return render_template("contest.html", contests=contests, user=current_user, user_role=user_role, user_has_submitted=user_has_submitted, ongoing_contests=ongoing_contests, upcoming_contests=upcoming_contests, completed_contests=completed_contests)
+    ongoing_page_items, ongoing_total_pages = paginate(ongoing_contests, page_ongoing)
+    upcoming_page_items, upcoming_total_pages = paginate(upcoming_contests, page_upcoming)
+    completed_page_items, completed_total_pages = paginate(completed_contests, page_completed)
+    
+    return render_template("contest.html", contests=contests, user=current_user, user_role=user_role, user_has_submitted=user_has_submitted, 
+                           ongoing_contests=ongoing_page_items, upcoming_contests=upcoming_page_items, completed_contests=completed_page_items, 
+                           ongoing_page=page_ongoing, ongoing_total_pages=ongoing_total_pages, upcoming_page=page_upcoming, upcoming_total_pages=upcoming_total_pages, completed_page=page_completed, completed_total_pages=completed_total_pages, section=section)
 
 @contestmanagement_bp.route('/create_contest', methods=['GET', 'POST'])
 @login_required 
