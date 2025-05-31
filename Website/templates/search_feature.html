@@ -5,90 +5,88 @@
 
 <style>
     body {
-            font-family: 'Times New Roman', Times, serif;
-            background-color: #f2eadf;
-            margin: 0;
-            padding: 0;
-        }
+        font-family: 'Times New Roman', Times, serif;
+        background-color: #f2eadf;
+    }
 
-        h1 {
-            font-weight: bold;
-            color: #94693e;
-            text-align: center;
-            font-size: 36px;
-            margin-bottom: 10px;
-            padding-top: 25px;
-            
-        }
-
-        .form-container{
-            max-width:500px;
-            background-color: #fffaf3;
-            margin: 40px auto;
-            padding: 30px;
-            border-radius: 10px;
-            box-sizing: border-box;
-            box-shadow: 0px 8px 3px #c39f76;
-        }
-
-        .search-bar label,
-        .filter-bar label {
-            color: #6b4f2f;
-            font-weight: bold;
-            margin-bottom: 3px;
-        }
+    h1 {
+        font-weight: bold;
+        color: #94693e;
+        text-align: center;
+        font-size: 36px;
+        margin-bottom: 10px;
+        padding-top: 25px;
         
-        .search-bar input,
-        .filter-bar select {
-            width: 100%;
-            padding: 8px;
-            background-color: #fffbe9;
-            border-radius: 12px;
-            margin-bottom: 10px;
-            transition: border-color 0.3s ease;
-        }
+    }
 
-        .search-bar input:focus,
-        .filter-bar select:focus {
-            border: 2px solid #94693e;
-            outline: none;
-        }
+    .form-container{
+        max-width:500px;
+        background-color: #fffaf3;
+        margin: 40px auto;
+        padding: 30px;
+        border-radius: 10px;
+        box-sizing: border-box;
+        box-shadow: 0px 8px 3px #c39f76;
+    }
 
-        .search-bar input::placeholder {
-            color: #c2a177;
-            font-style: italic;     
-        }
+    .search-bar label,
+    .filter-bar label {
+        color: #6b4f2f;
+        font-weight: bold;
+        margin-bottom: 3px;
+    }
+    
+    .search-bar input,
+    .filter-bar select {
+        width: 100%;
+        padding: 8px;
+        background-color: #fffbe9;
+        border-radius: 12px;
+        margin-bottom: 10px;
+        transition: border-color 0.3s ease;
+    }
 
-        .filter-bar select {
-            font-size: 14px;
-            color: #380c0c;
-            cursor: pointer;
-            appearance: none;
-            background-image: url("/static/cat_paws_icon.png");
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-            background-size: 20px;
-        }
+    .search-bar input:focus,
+    .filter-bar select:focus {
+        border: 2px solid #94693e;
+        outline: none;
+    }
 
-        form button{
-            width: 100%;
-            padding: 12px;
-            background-color: #dccbb7;
-            border-radius: 15px;
-            border: none;
-            color: #6b4f2f;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }    
-            
-        form button:hover {
-            background-color: #d4bfae;
-            border-radius: 15px;
-            transform: scale(1.05);
-            box-shadow: 0px 8px 15px rgba(255, 163, 71, 0.2);
-        }
+    .search-bar input::placeholder {
+        color: #c2a177;
+        font-style: italic;     
+    }
+
+    .filter-bar select {
+        font-size: 14px;
+        color: #380c0c;
+        cursor: pointer;
+        appearance: none;
+        background-image: url("/static/cat_paws_icon.png");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 20px;
+    }
+
+    form button{
+        width: 100%;
+        padding: 12px;
+        background-color: #dccbb7;
+        border-radius: 15px;
+        border: none;
+        color: #6b4f2f;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+    }    
+        
+    form button:hover {
+        background-color: #d4bfae;
+        border-radius: 15px;
+        transform: scale(1.05);
+        box-shadow: 0px 8px 15px rgba(255, 163, 71, 0.2);
+    }
         
 </style>    
     
@@ -131,10 +129,8 @@
     
             <button type="submit">🐾Go🐾</button>  
 
-    </div>    
-           
+    </div>            
 
 </form>                    
     
-
 {% endblock %}
