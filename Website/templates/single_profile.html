@@ -1,88 +1,87 @@
-<html>
-    <head>
-        <title>{{ cat['name'] }}'s Profile</title>
-        <style>
-            body {
-            font-family: 'Times New Roman', Times, serif;
-            background-color: #f2eadf;
-            display: flex;
-            flex-direction: column; 
-            justify-content: flex-start;
-            align-items: center;
-            height: 100vh;
-        }
+{% extends "base.html" %}
+{% block title %}{{ cat['name'] }}'s Profile{% endblock %}
 
-        h1 {
-            color: #94693e;
-            text-align: center;
-            font-size: 36px;
-            margin-top: 20px;
-            margin-bottom: 20px;
-        }
+{% block content %}
 
-        h2 {
-            color: #6b4f2f;
-        }
+<style>
+    body {
+        font-family: 'Times New Roman', Times, serif;
+        background-color: #f2eadf;
+        margin: 0;
+        display: flex;
+        flex-direction: column; 
+        justify-content: flex-start;
+        align-items: center;
+    }
 
-        .profile-container {
-            padding: 30px;
-            background-color: #fffbe9;
-            border-radius: 12px;
-            width: 80%;
-            max-width: 500px;
-            height: 90%;
-            text-align: center;
-            flex-direction: column;
-        }
+    h1 {
+        color: #94693e;
+        text-align: center;
+        font-size: 36px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
 
-        .profile-picture {
-            width: 300px;
-            height: 300px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
+    h2 {
+        color: #6b4f2f;
+    }
 
-        .profile-container p {
-            color: #6b4f2f;
-        }
+    .profile-container {
+        padding: 30px;
+        background-color: #fffbe9;
+        border-radius: 12px;
+        width: 80%;
+        max-width: 500px;
+        height: 90%;
+        text-align: center;
+        flex-direction: column;
+    }
 
-        .back-button {
-                margin-top: 20px;
-                padding: 10px 20px;
-                background-color: #dccbb7;
-                color: #6b4f2f;
-                font-weight: bold;
-                border: none;
-                border-radius: 8px;
-                cursor: pointer;
-                text-align: center;
-                text-decoration: none;
-            }
+    .profile-picture {
+        width: 300px;
+        height: 300px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
 
-        .back-button:hover {
-                background-color: #d4bfae;
-                transform: scale(1.05);
-                box-shadow: 0px 8px 15px rgba(255, 163, 71, 0.2);
-            }
+    .profile-container p {
+        color: #6b4f2f;
+    }
 
-        </style>
-    </head>
+    .back-button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        background-color: #dccbb7;
+        color: #6b4f2f;
+        font-weight: bold;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        text-align: center;
+        text-decoration: none;
+    }
 
-    <body>
-        <h1>{{ cat['name'] }}'s Profile</h1>
+    .back-button:hover {
+        background-color: #d4bfae;
+        transform: scale(1.05);
+        box-shadow: 0px 8px 15px rgba(255, 163, 71, 0.2);
+    }
 
-        <div class="profile-container">
-            <img class="profile-picture" src="{{ url_for('static', filename='uploads/' + cat['photo']) if cat['photo'] else url_for('static', filename='uploads/default.png') }}" alt="{{ cat['name'] }}">
-            <h2>Personal information</h2>
-            <p><strong>Name: </strong>{{ cat.name }}</p>
-            <p><strong>Gender: </strong>{{ cat.gender }}</p>
-            <p><strong>Color: </strong>{{ cat.color }}</p>
-            <p><strong>Description: </strong>{{ cat.description }}</p>
-        </div>
+</style>
 
-        <a href="{{ request.referrer or url_for('search.search_feature') }}" class="back-button">
-            Back
-        </a>
-        
-    </body>
-</html>
+<h1>{{ cat['name'] }}'s Profile</h1>
+
+<div class="profile-container">
+    <img class="profile-picture" src="{{ url_for('static', filename='uploads/' + cat['photo']) if cat['photo'] else url_for('static', filename='uploads/default.png') }}" alt="{{ cat['name'] }}">
+    <h2>Personal information</h2>
+    <p><strong>Name: </strong>{{ cat.name }}</p>
+    <p><strong>Gender: </strong>{{ cat.gender }}</p>
+    <p><strong>Color: </strong>{{ cat.color }}</p>
+    <p><strong>Description: </strong>{{ cat.description }}</p>
+</div>
+
+<a href="{{ request.referrer or url_for('search.search_feature') }}" class="back-button">
+    Back
+</a>
+    
+{% endblock %}
