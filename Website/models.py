@@ -47,6 +47,7 @@ class Report(db.Model):
     story_id = db.Column(db.Integer, db.ForeignKey("story.id"), nullable=True)
     post_id = db.Column(db.Integer, nullable=True)
     comment_id = db.Column(db.Integer, nullable=True)
+    profile_id = db.Column(db.Integer, nullable=True)
     reason = db.Column(db.String(255), nullable=False)
     details = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
