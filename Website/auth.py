@@ -734,18 +734,21 @@ def view_user_profile(user_id):
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    #fetch user details
-    cursor.execute("SELECT id, name, email, profile_picture, cover_photo, status, birthday, mbti, hobby, bio FROM user WHERE id = ?", (user_id,))
-    user = cursor.fetchone()
+    #fetch the profile owner's data
+    cursor.execute("""
+        SELECT id, name, email, profile_picture, cover_photo, status, birthday, mbti, hobby, bio 
+        FROM user WHERE id = ?
+    """, (user_id,))
+    profile_owner = cursor.fetchone()
 
-    if not user:
+    if not profile_owner:
         flash("User profile not found!", category="error")
         return redirect(url_for('community.community_feature'))
 
-    #fetch posts directly within the same function
+    #fetch posts of the profile owner
     cursor.execute("SELECT * FROM post WHERE user_id = ?", (user_id,))
     posts = cursor.fetchall()
 
     conn.close()
 
-    return render_template("view_user_profile.html", user=user, posts=posts)
+    return render_template("view_user_profile.html", profile_owner=profile_owner, posts=posts, user=current_user)
