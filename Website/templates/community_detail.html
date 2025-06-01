@@ -389,7 +389,9 @@
     {% endif %}
 
     <div class="post-info">
-        <img class="profile-picture" src="{{ url_for('static', filename='Userprofile/' + (post['profile_picture'] if post['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
+        <a href="{{ url_for('auth.view_user_profile', user_id=post['user_id']) }}">
+            <img class="profile-picture" src="{{ url_for('static', filename='Userprofile/' + (post['profile_picture'] if post['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
+        </a>
         <p><strong>{{ post['name'] }}</strong> posted at {{ post['created_at'] }}</p>
     </div>
 
