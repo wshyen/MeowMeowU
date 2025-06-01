@@ -291,7 +291,8 @@
         display: none;
     }
 
-    .menu-container {
+    /* 3 dots */
+    .menu-container { 
         position: absolute;
         top: 10px;
         right: 25px;
@@ -361,6 +362,23 @@
         transform: scale(1.05);
     }
     
+    /* click profile pic to view profile */
+    .profile-picture:hover,
+    .comment-profile-picture:hover {
+        transform: scale(1.15);
+    }
+
+    .post-info a:hover,
+    .post-info a:focus,
+    .post-info a:active,
+    .comment-info a:hover,
+    .comment-info a:focus,
+    .comment-info a:active {
+        background-color: transparent !important;
+        outline: none;
+        box-shadow: none;
+    }
+
 </style>
 
 <h1>Post Details</h1>
@@ -389,7 +407,9 @@
     {% endif %}
 
     <div class="post-info">
-        <img class="profile-picture" src="{{ url_for('static', filename='Userprofile/' + (post['profile_picture'] if post['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
+        <a href="{{ url_for('auth.view_user_profile', user_id=post['user_id']) }}">
+            <img class="profile-picture" src="{{ url_for('static', filename='Userprofile/' + (post['profile_picture'] if post['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
+        </a>
         <p><strong>{{ post['name'] }}</strong> posted at {{ post['created_at'] }}</p>
     </div>
 
@@ -443,7 +463,9 @@
     {% for comment in comments %}
         <div class="comment">
             <div class="comment-info">
-                <img class="comment-profile-picture" src="{{ url_for('static', filename='Userprofile/' + (comment['profile_picture'] if comment['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
+                <a href="{{ url_for('auth.view_user_profile', user_id=comment['user_id']) }}">
+                    <img class="comment-profile-picture" src="{{ url_for('static', filename='Userprofile/' + (comment['profile_picture'] if comment['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
+                </a>
                 <p><strong>{{ comment['name'] }}</strong> commented at {{ comment['created_at'] }}</p>
                 <span class="floor-number" style="font-size: 20px; margin-left: 10px; color: #6b4f2f;">
                     #{{ comment['floor'] }}

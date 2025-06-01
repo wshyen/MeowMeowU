@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}User Profile{% endblock %}
+
+{% block content %}
+
+<style>
+  body {
+    background-color: #f2eadf;
+  }
+
+  h2, h5, label {
+    font-family: 'Times New Roman';
+    color: rgb(78, 68, 57);
+  }
+
+  .profile-header {
+    position: relative;
+    margin-bottom: 30px;
+    margin-top: 25px;
+    align-items: center;
+  }
+
+  .cover-photo {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 20px;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  }
+
+  .cover-photo:hover {
+    transform: scale(1.01);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.15);
+  }
+
+  .profile-content {
+    position: absolute;
+    top: 100px;
+    left: 30px;
+    display: flex;
+    align-items: center;
+    border-radius: 10px;
+  }
+
+  .profile-picture {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid white;
+    background: white;
+  }
+
+  .profile-picture:hover {
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .profile-info {
+    margin-left: 20px;
+  }
+
+  .profile-details {
+    margin-top: 45px;
+    margin-bottom: 45px;
+    background: #fff7ec;
+    padding: 20px;
+    border-radius: 10px;
+  }
+
+  button {
+    font-family: 'Times New Roman';
+    background-color: rgb(176, 148, 119);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+
+  button:hover {
+    background-color: rgb(156, 128, 100);
+  }
+
+</style>
+
+<h1 style="font-size: 40px; font-weight: bold; text-align: center; padding-top: 25px; color: #94693e; font-family: 'Times New Roman';">
+    {{ user.name }}'s Profile
+</h1>
+<h5 style="font-size: 20px; font-weight: bold; text-align: center; margin-top: 5px; margin-bottom: 20px; color: #6b4f2f; font-family: 'Times New Roman'; font-style: italic;">
+    Here is meowfile🐈‍⬛
+</h5>
+
+<div class="container mt-4">
+  <div class="profile-details">
+
+    <div class="profile-header">
+      {% if user.cover_photo %}
+        <img src="{{ url_for('static', filename='Userprofile/' ~ user.cover_photo) }}" alt="Cover Photo" class="cover-photo">
+      {% else %}
+        <img src="{{ url_for('static', filename='Userprofile/default_cover.png') }}" alt="Cover Photo" class="cover-photo">
+      {% endif %}
+
+      <div class="profile-content">
+        {% if user.profile_picture %}
+          <img src="{{ url_for('static', filename='Userprofile/' ~ user.profile_picture) }}" alt="Profile Picture" class="profile-picture">
+        {% else %}
+          <img src="{{ url_for('static', filename='Userprofile/default_profilepic.png') }}" alt="Profile Picture" class="profile-picture">
+        {% endif %}
+
+        <div class="profile-info">
+          <h2><b>{{ user.name }}</b></h2>
+          <h5><b>Status:</b> {{ user.status }}</h5>
+        </div>
+      </div>
+    </div>
+
+    <h5 style="padding: 5px;"><b>Email:</b> {{ user.email }}</h5>
+    <h5 style="padding: 5px;"><b>Birthday:</b> {{ user.birthday if user.birthday else "-" }}</h5>
+    <h5 style="padding: 5px;"><b>MBTI:</b> {{ user.mbti if user.mbti else "-" }}</h5>
+    <h5 style="padding: 5px;"><b>Hobby:</b> {{ user.hobby if user.hobby else "-" }}</h5>
+    <h5 style="padding: 5px;"><b>Bio:</b> {{ user.bio if user.bio else "-" }}</h5>
+
+    <button onclick="location.href='{{ url_for('community.community_feature') }}'">🐾Back🐾</button>
+
+  </div>
+</div>
+
+{% endblock %}
