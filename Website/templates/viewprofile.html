@@ -133,6 +133,36 @@
         color: #007bff;
         text-decoration: none;
     }
+
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        text-align: center;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-content {
+        width: 200px; 
+        height: 200px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .close {
+        position: absolute;
+        top: 20px;
+        right: 40px;
+        color: white;
+        font-size: 40px;
+        cursor: pointer;
+    }
 </style>
 
 <!-- main content container -->
@@ -147,8 +177,8 @@
         <!-- profile card box -->
         <div class="profile-card">
             {% if profile.photo %}
-            <img class="profile-picture" src="{{ url_for('static', filename='uploads/' + profile.photo) }}"
-                alt="{{ profile.name }}">
+            <img class="profile-picture" src="{{ url_for('static', filename='uploads/' + profile.photo) }} "
+                alt="{{ profile.name }}" onclick="showProfileImage('{{ url_for('static', filename='uploads/' + profile.photo) }}')">
             {% else %}
             <img class="profile-picture" src="{{ url_for('static', filename='uploads/default.png') }}"
                 alt="Default Placeholder">
@@ -174,9 +204,25 @@
         {% endif %}
         {% endfor %}
     </div>
+    <div id="profileModal" class="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img id="modalImage" class="modal-content">
+    </div>
+
     {% if profiles|length == 0 %}
     <p class="empty-message">No profiles found. Create one by clicking <a
             href="{{ url_for('auth.create_profiles') }}">here</a>.</p>
     {% endif %}
 </div>
+
+<script>
+    function showProfileImage(imageUrl) {
+        document.getElementById('modalImage').src = imageUrl;
+        document.getElementById('profileModal').style.display = "flex";
+    }
+
+    function closeModal() {
+        document.getElementById('profileModal').style.display = "none";
+    }
+</script>
 {% endblock %}
