@@ -727,6 +727,10 @@ def view_profile(profile_id):
 #view user profile
 @auth.route('/profile/<int:user_id>')
 def view_user_profile(user_id):
+    if not current_user.is_authenticated:
+        flash("You must be logged in to view profile!", category="error")
+        return redirect(url_for('auth.login'))
+    
     conn = get_db_connection()
     cursor = conn.cursor()
 
