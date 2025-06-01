@@ -463,7 +463,7 @@
     {% for comment in comments %}
         <div class="comment">
             <div class="comment-info">
-                <a href="{{ url_for('auth.view_user_profile', user_id=post['user_id']) }}">
+                <a href="{{ url_for('auth.view_user_profile', user_id=comment['user_id']) }}">
                     <img class="comment-profile-picture" src="{{ url_for('static', filename='Userprofile/' + (comment['profile_picture'] if comment['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
                 </a>
                 <p><strong>{{ comment['name'] }}</strong> commented at {{ comment['created_at'] }}</p>
