@@ -734,7 +734,7 @@ def view_user_profile(user_id):
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    #ffetch the profile owner's data
+    #fetch the profile owner's data
     cursor.execute("""
         SELECT id, name, email, profile_picture, cover_photo, status, birthday, mbti, hobby, bio 
         FROM user WHERE id = ?
@@ -745,7 +745,7 @@ def view_user_profile(user_id):
         flash("User profile not found!", category="error")
         return redirect(url_for('community.community_feature'))
 
-    #ffetch posts of the profile owner
+    #fetch posts of the profile owner
     cursor.execute("SELECT * FROM post WHERE user_id = ?", (user_id,))
     posts = cursor.fetchall()
 
