@@ -89,7 +89,7 @@
 </style>
 
 <h1 style="font-size: 40px; font-weight: bold; text-align: center; padding-top: 25px; color: #94693e; font-family: 'Times New Roman';">
-    {{ user.name }}'s Profile
+    {{ profile_owner.name }}'s Profile
 </h1>
 <h5 style="font-size: 20px; font-weight: bold; text-align: center; margin-top: 5px; margin-bottom: 20px; color: #6b4f2f; font-family: 'Times New Roman'; font-style: italic;">
     Here is meowfile🐈‍⬛
@@ -99,31 +99,31 @@
   <div class="profile-details">
 
     <div class="profile-header">
-      {% if user.cover_photo %}
-        <img src="{{ url_for('static', filename='Userprofile/' ~ user.cover_photo) }}" alt="Cover Photo" class="cover-photo">
+      {% if profile_owner.cover_photo %}
+        <img src="{{ url_for('static', filename='Userprofile/' ~ profile_owner.cover_photo) }}" alt="Cover Photo" class="cover-photo">
       {% else %}
         <img src="{{ url_for('static', filename='Userprofile/default_cover.png') }}" alt="Cover Photo" class="cover-photo">
       {% endif %}
 
       <div class="profile-content">
-        {% if user.profile_picture %}
-          <img src="{{ url_for('static', filename='Userprofile/' ~ user.profile_picture) }}" alt="Profile Picture" class="profile-picture">
+        {% if profile_owner.profile_picture %}
+          <img src="{{ url_for('static', filename='Userprofile/' ~ profile_owner.profile_picture) }}" alt="Profile Picture" class="profile-picture">
         {% else %}
           <img src="{{ url_for('static', filename='Userprofile/default_profilepic.png') }}" alt="Profile Picture" class="profile-picture">
         {% endif %}
 
         <div class="profile-info">
-          <h2><b>{{ user.name }}</b></h2>
-          <h5><b>Status:</b> {{ user.status }}</h5>
+          <h2><b>{{ profile_owner.name }}</b></h2>
+          <h5><b>Status:</b> {{ profile_owner.status }}</h5>
         </div>
       </div>
     </div>
 
-    <h5 style="padding: 5px;"><b>Email:</b> {{ user.email }}</h5>
-    <h5 style="padding: 5px;"><b>Birthday:</b> {{ user.birthday if user.birthday else "-" }}</h5>
-    <h5 style="padding: 5px;"><b>MBTI:</b> {{ user.mbti if user.mbti else "-" }}</h5>
-    <h5 style="padding: 5px;"><b>Hobby:</b> {{ user.hobby if user.hobby else "-" }}</h5>
-    <h5 style="padding: 5px;"><b>Bio:</b> {{ user.bio if user.bio else "-" }}</h5>
+    <h5 style="padding: 5px;"><b>Email:</b> {{ profile_owner.email }}</h5>
+    <h5 style="padding: 5px;"><b>Birthday:</b> {{ profile_owner.birthday if profile_owner.birthday else "-" }}</h5>
+    <h5 style="padding: 5px;"><b>MBTI:</b> {{ profile_owner.mbti if profile_owner.mbti else "-" }}</h5>
+    <h5 style="padding: 5px;"><b>Hobby:</b> {{ profile_owner.hobby if profile_owner.hobby else "-" }}</h5>
+    <h5 style="padding: 5px;"><b>Bio:</b> {{ profile_owner.bio if profile_owner.bio else "-" }}</h5>
 
     <button onclick="location.href='{{ url_for('community.community_feature') }}'">🐾Back🐾</button>
 
