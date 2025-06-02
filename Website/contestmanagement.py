@@ -5,10 +5,12 @@ from flask_login import current_user, login_required, login_user
 from werkzeug.utils import secure_filename
 from datetime import date, datetime
 from .badge import check_contest_winner_badges
+from flask_cors import CORS #Allows external website to access API
 
 app = Flask(__name__, static_folder='static')
 app.secret_key = 'your_secret_key'
 contestmanagement_bp = Blueprint('contestmanagement', __name__, template_folder='templates', static_folder='static')
+CORS(app) 
 
 UPLOAD_FOLDER = 'Website/static/contest' #Folder to store uploaded files
 ALLOWED_EXTENSIONS = {'png','jpg','jpeg'}
@@ -400,6 +402,18 @@ def get_winners(contest_id):
     top_vote = participants[0]['votes']
     winners = [p for p in participants if p['votes'] == top_vote]
     return winners
+
+#Calendar in homepage
+@contestmanagement_bp.route('/api/contests')
+def get_contests():
+    conn = get_db_connection()
+    contests = conn.execute(
+        'SELECT name, start_date FROM contests WHERE start_date >= CURRENT_DATE ORDER BY start_date ASC'
+    ).fetchall()
+    conn.close()
+
+    contest_events = [{"title": contest["name"], "start": contest["start_date"]} for contest in contests]
+    return jsonify(contest_events)
 
 if __name__ == '__main__':
     #Ensure the upload folder exists
