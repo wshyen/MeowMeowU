@@ -305,7 +305,7 @@
             <span class="separator">|</span>
 
             <button class="post-action-button" onclick="event.stopPropagation(); window.location.href='/post/{{ post['post_id'] }}#comments'">
-                💬 Comments
+               💬 {{ post['comment_count'] }} Comments
             </button>
         </div>
 
