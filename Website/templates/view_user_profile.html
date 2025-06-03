@@ -97,14 +97,15 @@
     flex-direction: column;
     width: 100%;
     width: 800px;
-    height: 400px;
+    min-height: 200px;
     background-color: #ffffff;
     border-radius: 10px;
     margin: 20px auto;
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    padding: 30px;
+    padding: 15px;
     cursor: pointer;
+    justify-content: space-between;
   }
   
   .post-info {
@@ -115,7 +116,7 @@
     margin-left: 20px;
   }
 
-  .post-info img.profile-picture {
+  .post-profile-picture {
     width: 50px;
     height: 50px;
     border-radius: 50%; 
@@ -126,34 +127,36 @@
   .post-content {
     text-align: left;    
     margin-left: 90px; 
+    max-width: 600px;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
     overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;  
-    max-width: 380px;
-    max-height: 230px;        
+    text-overflow: ellipsis;
+    white-space: normal;        
   }
 
   .media {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 10px 0;
+    align-items: flex-start;
+    margin: 10px 90px;
   }
 
   .media img,
   .media video {
-    margin: 10px auto;
-    border-radius: 12px;
-    width: 200px;
-    height: 200px;
+    width: 150px;
+    height: 150px;
     object-fit: cover; 
   }
 
   .post-actions {
-    margin: 10px 0;
+    margin-left: 70px;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: flex-start;
+    gap: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #6b4f2f;
+    border-top: 1px solid #e2d6ca;
   }
 
   .post-action-button {
@@ -163,7 +166,7 @@
     cursor: pointer;
     font-weight: bold;
     font-size: 18px; 
-    margin: 0 10px;
+    margin: 0 5px;
   }
 
   .post-action-button:hover {
@@ -266,11 +269,11 @@
 
     <div class="post" onclick="window.location.href='/post/{{ post['post_id'] }}'">
         <div class="post-info">
-            <img class="profile-picture" src="{{ url_for('static', filename='Userprofile/' + (post['profile_picture'] if post['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
-            <p><strong>{{ post['name'] }}</strong> posted at {{ post['created_at'] }}</p>
+            <img class="post-profile-picture" src="{{ url_for('static', filename='Userprofile/' ~ profile_owner.profile_picture) if profile_owner.profile_picture else url_for('static', filename='Userprofile/default_profilepic.png') }}"  alt="Avatar">
+            <p><strong>{{ profile_owner.name }}</strong> posted at {{ post['created_at'] }}</p>
         </div>
 
-        <p>{{ post['content'] }}</p>
+        <p class="post-content">{{ post['content'] }}</p>
           {% if post['cat_hashtag'] %}
               <p class="post-content">
                   <a class="hashtag" href="{{ url_for('community.hashtag_posts', hashtag=post['cat_hashtag']) }}">#{{ post['cat_hashtag'] }}</a>
