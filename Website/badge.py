@@ -96,7 +96,7 @@ def check_like_badges(user_id):
         'SELECT COUNT(*) FROM likes WHERE user_id = ?', (user_id,)).fetchone()[0]
     claimable_badges = set()
 
-    for milestone in [10, 50, 100]:
+    for milestone in [10, 50, 100, 500]:
         criteria = f'like_{milestone}_posts'
         badge = conn.execute('SELECT * FROM badge WHERE criteria = ?', (criteria,)).fetchone()
         if badge:
@@ -116,7 +116,7 @@ def check_comment_badges(user_id):
         'SELECT COUNT(*) FROM comment WHERE user_id = ?', (user_id,)).fetchone()[0]   
     claimable_badges = set ()
 
-    for milestone in [10, 50, 100]:
+    for milestone in [10, 50, 100, 500]:
         criteria = f'comment_{milestone}'
         badge = conn.execute('SELECT * FROM badge WHERE criteria = ?', (criteria,)).fetchone()
         if badge:
@@ -136,7 +136,7 @@ def check_post_badges(user_id):
         'SELECT COUNT(*) FROM post WHERE user_id = ?', (user_id,)).fetchone()[0]
     claimable_badges = set()
 
-    for milestone in [10, 50, 100]:
+    for milestone in [10, 50, 100, 500]:
         criteria = f'upload_{milestone}_posts'
         badge = conn.execute('SELECT * FROM badge WHERE criteria = ?', (criteria,)).fetchone()
         if badge:

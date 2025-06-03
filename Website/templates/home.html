@@ -55,13 +55,56 @@
         object-fit: cover;
     }
 
+    #contest-calendar {
+        max-width: 900px;
+        /* Same width as .about-section */
+        margin: 60px auto;
+        /* Same spacing */
+        padding: 40px;
+        background: #fff7ec;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    }
+
+    #calendar {
+        width: 100%;
+        height: 700px;
+        display: block;
+        background-color: #fff7ec;
+        padding: 20px;
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    .fc-button {
+        background-color: #6b4f2f !important;
+        color: white !important;
+        border: none !important;
+    }
+
+    .fc-button:hover {
+        background-color: #8d6c45 !important;
+    }
+
+    .fc-prev-button, .fc-next-button {
+        background-color: #c79058 !important;
+        color: white !important;
+    }
+
+    .fc-prev-button:hover, .fc-next-button:hover {
+        background-color: #9c6732 !important;
+    }
 </style>
+
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+</head>
 
 <div class="about-section">
     <div class="text">
         <h2><b>🐾 About MeowMeowU 🐾</b></h2>
         <p>
-            Welcome to MeowMeowU, a vibrant community where students celebrate campus cats❕<br/>
+            Welcome to MeowMeowU, a vibrant community where students celebrate campus cats❕<br />
             Share photos, create feline profiles, and interact with fellow cat lovers.
         </p>
         <p>
@@ -69,8 +112,8 @@
             this platform brings students together through their shared love of cats. 💕
         </p>
         <p>
-            Help make the campus a better place for our feline companions!  
-            Earn badges, participate in the community, and challenge yourself with fun quizzes. 🖊  
+            Help make the campus a better place for our feline companions!
+            Earn badges, participate in the community, and challenge yourself with fun quizzes. 🖊
             Connect with fellow cat enthusiasts and contribute to a cat-friendly environment. 🌟
         </p>
     </div>
@@ -79,5 +122,35 @@
         <img src="static/Images/home.image.jpeg" alt="Cat 1">
     </div>
 </div>
+
+<section id="contest-calendar">
+    <h2><b>📅 Upcoming & Ongoing Contests</b></h2>
+    <div id="calendar"></div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        fetch('/api/contests') //Send request to get the list of contests in backend
+            .then(response => response.json())
+            .then(data => {
+                console.log("Fetched Contests:", data);  //Debugging
+
+                var formattedData = data.map(event => ({ //Transform the API data into a format that the Calendar understands
+                    title: event.title,
+                    start: event.start //Ensures the date is passed in 'YYYY-MM-DD' format
+                }));
+
+                var calendarEl = document.getElementById('calendar');
+                var calendar = new FullCalendar.Calendar(calendarEl, { //Creates a new calendar instance
+                    initialView: 'dayGridMonth',
+                    events: formattedData, //Pass formatted contest data from your database
+                    eventClick: function (info) {
+                        alert('Contest: ' + info.event.title + '\nStart Date: ' + info.event.start);
+                    }
+                });
+                calendar.render();
+            });
+    });
+</script>
 
 {% endblock %}

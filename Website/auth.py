@@ -723,3 +723,32 @@ def view_profile(profile_id):
     
     flash("Profile not found!", category="error")
     return redirect(url_for("auth.view_report"))
+
+#view user profile
+@auth.route('/profile/<int:user_id>')
+def view_user_profile(user_id):
+    if not current_user.is_authenticated:
+        flash("You must be logged in to view profile!", category="error")
+        return redirect(url_for('auth.login'))
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    #fetch the profile owner's data
+    cursor.execute("""
+        SELECT id, name, email, profile_picture, cover_photo, status, birthday, mbti, hobby, bio 
+        FROM user WHERE id = ?
+    """, (user_id,))
+    profile_owner = cursor.fetchone()
+
+    if not profile_owner:
+        flash("User profile not found!", category="error")
+        return redirect(url_for('community.community_feature'))
+
+    #fetch posts of the profile owner
+    cursor.execute("SELECT * FROM post WHERE user_id = ?", (user_id,))
+    posts = cursor.fetchall()
+
+    conn.close()
+
+    return render_template("view_user_profile.html", profile_owner=profile_owner, posts=posts, user=current_user)
