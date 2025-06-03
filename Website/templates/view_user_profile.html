@@ -14,6 +14,12 @@
     color: rgb(78, 68, 57);
   }
 
+  h3 {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
   .profile-header {
     position: relative;
     margin-bottom: 30px;
@@ -72,6 +78,106 @@
     border-radius: 10px;
   }
 
+  .post-container {
+    width: 60%;
+    margin-left: auto; 
+    margin-right: 50px; 
+    padding: 20px;
+    background-color: #fff7ec;
+    color: #6b4f2f;
+    font-family: 'Times New Roman';
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .post {
+    display: flex;  
+    flex-direction: column;
+    width: 100%;
+    width: 800px;
+    min-height: 200px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    margin: 20px auto;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    cursor: pointer;
+    justify-content: space-between;
+  }
+  
+  .post-info {
+    width: 100%;  
+    display: flex;
+    align-items: center;  
+    justify-content: flex-start; 
+    margin-left: 20px;
+  }
+
+  .post-profile-picture {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%; 
+    margin-right: 20px;
+    border: 1px solid #c8a786; 
+  }
+
+  .post-content {
+    text-align: left;    
+    margin-left: 90px; 
+    max-width: 600px;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;        
+  }
+
+  .media {
+    display: flex;
+    align-items: flex-start;
+    margin: 10px 90px;
+  }
+
+  .media img,
+  .media video {
+    width: 150px;
+    height: 150px;
+    object-fit: cover; 
+  }
+
+  .post-actions {
+    margin-left: 70px;
+    display: flex;
+    justify-content: flex-start;
+    gap: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #6b4f2f;
+    border-top: 1px solid #e2d6ca;
+  }
+
+  .post-action-button {
+    background: none;
+    border: none;
+    color: #6b4f2f;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 18px; 
+    margin: 0 5px;
+  }
+
+  .post-action-button:hover {
+    background-color: inherit;
+  }
+  
+  .post-actions .separator {
+    font-size: 30px;
+    color: #6b4f2f;
+  }
+
   button {
     font-family: 'Times New Roman';
     background-color: rgb(176, 148, 119);
@@ -122,24 +228,24 @@
   <div class="profile-details">
 
     <div class="profile-header">
-      {% if profile_owner.cover_photo %}
-        <img src="{{ url_for('static', filename='Userprofile/' ~ profile_owner.cover_photo) }}" alt="Cover Photo" class="cover-photo" onclick="toggleModal('{{ url_for('static', filename='Userprofile/' ~ profile_owner.cover_photo) }}')">
-      {% else %}
-        <img src="{{ url_for('static', filename='Userprofile/default_cover.png') }}" alt="Cover Photo" class="cover-photo" onclick="toggleModal('{{ url_for('static', filename='Userprofile/default_cover.png') }}')">
-      {% endif %}
+          {% if profile_owner.cover_photo %}
+            <img src="{{ url_for('static', filename='Userprofile/' ~ profile_owner.cover_photo) }}" alt="Cover Photo" class="cover-photo" onclick="toggleModal('{{ url_for('static', filename='Userprofile/' ~ profile_owner.cover_photo) }}')">
+          {% else %}
+            <img src="{{ url_for('static', filename='Userprofile/default_cover.png') }}" alt="Cover Photo" class="cover-photo" onclick="toggleModal('{{ url_for('static', filename='Userprofile/default_cover.png') }}')">
+          {% endif %}
 
-      <div class="profile-content">
-        {% if profile_owner.profile_picture %}
-          <img src="{{ url_for('static', filename='Userprofile/' ~ profile_owner.profile_picture) }}" alt="Profile Picture" class="profile-picture" onclick="toggleModal('{{ url_for('static', filename='Userprofile/' ~ profile_owner.profile_picture) }}')">
-        {% else %}
-          <img src="{{ url_for('static', filename='Userprofile/default_profilepic.png') }}" alt="Profile Picture" class="profile-picture" onclick="toggleModal('{{ url_for('static', filename='Userprofile/default_profilepic.png') }}')">
-        {% endif %}
+          <div class="profile-content">
+            {% if profile_owner.profile_picture %}
+              <img src="{{ url_for('static', filename='Userprofile/' ~ profile_owner.profile_picture) }}" alt="Profile Picture" class="profile-picture" onclick="toggleModal('{{ url_for('static', filename='Userprofile/' ~ profile_owner.profile_picture) }}')">
+            {% else %}
+              <img src="{{ url_for('static', filename='Userprofile/default_profilepic.png') }}" alt="Profile Picture" class="profile-picture" onclick="toggleModal('{{ url_for('static', filename='Userprofile/default_profilepic.png') }}')">
+            {% endif %}
 
-        <div class="profile-info">
-          <h2><b>{{ profile_owner.name }}</b></h2>
-          <h5><b>Status:</b> {{ profile_owner.status }}</h5>
-        </div>
-      </div>
+            <div class="profile-info">
+              <h2><b>{{ profile_owner.name }}</b></h2>
+              <h5><b>Status:</b> {{ profile_owner.status }}</h5>
+            </div>
+          </div>
     </div>
 
     <h5 style="padding: 5px;"><b>Email:</b> {{ profile_owner.email }}</h5>
@@ -152,6 +258,64 @@
 
   </div>
 </div>
+
+
+<div class="post-container">
+    <h3 style="font-size: 30px; font-weight: bold; text-align: center;">
+      {{ profile_owner.name }}'s posts
+    </h3>
+
+  {% for post in posts %}
+
+    <div class="post" onclick="window.location.href='/post/{{ post['post_id'] }}'">
+        <div class="post-info">
+            <img class="post-profile-picture" src="{{ url_for('static', filename='Userprofile/' ~ profile_owner.profile_picture) if profile_owner.profile_picture else url_for('static', filename='Userprofile/default_profilepic.png') }}"  alt="Avatar">
+            <p><strong>{{ profile_owner.name }}</strong> posted at {{ post['created_at'] }}</p>
+        </div>
+
+        <p class="post-content">{{ post['content'] }}</p>
+          {% if post['cat_hashtag'] %}
+              <p class="post-content">
+                  <a class="hashtag" href="{{ url_for('community.hashtag_posts', hashtag=post['cat_hashtag']) }}">#{{ post['cat_hashtag'] }}</a>
+              </p>
+          {% endif %}
+
+        <div class="media">
+          {% if post['media_url'] %}
+              {% set ext = post['media_url'].rsplit('.', 1)[1].lower() %}
+              {% if ext in ['jpg', 'jpeg', 'png', 'gif'] %}
+                  <img src="{{ url_for('static', filename=post['media_url']) }}" alt="Image">
+              {% elif ext in ['mp4', 'mov', 'avi'] %}
+                  <video controls>
+                      <source src="{{ url_for('static', filename=post['media_url']) }}" type="video/{{ ext }}">
+                  </video>
+              {% endif %}
+          {% endif %}
+        </div>
+        
+        <div class="post-actions">
+            <form id="like-form-{{ post['post_id'] }}" action="{{ url_for('community.like_post' if not post['liked_by_current_user'] else 'community.unlike_post', post_id=post['post_id']) }}" method="post" style="display:inline;">
+                <button type="submit" class="post-action-button">
+                    {% if post['liked_by_current_user'] %}
+                        ❤️ 
+                    {% else %}
+                        🤍 
+                    {% endif %}
+                    {{ post['like_count'] }} Like
+                </button>
+            </form>
+            
+            <span class="separator">|</span>
+
+            <button class="post-action-button" onclick="event.stopPropagation(); window.location.href='/post/{{ post['post_id'] }}#comments'">
+                💬 Comments
+            </button>
+        </div>
+    </div>
+
+  {% endfor %}
+
+</div>  
 
 <div class="modal" id="imageModal" onclick="closeModal()">
   <span class="modal-close" onclick="closeModal()">&times;</span>
