@@ -415,6 +415,21 @@ def get_contests():
     contest_events = [{"title": contest["name"], "start": contest["start_date"]} for contest in contests]
     return jsonify(contest_events)
 
+@contestmanagement_bp.route('/get_upcoming_contest')
+def get_upcoming_contest():
+    conn = get_db_connection()
+    contests = conn.execute(
+        'SELECT name, start_date FROM contests WHERE start_date >= CURRENT_DATE ORDER BY start_date ASC'
+    ).fetchall()
+    conn.close()
+
+    if contests:  # Check if there are any upcoming contests
+        next_contest = contests[0]  # Get the first upcoming contest
+        return jsonify({'start_date': next_contest['start_date']})
+    else:
+        return jsonify({'start_date': None})
+
+
 if __name__ == '__main__':
     #Ensure the upload folder exists
     if not os.path.exists(app.config['UPLOAD_FOLDER']):
