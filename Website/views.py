@@ -1,13 +1,14 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import current_user, login_required
-from .models import Note
+from .models import Note, Story
 from .import db
 
 views = Blueprint("views", __name__)
 
 @views.route("/")
 def home():
-    return render_template("home.html", user=current_user)
+    latest_stories = Story.query.order_by(Story.created_at.desc()).limit(1).all()
+    return render_template("home.html", user=current_user, stories=latest_stories)
 
 @views.route('/suggestion-box', methods=['GET', 'POST'])
 @login_required
