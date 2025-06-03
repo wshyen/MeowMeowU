@@ -7,4 +7,5 @@ venv/
 env/
 *.db-shm
 *.db-wal
-*.svg
+*.svg"__pycache__/" 
+"*.pyc" 
