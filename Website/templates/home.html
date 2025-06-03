@@ -93,6 +93,47 @@
     .fc-prev-button:hover, .fc-next-button:hover {
         background-color: #9c6732 !important;
     }
+
+    .fc-event {
+        background-color: #812d9b !important; /* Match the card background */
+        border: none;
+        color: white !important;
+        font-weight: bold !important;
+    }
+
+    .fc-event:hover {
+        background-color: #a665b9 !important;
+        color: white !important;
+    }
+
+    .fc-event * {
+        color: white !important;
+        font-weight: bold;
+    }
+
+    .fc-daygrid-event {
+        width: 100% !important;
+        height: 100% !important;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 5px;
+    }
+    
+    footer {
+        background-color: #5C4033;
+        color: white;
+        text-align: center;
+        padding: 10px;
+        bottom: 0;
+        width: 100%;
+    }
+
+    footer p {
+    margin: 5px 0;
+    font-size: 16px;
+}
 </style>
 
 <head>
@@ -127,6 +168,12 @@
     <h2><b>📅 Upcoming & Ongoing Contests</b></h2>
     <div id="calendar"></div>
 </section>
+
+<footer>
+    <p>© 2025 MeowMeowU | All rights reserved.</p>
+    <p>2510 CSP1123 3-07</p>
+    <p>Instagram: @shyen_17 | @mingyenn__ | @yinnie_s </p>
+</footer>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
