@@ -153,6 +153,35 @@
   </div>
 </div>
 
+
+<div class="post_container" style="display: block; align-items: end; color: #6b4f2f; font-family: 'Times New Roman';">
+  <div class="user_posts">
+    <h3 style="font-size: 30px; font-weight: bold; text-align: center;">
+      {{ profile_owner.name }}'s posts
+    </h3>
+
+    <ul style="list-style:none; padding:0; display:flex; flex-direction: column; align-items: flex-end;">
+      {% for post in posts %}
+        <li>
+            <a href="{{ url_for('community.post_detail', post_id=post.post_id) }}" style="display: flex; align-items: center; text-decoration: none; color: inherit; width: 100%;">
+              {% if post.media_url %}
+                <img src="{{ url_for('static', filename=post['media_url']) }}" alt="Post media" style="max-width:100px;">
+              {% endif %}
+              <p>{{ post.content }}</p>
+              <p>Likes: {{ post.like_count }}</p>
+            </a>
+        </li>
+      {% else %}
+        <li>No posts yet.</li>
+      {% endfor %}
+    </ul>
+   
+
+
+  </div>
+
+</div>  
+
 <div class="modal" id="imageModal" onclick="closeModal()">
   <span class="modal-close" onclick="closeModal()">&times;</span>
   <img id="modalImage">
