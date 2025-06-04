@@ -63,6 +63,10 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+        position: sticky !important;
+        position: -webkit-sticky !important;
+        z-index: 1000;
+        top: 0%; 
     }
 
     .ml-auto {
@@ -132,33 +136,6 @@
         opacity: 1;
         transform: translateX(0);
     }
-
-    #adminPanelButton {
-        position: fixed;
-        bottom: 80px;
-        left: 130px;
-        background-color: #B4906E;
-        border: none;
-        padding: 5px 10px;
-        cursor: pointer;
-        border-radius: 5px;
-        display: none;
-        opacity: 0;
-        transition: opacity 0.5s ease, transform 0.5s ease;
-        outline: none;
-        z-index: 9999;
-    }
-
-    #adminPanelButton:hover {
-        background-color: #94693e;
-        transform: scale(1.1);
-    }
-
-    #adminPanelButton.show {
-        display: block;
-        opacity: 1;
-        transform: translateX(0);
-    }
 </style>
 
 <head>
@@ -168,12 +145,18 @@
         crossorigin="anonymous" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
         crossorigin="anonymous" />
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
 
     <title>{% block title %}Home{% endblock %}</title>
 </head>
 
 <body>
+
     <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgb(176, 148, 119);">
+        <div style="height: 60px; width: 60px; border-radius: 50%; background-color: rgb(176, 148, 119);; 
+            padding: 5px; margin-right: 5px; display: flex; overflow: hidden; align-items: center; justify-content: center;">
+            <img src="{{ url_for('static', filename='Images/Logo.png') }}" alt="Logo" style="width: auto; height: 130%; object-fit: contain;">
+        </div>    
         <a class="nav-item nav-link" style="font-family: 'Times New Roman'; color: white; font-size: 19px;"
             href="/">Home</a>
 
