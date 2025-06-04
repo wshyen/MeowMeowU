@@ -90,18 +90,27 @@
         
 </style>    
     
-<h1>SEARCH CAT PROFILE</h1>
+<h1>SEARCH</h1>
   
-<form action="/cat_list" method="get">
+<form action="/search" method="get">
     
     <div class="form-container">    
 
         <div class="search-bar">
-            <label for="name">Search by name:</label> 
+            <label for="name">Keyword:</label> 
             <input type="text" id="name" name="name" placeholder="e.g., Tom, Bubble" /> 
         </div>   
                 
         <div class="filter-bar">
+            <label for="search_type">Search in:</label>
+            <select id="search_type" name="search_type">
+                <option value="cat">Cat Profiles</option>
+                <option value="post">Community Posts</option>
+                <option value="user">Users</option>
+            </select>
+        </div>
+
+        <div class="filter-bar" id = "cat-filters">
             <label for="gender">Filter by gender:</label>
             <select id="gender" name="gender">
                 <option value="">Any</option>
@@ -127,10 +136,12 @@
                 </select>
         </div>
     
-            <button type="submit">🐾Go🐾</button>  
+        <button type="submit">🐾Go🐾</button>  
 
     </div>            
 
 </form>                    
     
+
+
 {% endblock %}
