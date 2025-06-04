@@ -135,6 +135,7 @@
     }
 
     .latest-stories-container {
+        align-items: center;
         max-width: 450px;
         margin: 40px;
         margin-left: 20%;
@@ -196,6 +197,28 @@
         transform: scale(1.05);
     }
 
+    .view-stories-link {
+        text-align: center;
+        margin-top: 5px;
+    }
+
+    .view-stories-link a {
+        font-size: 20px;
+        font-family: 'Times New Roman', serif;
+        color: rgb(120, 100, 80);
+        font-weight: bold;
+        text-decoration: none;
+        transition: color 0.3s ease, transform 0.3s ease;
+        display: inline-block;
+        cursor: pointer;
+    }
+
+    .view-stories-link a:hover {
+        background-color: transparent;
+        transform: scale(1.1);
+        text-decoration: underline;
+    }
+
 </style>
 
 <head>
@@ -233,6 +256,8 @@
     <div id="calendar"></div>
 </section>
 
+<hr>
+
 <div class="latest-stories-container">
     <h2 style="font-weight: bold; color: rgb(78, 68, 57); font-family: Times New Roman; padding-bottom: 10px; text-align: center;">📖Latest Cat Stories</h2>
     <div class="latest-stories-grid">
@@ -247,11 +272,9 @@
         </div>
         {% endfor %}
     </div>
-    <a href="{{ url_for('auth.cat_story') }}" style="text-align: center;">View Stories</a>
-</div>
-
-<div class="latest-post-container">
-    
+    <div class="view-stories-link">
+        <a href="{{ url_for('auth.cat_story') }}">📓More Cat Stories</a>
+    </div>
 </div>
 
 <footer>

@@ -65,8 +65,8 @@
         align-items: center;
         position: sticky !important;
         position: -webkit-sticky !important;
-        top: 15%;
-        z-index: 1001; 
+        z-index: 1000;
+        top: 0%; 
     }
 
     .ml-auto {
@@ -75,8 +75,6 @@
 
     body {
         background-color: #f9f4ef;
-        margin: 0;
-        padding-top: 110px;
     }
 
     button:hover {
@@ -166,29 +164,6 @@
         transform: translateX(0);
     }
 
-    .site-header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        height: 15%;
-        width: 100%;
-        background-color: #f2f2f2;
-        z-index: 1002;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 10px;
-    }
-
-    .logo-img {
-        height: 250px;
-        width: auto;
-        margin-top: 5px;
-        margin-right: 10px;
-        justify-content: center !important;
-        align-items: center !important;
-    }
-
 </style>
 
 <head>
@@ -203,10 +178,6 @@
 </head>
 
 <body>
-    <!-- Website Logo and Name Header -->
-    <div class="site-header d-flex align-items-center justify-content-center p-4">
-        <img src="{{ url_for('static', filename='Images/logo.png') }}" alt="Site Logo" class="logo-img">
-    </div>
 
     <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgb(176, 148, 119);">
         <a class="nav-item nav-link" style="font-family: 'Times New Roman'; color: white; font-size: 19px;"
