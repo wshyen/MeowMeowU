@@ -24,7 +24,9 @@
     position: relative;
     margin-bottom: 30px;
     margin-top: 25px;
-    align-items: center;
+    align-items: center !important;
+    text-align: center !important;
+    justify-content: center !important;
   }
 
   .cover-photo {
@@ -41,13 +43,16 @@
     box-shadow: 0 8px 22px rgba(0, 0, 0, 0.15);
   }
 
-  .profile-content {
-    position: absolute;
-    top: 100px;
-    left: 30px;
-    display: flex;
+  .main-wrapper {
+    width: 85%;
+    max-width: 1000px;
+    margin: 30px auto;
+    background: #fff7ec;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     align-items: center;
-    border-radius: 10px;
+    justify-content: center;
   }
 
   .profile-picture {
@@ -67,15 +72,47 @@
   }
 
   .profile-info {
-    margin-left: 20px;
+    align-items: center !important;
+    text-align: center !important;
+    justify-content: center !important;
+    font-family: 'Times New Roman';
+    color: #4e4439;
+  }
+
+  .profile-info h2, .profile-info h5 {
+    font-weight: bold;
+    margin: 5px 0;
   }
 
   .profile-details {
-    margin-top: 45px;
-    margin-bottom: 45px;
+    width: 100%;
+    height: 100%;
+    margin-bottom: 10px;
     background: #fff7ec;
     padding: 20px;
     border-radius: 10px;
+  }
+
+  .profile-details h5 {
+    font-size: 18px;
+  }
+
+  .main-content-row {
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+    margin-top: 20px;
+  }
+
+  .profile-section {
+    width: 30%;
+    background-color: #e5d1bb;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   .post-container {
@@ -178,20 +215,27 @@
     color: #6b4f2f;
   }
 
-  button {
-    font-family: 'Times New Roman';
-    background-color: rgb(176, 148, 119);
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    font-size: 16px;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 10px;
+  .back-community {
+    text-align: center;
+    margin-top: 5px;
   }
 
-  button:hover {
-    background-color: rgb(156, 128, 100);
+  .back-community a {
+    font-size: 20px;
+    font-family: 'Times New Roman', serif;
+    color: rgb(120, 100, 80);
+    font-weight: bold;
+    text-decoration: none;
+    transition: color 0.3s ease, transform 0.3s ease;
+    display: inline-block;
+    cursor: pointer;
+  }
+
+  .back-community a:hover {
+    background-color: transparent;
+    transform: scale(1.1);
+    color: rgb(120, 100, 80);
+    text-decoration: underline;
   }
 
   .modal {
@@ -217,47 +261,49 @@
 
 </style>
 
-<h1 style="font-size: 40px; font-weight: bold; text-align: center; padding-top: 25px; color: #94693e; font-family: 'Times New Roman';">
-    {{ profile_owner.name }}'s Profile
-</h1>
-<h5 style="font-size: 20px; font-weight: bold; text-align: center; margin-top: 5px; margin-bottom: 20px; color: #6b4f2f; font-family: 'Times New Roman'; font-style: italic;">
-    Here is meowfile🐈‍⬛
-</h5>
+<div class="main-wrapper">
 
-<div class="container mt-4">
-  <div class="profile-details">
+  {% if profile_owner.cover_photo %}
+    <img style="margin-bottom: 20px;" src="{{ url_for('static', filename='Userprofile/' ~ profile_owner.cover_photo) }}" alt="Cover Photo" class="cover-photo" onclick="toggleModal('{{ url_for('static', filename='Userprofile/' ~ profile_owner.cover_photo) }}')">
+  {% else %}
+    <img style="margin-bottom: 20px;" src="{{ url_for('static', filename='Userprofile/default_cover.png') }}" alt="Cover Photo" class="cover-photo" onclick="toggleModal('{{ url_for('static', filename='Userprofile/default_cover.png') }}')">
+  {% endif %}
 
-    <div class="profile-header">
-          {% if profile_owner.cover_photo %}
-            <img src="{{ url_for('static', filename='Userprofile/' ~ profile_owner.cover_photo) }}" alt="Cover Photo" class="cover-photo" onclick="toggleModal('{{ url_for('static', filename='Userprofile/' ~ profile_owner.cover_photo) }}')">
-          {% else %}
-            <img src="{{ url_for('static', filename='Userprofile/default_cover.png') }}" alt="Cover Photo" class="cover-photo" onclick="toggleModal('{{ url_for('static', filename='Userprofile/default_cover.png') }}')">
-          {% endif %}
+  <hr>
 
-          <div class="profile-content">
-            {% if profile_owner.profile_picture %}
-              <img src="{{ url_for('static', filename='Userprofile/' ~ profile_owner.profile_picture) }}" alt="Profile Picture" class="profile-picture" onclick="toggleModal('{{ url_for('static', filename='Userprofile/' ~ profile_owner.profile_picture) }}')">
-            {% else %}
-              <img src="{{ url_for('static', filename='Userprofile/default_profilepic.png') }}" alt="Profile Picture" class="profile-picture" onclick="toggleModal('{{ url_for('static', filename='Userprofile/default_profilepic.png') }}')">
-            {% endif %}
+  <div class="main-content-row">
+    
+    <div class="profile-section">
+      <div class="profile-header">
+        {% if profile_owner.profile_picture %}
+          <img src="{{ url_for('static', filename='Userprofile/' ~ profile_owner.profile_picture) }}" alt="Profile Picture" class="profile-picture" onclick="toggleModal('{{ url_for('static', filename='Userprofile/' ~ profile_owner.profile_picture) }}')">
+        {% else %}
+          <img src="{{ url_for('static', filename='Userprofile/default_profilepic.png') }}" alt="Profile Picture" class="profile-picture" onclick="toggleModal('{{ url_for('static', filename='Userprofile/default_profilepic.png') }}')">
+        {% endif %}
+        <div class="profile-info">
+          <h2>{{ profile_owner.name }}</h2>
+          <h5>Status: {{ profile_owner.status }}</h5>
+        </div>
+      </div>
 
-            <div class="profile-info">
-              <h2><b>{{ profile_owner.name }}</b></h2>
-              <h5><b>Status:</b> {{ profile_owner.status }}</h5>
-            </div>
-          </div>
+      <div class="profile-details">
+        <h5><b>Birthday:</b> {{ profile_owner.birthday if profile_owner.birthday else "-" }}</h5>
+        <h5><b>MBTI:</b> {{ profile_owner.mbti if profile_owner.mbti else "-" }}</h5>
+        <h5><b>Hobby:</b> {{ profile_owner.hobby if profile_owner.hobby else "-" }}</h5>
+        <h5><b>Bio:</b> {{ profile_owner.bio if profile_owner.bio else "-" }}</h5>
+      </div>
+      <div class="back-community">
+          <a onclick="location.href='{{ url_for('community.community_feature') }}'">🐾Back to Community🐾</a>
+        </div>
     </div>
 
-    <h5 style="padding: 5px;"><b>Birthday:</b> {{ profile_owner.birthday if profile_owner.birthday else "-" }}</h5>
-    <h5 style="padding: 5px;"><b>MBTI:</b> {{ profile_owner.mbti if profile_owner.mbti else "-" }}</h5>
-    <h5 style="padding: 5px;"><b>Hobby:</b> {{ profile_owner.hobby if profile_owner.hobby else "-" }}</h5>
-    <h5 style="padding: 5px;"><b>Bio:</b> {{ profile_owner.bio if profile_owner.bio else "-" }}</h5>
-
-    <button onclick="location.href='{{ url_for('community.community_feature') }}'">🐾Back to Community🐾</button>
+    <div class="main-right-content">
+      <!-- Yinnie post -->
+    </div>
 
   </div>
-</div>
 
+</div>
 
 <div class="post-container">
     <h3 style="font-size: 30px; font-weight: bold; text-align: center;">
