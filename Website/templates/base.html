@@ -136,34 +136,6 @@
         opacity: 1;
         transform: translateX(0);
     }
-
-    #adminPanelButton {
-        position: fixed;
-        bottom: 80px;
-        left: 130px;
-        background-color: #B4906E;
-        border: none;
-        padding: 5px 10px;
-        cursor: pointer;
-        border-radius: 5px;
-        display: none;
-        opacity: 0;
-        transition: opacity 0.5s ease, transform 0.5s ease;
-        outline: none;
-        z-index: 9999;
-    }
-
-    #adminPanelButton:hover {
-        background-color: #94693e;
-        transform: scale(1.1);
-    }
-
-    #adminPanelButton.show {
-        display: block;
-        opacity: 1;
-        transform: translateX(0);
-    }
-
 </style>
 
 <head>
@@ -173,6 +145,7 @@
         crossorigin="anonymous" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
         crossorigin="anonymous" />
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
 
     <title>{% block title %}Home{% endblock %}</title>
 </head>
