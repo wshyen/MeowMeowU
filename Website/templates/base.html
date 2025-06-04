@@ -63,6 +63,10 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+        position: sticky !important;
+        position: -webkit-sticky !important;
+        z-index: 1000;
+        top: 0%; 
     }
 
     .ml-auto {
@@ -159,6 +163,7 @@
         opacity: 1;
         transform: translateX(0);
     }
+
 </style>
 
 <head>
@@ -173,7 +178,12 @@
 </head>
 
 <body>
+
     <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgb(176, 148, 119);">
+        <div style="height: 60px; width: 60px; border-radius: 50%; background-color: rgb(176, 148, 119);; 
+            padding: 5px; margin-right: 5px; display: flex; overflow: hidden; align-items: center; justify-content: center;">
+            <img src="{{ url_for('static', filename='Images/Logo.png') }}" alt="Logo" style="width: auto; height: 130%; object-fit: contain;">
+        </div>    
         <a class="nav-item nav-link" style="font-family: 'Times New Roman'; color: white; font-size: 19px;"
             href="/">Home</a>
 

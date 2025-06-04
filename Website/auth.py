@@ -737,7 +737,7 @@ def view_user_profile(user_id):
 
     #fetch the profile owner's data
     cursor.execute("""
-        SELECT id, name, email, profile_picture, cover_photo, status, birthday, mbti, hobby, bio 
+        SELECT id, name, profile_picture, cover_photo, status, birthday, mbti, hobby, bio 
         FROM user WHERE id = ?
     """, (user_id,))
     profile_owner = cursor.fetchone()
