@@ -360,7 +360,6 @@ def add_comment(post_id):
     created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     user_id = current_user.id
     parent_id = request.form.get('parent_id')
-    cmtsort = request.form.get('cmtsort', 'date_desc')
 
     if not parent_id:
         parent_id = None    
