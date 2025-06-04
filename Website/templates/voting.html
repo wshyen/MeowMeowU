@@ -3,7 +3,6 @@
 {% block title %}Voting{% endblock %}
 
 {% block content %}
-
 <style>
     body {
         background-color: #f2eadf;
@@ -24,7 +23,7 @@
     }
 
     h2 {
-        margin-bottom: 20px;
+        margin-bottom: 10px;
         font-weight: bold;
         font-size: 35px;
     }
@@ -46,11 +45,42 @@
         box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
         width: 90%;
         justify-content: space-between;
+        position: relative;
+    }
+
+    .poll-option.drag-over {
+        border: 2px dashed #a67c52;
+        background-color: #f8eedd;
+    }
+
+    .selected-banner {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        background-color: #a67c52;
+        color: white;
+        padding: 5px 10px;
+        font-size: 14px;
+        font-weight: bold;
+        border-radius: 5px;
+        display: none;
     }
 
     .description-container {
         flex: 1;
         text-align: left;
+        font-size: 20px;
+    }
+
+    .description-container p {
+        font-size: 18px;
+        margin: 5px 0 0 0;
+    }
+
+    .option-label {
+        font-size: 22px;
+        font-weight: bold;
+        margin-bottom: 5px;
     }
 
     .image-container {
@@ -58,22 +88,11 @@
         text-align: center;
     }
 
-    .image-container input {
-        display: none;
-    }
-
-    .image-container label {
-        cursor: pointer;
-        display: block;
-    }
-
     .image-container img {
         width: 200px;
         height: 200px;
         object-fit: cover;
         border-radius: 8px;
-        display: block;
-        transition: transform 0.3s ease-in-out;
         cursor: pointer;
     }
 
@@ -99,9 +118,35 @@
         border-radius: 10px;
     }
 
-    .option-label {
-        font-size: 22px;
-        font-weight: bold;
+    #paw {
+        position: fixed;
+        top: 150px;
+        right: 200px;
+        width: 120px;
+        height: auto;
+        z-index: 999;
+        cursor: grab;
+        user-select: none;
+    }
+
+    .paw {
+        width: 100px;
+        cursor: grab;
+    }
+
+    #paw {
+        outline: none;
+        -webkit-user-drag: element;
+        user-select: none;
+    }
+
+    #paw:focus {
+        outline: none;
+    }
+
+    .participant.drag-over {
+        border: 2px solid #fff7ec;
+        box-shadow: 0 0 10px rgba(202, 165, 107, 0.6);
     }
 
     button {
@@ -134,20 +179,21 @@
     }
 </style>
 
+<img id="paw" src="{{ url_for('static', filename='images/paw-stamp.png') }}" 
+     alt="Drag to vote" draggable="true">
+
 <div class="container">
     <h2>📍Vote for {{ contest_name }}</h2>
-    <div class="contest-info" style="font-style: italic;">You are voting in the "{{ contest_name }}" contest.</div>
+    <div class="contest-info" style="font-style: italic; padding-bottom: 20px;">You are voting in the "{{ contest_name }}" contest. Let's vote!<br>(Drag the paw at right and drop your vote.)</div>
 
     {% if participants %}
     <form method="POST" action="{{ url_for('contestmanagement.submit_vote', contest_id=contest_id) }}">
+        <input type="hidden" name="vote" id="voteInput">
         {% for participant in participants %}
-        <div class="poll-option">
+        <div class="poll-option participant" data-id="{{ participant.id }}">
+            <div class="selected-banner">Selected</div>
             <div class="description-container">
-                <div class="option-label">
-                    <input type="radio" name="vote" value="{{ participant.id }}">
-                    <label for="{{ participant.id }}">🐱{{ participant.name }}</label>
-                </div>
-
+                <div class="option-label"><strong>🐱{{ participant.name }}</strong></div>
                 {% if participant.description %}
                     <p><strong>Description:</strong> {{ participant.description }}</p>
                 {% else %}
@@ -164,8 +210,8 @@
             {% endif %}
         </div>
         {% endfor %}
-
-        <button type="submit">🐾 Submit Vote 🐾</button><a href="{{ url_for('contestmanagement.contest_page') }}" class="back_contest">Back to contest</a>
+        <button type="submit">🐾 Submit Vote 🐾</button>
+        <a href="{{ url_for('contestmanagement.contest_page') }}" class="back_contest">Back to contest</a>
     </form>
     {% else %}
         <p style="font-size: 20px;">No participants available for voting.</p>
@@ -177,22 +223,42 @@
     <img id="modalImage">
 </div>
 
-<script> // Js part(some from yt)
-    function toggleModal(imageSrc) {
-        let modal = document.getElementById("imageModal"); // Get the modal element
-        let modalImage = document.getElementById("modalImage"); // Get the modal image element
+<script>
+    const paw = document.getElementById("paw");
+    const voteInput = document.getElementById("voteInput");
+    const participants = document.querySelectorAll(".participant");
 
-        if (modal.style.display === "flex") {
-            modal.style.display = "none"; // Close the modal if it's already open
-        } else {
-            modalImage.src = imageSrc; // Set the clicked image inside modal
-            modal.style.display = "flex"; // Show the modal
-        }
+    participants.forEach(participant => {
+        participant.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            participant.classList.add("drag-over");
+        });
+
+        participant.addEventListener("dragleave", () => {
+            participant.classList.remove("drag-over");
+        });
+
+        participant.addEventListener("drop", () => {
+            const selectedId = participant.getAttribute("data-id");
+            voteInput.value = selectedId;
+
+            document.querySelectorAll(".selected-banner").forEach(b => b.style.display = "none");
+            participant.querySelector(".selected-banner").style.display = "block";
+
+            participants.forEach(p => p.classList.remove("drag-over"));
+        });
+    });
+
+    function toggleModal(imageSrc) {
+        const modal = document.getElementById("imageModal");
+        const modalImage = document.getElementById("modalImage");
+
+        modalImage.src = imageSrc;
+        modal.style.display = "flex";
     }
 
     function closeModal() {
-        document.getElementById("imageModal").style.display = "none"; // Hide the modal when clicked outside
+        document.getElementById("imageModal").style.display = "none";
     }
 </script>
-
 {% endblock %}
