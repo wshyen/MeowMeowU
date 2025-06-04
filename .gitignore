@@ -9,3 +9,4 @@ env/
 *.db-wal
 *.svg"__pycache__/" 
 "*.pyc" 
+"Website/__pycache__/views.cpython-313.pyc" 
