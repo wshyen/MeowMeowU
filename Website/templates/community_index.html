@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}COMMUNITY{% endblock %}
+{% block title %}Community{% endblock %}
 
 {% block content %}
 
@@ -111,12 +111,12 @@
         text-align: left;    
         margin-left: 90px; 
         overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;  
-        max-width: 380px;
-        max-height: 230px;        
+        display: -webkit-box;
+        -webkit-line-clamp: 5;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;    
     }
-
 
     .media {
         display: flex;
