@@ -56,6 +56,7 @@
         background-size: 20px;
     }
 
+    .user-grid,
     .cat-grid {
         display: flex;
         flex-wrap: wrap;
@@ -64,7 +65,7 @@
         margin-top: 20px;
     }
 
-    .cat-card {
+    .card {
         background-color: #fffbe9;
         padding: 30px;
         width: 270px;
@@ -80,14 +81,14 @@
         transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
-    .cat-card:hover {
+    .card:hover {
         transform: scale(1.15); 
         background-color: #fffbe9;
         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
     }
 
 
-    .cat-card img {
+    .card img {
         width: 150px; 
         height: 150px;
         border-radius: 50%;
@@ -98,23 +99,23 @@
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     }       
     
-    .cat-card:hover img {
+    .card:hover img {
         transform: scale(1.2);
         filter: brightness(1.1) contrast(1.1);
     }
 
-    .cat-card p {
+    .card p {
         margin: 10px 0;
         font-size: larger;
         color: inherit;
     }
 
-    .cat-card a {
+    .card a {
         text-decoration: none;
         color: inherit; 
     }
 
-    .cat-card a:hover {
+    .card a:hover {
         text-decoration: none;
         color: inherit;
         background-color: transparent;
@@ -123,18 +124,20 @@
 
 {% if search_type == 'user' %}
   <h1>SEARCH USER PROFILE</h1>
+
   {% if users %}
   <h2>The following us matches your search:</h2>
-    {% for u in users %}
-        <div class="user-grid">
-                <div class="user-card">
-                    <a href="{{ url_for('auth.view_user_profile', user_id=u.id) }}">
-                        <img class="user-pic" src="{{ url_for('static', filename='Userprofile/' + (u['profile_picture'] if u['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
-                        <p><strong>Name: </strong>{{ u.name }}</p>
-                    </a>    
-                </div>
-        </div>
-    {% endfor %}
+    <div class="user-grid">
+        {% for u in users %}
+            <div class="card">
+                <a href="{{ url_for('auth.view_user_profile', user_id=u.id) }}">
+                    <img class="user-pic" src="{{ url_for('static', filename='Userprofile/' + (u['profile_picture'] if u['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
+                    <p><strong>Name: </strong>{{ u.name }}</p>
+                </a>    
+            </div>
+        {% endfor %}
+    </div>
+
   {% elif message %}
     <h2>{{ message }}</h2>
   {% endif %}
@@ -176,7 +179,7 @@
     <h2>The following matches your search:</h2>
     <div class="cat-grid">
         {% for cat in profiles %}
-            <div class="cat-card">
+            <div class="card">
                 <a href="/single_profile?name={{ cat.name | lower }}">
                     {% if cat.photo %}
                         <img src="{{ url_for('static', filename='uploads/' + cat['photo']) }}" alt="{{ cat['name'] }}">
