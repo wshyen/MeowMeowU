@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for, send_from_directory #Flask is a web framework that allows developers to build web applications
+from flask import Blueprint, render_template, request, flash, redirect, url_for, send_from_directory, Flask #Flask is a web framework that allows developers to build web applications
 import re
 from .models import User, Story, Report
 from . import db
@@ -21,6 +21,8 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 DEFAULT_PROFILE_PICTURE = "default_profilepic.png"
 DEFAULT_COVER_PHOTO = "default_cover.png"
+
+app = Flask(__name__, static_folder="static")
 
 #makesure the upload folder exists before saving files
 if not os.path.exists(UPLOAD_FOLDER):

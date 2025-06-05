@@ -77,8 +77,35 @@
         text-align: left;
         font-family: 'Times New Roman', Times, serif;
     }
+
+    .quiz-wrapper {
+        padding: 20px;
+    }
+
+    .admin-button-container {
+        text-align: right; 
+        margin-bottom: 20px; 
+        position: fixed; 
+        bottom: 20px; 
+        right: 20px;
+    }
+
+    .manage-button {
+        font-size: 20px; 
+        background-color: #94693e; 
+        color: white; 
+        padding: 10px 15px; 
+        border-radius: 5px; 
+        cursor: pointer; 
+        border: none;
+    }
+
+    .not-enough-q-msg {
+        color: red; 
+        font-weight: bold;
+    }
 </style>
-<div style="padding: 20px;">
+<div class="quiz-wrapper">
     <h1>Quiz</h1>
 
     <div class="container">
@@ -99,7 +126,7 @@
             {% if level1_count >= 10 %}
                 <button class="start-button" onclick="window.location.href='{{ url_for('quiz.quiz_level1') }}'">Start Level 1</button>
             {% else %}
-                <p style="color: red; font-weight: bold;">Not enough questions to start Level 1 quiz.</p>
+                <p class="not-enough-q-msg">Not enough questions to start Level 1 quiz.</p>
             {% endif %}
         </div>
 
@@ -129,9 +156,8 @@
     </div>
 
     {% if user_role == 'admin' %}
-    <div style="text-align: right; margin-bottom: 20px; position: fixed; bottom: 20px; right: 20px;">
-        <button id="manage-questions-button" onclick="window.location.href='{{ url_for('quiz.manage_quiz') }}'"
-            style="font-size: 20px; background-color: #94693e; color: white; padding: 10px 15px; border-radius: 5px; cursor: pointer; border: none;">
+    <div class="admin-button-container">
+        <button id="manage-questions-button" class="manage-button" onclick="window.location.href='{{ url_for('quiz.manage_quiz') }}'">
             ✎
         </button>
     </div>
