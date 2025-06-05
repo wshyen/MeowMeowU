@@ -314,27 +314,40 @@
       {% endif %}
       <div class="profile-info">
         <h2>{{ profile_owner.name }}</h2>
-        <h5>Status: {{ profile_owner.status }}</h5>
+        {% if profile_owner.privacy=="Private" %}
+          <h5>Not available to view</h5>
+        {% else %}
+          <h5>Status: {{ profile_owner.status }}</h5>
+        {% endif %}
       </div>
     </div>
-
+ 
     <div class="profile-details">
-      <h5><b>Birthday:</b> {{ profile_owner.birthday if profile_owner.birthday else "-" }}</h5>
-      <h5><b>MBTI:</b> {{ profile_owner.mbti if profile_owner.mbti else "-" }}</h5>
-      <h5><b>Hobby:</b> {{ profile_owner.hobby if profile_owner.hobby else "-" }}</h5>
-      <h5><b>Bio:</b> {{ profile_owner.bio if profile_owner.bio else "-" }}</h5>
+      {% if profile_owner.privacy=="Private" %}
+        <h5 style="text-align: center;"><b>This account is private account🔒</b></h5>
+      {% else %}
+        <h5><b>Birthday:</b> {{ profile_owner.birthday if profile_owner.birthday else "-" }}</h5>
+        <h5><b>MBTI:</b> {{ profile_owner.mbti if profile_owner.mbti else "-" }}</h5>
+        <h5><b>Hobby:</b> {{ profile_owner.hobby if profile_owner.hobby else "-" }}</h5>
+        <h5><b>Bio:</b> {{ profile_owner.bio if profile_owner.bio else "-" }}</h5>
+      {% endif %}
     </div>
-
+    
     <div class="badge-display">
-      <h3><b>Achievements:</b></h3>
-      <div id="badgeGallery">
-        {% for badge in badges %}
-            <div class="badge-item">
-                <img src="{{ url_for('static', filename='badges/' ~ badge[2]) }}" title="{{ badge[0] }}" class="badge-icon">
-                <h4 class="badge-condition">{{ badge[1] }}</h4>
-            </div>
-        {% endfor %}
-      </div>
+      
+      {% if profile_owner.privacy=="Private" %}
+        <h5 style="font-weight: bold; font-size: 18px;">Achievements are not available to view.</h5>
+      {% else %}
+        <h3><b>Achievements:</b></h3>
+        <div id="badgeGallery">
+          {% for badge in badges %}
+              <div class="badge-item">
+                  <img src="{{ url_for('static', filename='badges/' ~ badge[2]) }}" title="{{ badge[0] }}" class="badge-icon">
+                  <h4 class="badge-condition">{{ badge[1] }}</h4>
+              </div>
+          {% endfor %}
+        </div>
+      {% endif %}
     </div>
 
     <div class="back-community">

@@ -115,6 +115,12 @@
       {% endfor %}
     </select>
 
+    <label for="privacy">Profile Privacy:</label>
+    <select id="privacy" name="privacy">
+      <option value="Public" {% if user.privacy == "Public" %}selected{% endif %}>Public 🌏</option>
+      <option value="Private" {% if user.privacy == "Private" %}selected{% endif %}>Private 🔒</option>
+    </select>
+
     <label for="email">Email:</label>
     <div class="readonly-field">{{ user.email }}</div>
 
