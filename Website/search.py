@@ -14,16 +14,75 @@ def get_db_connection():
 
 @search_bp.route('/search-feature')
 def search_feature():
-    return render_template("search_feature.html", user=current_user)
+    search_type = request.args.get('search_type', '')
+    keyword = request.args.get('keyword', '')
 
-@search_bp.route('/cat_list')
-def cat_list():
-    name = request.args.get("name", "").lower()
+    if not search_type and not keyword:
+        return render_template('search_feature.html', user=current_user) 
+
+    gender = request.args.get('gender', '')
+    color = request.args.get('color', '')
+    sort = request.args.get('sort', '')
+
+    if search_type == 'user':
+        return redirect(url_for('search.user_result', search_type="user", keyword=keyword))
+    elif search_type == 'post':
+        return redirect(url_for('search.post_result', search_type="post", keyword=keyword))
+    else:
+        return redirect(url_for('search.cat_result', search_type="cat", keyword=keyword, gender=gender, color=color, sort=sort))
+    
+@search_bp.route('/user_result')
+def user_result():
+    keyword = request.args.get("keyword", "").lower()
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    query = "SELECT * FROM user WHERE 1=1"
+    user_filters = []
+
+    if keyword:
+        query += " AND LOWER(Name) LIKE ?"
+        user_filters.append(f"%{keyword}%")
+
+    cursor.execute(query, user_filters)
+    users = cursor.fetchall()
+    conn.close()
+
+    if users:
+        return render_template("search_result.html", search_type="user", users=users, user=current_user)
+    else:
+        return render_template("search_result.html", search_type="user", message="No users found matching your criteria.", user=current_user)
+
+@search_bp.route('/post_result')
+def post_result():
+    keyword = request.args.get("keyword", "").lower()
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    query = "SELECT * FROM post WHERE 1=1"
+    post_filters = []
+
+    if keyword:
+        query += " AND LOWER(content) LIKE ?"
+        post_filters.append(f"%{keyword}%")
+
+    cursor.execute(query, post_filters)
+    posts = cursor.fetchall()
+    conn.close()
+
+    if posts:
+        return render_template("search_result.html", search_type="post", posts=posts, user=current_user)
+    else:
+        return render_template("search_result.html", search_type="post", message="No posts found matching your criteria.", user=current_user)
+
+@search_bp.route('/cat_result')
+def cat_result():
+    keyword = request.args.get("keyword", "").lower()
     gender = request.args.get("gender", "")
     color = request.args.get("color", "")
     sort = request.args.get("sort")
 
-    print(f"Name: {name}, Gender: {gender}, Color: {color}, Sort: {sort}")
+    print(f"Name: {keyword}, Gender: {gender}, Color: {color}, Sort: {sort}")
 
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -31,9 +90,9 @@ def cat_list():
     query = "SELECT * FROM profiles WHERE 1=1"
     cat_filters = []
 
-    if name:
+    if keyword:
         query += " AND LOWER(name) LIKE ?"
-        cat_filters.append(f"%{name}%")
+        cat_filters.append(f"%{keyword}%")
 
     if gender and gender != "Any":
         query += " AND gender = ?"
@@ -53,9 +112,9 @@ def cat_list():
     conn.close()
 
     if profiles:
-        return render_template("cat_list.html", profiles=profiles, user=current_user)
+        return render_template("search_result.html", search_type="cat", profiles=profiles, user=current_user)
     else:
-        return render_template("cat_list.html", message="No cats found matching your criteria.", user=current_user)
+        return render_template("search_result.html", search_type="cat", message="No cats found matching your criteria.", user=current_user)
 
  
 @search_bp.route('/single_profile')
