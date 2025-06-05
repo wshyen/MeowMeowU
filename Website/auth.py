@@ -254,8 +254,8 @@ def update_profile():
                     flash(f"Invalid file format for {file_type}. Only PNG, JPG, JPEG allowed.", category="error")
                     return redirect(url_for("auth.update_profile"))
 
-        if not changes_made:
-            flash("No changes were made to your profile.", category="info")
+        if changes_made == True:
+            flash("No changes were made to your profile.", category="error")
             return redirect(url_for("auth.update_profile"))
 
         try:
@@ -742,7 +742,7 @@ def view_user_profile(user_id):
 
     #fetch the profile owner's data
     cursor.execute("""
-        SELECT id, name, profile_picture, cover_photo, status, birthday, mbti, hobby, bio 
+        SELECT id, name, profile_picture, cover_photo, status, birthday, mbti, hobby, bio, privacy
         FROM user WHERE id = ?
     """, (user_id,))
     profile_owner = cursor.fetchone()

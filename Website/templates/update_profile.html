@@ -117,8 +117,8 @@
 
     <label for="privacy">Profile Privacy:</label>
     <select id="privacy" name="privacy">
-      <option value="public" {% if user.privacy == "Public" %}selected{% endif %}>Public 🌏</option>
-      <option value="private" {% if user.privacy == "Private" %}selected{% endif %}>Private 🔒</option>
+      <option value="Public" {% if user.privacy == "Public" %}selected{% endif %}>Public 🌏</option>
+      <option value="Private" {% if user.privacy == "Private" %}selected{% endif %}>Private 🔒</option>
     </select>
 
     <label for="email">Email:</label>
