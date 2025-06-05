@@ -54,7 +54,8 @@ def community_feature():
 
     query = f'''
         SELECT post.*, user.name, user.profile_picture,
-            COUNT(likes.id) AS like_count,
+            (SELECT COUNT(*) FROM likes WHERE likes.post_id = post.post_id) AS like_count,
+            (SELECT COUNT(*) FROM comment WHERE comment.post_id = post.post_id) AS comment_count,
             CASE 
                 WHEN EXISTS (
                     SELECT 1 FROM likes 
@@ -84,7 +85,8 @@ def post_detail(post_id):
             post.*, 
             user.name,
             user.profile_picture,
-             (SELECT COUNT(*) FROM likes WHERE likes.post_id = post.post_id) AS like_count,
+                (SELECT COUNT(*) FROM likes WHERE likes.post_id = post.post_id) AS like_count,
+                (SELECT COUNT(*) FROM comment WHERE comment.post_id = post.post_id) AS comment_count,
             CASE 
                 WHEN EXISTS (
                     SELECT 1 FROM likes 
@@ -198,7 +200,8 @@ def hashtag_posts(hashtag):
     posts = conn.execute(
         f'''
         SELECT post.*, user.name, user.profile_picture,
-            COUNT(likes.id) AS like_count,
+            (SELECT COUNT(*) FROM likes WHERE likes.post_id = post.post_id) AS like_count,
+            (SELECT COUNT(*) FROM comment WHERE comment.post_id = post.post_id) AS comment_count,
             CASE 
                 WHEN EXISTS (
                     SELECT 1 FROM likes 
@@ -357,7 +360,6 @@ def add_comment(post_id):
     created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     user_id = current_user.id
     parent_id = request.form.get('parent_id')
-    sort = request.form.get('sort', 'date_desc')
 
     if not parent_id:
         parent_id = None    
