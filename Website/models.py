@@ -30,6 +30,7 @@ class User(db.Model, UserMixin):
     cover_photo = db.Column(db.String(255), default="default_cover.png")
     role = db.Column(db.String(50), default='user', nullable=False)
     level1_completed = db.Column(db.Boolean, default=False)
+    privacy = db.Column(db.String(50), default="Public", nullable=False)
 
 class Story(db.Model):
     id = db.Column(db.Integer, primary_key=True)

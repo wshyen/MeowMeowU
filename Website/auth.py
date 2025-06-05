@@ -232,6 +232,11 @@ def update_profile():
             current_user.mbti = mbti if mbti else None
             changes_made = True
 
+        privacy = request.form.get("privacy", "Public")  #defaults to 'public' if not selected
+        if privacy != current_user.privacy:
+            current_user.privacy = privacy
+            changes_made = True
+
         #handle file uploads
         for file_type, default_image in [("profile_picture", DEFAULT_PROFILE_PICTURE), ("cover_photo", DEFAULT_COVER_PHOTO)]:
             if request.form.get(f"clear_{file_type}"):  # Reset to default if checkbox checked
