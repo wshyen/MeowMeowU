@@ -152,7 +152,7 @@
   }
 
   .post-content {
-    margin-left: 90px; 
+    margin: 0 70px 0 90px;
     max-width: 100%;
     text-align: left;    
     white-space: normal; 
@@ -361,7 +361,7 @@
     </h3>
 
     {% for post in posts %}
-      <div class="post" onclick="window.location.href='/post/{{ post['post_id'] }}'">
+      <div class="post" onclick="window.location.href='/post/{{ post.post_id}}'">
           <div class="post-info">
               <img class="post-profile-picture" src="{{ url_for('static', filename='Userprofile/' ~ profile_owner.profile_picture) if profile_owner.profile_picture else url_for('static', filename='Userprofile/default_profilepic.png') }}"  alt="Avatar">
               <p><strong>{{ profile_owner.name }}</strong> posted at {{ post['created_at'] }}</p>
@@ -401,7 +401,7 @@
               
               <span class="separator">|</span>
 
-              <button class="post-action-button" onclick="event.stopPropagation(); window.location.href='/post/{{ post['post_id'] }}#comments'">
+              <button class="post-action-button" onclick="event.stopPropagation(); window.location.href='/post/{{ post.post_id}}#comments'">
                   💬 Comments
               </button>
           </div>
