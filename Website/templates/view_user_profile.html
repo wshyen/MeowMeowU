@@ -8,6 +8,7 @@
   body {
     background-color: #f2eadf;
     font-family: 'Times New Roman';
+    margin-bottom: 80px;
   }
 
   h2, h5, label {
@@ -73,7 +74,7 @@
 
   .profile-details {
     width: 100%;
-    height: 100%;
+    height: 30%;
     margin-bottom: 10px;
     background: #ffffff;
     padding: 20px;
@@ -243,6 +244,47 @@
     border: 10px solid #f2eadf;
   }
 
+  .badge-display {
+    width: 100%;
+    height: 100%;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+
+  .badge-display h3 {
+    color: rgb(78, 68, 57);
+  }
+
+  .badge-item {
+    display: inline-block;
+    margin: 10px;
+}
+
+.badge-icon {
+    width: 100%;
+    height: 100%;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+.badge-icon:hover {
+    transform: scale(1.1);
+}
+
+.badge-condition h4 {
+  font-weight: bolder;
+  font-size: 15px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+}
 </style>
 
 <h1 style="font-size: 40px; font-weight: bold; text-align: center; padding-top: 25px; color: #94693e;">
@@ -281,6 +323,19 @@
       <h5><b>Hobby:</b> {{ profile_owner.hobby if profile_owner.hobby else "-" }}</h5>
       <h5><b>Bio:</b> {{ profile_owner.bio if profile_owner.bio else "-" }}</h5>
     </div>
+
+    <div class="badge-display">
+      <h3><b>Achievements:</b></h3>
+      <div id="badgeGallery">
+        {% for badge in badges %}
+            <div class="badge-item">
+                <img src="{{ url_for('static', filename='badges/' ~ badge[2]) }}" title="{{ badge[0] }}" class="badge-icon">
+                <h4 class="badge-condition">{{ badge[1] }}</h4>
+            </div>
+        {% endfor %}
+      </div>
+    </div>
+
     <div class="back-community">
         <a onclick="location.href='{{ url_for('community.community_feature') }}'">🐾Back to Community🐾</a>
       </div>

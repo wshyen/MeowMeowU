@@ -429,7 +429,6 @@ def get_upcoming_contest():
     else:
         return jsonify({'start_date': None})
 
-
 if __name__ == '__main__':
     #Ensure the upload folder exists
     if not os.path.exists(app.config['UPLOAD_FOLDER']):
