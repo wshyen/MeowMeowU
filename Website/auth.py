@@ -756,6 +756,14 @@ def view_user_profile(user_id):
     """, (user_id,))
     posts = cursor.fetchall()
 
+    cursor.execute("""
+        SELECT b.name, b.description, b.icon 
+        FROM badge b
+        JOIN user_badge ub ON b.id = ub.badge_id
+        WHERE ub.user_id = ?
+    """, (user_id,))
+    badges = cursor.fetchall()
+
     conn.close()
 
-    return render_template("view_user_profile.html", profile_owner=profile_owner, posts=posts, user=current_user)
+    return render_template("view_user_profile.html", profile_owner=profile_owner, posts=posts, badges=badges, user=current_user)

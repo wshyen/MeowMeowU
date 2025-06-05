@@ -9,7 +9,9 @@
     background-color: #f2eadf;
   }
 
-  h2, h5, label {
+  h2,
+  h5,
+  label {
     font-family: 'Times New Roman';
     color: rgb(78, 68, 57);
   }
@@ -108,6 +110,59 @@
     border-radius: 10px;
   }
 
+  .contest-history-wrapper {
+    background: #fff7ec;  
+    border-radius: 10px;
+    padding: 20px;
+    width: 100%;
+    max-width: 800px;
+    text-align: center;
+    margin: 20px auto;  
+  }
+
+  .contest-history-header {
+    font-family: 'Times New Roman';
+    color: rgb(78, 68, 57);
+    text-align: center;
+  }
+
+  .contest-history-container {
+    background: #edd8bc;
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 650px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+
+  .contest-item {
+    display: flex;
+    align-items: center;
+    background: #1E1E1E;
+    padding: 10px;
+    border-radius: 8px;
+  }
+
+  .contest-banner {
+    width: 60px;
+    height: 60px;
+    border-radius: 5px;
+  }
+
+  .contest-info {
+    flex-grow: 1;
+    padding-left: 10px;
+  }
+
+  .arrow-link {
+    font-size: 18px;
+    color: white;
+    text-decoration: none;
+  }
 </style>
 
 <div class="container mt-4">
@@ -115,16 +170,23 @@
 
     <div class="profile-header">
       {% if user.cover_photo %}
-        <img src="{{ url_for('static', filename='Userprofile/' ~ user.cover_photo) }}" alt="Cover Photo" class="cover-photo" onclick="toggleModal('{{ url_for('static', filename='Userprofile/' ~ user.cover_photo) }}')">
+      <img src="{{ url_for('static', filename='Userprofile/' ~ user.cover_photo) }}" alt="Cover Photo"
+        class="cover-photo"
+        onclick="toggleModal('{{ url_for('static', filename='Userprofile/' ~ user.cover_photo) }}')">
       {% else %}
-        <img src="{{ url_for('static', filename='Userprofile/default_cover.png') }}" alt="Cover Photo" class="cover-photo" onclick="toggleModal('{{ url_for('static', filename='Userprofile/default_cover.png') }}')">
+      <img src="{{ url_for('static', filename='Userprofile/default_cover.png') }}" alt="Cover Photo" class="cover-photo"
+        onclick="toggleModal('{{ url_for('static', filename='Userprofile/default_cover.png') }}')">
       {% endif %}
 
       <div class="profile-content">
         {% if user.profile_picture %}
-          <img src="{{ url_for('static', filename='Userprofile/' ~ user.profile_picture) }}" alt="Profile Picture" class="profile-picture" onclick="toggleModal('{{ url_for('static', filename='Userprofile/' ~ user.profile_picture) }}')">
+        <img src="{{ url_for('static', filename='Userprofile/' ~ user.profile_picture) }}" alt="Profile Picture"
+          class="profile-picture"
+          onclick="toggleModal('{{ url_for('static', filename='Userprofile/' ~ user.profile_picture) }}')">
         {% else %}
-          <img src="{{ url_for('static', filename='Userprofile/default_profilepic.png') }}" alt="Profile Picture" class="profile-picture" onclick="toggleModal('{{ url_for('static', filename='Userprofile/default_profilepic.png') }}')">
+        <img src="{{ url_for('static', filename='Userprofile/default_profilepic.png') }}" alt="Profile Picture"
+          class="profile-picture"
+          onclick="toggleModal('{{ url_for('static', filename='Userprofile/default_profilepic.png') }}')">
         {% endif %}
 
         <div class="profile-info">
