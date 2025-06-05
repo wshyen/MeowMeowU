@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}SEARCH{% endblock %}
+{% block title %}Result{% endblock %}
 
 {% block content %}
 
@@ -28,6 +28,10 @@
         font-style: italic;
         margin-top: 0;
         margin-bottom: 20px;
+    }
+
+    p {
+        font-size: 18px;
     }
 
     .sort-container {
@@ -120,13 +124,73 @@
         color: inherit;
         background-color: transparent;
     }
+
+    .post {
+        width: 100%;
+        max-width: 1000px;
+        min-height: 200px;
+        max-height: 300px;
+        margin: 20px auto;
+        padding: 20px 20px 10px 20px;
+        background-color: #ffffff;
+        border-radius: 10px;
+        overflow: hidden;
+        cursor: pointer;
+        display: flex;  
+        flex-direction: column;
+    }
+
+    .post .profile-picture {
+        width: 50px;
+        height: 50px;
+        margin-right: 20px;
+        border-radius: 50%; 
+        border: 1px solid #c8a786; 
+    } 
+
+    .post-info {
+        display: flex;
+        align-items: center;  
+        justify-content: flex-start; 
+        margin-left: 20px;
+    }
+
+    .post-info p {
+        margin: 0;      
+        line-height: 1.2; 
+    }
+
+    .post-content {
+        margin: 0 70px 0 90px;
+        max-width: 100%;
+        text-align: left;    
+        white-space: normal; 
+        display: -webkit-box;
+        -webkit-line-clamp: 5;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis; 
+    }
+
+    .media {
+        display: flex;
+        align-items: flex-start;
+        margin: 20px 90px;
+    }
+
+    .media img,
+    .media video {
+        width: 150px;
+        height: 150px;
+        object-fit: cover; 
+    }
+
 </style>
 
 {% if search_type == 'user' %}
   <h1>SEARCH USER PROFILE</h1>
-
   {% if users %}
-  <h2>The following us matches your search:</h2>
+  <h2>The following us matches your search: {{keyword}}</h2>
     <div class="user-grid">
         {% for u in users %}
             <div class="card">
@@ -137,27 +201,48 @@
             </div>
         {% endfor %}
     </div>
-
   {% elif message %}
-    <h2>{{ message }}</h2>
+    <h2>{{ message }} {{keyword}}</h2>
   {% endif %}
+
 
 {% elif search_type == 'post' %}
+
   <h1>SEARCH COMMUNITY POSTS</h1>
+
   {% if posts %}
-    <h2>The following posts match your search:</h2>
-    <ul>
-      {% for post in posts %}
-        <li>
-          <a href="/post_detail?id={{ post.id }}">
-            {{ post.content[:100] }}{% if post.content|length > 100 %}...{% endif %}
-          </a>
-        </li>
-      {% endfor %}
-    </ul>
+    <h2>The following posts match your search: {{keyword}}</h2>
+    <div class="post-container">
+        {% for post in posts %}
+        <div class="post" onclick="window.location.href='/post/{{ post.post_id }}'">
+                <div class="post-info">
+                    <img class="profile-picture" src="{{ url_for('static', filename='Userprofile/' + (post['profile_picture'] if post['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
+                    <p><strong>{{ post['name'] }}</strong> posted at {{ post['created_at'] }}</p>
+                </div>
+
+            <p class="post-content">{{ post['content'] }}</p>
+
+            <div class="media">
+                {% if post['media_url'] %}
+                    {% set ext = post['media_url'].rsplit('.', 1)[1].lower() %}
+                    {% if ext in ['jpg', 'jpeg', 'png', 'gif'] %}
+                        <img src="{{ url_for('static', filename=post['media_url']) }}" alt="Image">
+                    {% elif ext in ['mp4', 'mov', 'avi'] %}
+                        <video controls>
+                            <source src="{{ url_for('static', filename=post['media_url']) }}" type="video/{{ ext }}">
+                        </video>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
   {% elif message %}
-    <h2>{{ message }}</h2>
+    <h2>{{ message }} {{keyword}} </h2>
   {% endif %}
+
+
 
 {% elif search_type == 'cat' %}
     <h1>SEARCH CAT PROFILE</h1>
@@ -176,7 +261,7 @@
     </div>
 
     {% if profiles %}
-    <h2>The following matches your search:</h2>
+    <h2>The following matches your search: {{ keyword}}</h2>
     <div class="cat-grid">
         {% for cat in profiles %}
             <div class="card">
@@ -194,7 +279,7 @@
     </div>
 
     {% elif message %}
-        <h2>{{ message }}</h2>
+        <h2>{{ message }} {{ keyword}}</h2>
     {% endif %}
 {% endif %}
 
