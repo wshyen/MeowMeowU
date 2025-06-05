@@ -122,7 +122,7 @@ def single_profile():
 
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM profiles WHERE LOWER(name) = ?", (name.lower(),))
+    cursor.execute("SELECT * FROM profiles WHERE LOWER(name) = ?", (name,))
     cat = cursor.fetchone()
     conn.close()
 
