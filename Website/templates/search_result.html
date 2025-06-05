@@ -121,10 +121,41 @@
     }
 </style>
 
+{% if search_type == 'user' %}
+  <h1>SEARCH USER PROFILE</h1>
+  {% if users %}
+  <h2>The following us matches your search:</h2>
+    <ul>
+      {% for u in users %}
+        <li><a href="/user_profile?name={{ u.Name | lower }}">{{ u.Name }}</a></li>
+      {% endfor %}
+    </ul>
+  {% elif message %}
+    <h2>{{ message }}</h2>
+  {% endif %}
+
+{% elif search_type == 'post' %}
+  <h1>SEARCH COMMUNITY POSTS</h1>
+  {% if posts %}
+    <h2>The following posts match your search:</h2>
+    <ul>
+      {% for post in posts %}
+        <li>
+          <a href="/post_detail?id={{ post.id }}">
+            {{ post.content[:100] }}{% if post.content|length > 100 %}...{% endif %}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% elif message %}
+    <h2>{{ message }}</h2>
+  {% endif %}
+
+{% elif search_type == 'cat' %}
     <h1>SEARCH CAT PROFILE</h1>
 
     <div class="sort-container">
-        <form method="GET" action="/cat_list">
+        <form method="GET" action="/cat_result">
             <label for="sort">Sort by:</label>
             <select name="sort" id="sort" onchange="this.form.submit()">
                 <option value="name_asc" {% if request.args.get('sort') == 'name_asc' %}selected{% endif %}>Name (A-Z)</option>
@@ -154,8 +185,9 @@
         {% endfor %}
     </div>
 
-{% elif message %}
-    <h2>{{ message }}</h2>
+    {% elif message %}
+        <h2>{{ message }}</h2>
+    {% endif %}
 {% endif %}
 
 
