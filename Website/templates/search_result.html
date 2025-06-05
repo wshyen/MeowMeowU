@@ -70,7 +70,7 @@
     }
 
     .card {
-        background-color: #fffbe9;
+        background-color: #ffffff;
         padding: 30px;
         width: 270px;
         height: 350px;
@@ -87,7 +87,7 @@
 
     .card:hover {
         transform: scale(1.15); 
-        background-color: #fffbe9;
+        background-color: #fcfaed;
         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
     }
 
@@ -266,11 +266,7 @@
         {% for cat in profiles %}
             <div class="card">
                 <a href="/single_profile?name={{ cat.name | lower }}">
-                    {% if cat.photo %}
-                        <img src="{{ url_for('static', filename='uploads/' + cat['photo']) }}" alt="{{ cat['name'] }}">
-                    {% else %}
-                        <img src="{{ url_for('static', filename='uploads/default.png') }}" alt="Default Placeholder">
-                    {% endif %}
+                    <img src="{{ url_for('static', filename='uploads/' + (cat.photo if cat.photo else 'default.png')) }}" alt="{{ cat.name }}">
                     <p><strong>Name: </strong>{{ cat.name }}</p>
                     <p><strong>Gender: </strong>{{ cat.gender }}</p>
                 </a>    
