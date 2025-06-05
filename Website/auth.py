@@ -746,17 +746,24 @@ def view_user_profile(user_id):
         flash("User profile not found!", category="error")
         return redirect(url_for('community.community_feature'))
 
-    #fetch posts of the profile owner
+    #fetch all posts of the profile owner
     cursor.execute("""
         SELECT post.*, 
             (SELECT COUNT(*) FROM likes WHERE likes.post_id = post.post_id) AS like_count
         FROM post
         WHERE post.user_id = ?
         ORDER BY like_count DESC
-        LIMIT 5
     """, (user_id,))
     posts = cursor.fetchall()
 
+    cursor.execute("""
+        SELECT b.name, b.description, b.icon 
+        FROM badge b
+        JOIN user_badge ub ON b.id = ub.badge_id
+        WHERE ub.user_id = ?
+    """, (user_id,))
+    badges = cursor.fetchall()
+
     conn.close()
 
-    return render_template("view_user_profile.html", profile_owner=profile_owner, posts=posts, user=current_user)
+    return render_template("view_user_profile.html", profile_owner=profile_owner, posts=posts, badges=badges, user=current_user)
