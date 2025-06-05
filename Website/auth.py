@@ -746,14 +746,13 @@ def view_user_profile(user_id):
         flash("User profile not found!", category="error")
         return redirect(url_for('community.community_feature'))
 
-    #fetch posts of the profile owner
+    #fetch all posts of the profile owner
     cursor.execute("""
         SELECT post.*, 
             (SELECT COUNT(*) FROM likes WHERE likes.post_id = post.post_id) AS like_count
         FROM post
         WHERE post.user_id = ?
         ORDER BY like_count DESC
-        LIMIT 5
     """, (user_id,))
     posts = cursor.fetchall()
 
