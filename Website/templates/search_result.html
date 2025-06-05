@@ -125,11 +125,16 @@
   <h1>SEARCH USER PROFILE</h1>
   {% if users %}
   <h2>The following us matches your search:</h2>
-    <ul>
-      {% for u in users %}
-        <li><a href="/user_profile?name={{ u.Name | lower }}">{{ u.Name }}</a></li>
-      {% endfor %}
-    </ul>
+    {% for u in users %}
+        <div class="user-grid">
+                <div class="user-card">
+                    <a href="{{ url_for('auth.view_user_profile', user_id=u.id) }}">
+                        <img class="user-pic" src="{{ url_for('static', filename='Userprofile/' + (u['profile_picture'] if u['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
+                        <p><strong>Name: </strong>{{ u.name }}</p>
+                    </a>    
+                </div>
+        </div>
+    {% endfor %}
   {% elif message %}
     <h2>{{ message }}</h2>
   {% endif %}
@@ -174,9 +179,9 @@
             <div class="cat-card">
                 <a href="/single_profile?name={{ cat.name | lower }}">
                     {% if cat.photo %}
-                        <img class="profile-picture" src="{{ url_for('static', filename='uploads/' + cat['photo']) }}" alt="{{ cat['name'] }}">
+                        <img src="{{ url_for('static', filename='uploads/' + cat['photo']) }}" alt="{{ cat['name'] }}">
                     {% else %}
-                        <img class="profile-picture" src="{{ url_for('static', filename='uploads/default.png') }}" alt="Default Placeholder">
+                        <img src="{{ url_for('static', filename='uploads/default.png') }}" alt="Default Placeholder">
                     {% endif %}
                     <p><strong>Name: </strong>{{ cat.name }}</p>
                     <p><strong>Gender: </strong>{{ cat.gender }}</p>
