@@ -254,7 +254,7 @@ def update_profile():
                     flash(f"Invalid file format for {file_type}. Only PNG, JPG, JPEG allowed.", category="error")
                     return redirect(url_for("auth.update_profile"))
 
-        if changes_made == True:
+        if changes_made == False:
             flash("No changes were made to your profile.", category="error")
             return redirect(url_for("auth.update_profile"))
 
