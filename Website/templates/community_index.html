@@ -262,7 +262,7 @@
 
 {% for post in posts %}
 
-    <div class="post" onclick="window.location.href='/post/{{ post['post_id'] }}'">
+    <div class="post" onclick="window.location.href='/post/{{ post.post_id}}'">
 
         <div class="post-info">
             <img class="profile-picture" src="{{ url_for('static', filename='Userprofile/' + (post['profile_picture'] if post['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
@@ -304,7 +304,7 @@
             
             <span class="separator">|</span>
 
-            <button class="post-action-button" onclick="event.stopPropagation(); window.location.href='/post/{{ post['post_id'] }}#comments'">
+            <button class="post-action-button" onclick="event.stopPropagation(); window.location.href='/post/{{ post.post_id }}#comments'">
                💬 {{ post['comment_count'] }} Comments
             </button>
         </div>
