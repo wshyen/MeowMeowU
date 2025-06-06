@@ -137,14 +137,14 @@
         font-size: 16px;
     }
 
-        .footer-container {
+    .footer-container {
         display: flex;
         justify-content: space-between;
         padding: 20px;
         color: white;
     }
 
-        .footer-center {
+    .footer-center {
         text-align: center;
         flex: 1;
     }
@@ -270,6 +270,31 @@
         transform: scale(1.1);
         text-decoration: underline;
     }
+
+    #weekly-fact-container {
+        background-color: #ffe4c4; 
+        border: 2px solid #d2691e; 
+        border-radius: 12px;
+        padding: 15px;
+        text-align: center;
+        width: 80%;
+        margin: 20px auto;
+        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    h3 {
+        color: #d2691e; 
+        font-weight: bold;
+        font-family: 'Times New Roman', Times, serif;
+        font-size: xx-large;
+
+    }
+
+    p.weekly-fact {
+        font-size: 18px;
+        color: #3e2f1c; 
+        font-family: 'Times New Roman', Times, serif;
+    }
 </style>
 
 <head>
@@ -306,6 +331,14 @@
     <h2 style="text-align: center; margin-bottom: 25px;"><b>📅 Upcoming Contests</b></h2>
     <div id="calendar"></div>
 </section>
+
+<hr>
+
+<!-- Weekly Fun Cat Fact Section -->
+<div id="weekly-fact-container">
+    <h3>💡 Weekly Fun Cat Fact 💡</h3>
+    <p id="weekly-fact" class="weekly-fact">Loading fun cat fact...</p>
+</div>
 
 <hr>
 
@@ -378,6 +411,45 @@
                 calendar.render();
             });
     });
+
+    function fetchWeeklyFact() {
+        fetch("https://catfact.ninja/fact") //Send request to API to get a new cat fact
+            .then(response => response.json()) //API responds then converts the data into JSON 
+            .then(data => { //Extracts the cat fact from API response 
+                if (data && data.fact) { 
+                    document.getElementById("weekly-fact").innerText = data.fact; //Makes sure the API returned a valid fact before using it
+                    localStorage.setItem("weeklyFact", data.fact); // Stores the fact in browser memory (local storage) so users will see the same fact for a week
+                    localStorage.setItem("factDate", new Date().getTime()); //ets the current date or time and save it to track when the fact was fetched
+                } else {
+                    document.getElementById("weekly-fact").innerText = "Oops! Couldn't fetch a fact.";
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching cat fact:", error);
+                document.getElementById("weekly-fact").innerText = "Error loading fact. Try again later!";
+            });
+    }
+
+    //Check if a week has passed
+    function updateFact() {
+        let savedFact = localStorage.getItem("weeklyFact"); //Loads the last saved cat fact from memory
+        let savedDate = localStorage.getItem("factDate"); //Loads the date when the fact was last fetched
+
+        if (savedFact && savedDate) {
+            let lastUpdated = new Date(parseInt(savedDate));
+            let today = new Date(); //Get today's date and compare with the last update
+
+            if ((today - lastUpdated) / (1000 * 60 * 60 * 24 * 7) >= 1) {
+                fetchWeeklyFact(); //Fetch new fact after a week
+            } else {
+                document.getElementById("weekly-fact").innerText = savedFact; //Use stored fact
+            }
+        } else {
+            fetchWeeklyFact(); //First-time fetch
+        }
+    }
+
+    window.onload = updateFact;
 </script>
 
 {% endblock %}
