@@ -65,7 +65,6 @@ def community_feature():
             END AS liked_by_current_user
         FROM post 
         JOIN user ON post.user_id = user.id 
-        LEFT JOIN likes ON post.post_id = likes.post_id
         GROUP BY post.post_id
         ORDER BY {order_by}
     '''
@@ -211,7 +210,6 @@ def hashtag_posts(hashtag):
             END AS liked_by_current_user
         FROM post
         JOIN user ON post.user_id = user.id
-        LEFT JOIN likes ON post.post_id = likes.post_id
         WHERE post.cat_hashtag = ?
         GROUP BY post.post_id
         ORDER BY {order_by}
@@ -236,7 +234,6 @@ def my_posts():
             COUNT(likes.id) AS like_count
         FROM post
         JOIN user ON post.user_id = user.id
-        LEFT JOIN likes ON post.post_id = likes.post_id
         WHERE post.user_id = ?
         GROUP BY post.post_id
         ORDER BY post.created_at DESC

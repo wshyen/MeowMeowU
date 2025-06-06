@@ -56,7 +56,6 @@
     }
 
     .back-button {
-        display: inline-block;
         margin: 20px 0;
         padding: 10px 20px;
         background-color: #dccbb7;
@@ -161,9 +160,9 @@
             <span class="dots">...</span>
             <div class="menu">
                 {% if user.role == 'user' %}
-                    <a href="{{ url_for('auth.report_page', report_type='profiles', item_id=profile.id) }}">Report Profile</a>
+                    <a href="{{ url_for('auth.report_page', report_type='profiles', item_id=cat.id) }}">Report Profile</a>
                 {% elif user.role == 'admin' %}
-                    <form action="{{ url_for('auth.delete_profile', profile_id=profile.id) }}" method="POST">
+                    <form action="{{ url_for('auth.delete_profile', profile_id=cat.id) }}" method="POST">
                         <button type="submit" class="delete-btn">
                             Delete Profile
                         </button>
@@ -182,9 +181,7 @@
 </div>
 
 <div class="button-container">
-    <a href="{{ request.referrer or url_for('search.search_feature') }}" class="back-button">
-        Back
-    </a>
+    <button class="back-button" onclick="history.back()">Back</button>
 </div>
     
 {% endblock %}
