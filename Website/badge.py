@@ -49,8 +49,11 @@ def initialize_database():
 
 #User badge gallery
 @badge_bp.route('/badges')
-@login_required
 def badge_gallery():
+    if not current_user.is_authenticated:
+        flash("You must be logged in to view badge gallery!", category="error")
+        return redirect(url_for('auth.login'))
+    
     user_role = getattr(current_user, 'role', None)
     conn = get_db_connection()
     badges = conn.execute('SELECT * FROM badge').fetchall()

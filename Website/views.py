@@ -11,8 +11,11 @@ def home():
     return render_template("home.html", user=current_user, stories=latest_stories)
 
 @views.route('/suggestion-box', methods=['GET', 'POST'])
-@login_required
 def suggestion():
+    if not current_user.is_authenticated:
+        flash("You must be logged in to give suggestion!", category="error")
+        return redirect(url_for('auth.login'))
+    
     if request.method == "POST":
         note = request.form.get("note")
 
