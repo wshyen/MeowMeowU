@@ -83,17 +83,20 @@
         background-color: #8d6c45 !important;
     }
 
-    .fc-prev-button, .fc-next-button {
+    .fc-prev-button,
+    .fc-next-button {
         background-color: #c79058 !important;
         color: white !important;
     }
 
-    .fc-prev-button:hover, .fc-next-button:hover {
+    .fc-prev-button:hover,
+    .fc-next-button:hover {
         background-color: #9c6732 !important;
     }
 
     .fc-event {
-        background-color: #812d9b !important; /* Match the card background */
+        background-color: #812d9b !important;
+        /* Match the card background */
         border: none;
         color: white !important;
         font-weight: bold !important;
@@ -118,7 +121,7 @@
         text-align: center;
         padding: 5px;
     }
-    
+
     footer {
         background-color: #5C4033;
         color: white;
@@ -132,6 +135,55 @@
     footer p {
         margin: 5px 0;
         font-size: 16px;
+    }
+
+        .footer-container {
+        display: flex;
+        justify-content: space-between;
+        padding: 20px;
+        color: white;
+    }
+
+        .footer-center {
+        text-align: center;
+        flex: 1;
+    }
+
+    .footer-right {
+        flex: 1;
+    }
+
+    .footer-center {
+        flex: 0.5;
+    }
+
+    .footer-left,
+    .footer-right {
+        width: 50%;
+        text-align: center;
+    }
+
+    .footer-right ul,
+    .footer-center ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .footer-right li,
+    .footer-center li {
+        margin-bottom: 8px;
+    }
+
+    .footer-right a,
+    .footer-center a {
+        color: white;
+        text-decoration: none;
+    }
+
+    .footer-right a:hover,
+    .footer-center a:hover {
+        text-decoration: underline;
+        background: none;
     }
 
     .latest-stories-container {
@@ -160,7 +212,7 @@
         max-width: 900px;
         margin: auto;
         align-items: center;
-    }  
+    }
 
     .latest-story-box {
         width: 280px;
@@ -218,7 +270,6 @@
         transform: scale(1.1);
         text-decoration: underline;
     }
-
 </style>
 
 <head>
@@ -259,7 +310,9 @@
 <hr>
 
 <div class="latest-stories-container">
-    <h2 style="font-weight: bold; color: rgb(78, 68, 57); font-family: Times New Roman; padding-bottom: 10px; text-align: center;">📖Latest Cat Stories</h2>
+    <h2
+        style="font-weight: bold; color: rgb(78, 68, 57); font-family: Times New Roman; padding-bottom: 10px; text-align: center;">
+        📖Latest Cat Stories</h2>
     <div class="latest-stories-grid">
         {% for story in stories %}
         <div class="latest-story-box">
@@ -278,11 +331,30 @@
 </div>
 
 <footer>
-    <p>© 2025 MeowMeowU | All rights reserved.</p>
-    <p>2510 CSP1123 3-07</p>
-    <p>Instagram: @shyen_17 | @mingyenn__ | @yinnie_s </p>
+    <div class="footer-container">
+        <div class="footer-left">
+            <p>© 2025 MeowMeowU | All rights reserved.</p>
+            <p>2510 CSP1123 3-07</p>
+            <p>Instagram: @shyen_17 | @mingyenn__ | @yinnie_s</p>
+        </div>
+        <div class="footer-center">
+            <ul>
+                <li><a href="/community_feature">Community</a></li>
+                <li><a href="/contest_page">Contests</a></li>
+                <li><a href="/view_profiles">Cat Profiles</a></li>
+                <li><a href="/badges">Badges</a></li>
+            </ul>
+        </div>
+        <div class="footer-right">
+            <ul>
+                <li><a href="/cat_story">Cat Story</a></li>
+                <li><a href="/relationship_feature">Cat Relationship Tree</a></li>
+                <li><a href="/quiz">Quizzes</a></li>
+                <li><a href="/suggestion-box">Suggestion Box</a></li>
+            </ul>
+        </div>
+    </div>
 </footer>
-
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         fetch('/api/contests') //Send request to get the list of contests in backend

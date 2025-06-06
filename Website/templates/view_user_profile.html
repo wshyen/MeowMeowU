@@ -286,6 +286,13 @@
   display: flex;
   justify-content: center;
 }
+
+p {
+  text-align: center; 
+  font-style: italic; 
+  font-size: 18px; 
+  color: #6b4f2f;
+}
 </style>
 
 <h1 style="font-size: 40px; font-weight: bold; text-align: center; padding-top: 25px; color: #94693e;">
@@ -339,14 +346,18 @@
         <h5 style="font-weight: bold; font-size: 18px;">Achievements are not available to view.</h5>
       {% else %}
         <h3><b>Achievements:</b></h3>
-        <div id="badgeGallery">
-          {% for badge in badges %}
+        {% if badges %}
+          <div id="badgeGallery">
+            {% for badge in badges %}
               <div class="badge-item">
                   <img src="{{ url_for('static', filename='badges/' ~ badge[2]) }}" title="{{ badge[0] }}" class="badge-icon">
                   <h4 class="badge-condition">{{ badge[1] }}</h4>
               </div>
-          {% endfor %}
-        </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p> No achievements yet! Keep exploring to earn badges. </p>
+        {% endif %}
       {% endif %}
     </div>
 
