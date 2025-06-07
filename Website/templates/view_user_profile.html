@@ -267,7 +267,7 @@
     margin: 10px;
 }
 
-.badge-icon {
+  .badge-icon {
     width: 100%;
     height: 100%;
     transition: transform 0.3s ease;
@@ -275,24 +275,24 @@
     margin-bottom: 20px;
 }
 
-.badge-icon:hover {
+  .badge-icon:hover {
     transform: scale(1.1);
-}
+  }
 
-.badge-condition h4 {
-  font-weight: bolder;
-  font-size: 15px;
-  text-align: center;
-  display: flex;
-  justify-content: center;
-}
+  .badge-condition h4 {
+    font-weight: bolder;
+    font-size: 15px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+  }
 
-p {
-  text-align: center; 
-  font-style: italic; 
-  font-size: 18px; 
-  color: #6b4f2f;
-}
+  p.italic{
+    text-align: center; 
+    font-style: italic; 
+    font-size: 18px; 
+    color: #6b4f2f;
+  }
 </style>
 
 <h1 style="font-size: 40px; font-weight: bold; text-align: center; padding-top: 25px; color: #94693e;">
@@ -356,7 +356,7 @@ p {
             {% endfor %}
           </div>
         {% else %}
-          <p> No achievements yet! Keep exploring to earn badges. </p>
+          <p class="italic"> No achievements yet! Keep exploring to earn badges. </p>
         {% endif %}
       {% endif %}
     </div>
