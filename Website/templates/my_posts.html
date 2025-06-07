@@ -23,20 +23,20 @@
   }
 
   .post {
+    width: 100%;
+    max-width: 700px;
+    max-height: 750px;
+    margin: 20px auto;
+    padding: 30px;      
+    background-color: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
     display: flex;  
     flex-direction: column;
-    width: 100%;
-    max-width: 600px;
-    max-height: 650px;
-    background-color: #ffffff;
-    border-radius: 10px;
-    margin: 20px auto;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    padding: 30px;
     cursor: pointer;
   }
-    
+  
   .post-info {
     width: 100%;  
     display: flex;
@@ -53,30 +53,42 @@
     border: 1px solid #c8a786; 
   }
 
-  .post-content {
-    text-align: left;    
-    margin-left: 90px; 
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;  
-    max-width: 380px;
-    max-height: 230px;        
+  .post-body{
+    margin-left: 90px;
   }
 
-  .media {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  .post-content {
+    text-align: left;    
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;    
+  }
+
+  .media-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    width: 100%;
+    max-width: 600px;
     margin: 10px 0;
   }
 
-  .media img,
-  .media video {
-    margin: 10px auto;
-    border-radius: 12px;
-    max-width: 300px;
-    height: 350px;
-    object-fit: contain; 
+  .media-item {
+    height: 150px;
+    position: relative;
+    overflow: hidden;
+    background: #f0f0f0;
+  }
+
+  .media-item img,
+  .media-item video {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
   .post-actions {
@@ -143,23 +155,24 @@
     display: none;
   }
 
+  
   .button-container {
     display: flex; 
-    flex-direction: row; 
-    align-items: center; 
-    justify-content: center;
-    margin-top: 10px;
+    justify-content: space-between; 
+    margin: 10px auto 30px auto;
+    max-width: 700px;
+    padding: 0 30px; 
   }
 
   .button-container button, 
   .modal-content button{
     padding: 10px 20px;
-    margin: 10px 200px;
+    margin: 10px;
     background-color: #dccbb7;
     border-radius: 15px;
     border: none;
     color: #6b4f2f;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: bold;
     cursor: pointer;
     transition: transform 0.2s ease;
@@ -193,32 +206,40 @@
 <hr>
 
 {% for post in posts %}
-  <div class="post">
+  <div class="post" onclick="window.location.href='/post/{{ post.post_id}}'">
+
     <div class="post-info">
       <img class="profile-picture" src="{{ url_for('static', filename='Userprofile/' + (post['profile_picture'] if post['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
       <p><strong>You</strong> posted at {{ post['created_at'] }}</p>
     </div>
 
-    <p class="post-content">{{ post['content'] }}</p>
-      {% if post['cat_hashtag'] %}
+    <div class="post-body">
+      <p class="post-content">{{ post['content'] }}</p>
+        {% if post['cat_hashtag'] %}
           <p class="post-content">
-            <a href="{{ url_for('community.hashtag_posts', hashtag=post['cat_hashtag']) }}">#{{ post['cat_hashtag'] }}</a>
+            <a class="hashtag" href="{{ url_for('community.hashtag_posts', hashtag=post['cat_hashtag']) }}">#{{ post['cat_hashtag'] }}</a>
           </p>
-      {% endif %}
-
-    <div class="media">
-        {% if post['media_url'] %}
-            {% set ext = post['media_url'].rsplit('.', 1)[1].lower() %}
-            {% if ext in ['jpg', 'jpeg', 'png', 'gif'] %}
-              <img src="{{ url_for('static', filename=post['media_url']) }}" alt="Image">
-            {% elif ext in ['mp4', 'mov', 'avi'] %}
-                <video controls>
-                  <source src="{{ url_for('static', filename=post['media_url']) }}" type="video/{{ ext }}">
-                </video>
-            {% endif %}
         {% endif %}
-    </div>
-    
+
+      <div class="media-grid">
+        {% if post['media_url'] %}
+          {% set media_list = post['media_url'].split(';') %}
+          {% set total = media_list | length %}
+          {% for media_url in media_list%}
+            {% set ext = media_url.rsplit('.', 1)[1].lower() %}
+            <div class="media-item">
+              {% if ext in ['jpg', 'jpeg', 'png', 'gif'] %}
+                <img src="{{ url_for('static', filename=media_url) }}" alt="Image">
+              {% elif ext in ['mp4', 'mov', 'avi'] %}
+                <video controls>
+                  <source src="{{ url_for('static', filename=media_url) }}" type="video/{{ ext }}">
+                </video>
+              {% endif %}
+            </div>
+          {% endfor %}
+        {% endif %}
+      </div>
+
       <div class="post-actions">
         <span class="like-count">
             {{ post['like_count'] }}❤️
@@ -226,6 +247,7 @@
             {{ post['comment_count'] }}💬
         </span>
       </div>
+    </div>
   </div>
 
   <div class="button-container">
@@ -234,10 +256,6 @@
     </form>
     <button onclick='openEditModal({{ post.post_id }}, {{ post.content | tojson }}, {{ post.cat_hashtag | tojson }})'>Edit</button>
   </div>
-
-<hr>
-
-</div>
 {% endfor %}
 
 <div id="editModal" class="modal hidden">
