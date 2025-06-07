@@ -41,7 +41,7 @@
 
     .post {
         width: 100%;
-        max-width: 800px;
+        max-width: 1000px;
         height: auto;
         margin: 20px auto;
         padding: 30px;
@@ -117,9 +117,9 @@
     }
 
     .post-actions {
+        gap: 40px;
         margin-top: 20px;
         display: flex;
-        justify-content: center;
         align-items: center;
     }
     
@@ -130,7 +130,6 @@
         cursor: pointer;
         font-weight: bold;
         font-size: 24px; 
-        margin: 0 10px;
     }
 
     .post-action-button:hover {
@@ -212,7 +211,7 @@
         background-color: #f2eadf; 
         padding: 10px;
         box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); 
-        z-index: 1000;
+        z-index: 90;
     }
 
     .comment-form-container form {
@@ -302,13 +301,18 @@
         left: 50%;
         transform: translate(-50%, -50%);
         width: auto;
-        height: 60vh;
+        height: 85vh;
         max-width: 80vw;
-        max-height: 60vh;
+        max-height: 85vh;
         object-fit: contain;
         border: 10px solid #f2eadf;
         z-index: 100;
     }    
+
+    
+    video:fullscreen {
+        object-fit: contain;
+    }
 
     .hidden {
         display: none;
@@ -452,15 +456,16 @@
                     {% set ext = media_url.rsplit('.', 1)[1].lower() %}
                     <div class="media-item">
                         {% if ext in ['jpg', 'jpeg', 'png', 'gif'] %}
-                            <img src="{{ url_for('static', filename=media_url) }}" alt="Image">
+                            <div class="media-container">
+                                <input type="checkbox" id="post-media-img-{{ post['post_id'] }}-{{ loop.index }}">
+                                <label for="post-media-img-{{ post['post_id'] }}-{{ loop.index }}">
+                                    <img src="{{ url_for('static', filename=media_url) }}" alt="Image">
+                                </label>
+                            </div>
                         {% elif ext in ['mp4', 'mov', 'avi'] %}
                             <video controls>
                                 <source src="{{ url_for('static', filename=media_url) }}" type="video/{{ ext }}">
                             </video>
-                        {% endif %}
-
-                        {% if loop.index == max_show and total > max_show %}
-                            <div class="more-overlay">+{{ total - max_show }}</div>
                         {% endif %}
                     </div>
                 {% endfor %}
@@ -588,7 +593,6 @@
 
 {{ render_comments(grouped_comments[None], grouped_comments) }}
 
-
 <div class="comment-form-container">
     <form action="{{ url_for('community.add_comment', post_id=post['post_id']) }}" method="POST" enctype="multipart/form-data">
         <textarea id="comment-textarea" name="content" placeholder="Write a comment..."></textarea>
@@ -602,8 +606,8 @@
     </form>
 </div>
 
-<script>
 
+<script>
 document.addEventListener('DOMContentLoaded', function () {
     const fileInput = document.getElementById('comment-media');
     const fileNameDisplay = document.getElementById('file-name-display');
@@ -649,6 +653,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+
+
 </script>
 
 {% endblock %}
