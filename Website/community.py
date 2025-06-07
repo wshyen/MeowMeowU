@@ -235,10 +235,12 @@ def my_posts():
     conn = get_db_connection()
     posts = conn.execute('''
         SELECT post.*, user.name, user.profile_picture,
-            COUNT(likes.id) AS like_count
+            COUNT(likes.id) AS like_count,
+            COUNT(comment.id) AS comment_count
         FROM post
         JOIN user ON post.user_id = user.id
         LEFT JOIN likes ON post.post_id = likes.post_id
+        LEFT JOIN comment ON post.post_id = comment.post_id 
         WHERE post.user_id = ?
         GROUP BY post.post_id
         ORDER BY post.created_at DESC
