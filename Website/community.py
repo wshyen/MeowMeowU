@@ -234,6 +234,7 @@ def my_posts():
             COUNT(likes.id) AS like_count
         FROM post
         JOIN user ON post.user_id = user.id
+        LEFT JOIN likes ON post.post_id = likes.post_id
         WHERE post.user_id = ?
         GROUP BY post.post_id
         ORDER BY post.created_at DESC
