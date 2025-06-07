@@ -152,19 +152,23 @@ def create_post():
     cat_hashtag = request.form.get('cat_hashtag')
     user_id = current_user.id
     created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    media = request.files.get('media')
+    media_files = request.files.getlist('media')
     media_url = None
 
     if len(content.split()) > 100:
         flash("Post content must be 100 words or less!", category="error")
         return redirect(url_for('community.community_feature'))
 
-    if media and allowed_file(media.filename):
-        os.makedirs(POSTS_FOLDER, exist_ok=True)
-        filename = secure_filename(media.filename)
-        media.save(os.path.join(POSTS_FOLDER, filename))
-        media_url = f"posts/{filename}"
-        print("File saved to:", os.path.join(POSTS_FOLDER, filename))
+    media_urls = []
+
+    for media in media_files:
+        if media and allowed_file(media.filename):
+            os.makedirs(POSTS_FOLDER, exist_ok=True)
+            filename = secure_filename(media.filename)
+            media.save(os.path.join(POSTS_FOLDER, filename))
+            media_urls.append(f"posts/{filename}") 
+
+    media_url = ';'.join(media_urls) if media_urls else None        
 
     conn = get_db_connection()
     conn.execute(
