@@ -151,8 +151,12 @@
     border: 1px solid #c8a786; 
   }
 
+
+  .post-body{
+    margin: 0 90px;
+  }
+
   .post-content {
-    margin: 0 70px 0 90px;
     max-width: 100%;
     text-align: left;    
     display: -webkit-box;
@@ -162,21 +166,46 @@
     text-overflow: ellipsis; 
   }
 
-  .media {
-    display: flex;
-    align-items: flex-start;
-    margin: 20px 90px;
+  .media-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    width: 100%;
+    max-width: 600px;
+    margin: 10px 0;
   }
 
-  .media img,
-  .media video {
-    width: 150px;
-    height: 150px;
-    object-fit: cover; 
+  .media-item {
+    height: 200px;
+    position: relative;
+    overflow: hidden;
+    background: #f0f0f0;
+  }
+
+  .media-item img,
+  .media-item video {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .more-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0,0,0,0.5);
+    color: white;
+    font-size: 36px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
   }
 
   .post-actions {
-    margin: 20px 0 0 70px;
+    margin: 20px 0;
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -186,6 +215,7 @@
 
   .post-action-button {
     background: none;
+    padding-top: 20px;
     border: none;
     color: #6b4f2f;
     cursor: pointer;
@@ -195,11 +225,6 @@
 
   .post-action-button:hover {
     background-color: inherit;
-  }
-  
-  .post-actions .separator {
-    font-size: 40px;
-    color: #b9aa98;
   }
 
   .back-community {
@@ -375,56 +400,68 @@
 
         {% for post in posts %}
           <div class="post" onclick="window.location.href='/post/{{ post.post_id}}'">
-              <div class="post-info">
-                  <img class="post-profile-picture" src="{{ url_for('static', filename='Userprofile/' ~ profile_owner.profile_picture) if profile_owner.profile_picture else url_for('static', filename='Userprofile/default_profilepic.png') }}"  alt="Avatar">
-                  <p><strong>{{ profile_owner.name }}</strong> posted at {{ post['created_at'] }}</p>
-              </div>
+            <div class="post-info">
+                <img class="post-profile-picture" src="{{ url_for('static', filename='Userprofile/' ~ profile_owner.profile_picture) if profile_owner.profile_picture else url_for('static', filename='Userprofile/default_profilepic.png') }}"  alt="Avatar">
+                <p><strong>{{ profile_owner.name }}</strong> posted at {{ post['created_at'] }}</p>
+            </div>
 
-              <p class="post-content">{{ post['content'] }}</p>
-                {% if post['cat_hashtag'] %}
-                    <p class="post-content">
-                        <a class="hashtag" href="{{ url_for('community.hashtag_posts', hashtag=post['cat_hashtag']) }}">#{{ post['cat_hashtag'] }}</a>
-                    </p>
-                {% endif %}
-
-              <div class="media">
-                {% if post['media_url'] %}
-                    {% set ext = post['media_url'].rsplit('.', 1)[1].lower() %}
-                    {% if ext in ['jpg', 'jpeg', 'png', 'gif'] %}
-                        <img src="{{ url_for('static', filename=post['media_url']) }}" alt="Image">
-                    {% elif ext in ['mp4', 'mov', 'avi'] %}
-                        <video controls>
-                            <source src="{{ url_for('static', filename=post['media_url']) }}" type="video/{{ ext }}">
-                        </video>
+            <div class="post-body">
+                <p class="post-content">{{ post['content'] }}</p>
+                    {% if post['cat_hashtag'] %}
+                        <p class="post-content">
+                            <a class="hashtag" href="{{ url_for('community.hashtag_posts', hashtag=post['cat_hashtag']) }}">#{{ post['cat_hashtag'] }}</a>
+                        </p>
                     {% endif %}
-                {% endif %}
-              </div>
-              
-              <div class="post-actions">
-                  <form id="like-form-{{ post['post_id'] }}" action="{{ url_for('community.like_post' if not post['liked_by_current_user'] else 'community.unlike_post', post_id=post['post_id']) }}" method="post" style="display:inline;">
-                      <button type="submit" class="post-action-button">
-                          {% if post['liked_by_current_user'] %}
-                              ❤️ 
-                          {% else %}
-                              🤍 
-                          {% endif %}
-                          {{ post['like_count'] }} Like
-                      </button>
-                  </form>
-                  
-                  <span class="separator">|</span>
 
-                  <button class="post-action-button" onclick="event.stopPropagation(); window.location.href='/post/{{ post.post_id}}#comments'">
-                      💬 Comments
-                  </button>
-              </div>
+                <div class="media-grid">
+                    {% if post['media_url'] %}
+                        {% set media_list = post['media_url'].split(';') %}
+                        {% set max_show = 3 %}
+                        {% set total = media_list | length %}
+                        {% for media_url in media_list[:max_show] %}
+                            {% set ext = media_url.rsplit('.', 1)[1].lower() %}
+                            <div class="media-item">
+                                {% if ext in ['jpg', 'jpeg', 'png', 'gif'] %}
+                                    <img src="{{ url_for('static', filename=media_url) }}" alt="Image">
+                                {% elif ext in ['mp4', 'mov', 'avi'] %}
+                                    <video controls>
+                                        <source src="{{ url_for('static', filename=media_url) }}" type="video/{{ ext }}">
+                                    </video>
+                                {% endif %}
+
+                                {% if loop.index == max_show and total > max_show %}
+                                    <div class="more-overlay">+{{ total - max_show }}</div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <div class="post-actions">
+                    <form id="like-form-{{ post['post_id'] }}" action="{{ url_for('community.like_post' if not post['liked_by_current_user'] else 'community.unlike_post', post_id=post['post_id']) }}" method="post" style="display:inline;">
+                        <input type="hidden" name="sort" value="{{ sort }}">
+                        <button type="submit" class="post-action-button">
+                            {% if post['liked_by_current_user'] %}
+                                ❤️ 
+                            {% else %}
+                                🤍 
+                            {% endif %}
+                            {{ post['like_count'] }} Likes
+                        </button>
+                    </form>
+
+                    <button class="post-action-button" onclick="event.stopPropagation(); window.location.href='/post/{{ post.post_id }}#comments'">
+                    💬 {{ post['comment_count'] }} Comments
+                    </button>
+                </div>
+            </div>
           </div>
         {% endfor %}
 
     {% else %}
           <h3>This user hasn't posted anything yet.</h3>
     {% endif %}
-    
+  </div> 
 </div>
 
 <div class="modal" id="imageModal" onclick="closeModal()">
