@@ -77,17 +77,17 @@
     }    
 
     .post {
+        width: 100%;
+        max-width: 850px;
+        max-height: 650px;
+        margin: 20px auto;
+        padding: 30px;      
+        background-color: #ffffff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        overflow: hidden;
         display: flex;  
         flex-direction: column;
-        width: 100%;
-        max-width: 600px;
-        max-height: 650px;
-        background-color: #ffffff;
-        border-radius: 10px;
-        margin: 20px auto;
-        overflow: hidden;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        padding: 30px;
         cursor: pointer;
     }
     
@@ -107,9 +107,12 @@
         border: 1px solid #c8a786; 
     }
 
+    .post-body{
+        margin-left: 90px;
+    }
+
     .post-content {
         text-align: left;    
-        margin-left: 90px; 
         display: -webkit-box;
         -webkit-line-clamp: 5;
         -webkit-box-orient: vertical;
@@ -117,27 +120,50 @@
         text-overflow: ellipsis;    
     }
 
-    .media {
-        display: flex;
-        align-items: center;
-        justify-content: center;
+    .media-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        width: 100%;
+        max-width: 600px;
         margin: 10px 0;
     }
 
-    .media img,
-    .media video {
-        margin: 10px auto;
+    .media-item {
+        height: 200px;
+        position: relative;
+        overflow: hidden;
+        background: #f0f0f0;
+    }
+
+    .media-item img,
+    .media-item video {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .more-overlay {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-color: rgba(0,0,0,0.5);
+        color: white;
+        font-size: 36px;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         border-radius: 12px;
-        max-width: 300px;
-        height: 350px;
-        object-fit: contain; 
     }
 
     .post-actions {
-        margin: 10px 0;
+        margin-top: 20px;
         display: flex;
-        justify-content: center;
         align-items: center;
+        justify-content: flex-start;
+        gap: 15px;
     }
 
     .post-action-button {
@@ -147,16 +173,10 @@
         cursor: pointer;
         font-weight: bold;
         font-size: 18px; 
-        margin: 0 10px;
     }
 
     .post-action-button:hover {
         background-color: inherit;
-    }
-    
-    .post-actions .separator {
-        font-size: 30px;
-        color: #6b4f2f;
     }
     
     .button-container {
@@ -268,46 +288,56 @@
             <p><strong>{{ post['name'] }}</strong> posted at {{ post['created_at'] }}</p>
         </div>
 
-        <p class="post-content">{{ post['content'] }}</p>
-            {% if post['cat_hashtag'] %}
-                <p class="post-content">
-                    <a class="hashtag" href="{{ url_for('community.hashtag_posts', hashtag=post['cat_hashtag']) }}">#{{ post['cat_hashtag'] }}</a>
-                </p>
-            {% endif %}
-
-        <div class="media">
-            {% if post['media_url'] %}
-                {% set ext = post['media_url'].rsplit('.', 1)[1].lower() %}
-                {% if ext in ['jpg', 'jpeg', 'png', 'gif'] %}
-                    <img src="{{ url_for('static', filename=post['media_url']) }}" alt="Image">
-                {% elif ext in ['mp4', 'mov', 'avi'] %}
-                    <video controls>
-                        <source src="{{ url_for('static', filename=post['media_url']) }}" type="video/{{ ext }}">
-                    </video>
+        <div class="post-body">
+            <p class="post-content">{{ post['content'] }}</p>
+                {% if post['cat_hashtag'] %}
+                    <p class="post-content">
+                        <a class="hashtag" href="{{ url_for('community.hashtag_posts', hashtag=post['cat_hashtag']) }}">#{{ post['cat_hashtag'] }}</a>
+                    </p>
                 {% endif %}
-            {% endif %}
-        </div>
-        
-        <div class="post-actions">
-            <form id="like-form-{{ post['post_id'] }}" action="{{ url_for('community.like_post' if not post['liked_by_current_user'] else 'community.unlike_post', post_id=post['post_id']) }}" method="post" style="display:inline;">
-                <input type="hidden" name="sort" value="{{ sort }}">
-                <button type="submit" class="post-action-button">
-                    {% if post['liked_by_current_user'] %}
-                        ❤️ 
-                    {% else %}
-                        🤍 
-                    {% endif %}
-                    {{ post['like_count'] }} Like
+
+            <div class="media-grid">
+                {% if post['media_url'] %}
+                    {% set media_list = post['media_url'].split(';') %}
+                    {% set max_show = 3 %}
+                    {% set total = media_list | length %}
+                    {% for media_url in media_list[:max_show] %}
+                        {% set ext = media_url.rsplit('.', 1)[1].lower() %}
+                        <div class="media-item">
+                            {% if ext in ['jpg', 'jpeg', 'png', 'gif'] %}
+                                <img src="{{ url_for('static', filename=media_url) }}" alt="Image">
+                            {% elif ext in ['mp4', 'mov', 'avi'] %}
+                                <video controls>
+                                    <source src="{{ url_for('static', filename=media_url) }}" type="video/{{ ext }}">
+                                </video>
+                            {% endif %}
+
+                            {% if loop.index == max_show and total > max_show %}
+                                <div class="more-overlay">+{{ total - max_show }}</div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="post-actions">
+                <form id="like-form-{{ post['post_id'] }}" action="{{ url_for('community.like_post' if not post['liked_by_current_user'] else 'community.unlike_post', post_id=post['post_id']) }}" method="post" style="display:inline;">
+                    <input type="hidden" name="sort" value="{{ sort }}">
+                    <button type="submit" class="post-action-button">
+                        {% if post['liked_by_current_user'] %}
+                            ❤️ 
+                        {% else %}
+                            🤍 
+                        {% endif %}
+                        {{ post['like_count'] }} Likes
+                    </button>
+                </form>
+
+                <button class="post-action-button" onclick="event.stopPropagation(); window.location.href='/post/{{ post.post_id }}#comments'">
+                💬 {{ post['comment_count'] }} Comments
                 </button>
-            </form>
-            
-            <span class="separator">|</span>
-
-            <button class="post-action-button" onclick="event.stopPropagation(); window.location.href='/post/{{ post.post_id }}#comments'">
-               💬 {{ post['comment_count'] }} Comments
-            </button>
+            </div>
         </div>
-
     </div>
 
 {% endfor %}
@@ -318,7 +348,7 @@
     <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>
         <h3>New Post</h3>
-        <form action="/post/create" method="post" enctype="multipart/form-data">
+        <form action="/post/create" method="post" enctype="multipart/form-data" onsubmit="return checkWordLimit() && checkFilesCount()">
             <div style="position: relative;">
                 <textarea id="content" name="content" placeholder="Have a meowment to share?" required style="box-sizing: border-box;"></textarea>
                 <div style="position: absolute; right: 10px; bottom: 20px; font-size: 14px; color: #94693e; background: #eae8e6;">
@@ -332,7 +362,7 @@
                     <option value="{{ cat_name }}">#{{ cat_name }}</option>
                 {% endfor %}
             </select><br>
-            <input type="file" name="media" multiple><br>
+            <input type="file" name="media" multiple id="media-input"><br>
             <button type="submit">Post</button>
         </form>
     </div>
@@ -376,6 +406,15 @@ function checkWordLimit() {
     var wordCount = content.split(/\s+/).filter(Boolean).length;
     if (wordCount > 100) {
         alert("Post content must be 100 words or less!");
+        return false;
+    }
+    return true;
+}
+
+function checkFilesCount() {
+    var input = document.getElementById('media-input');
+    if (input.files.length > 9) {
+        alert("You can upload up to 9 media files only.");
         return false;
     }
     return true;
