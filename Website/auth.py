@@ -530,7 +530,17 @@ def submit_report():
     elif report_type == "profiles":
         profile_id = item_id
     elif report_type == "user_profile":
-        user_profile_id = item_id
+        try:
+            item_id_int = int(item_id)
+        except (TypeError, ValueError):
+            flash("Invalid user ID.", category="error")
+            return redirect(url_for("views.home"))
+
+        if item_id_int == current_user.id:
+            flash("You cannot report yourself.", category="error")
+            return redirect(url_for("views.home"))
+
+        user_profile_id = item_id_int
 
     #store report data
     new_report = Report(
@@ -559,7 +569,7 @@ def submit_report():
     elif report_type == "profiles":
         return redirect(url_for("search.single_profile", profile_id=profile_id))
     elif report_type == "user_profile":
-        return redirect(url_for("auth.view_user_profile", user_id=user_profile_id))
+        return redirect(url_for("auth.view_user_profile", user_profile_id))
 
     return redirect(url_for("views.home"))
 
