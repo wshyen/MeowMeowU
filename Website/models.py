@@ -49,12 +49,14 @@ class Report(db.Model):
     post_id = db.Column(db.Integer, nullable=True)
     comment_id = db.Column(db.Integer, nullable=True)
     profile_id = db.Column(db.Integer, nullable=True)
+    user_profile_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
     reason = db.Column(db.String(255), nullable=False)
     details = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     user = db.relationship("User", backref=db.backref("user_reports", lazy=True, cascade="all, delete-orphan"))
     story = db.relationship("Story", backref="reports", lazy=True)
+    user_profile = db.relationship("User", backref="user_reports", lazy=True)
 
     @property
     def report_type(self):
@@ -66,6 +68,8 @@ class Report(db.Model):
             return "Deleted Successfully"
         elif self.profile_id and not db.session.execute(text("SELECT id FROM profiles WHERE id = :profile_id"), {"profile_id": self.profile_id}).fetchone():
             return "Deleted Successfully"
+        elif self.user_profile_id and not db.session.execute(text("SELECT id FROM user WHERE id = :profile_id"),{"profile_id": self.user_profile_id}).fetchone():
+            return "Deleted Successfully"
         elif self.story_id:
             return "Story"
         elif self.comment_id and self.post_id:
@@ -73,7 +77,9 @@ class Report(db.Model):
         elif self.post_id:
             return "Post"
         elif self.profile_id:
-            return "Profile"
+            return "Cat Profile"
+        elif self.user_profile_id:
+            return "User Profile"
         return "Deleted Successfully"
 
     @property
@@ -86,4 +92,6 @@ class Report(db.Model):
             return ("auth.view_story", {"story_id": self.story_id}, "View Story") if db.session.execute(text("SELECT id FROM story WHERE id = :story_id"), {"story_id": self.story_id}).fetchone() else (None, {}, "Deleted Successfully")
         elif self.profile_id:
             return ("auth.view_profile", {"profile_id": self.profile_id}, "View Profile") if db.session.execute(text("SELECT id FROM profiles WHERE id = :profile_id"), {"profile_id": self.profile_id}).fetchone() else (None, {}, "Deleted Successfully")
+        elif self.user_profile_id:
+            return ("auth.view_user_profile", {"profile_id": self.user_profile_id}, "View User Profile") if db.session.execute(text("SELECT id FROM user WHERE id = :profile_id"), {"profile_id": self.user_profile_id}).fetchone() else (None, {}, "Deleted Successfully")
         return (None, {}, "")
