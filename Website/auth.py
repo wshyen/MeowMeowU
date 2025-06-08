@@ -434,12 +434,16 @@ def validate_existence(table, item_id):
         "post": "post_id",
         "story": "id",
         "comment": "id",
-        "profiles": "id"
+        "profiles": "id",
+        "user_profile": "id"
     }
 
     column = column_map.get(table)
     if not column:
         return False  #prevent unknown table access
+    
+    if table == "user_profile":
+        table = "user" #correctly map user profile reports to the user table
 
     query = text(f"SELECT EXISTS(SELECT 1 FROM {table} WHERE {column} = :item_id)")
     return db.session.execute(query, {"item_id": item_id}).scalar()
@@ -452,7 +456,7 @@ def report_page(report_type, item_id):
 
     #ensure report type is valid (case-insensitive)
     report_type = report_type.lower()
-    if report_type not in ["post", "story", "comment", "profiles"]:
+    if report_type not in ["post", "story", "comment", "profiles", "user_profile"]:
         flash("Invalid report type!", category="error")
         return redirect(url_for('views.home'))
 
@@ -493,7 +497,7 @@ def submit_report():
         return redirect(url_for("auth.report_page", report_type=report_type, item_id=item_id))
 
     #validate report type
-    if report_type not in ["post", "story", "comment", "profiles"]:
+    if report_type not in ["post", "story", "comment", "profiles", "user_profile"]:
         flash("Invalid report type.", category="error")
         return redirect(url_for("views.home"))
 
@@ -555,7 +559,7 @@ def submit_report():
     elif report_type == "profiles":
         return redirect(url_for("search.single_profile", profile_id=profile_id))
     elif report_type == "user_profile":
-        return redirect(url_for("auth.view_user_profile", profile_id=user_profile_id))
+        return redirect(url_for("auth.view_user_profile", user_id=user_profile_id))
 
     return redirect(url_for("views.home"))
 
