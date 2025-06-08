@@ -89,7 +89,7 @@
         <tr>
             <td>{{ report.reason }}</td>
             <td>{{ report.details if report.details else '-' }}</td>
-            <td>{{ report.user.Name }}</td>
+            <td>{{ report.reporting_user.Name }}</td>
             <td>{{ report.created_at.strftime('%Y-%m-%d') }}</td>
             <td>{{ report.report_type }}</td>
             <td>
