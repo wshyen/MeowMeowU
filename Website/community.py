@@ -282,10 +282,16 @@ def delete_post(post_id):
 
     # Check if the post exists and belongs to the current user
     if post and post['user_id'] == current_user.id:
+
         # Delete all likes associated with the post
         conn.execute('DELETE FROM likes WHERE post_id = ?', (post_id,))
+
         # Delete all comments associated with the post
         conn.execute('DELETE FROM comment WHERE post_id = ?', (post_id,))
+
+        # Delete all comment's like associated with the post
+        conn.execute('DELETE FROM comment_like WHERE post_id = ?', (post_id,))        
+
         # Delete the post from the database
         conn.execute('DELETE FROM post WHERE post_id = ?', (post_id,))
         conn.commit()
