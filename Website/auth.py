@@ -511,6 +511,7 @@ def submit_report():
     story_id = None
     comment_id = None
     profile_id = None
+    user_profile_id = None
 
     if report_type == "post":
         post_id = item_id
@@ -524,6 +525,8 @@ def submit_report():
             return redirect(url_for("views.home"))
     elif report_type == "profiles":
         profile_id = item_id
+    elif report_type == "user_profile":
+        user_profile_id = item_id
 
     #store report data
     new_report = Report(
@@ -532,6 +535,7 @@ def submit_report():
         story_id=story_id,
         comment_id=comment_id,
         profile_id=profile_id,
+        user_profile_id=user_profile_id,
         reason=other_reason if reason == "other" else reason,
         details=details,
     )
@@ -550,6 +554,8 @@ def submit_report():
         return redirect(url_for("community.post_detail", post_id=post_id, comment_id=comment_id))
     elif report_type == "profiles":
         return redirect(url_for("search.single_profile", profile_id=profile_id))
+    elif report_type == "user_profile":
+        return redirect(url_for("auth.view_user_profile", profile_id=user_profile_id))
 
     return redirect(url_for("views.home"))
 
