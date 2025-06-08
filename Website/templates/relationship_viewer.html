@@ -28,6 +28,13 @@
         margin: 0 25px;
     }
 
+    p {
+        color:#94693e; 
+        font-weight:bold; 
+        font-size:25px; 
+        text-align:center;
+    }
+    
     .graph-container {
         display: flex;
         justify-content: center;
@@ -227,10 +234,28 @@
  
 </style>
 
-<h1>All Cat Relationship Graph</h1>
+<h1>Cat Relationship Graph</h1>
+
+<form method="POST" action="{{ url_for('relationship.view_graph') }}">
+  <label for="cat_filter_name">Filter by Cat:</label>
+  <select name="cat_filter_name" onchange="this.form.submit()">
+    {% for cat in profiles %}
+      <option value="{{ cat.name }}" {% if cat.name == cat_filter_name %}selected{% endif %}>
+        {{ cat.name }}
+      </option>
+    {% endfor %}
+  </select>
+  <input type="hidden" name="action" value="filter">
+</form>
 
 <div class="graph-container">
-    <object id="cat-graph" type="image/svg+xml" data="{{ tree_img }}" alt="Cat Relationship Tree"></object>
+    {% if no_relation_msg %}
+        <p>
+            {{ no_relation_msg }}
+        </p>
+    {% else %}
+        <object id="cat-graph" type="image/svg+xml" data="{{ tree_img }}" alt="Cat Relationship Tree"></object>
+    {% endif %}
 </div>
 
     
