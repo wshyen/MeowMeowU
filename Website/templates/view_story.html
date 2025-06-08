@@ -218,7 +218,9 @@
     <small class="timestamp">Shared on: {{ story.created_at.strftime('%Y-%m-%d') }}</small>
 </div>
 
-<button onclick="window.location.href='{{ url_for('auth.cat_story') }}'">🐾 Back to Cat Story 🐾</button>
+<button class="back-button" onclick="history.back();">
+    🐾Back🐾
+</button>
 
 <!-- Image Modal -->
 <div class="modal" id="imageModal" onclick="closeModal()">
