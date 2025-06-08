@@ -54,7 +54,8 @@ def community_feature():
 
     query = f'''
         SELECT post.*, user.name, user.profile_picture,
-            COUNT(likes.id) AS like_count,
+            (SELECT COUNT(*) FROM likes WHERE likes.post_id = post.post_id) AS like_count,
+            (SELECT COUNT(*) FROM comment WHERE comment.post_id = post.post_id) AS comment_count,
             CASE 
                 WHEN EXISTS (
                     SELECT 1 FROM likes 
@@ -64,7 +65,6 @@ def community_feature():
             END AS liked_by_current_user
         FROM post 
         JOIN user ON post.user_id = user.id 
-        LEFT JOIN likes ON post.post_id = likes.post_id
         GROUP BY post.post_id
         ORDER BY {order_by}
     '''
@@ -84,7 +84,8 @@ def post_detail(post_id):
             post.*, 
             user.name,
             user.profile_picture,
-             (SELECT COUNT(*) FROM likes WHERE likes.post_id = post.post_id) AS like_count,
+                (SELECT COUNT(*) FROM likes WHERE likes.post_id = post.post_id) AS like_count,
+                (SELECT COUNT(*) FROM comment WHERE comment.post_id = post.post_id) AS comment_count,
             CASE 
                 WHEN EXISTS (
                     SELECT 1 FROM likes 
@@ -151,19 +152,23 @@ def create_post():
     cat_hashtag = request.form.get('cat_hashtag')
     user_id = current_user.id
     created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    media = request.files.get('media')
+    media_files = request.files.getlist('media')
     media_url = None
 
     if len(content.split()) > 100:
         flash("Post content must be 100 words or less!", category="error")
         return redirect(url_for('community.community_feature'))
 
-    if media and allowed_file(media.filename):
-        os.makedirs(POSTS_FOLDER, exist_ok=True)
-        filename = secure_filename(media.filename)
-        media.save(os.path.join(POSTS_FOLDER, filename))
-        media_url = f"posts/{filename}"
-        print("File saved to:", os.path.join(POSTS_FOLDER, filename))
+    media_urls = []
+
+    for media in media_files:
+        if media and allowed_file(media.filename):
+            os.makedirs(POSTS_FOLDER, exist_ok=True)
+            filename = secure_filename(media.filename)
+            media.save(os.path.join(POSTS_FOLDER, filename))
+            media_urls.append(f"posts/{filename}") 
+
+    media_url = ';'.join(media_urls) if media_urls else None        
 
     conn = get_db_connection()
     conn.execute(
@@ -198,7 +203,8 @@ def hashtag_posts(hashtag):
     posts = conn.execute(
         f'''
         SELECT post.*, user.name, user.profile_picture,
-            COUNT(likes.id) AS like_count,
+            (SELECT COUNT(*) FROM likes WHERE likes.post_id = post.post_id) AS like_count,
+            (SELECT COUNT(*) FROM comment WHERE comment.post_id = post.post_id) AS comment_count,
             CASE 
                 WHEN EXISTS (
                     SELECT 1 FROM likes 
@@ -208,7 +214,6 @@ def hashtag_posts(hashtag):
             END AS liked_by_current_user
         FROM post
         JOIN user ON post.user_id = user.id
-        LEFT JOIN likes ON post.post_id = likes.post_id
         WHERE post.cat_hashtag = ?
         GROUP BY post.post_id
         ORDER BY {order_by}
@@ -230,10 +235,12 @@ def my_posts():
     conn = get_db_connection()
     posts = conn.execute('''
         SELECT post.*, user.name, user.profile_picture,
-            COUNT(likes.id) AS like_count
+            COUNT(likes.id) AS like_count,
+            COUNT(comment.id) AS comment_count
         FROM post
         JOIN user ON post.user_id = user.id
         LEFT JOIN likes ON post.post_id = likes.post_id
+        LEFT JOIN comment ON post.post_id = comment.post_id 
         WHERE post.user_id = ?
         GROUP BY post.post_id
         ORDER BY post.created_at DESC
@@ -357,7 +364,6 @@ def add_comment(post_id):
     created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     user_id = current_user.id
     parent_id = request.form.get('parent_id')
-    sort = request.form.get('sort', 'date_desc')
 
     if not parent_id:
         parent_id = None    

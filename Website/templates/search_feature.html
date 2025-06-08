@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}SEARCH{% endblock %}
+{% block title %}Search{% endblock %}
 
 {% block content %}
 
@@ -92,23 +92,24 @@
     
 <h1>SEARCH</h1>
   
-<form action="/search" method="get">
+<form id="search-form" action="/search-feature" method="get">
     
     <div class="form-container">    
 
-        <div class="search-bar">
-            <label for="name">Keyword:</label> 
-            <input type="text" id="name" name="name" placeholder="e.g., Tom, Bubble" /> 
-        </div>   
-                
         <div class="filter-bar">
             <label for="search_type">Search in:</label>
             <select id="search_type" name="search_type">
-                <option value="cat">Cat Profiles</option>
-                <option value="post">Community Posts</option>
                 <option value="user">Users</option>
+                <option value="post">Community Posts</option>
+                <option value="cat">Cat Profiles</option>
             </select>
         </div>
+
+        <div class="search-bar">
+            <label for="name">Keyword:</label> 
+            <input type="text" id="name" name="keyword"/>
+
+        </div>   
 
         <div class="filter-bar" id = "cat-filters">
             <label for="gender">Filter by gender:</label>
@@ -142,6 +143,28 @@
 
 </form>                    
     
+<script>
+const searchTypeSelect = document.getElementById('search_type');
+const catFilters = document.getElementById('cat-filters');
+const keywordInput = document.getElementById('name');
+
+function updateUI() {
+    const val = searchTypeSelect.value;
+    if (val === 'cat') {
+        catFilters.style.display = 'block';
+        keywordInput.placeholder = "e.g., Tom, Doraemon";
+    } else if (val === 'user') {
+        catFilters.style.display = 'none';
+        keywordInput.placeholder = "e.g., Elsa, SpongeBob";
+    } else if (val === 'post') {
+        catFilters.style.display = 'none';
+        keywordInput.placeholder = "e.g., cat peeing on food, cat stole my sandwich";
+    }
+}
+
+searchTypeSelect.addEventListener('change', updateUI);
+updateUI();
+</script>
 
 
 {% endblock %}

@@ -40,16 +40,16 @@
     }
 
     .post {
-        display: flex;  
-        flex-direction: column;
         width: 100%;
-        max-width: 800px;
+        max-width: 1000px;
         height: auto;
+        margin: 20px auto;
+        padding: 30px;
         background-color: #ffffff;
         border-radius: 10px;
-        margin: 20px auto;
+        display: flex;  
+        flex-direction: column;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        padding: 30px;
         cursor: pointer;
         position: relative;
     }
@@ -70,33 +70,56 @@
         margin-right: 20px;
         border: 1px solid #c8a786; 
     }
+    .post-body{
+        margin-left: 90px;
+    }
 
     .post-content {
         text-align: left;    
-        margin-left: 90px; 
-        max-width: 75%;      
     }
 
-    .media {
-        display: flex;
-        align-items: center;
-        justify-content: center;
+    .media-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        width: 100%;
+        max-width: 600px;
         margin: 10px 0;
     }
 
-    .media img,
-    .media video {
-        margin: 10px auto;
+    .media-item {
+        height: 200px;
+        position: relative;
+        overflow: hidden;
+        background: #f0f0f0;
+    }
+
+    .media-item img,
+    .media-item video {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .more-overlay {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-color: rgba(0,0,0,0.5);
+        color: white;
+        font-size: 36px;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         border-radius: 12px;
-        max-width: 50%;
-        max-height: 50%;
-        object-fit: contain; 
     }
 
     .post-actions {
-        margin-top: 10px;
+        gap: 40px;
+        margin-top: 20px;
         display: flex;
-        justify-content: center;
         align-items: center;
     }
     
@@ -107,7 +130,6 @@
         cursor: pointer;
         font-weight: bold;
         font-size: 24px; 
-        margin: 0 10px;
     }
 
     .post-action-button:hover {
@@ -176,7 +198,7 @@
         background-color: inherit;
     }
 
-    .commment-actions .separator {
+    .comment-actions .separator {
         font-size: 30px;
         color: #6b4f2f;
     }
@@ -189,7 +211,7 @@
         background-color: #f2eadf; 
         padding: 10px;
         box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); 
-        z-index: 1000;
+        z-index: 90;
     }
 
     .comment-form-container form {
@@ -279,13 +301,18 @@
         left: 50%;
         transform: translate(-50%, -50%);
         width: auto;
-        height: 60vh;
+        height: 85vh;
         max-width: 80vw;
-        max-height: 60vh;
+        max-height: 85vh;
         object-fit: contain;
         border: 10px solid #f2eadf;
         z-index: 100;
     }    
+
+    
+    video:fullscreen {
+        object-fit: contain;
+    }
 
     .hidden {
         display: none;
@@ -382,7 +409,7 @@
 </style>
 
 <h1>Post Details</h1>
-<button class="back-button" onclick="window.location.href='{{ url_for('community.community_feature') }}'">
+<button class="back-button" onclick="history.back();">
     Back
 </button>
 
@@ -413,43 +440,55 @@
         <p><strong>{{ post['name'] }}</strong> posted at {{ post['created_at'] }}</p>
     </div>
 
-    <p class="post-content">{{ post['content'] }}</p>
-    {% if post['cat_hashtag'] %}
-        <p class="post-content">
-            <a href="{{ url_for('community.hashtag_posts', hashtag=post['cat_hashtag']) }}">#{{ post['cat_hashtag'] }}</a>
-        </p>
-    {% endif %}
-
-    <div class="media">
-        {% if post['media_url'] %}
-            {% set ext = post['media_url'].rsplit('.', 1)[1].lower() %}
-            {% if ext in ['jpg', 'jpeg', 'png', 'gif'] %}
-            <img src="{{ url_for('static', filename=post['media_url']) }}" alt="Image">
-            {% elif ext in ['mp4', 'mov', 'avi'] %}
-                <video controls>
-                <source src="{{ url_for('static', filename=post['media_url']) }}" type="video/{{ ext }}">
-                </video>
+    <div class="post-body">
+        <p class="post-content">{{ post['content'] }}</p>
+            {% if post['cat_hashtag'] %}
+                <p class="post-content">
+                    <a class="hashtag" href="{{ url_for('community.hashtag_posts', hashtag=post['cat_hashtag']) }}">#{{ post['cat_hashtag'] }}</a>
+                </p>
             {% endif %}
-        {% endif %}
-    </div>
-    
-    <div class="post-actions">
-        <form id="like-form-{{ post['post_id'] }}" action="{{ url_for('community.like_post' if not post['liked_by_current_user'] else 'community.unlike_post', post_id=post['post_id']) }}" method="post" style="display:inline;">
-            <button type="submit" class="post-action-button">
-                {% if post['liked_by_current_user'] %}
-                    ❤️ 
-                {% else %}
-                    🤍 
-                {% endif %}
-                {{ post['like_count'] }} Like
-            </button>
-        </form>
-        
-        <span class="separator">|</span>
 
-        <button class="post-action-button" id="comment-button">
-            💬 Comments
-        </button>
+        <div class="media-grid">
+            {% if post['media_url'] %}
+                {% set media_list = post['media_url'].split(';') %}
+                {% set total = media_list | length %}
+                {% for media_url in media_list %}
+                    {% set ext = media_url.rsplit('.', 1)[1].lower() %}
+                    <div class="media-item">
+                        {% if ext in ['jpg', 'jpeg', 'png', 'gif'] %}
+                            <div class="media-container">
+                                <input type="checkbox" id="post-media-img-{{ post['post_id'] }}-{{ loop.index }}">
+                                <label for="post-media-img-{{ post['post_id'] }}-{{ loop.index }}">
+                                    <img src="{{ url_for('static', filename=media_url) }}" alt="Image">
+                                </label>
+                            </div>
+                        {% elif ext in ['mp4', 'mov', 'avi'] %}
+                            <video controls>
+                                <source src="{{ url_for('static', filename=media_url) }}" type="video/{{ ext }}">
+                            </video>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="post-actions">
+            <form id="like-form-{{ post['post_id'] }}" action="{{ url_for('community.like_post' if not post['liked_by_current_user'] else 'community.unlike_post', post_id=post['post_id']) }}" method="post" style="display:inline;">
+                <input type="hidden" name="sort" value="{{ sort }}">
+                <button type="submit" class="post-action-button">
+                    {% if post['liked_by_current_user'] %}
+                        ❤️ 
+                    {% else %}
+                        🤍 
+                    {% endif %}
+                    {{ post['like_count'] }} Likes
+                </button>
+            </form>
+
+            <button class="post-action-button" onclick="event.stopPropagation(); window.location.href='/post/{{ post.post_id }}#comments'">
+            💬 {{ post['comment_count'] }} Comments
+            </button>
+        </div>
     </div>
     
 </div>
@@ -459,6 +498,7 @@
 <!-- Comment List -->
 
 <h3 id="comments">Comments List</h3>
+
 {% macro render_comments(comments, grouped_comments) %}
     {% for comment in comments %}
         <div class="comment">
@@ -553,7 +593,6 @@
 
 {{ render_comments(grouped_comments[None], grouped_comments) }}
 
-
 <div class="comment-form-container">
     <form action="{{ url_for('community.add_comment', post_id=post['post_id']) }}" method="POST" enctype="multipart/form-data">
         <textarea id="comment-textarea" name="content" placeholder="Write a comment..."></textarea>
@@ -567,52 +606,55 @@
     </form>
 </div>
 
+
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const fileInput = document.getElementById('comment-media');
-        const fileNameDisplay = document.getElementById('file-name-display');
+document.addEventListener('DOMContentLoaded', function () {
+    const fileInput = document.getElementById('comment-media');
+    const fileNameDisplay = document.getElementById('file-name-display');
 
-        fileInput.addEventListener('change', function () {
-            if (fileInput.files.length > 0) {
-                const fileName = fileInput.files[0].name;
-                fileNameDisplay.textContent = `📎 ${fileName}`;
-            } else {
-                fileNameDisplay.textContent = '';
-            }
-        });
+    fileInput.addEventListener('change', function () {
+        if (fileInput.files.length > 0) {
+            const fileName = fileInput.files[0].name;
+            fileNameDisplay.textContent = `📎 ${fileName}`;
+        } else {
+            fileNameDisplay.textContent = '';
+        }
     });
+});
 
-    document.addEventListener('DOMContentLoaded', function () {
-        const commentButton = document.getElementById('comment-button');
-        const replyButtons = document.querySelectorAll('.reply-button');
-        const commentTextarea = document.getElementById('comment-textarea');
-        const parentIdInput = document.getElementById('parent-id');
+document.addEventListener('DOMContentLoaded', function () {
+    const commentButton = document.getElementById('comment-button');
+    const replyButtons = document.querySelectorAll('.reply-button');
+    const commentTextarea = document.getElementById('comment-textarea');
+    const parentIdInput = document.getElementById('parent-id');
 
-        commentButton.addEventListener('click', function () {
+    commentButton.addEventListener('click', function () {
+        commentTextarea.focus();
+    });        
+
+    replyButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const commentId = button.getAttribute('data-comment-id');
+            const floorSpan = button.closest('.comment').querySelector('.floor-number');
+            let floorText = '';
+            if (floorSpan) {
+                floorText = floorSpan.textContent.trim();
+            }
+            parentIdInput.value = commentId; 
+            commentTextarea.value = `Replying to ${floorText} `;
             commentTextarea.focus();
-        });        
-
-        replyButtons.forEach(button => {
-            button.addEventListener('click', function () {
-                const commentId = button.getAttribute('data-comment-id');
-                const floorSpan = button.closest('.comment').querySelector('.floor-number');
-                let floorText = '';
-                if (floorSpan) {
-                    floorText = floorSpan.textContent.trim();
-                }
-                parentIdInput.value = commentId; 
-                commentTextarea.value = `Replying to ${floorText} `;
-                commentTextarea.focus();
-            });
-        });
-
-        const commentForm = document.getElementById('comment-form');
-        commentForm.addEventListener('submit', function () {
-            if (!commentTextarea.value.trim()) {
-                parentIdInput.value = '';
-            }
         });
     });
+
+    const commentForm = document.getElementById('comment-form');
+    commentForm.addEventListener('submit', function () {
+        if (!commentTextarea.value.trim()) {
+            parentIdInput.value = '';
+        }
+    });
+});
+
+
 </script>
 
 {% endblock %}

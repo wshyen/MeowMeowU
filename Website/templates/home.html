@@ -83,17 +83,20 @@
         background-color: #8d6c45 !important;
     }
 
-    .fc-prev-button, .fc-next-button {
+    .fc-prev-button,
+    .fc-next-button {
         background-color: #c79058 !important;
         color: white !important;
     }
 
-    .fc-prev-button:hover, .fc-next-button:hover {
+    .fc-prev-button:hover,
+    .fc-next-button:hover {
         background-color: #9c6732 !important;
     }
 
     .fc-event {
-        background-color: #812d9b !important; /* Match the card background */
+        background-color: #812d9b !important;
+        /* Match the card background */
         border: none;
         color: white !important;
         font-weight: bold !important;
@@ -118,7 +121,7 @@
         text-align: center;
         padding: 5px;
     }
-    
+
     footer {
         background-color: #5C4033;
         color: white;
@@ -134,17 +137,76 @@
         font-size: 16px;
     }
 
+    .footer-container {
+        display: flex;
+        justify-content: space-between;
+        padding: 20px;
+        color: white;
+    }
+
+    .footer-center {
+        text-align: center;
+        flex: 1;
+    }
+
+    .footer-right {
+        flex: 1;
+    }
+
+    .footer-center {
+        flex: 0.5;
+    }
+
+    .footer-left,
+    .footer-right {
+        width: 50%;
+        text-align: center;
+    }
+
+    .footer-right ul,
+    .footer-center ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .footer-right li,
+    .footer-center li {
+        margin-bottom: 8px;
+    }
+
+    .footer-right a,
+    .footer-center a {
+        color: white;
+        text-decoration: none;
+    }
+
+    .footer-right a:hover,
+    .footer-center a:hover {
+        text-decoration: underline;
+        background: none;
+    }
+    
+    .main-content-row {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        gap: 20px;
+        max-width: 900px;
+        margin: 40px auto;
+    }
+
+    .popular-post-container,
     .latest-stories-container {
-        align-items: center;
-        max-width: 450px;
-        margin: 40px;
-        margin-left: 20%;
+        flex: 1;
+        min-width: 300px;
+        max-width: 4300px;
         padding: 20px;
         background-color: #fff7ec;
         border-radius: 10px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
     }
 
+    .popular-post-container a, 
     .latest-stories-container a {
         font-size: 18px;
         margin-top: 10px;
@@ -153,6 +215,7 @@
         font-family: "Times New Roman";
     }
 
+    .popular-post-grid,
     .latest-stories-grid {
         display: flex;
         flex-direction: column;
@@ -160,8 +223,9 @@
         max-width: 900px;
         margin: auto;
         align-items: center;
-    }  
+    }
 
+    .popular-post-box,
     .latest-story-box {
         width: 280px;
         border-radius: 10px;
@@ -171,6 +235,9 @@
         text-align: center;
     }
 
+
+    .popular-post-box img, 
+    .popular-post-box video, 
     .latest-story-box img {
         width: 100%;
         height: 180px;
@@ -180,6 +247,11 @@
         cursor: pointer;
     }
 
+    video:fullscreen {
+        object-fit: contain;
+    }
+
+    .popular-post-title,
     .latest-story-title {
         font-size: 18px;
         font-weight: bold;
@@ -188,20 +260,25 @@
         font-family: "Times New Roman";
     }
 
+    .popular-post-grid a,
     .latest-story-title a {
         text-decoration: none;
         color: rgb(120, 100, 80);
     }
 
+    .popular-post-box img:hover, 
+    .popular-post-box video:hover,
     .latest-story-box img:hover {
         transform: scale(1.05);
     }
 
+    .view-post-link,
     .view-stories-link {
         text-align: center;
         margin-top: 5px;
     }
 
+    .view-post-link a,
     .view-stories-link a {
         font-size: 20px;
         font-family: 'Times New Roman', serif;
@@ -210,15 +287,39 @@
         text-decoration: none;
         transition: color 0.3s ease, transform 0.3s ease;
         display: inline-block;
-        cursor: pointer;
     }
 
+    .view-post-link a:hover,
     .view-stories-link a:hover {
         background-color: transparent;
         transform: scale(1.1);
         text-decoration: underline;
     }
 
+    #weekly-fact-container {
+        background-color: #ffe4c4; 
+        border: 2px solid #d2691e; 
+        border-radius: 12px;
+        padding: 15px;
+        text-align: center;
+        width: 80%;
+        margin: 20px auto;
+        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    h3 {
+        color: #d2691e; 
+        font-weight: bold;
+        font-family: 'Times New Roman', Times, serif;
+        font-size: xx-large;
+
+    }
+
+    p.weekly-fact {
+        font-size: 18px;
+        color: #3e2f1c; 
+        font-family: 'Times New Roman', Times, serif;
+    }
 </style>
 
 <head>
@@ -258,31 +359,85 @@
 
 <hr>
 
-<div class="latest-stories-container">
-    <h2 style="font-weight: bold; color: rgb(78, 68, 57); font-family: Times New Roman; padding-bottom: 10px; text-align: center;">📖Latest Cat Stories</h2>
-    <div class="latest-stories-grid">
-        {% for story in stories %}
-        <div class="latest-story-box">
-            <a href="{{ url_for('auth.view_story', story_id=story.id) }}">
-                <img src="{{ url_for('auth.uploaded_file', filename=story.image_filename) }}" alt="Story Image">
-            </a>
-            <h3 class="latest-story-title">
-                <a href="{{ url_for('auth.view_story', story_id=story.id) }}">{{ story.caption }}</a>
-            </h3>
+<!-- Weekly Fun Cat Fact Section -->
+<div id="weekly-fact-container">
+    <h3>💡 Weekly Fun Cat Fact 💡</h3>
+    <p id="weekly-fact" class="weekly-fact">Loading fun cat fact...</p>
+</div>
+
+<hr>
+<div class="main-content-row">
+    <div class="latest-stories-container">
+        <h2 style="font-weight: bold; color: rgb(78, 68, 57); font-family: Times New Roman; padding-bottom: 10px; text-align: center;">
+            📖Latest Cat Stories</h2>
+        <div class="latest-stories-grid">
+            {% for story in stories %}
+            <div class="latest-story-box">
+                <a href="{{ url_for('auth.view_story', story_id=story.id) }}">
+                    <img src="{{ url_for('auth.uploaded_file', filename=story.image_filename) }}" alt="Story Image">
+                </a>
+                <h3 class="latest-story-title">
+                    <a href="{{ url_for('auth.view_story', story_id=story.id) }}">{{ story.caption }}</a>
+                </h3>
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
+        <div class="view-stories-link">
+            <a href="{{ url_for('auth.cat_story') }}">📓More Cat Stories</a>
+        </div>
     </div>
-    <div class="view-stories-link">
-        <a href="{{ url_for('auth.cat_story') }}">📓More Cat Stories</a>
+
+    <div class="popular-post-container">
+        <h2 style="font-weight: bold; color: rgb(78, 68, 57); font-family: Times New Roman; padding-bottom: 10px; text-align: center;">
+            ⭐ Most Liked Post</h2>
+        <div class="popular-post-grid">
+            <a href="{{ url_for('community.post_detail', post_id=popular_post.post_id) }}">
+                <div class="popular-post-box">
+                    {% if popular_post.media_url %}
+                        {% set ext = popular_post.media_url .rsplit('.', 1)[1].lower() %}
+                        {% if ext in ['jpg', 'jpeg', 'png', 'gif'] %}
+                            <img src="{{ url_for('static', filename=popular_post.media_url) }}" alt="Image">
+                        {% elif ext in ['mp4', 'mov', 'avi'] %}
+                            <video controls>
+                                <source src="{{ url_for('static', filename=popular_post.media_url) }}" type="video/{{ ext }}">
+                            </video>
+                        {% endif %}
+                    {% endif %}
+                    <h3 class="popular-post-title">{{ popular_post.content }}</h3>
+                </div>
+            </a>    
+        </div>
+        <div class="view-post-link">
+            <a href="{{ url_for('community.community_feature') }}">🧭Explore More Posts</a>
+        </div>
     </div>
 </div>
 
 <footer>
-    <p>© 2025 MeowMeowU | All rights reserved.</p>
-    <p>2510 CSP1123 3-07</p>
-    <p>Instagram: @shyen_17 | @mingyenn__ | @yinnie_s </p>
+    <div class="footer-container">
+        <div class="footer-left">
+            <p>© 2025 MeowMeowU | All rights reserved.</p>
+            <p>2510 CSP1123 3-07</p>
+            <p>Instagram: @shyen_17 | @mingyenn__ | @yinnie_s</p>
+        </div>
+        <div class="footer-center">
+            <ul>
+                <li><a href="/community_feature">Community</a></li>
+                <li><a href="/contest_page">Contests</a></li>
+                <li><a href="/view_profiles">Cat Profiles</a></li>
+                <li><a href="/badges">Badges</a></li>
+            </ul>
+        </div>
+        <div class="footer-right">
+            <ul>
+                <li><a href="/cat_story">Cat Story</a></li>
+                <li><a href="/relationship_feature">Cat Relationship Tree</a></li>
+                <li><a href="/quiz">Quizzes</a></li>
+                <li><a href="/suggestion-box">Suggestion Box</a></li>
+            </ul>
+        </div>
+    </div>
 </footer>
-
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         fetch('/api/contests') //Send request to get the list of contests in backend
@@ -306,6 +461,45 @@
                 calendar.render();
             });
     });
+
+    function fetchWeeklyFact() {
+        fetch("https://catfact.ninja/fact") //Send request to API to get a new cat fact
+            .then(response => response.json()) //API responds then converts the data into JSON 
+            .then(data => { //Extracts the cat fact from API response 
+                if (data && data.fact) { 
+                    document.getElementById("weekly-fact").innerText = data.fact; //Makes sure the API returned a valid fact before using it
+                    localStorage.setItem("weeklyFact", data.fact); // Stores the fact in browser memory (local storage) so users will see the same fact for a week
+                    localStorage.setItem("factDate", new Date().getTime()); //ets the current date or time and save it to track when the fact was fetched
+                } else {
+                    document.getElementById("weekly-fact").innerText = "Oops! Couldn't fetch a fact.";
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching cat fact:", error);
+                document.getElementById("weekly-fact").innerText = "Error loading fact. Try again later!";
+            });
+    }
+
+    //Check if a week has passed
+    function updateFact() {
+        let savedFact = localStorage.getItem("weeklyFact"); //Loads the last saved cat fact from memory
+        let savedDate = localStorage.getItem("factDate"); //Loads the date when the fact was last fetched
+
+        if (savedFact && savedDate) {
+            let lastUpdated = new Date(parseInt(savedDate));
+            let today = new Date(); //Get today's date and compare with the last update
+
+            if ((today - lastUpdated) / (1000 * 60 * 60 * 24 * 7) >= 1) {
+                fetchWeeklyFact(); //Fetch new fact after a week
+            } else {
+                document.getElementById("weekly-fact").innerText = savedFact; //Use stored fact
+            }
+        } else {
+            fetchWeeklyFact(); //First-time fetch
+        }
+    }
+
+    window.onload = updateFact;
 </script>
 
 {% endblock %}

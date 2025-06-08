@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}SEARCH{% endblock %}
+{% block title %}Result{% endblock %}
 
 {% block content %}
 
@@ -30,6 +30,10 @@
         margin-bottom: 20px;
     }
 
+    p {
+        font-size: 18px;
+    }
+
     .sort-container {
         text-align: center;
         margin-bottom: 20px;
@@ -56,6 +60,7 @@
         background-size: 20px;
     }
 
+    .user-grid,
     .cat-grid {
         display: flex;
         flex-wrap: wrap;
@@ -64,8 +69,8 @@
         margin-top: 20px;
     }
 
-    .cat-card {
-        background-color: #fffbe9;
+    .card {
+        background-color: #ffffff;
         padding: 30px;
         width: 270px;
         height: 350px;
@@ -80,14 +85,14 @@
         transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
-    .cat-card:hover {
+    .card:hover {
         transform: scale(1.15); 
-        background-color: #fffbe9;
+        background-color: #fcfaed;
         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
     }
 
 
-    .cat-card img {
+    .card img {
         width: 150px; 
         height: 150px;
         border-radius: 50%;
@@ -98,33 +103,152 @@
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     }       
     
-    .cat-card:hover img {
+    .card:hover img {
         transform: scale(1.2);
         filter: brightness(1.1) contrast(1.1);
     }
 
-    .cat-card p {
+    .card p {
         margin: 10px 0;
         font-size: larger;
         color: inherit;
     }
 
-    .cat-card a {
+    .card a {
         text-decoration: none;
         color: inherit; 
     }
 
-    .cat-card a:hover {
+    .card a:hover {
         text-decoration: none;
         color: inherit;
         background-color: transparent;
     }
+
+    .post {
+        width: 100%;
+        max-width: 1000px;
+        min-height: 200px;
+        max-height: 300px;
+        margin: 20px auto;
+        padding: 20px 20px 10px 20px;
+        background-color: #ffffff;
+        border-radius: 10px;
+        overflow: hidden;
+        cursor: pointer;
+        display: flex;  
+        flex-direction: column;
+    }
+
+    .post .profile-picture {
+        width: 50px;
+        height: 50px;
+        margin-right: 20px;
+        border-radius: 50%; 
+        border: 1px solid #c8a786; 
+    } 
+
+    .post-info {
+        display: flex;
+        align-items: center;  
+        justify-content: flex-start; 
+        margin-left: 20px;
+    }
+
+    .post-info p {
+        margin: 0;      
+        line-height: 1.2; 
+    }
+
+    .post-content {
+        margin: 0 70px 0 90px;
+        max-width: 100%;
+        text-align: left;    
+        white-space: normal; 
+        display: -webkit-box;
+        -webkit-line-clamp: 5;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis; 
+    }
+
+    .media {
+        display: flex;
+        align-items: flex-start;
+        margin: 20px 90px;
+    }
+
+    .media img,
+    .media video {
+        width: 150px;
+        height: 150px;
+        object-fit: cover; 
+    }
+
 </style>
 
+{% if search_type == 'user' %}
+  <h1>SEARCH USER PROFILE</h1>
+  {% if users %}
+  <h2>The following us matches your search: {{keyword}}</h2>
+    <div class="user-grid">
+        {% for u in users %}
+            <div class="card">
+                <a href="{{ url_for('auth.view_user_profile', user_id=u.id) }}">
+                    <img class="user-pic" src="{{ url_for('static', filename='Userprofile/' + (u['profile_picture'] if u['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
+                    <p><strong>Name: </strong>{{ u.name }}</p>
+                </a>    
+            </div>
+        {% endfor %}
+    </div>
+  {% elif message %}
+    <h2>{{ message }} {{keyword}}</h2>
+  {% endif %}
+
+
+{% elif search_type == 'post' %}
+
+  <h1>SEARCH COMMUNITY POSTS</h1>
+
+  {% if posts %}
+    <h2>The following posts match your search: {{keyword}}</h2>
+    <div class="post-container">
+        {% for post in posts %}
+        <div class="post" onclick="window.location.href='/post/{{ post.post_id }}'">
+                <div class="post-info">
+                    <img class="profile-picture" src="{{ url_for('static', filename='Userprofile/' + (post['profile_picture'] if post['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
+                    <p><strong>{{ post['name'] }}</strong> posted at {{ post['created_at'] }}</p>
+                </div>
+
+            <p class="post-content">{{ post['content'] }}</p>
+
+            <div class="media">
+                {% if post['media_url'] %}
+                    {% set ext = post['media_url'].rsplit('.', 1)[1].lower() %}
+                    {% if ext in ['jpg', 'jpeg', 'png', 'gif'] %}
+                        <img src="{{ url_for('static', filename=post['media_url']) }}" alt="Image">
+                    {% elif ext in ['mp4', 'mov', 'avi'] %}
+                        <video controls>
+                            <source src="{{ url_for('static', filename=post['media_url']) }}" type="video/{{ ext }}">
+                        </video>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+  {% elif message %}
+    <h2>{{ message }} {{keyword}} </h2>
+  {% endif %}
+
+
+
+{% elif search_type == 'cat' %}
     <h1>SEARCH CAT PROFILE</h1>
 
     <div class="sort-container">
-        <form method="GET" action="/cat_list">
+        <form method="GET" action="/cat_result">
             <label for="sort">Sort by:</label>
             <select name="sort" id="sort" onchange="this.form.submit()">
                 <option value="name_asc" {% if request.args.get('sort') == 'name_asc' %}selected{% endif %}>Name (A-Z)</option>
@@ -137,16 +261,12 @@
     </div>
 
     {% if profiles %}
-    <h2>The following matches your search:</h2>
+    <h2>The following matches your search: {{ keyword}}</h2>
     <div class="cat-grid">
         {% for cat in profiles %}
-            <div class="cat-card">
+            <div class="card">
                 <a href="/single_profile?name={{ cat.name | lower }}">
-                    {% if cat.photo %}
-                        <img class="profile-picture" src="{{ url_for('static', filename='uploads/' + cat['photo']) }}" alt="{{ cat['name'] }}">
-                    {% else %}
-                        <img class="profile-picture" src="{{ url_for('static', filename='uploads/default.png') }}" alt="Default Placeholder">
-                    {% endif %}
+                    <img src="{{ url_for('static', filename='uploads/' + (cat.photo if cat.photo else 'default.png')) }}" alt="{{ cat.name }}">
                     <p><strong>Name: </strong>{{ cat.name }}</p>
                     <p><strong>Gender: </strong>{{ cat.gender }}</p>
                 </a>    
@@ -154,8 +274,9 @@
         {% endfor %}
     </div>
 
-{% elif message %}
-    <h2>{{ message }}</h2>
+    {% elif message %}
+        <h2>{{ message }} {{ keyword}}</h2>
+    {% endif %}
 {% endif %}
 
 

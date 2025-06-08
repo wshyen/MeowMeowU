@@ -1,3 +1,5 @@
+import os
+import sqlite3
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import current_user, login_required
 from .models import Note, Story
@@ -5,14 +7,33 @@ from .import db
 
 views = Blueprint("views", __name__)
 
+def get_db_connection():
+    db_path = os.path.join(os.path.dirname(__file__), '..', 'instance', 'datebase.db')
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
+    return conn
+
 @views.route("/")
 def home():
     latest_stories = Story.query.order_by(Story.created_at.desc()).limit(1).all()
-    return render_template("home.html", user=current_user, stories=latest_stories)
+
+    conn = get_db_connection()
+    popular_post = conn.execute('''
+        SELECT post.*, 
+            (SELECT COUNT(*) FROM likes WHERE likes.post_id = post.post_id) AS like_count
+        FROM post
+        ORDER BY like_count DESC
+        LIMIT 1
+    ''').fetchone()
+    conn.close()
+    return render_template("home.html", user=current_user, stories=latest_stories, popular_post=popular_post)
 
 @views.route('/suggestion-box', methods=['GET', 'POST'])
-@login_required
 def suggestion():
+    if not current_user.is_authenticated:
+        flash("You must be logged in to give suggestion!", category="error")
+        return redirect(url_for('auth.login'))
+    
     if request.method == "POST":
         note = request.form.get("note")
 
