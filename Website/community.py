@@ -282,17 +282,23 @@ def delete_post(post_id):
 
     # Check if the post exists and belongs to the current user
     if post and post['user_id'] == current_user.id:
-        #delete all comments associated with the post
+        # Delete all likes associated with the post
+        conn.execute('DELETE FROM likes WHERE post_id = ?', (post_id,))
+        # Delete all comments associated with the post
         conn.execute('DELETE FROM comment WHERE post_id = ?', (post_id,))
-        conn.commit()
         # Delete the post from the database
         conn.execute('DELETE FROM post WHERE post_id = ?', (post_id,))
         conn.commit()
 
-    if post['media_url']:
-        file_path = os.path.join(os.path.dirname(__file__), 'static', post['media_url'])
-        if os.path.exists(file_path):
-            os.remove(file_path)
+        # Delete all media files associated with the post
+        media_files = post['media_url']
+        if media_files:
+            files = media_files.split(';')
+            for file_path in files:
+                filename = os.path.basename(file_path)
+                filepath = os.path.join(POSTS_FOLDER, filename)
+                if os.path.exists(filepath):
+                    os.remove(filepath)                    
 
     conn.close()
     # Redirect back to the community feature page after deletion
@@ -308,7 +314,6 @@ def like_post(post_id):
     
     user_id = current_user.id
     sort = request.form.get('sort', 'date_desc')
-
     conn = get_db_connection()
     # Check if the post has already been liked to avoid duplicate likes
     existing_like = conn.execute(
@@ -432,13 +437,6 @@ def unlike_comment(comment_id):
     user_id = current_user.id
     conn = get_db_connection()
 
-    result = conn.execute(
-        'SELECT post_id FROM comment WHERE id = ?',
-        (comment_id,)
-    ).fetchone()
-
-    post_id = result['post_id']
-
     conn.execute(
         'DELETE FROM comment_like WHERE user_id = ? AND comment_id = ?',
         (user_id, comment_id)
@@ -456,9 +454,11 @@ def delete_comment(comment_id):
         child_comments = conn.execute('SELECT id FROM comment WHERE parent_id = ?', (comment_id,)).fetchall()
         for child in child_comments:
             delete_with_replies(child['id'])
+        conn.execute('DELETE FROM comment_like WHERE comment_id = ?', (comment_id,))            
         conn.execute('DELETE FROM comment WHERE id = ?', (comment_id,))
     
     delete_with_replies(comment_id)
+
     conn.commit()
     conn.close()
 
