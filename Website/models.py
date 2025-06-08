@@ -19,7 +19,20 @@ class User(db.Model, UserMixin):
 
     notes = db.relationship("Note", backref="user", lazy=True, cascade="all, delete-orphan")
     stories = db.relationship("Story", backref="owner", lazy=True, cascade="all, delete-orphan")
-    reports = db.relationship("Report", backref="owner", lazy=True, cascade="all, delete-orphan")
+    reports_made = db.relationship(
+        "Report",
+        back_populates="reporting_user",
+        lazy=True,
+        cascade="all, delete-orphan",
+        foreign_keys="[Report.user_id]"
+    )
+
+    reports_received = db.relationship(
+        "Report",
+        back_populates="reported_user_profile",
+        lazy=True,
+        foreign_keys="[Report.user_profile_id]"
+    )
 
     status = db.Column(db.String(100)) #user profile part
     birthday = db.Column(db.Date)
@@ -54,19 +67,9 @@ class Report(db.Model):
     details = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    user = db.relationship(
-        "User",
-        backref=db.backref("user_reports", lazy=True, cascade="all, delete-orphan"),
-        foreign_keys=[user_id]
-    )
+    reporting_user = db.relationship("User", back_populates="reports_made", foreign_keys=[user_id])
+    reported_user_profile = db.relationship("User", back_populates="reports_received", foreign_keys=[user_profile_id])
     story = db.relationship("Story", backref="reports", lazy=True)
-    user_profile = db.relationship("User", backref="user_reports", lazy=True)
-    reported_user = db.relationship(
-        "User",
-        backref="reported_profiles",
-        lazy=True,
-        foreign_keys=[user_profile_id]
-    )
 
     @property
     def report_type(self):
