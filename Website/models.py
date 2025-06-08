@@ -67,8 +67,8 @@ class Report(db.Model):
     details = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    reporting_user = db.relationship("User", back_populates="reports_made", foreign_keys=[user_id])
-    reported_user_profile = db.relationship("User", back_populates="reports_received", foreign_keys=[user_profile_id])
+    reporting_user = db.relationship("User", foreign_keys=[user_id], backref="user_reports")
+    reported_user_profile = db.relationship("User", foreign_keys=[user_profile_id], backref="reported_profiles")
     story = db.relationship("Story", backref="reports", lazy=True)
 
     @property
@@ -106,5 +106,5 @@ class Report(db.Model):
         elif self.profile_id:
             return ("auth.view_profile", {"profile_id": self.profile_id}, "View Cat Profile") if db.session.execute(text("SELECT id FROM profiles WHERE id = :profile_id"), {"profile_id": self.profile_id}).fetchone() else (None, {}, "Deleted Successfully")
         elif self.user_profile_id:
-            return ("auth.view_user_profile", {"profile_id": self.user_profile_id}, "View User Profile") if db.session.execute(text("SELECT id FROM user WHERE id = :profile_id"), {"profile_id": self.user_profile_id}).fetchone() else (None, {}, "Deleted Successfully")
+            return ("auth.view_user_profile", {"user_id": self.user_profile_id}, "View User Profile") if db.session.execute(text("SELECT id FROM user WHERE id = :user_id"), {"user_id": self.user_profile_id}).fetchone() else (None, {}, "Deleted Successfully")
         return (None, {}, "")
