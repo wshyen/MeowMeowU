@@ -44,7 +44,8 @@
         top: -120px;
     }
 
-    .options, input {
+    .options,
+    input {
         margin: 10px;
         font-size: 30px;
         cursor: pointer;
@@ -116,7 +117,7 @@
         position: relative;
         top: -120px;
         font-family: 'Times New Roman', Times, serif;
-    }  
+    }
 
     #claim-badge-box {
         display: none;
@@ -126,7 +127,7 @@
         top: -120px;
         font-family: 'Times New Roman', Times, serif;
     }
-    
+
     .quiz-option-btn {
         background-color: #bc9160;
         color: whitesmoke;
@@ -146,6 +147,26 @@
         color: #fff;
         transform: scale(1.05);
     }
+
+    #timer-box {
+        position: absolute;
+        top: 10px;
+        left: 550px;
+        width: 260px;
+        height: 60px;
+        background-color: #9c5c13;
+        padding: 10px 15px;
+        border-radius: 8px;
+        font-weight: bold;
+        color: white;
+        font-family: 'Times New Roman', Times, serif;
+        box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    button:focus {
+        outline: none;
+        box-shadow: none;
+    }
 </style>
 <div style="padding: 20px;">
     <h1>Level 2</h1>
@@ -158,17 +179,22 @@
 
     <div class="cat-box" id="cat-box" style="display: none;">
         <h2 id="question-text"></h2>
+        <div id="timer-box">
+            <h2 id="question-timer">⏳ Time left: 15s</h2>
+        </div>
         <h2 id="feedback"></h2>
+        <div id="score-box"></div>
     </div>
 
     <div class="options" id="options"></div>
-    
+
     <div class="button-box" id="restart-box">
         <button class="restart-button" onclick="restartQuiz()">Restart</button>
     </div>
 
     <div class="button-box" id="back-button-box">
-        <button class="restart-button" onclick="window.location.href='{{ url_for('quiz.quiz_page') }}'">🐾 Back to Quiz 🐾</button>
+        <button class="restart-button" onclick="window.location.href='{{ url_for('quiz.quiz_page') }}'">🐾 Back to Quiz
+            🐾</button>
     </div>
 
     <div class="button-box" id="claim-badge-box" style="display: none;">
@@ -202,7 +228,7 @@
             if (count < 0) {
                 clearInterval(countdownInterval);
                 countdownBox.style.display = "none", //Hide countdown after it finishes
-                catBox.style.display = "flex"; //Show the cat face shape
+                    catBox.style.display = "flex"; //Show the cat face shape
                 fetchQuestions(); //Fetch questions after countdown ends
             }
         }, 1000); //Countdown updates every second
@@ -223,6 +249,24 @@
     function getRandomSubset(arr, num) {
         let shuffled = arr.sort(() => Math.random() - 0.5); //Shuffle the array
         return shuffled.slice(0, num); //Take only 10 random questions
+    }
+
+    function startQuestionTimer() {
+        let timeLeft = 15; //Set time limit for each question
+        let timerElement = document.getElementById("question-timer");
+
+        //Clear previous timer if exists
+        clearInterval(window.questionTimer);
+
+        window.questionTimer = setInterval(() => {
+            timerElement.innerHTML = `⏳ Time left: ${timeLeft}s`;
+            timeLeft--;
+
+            if (timeLeft < 0) {
+                clearInterval(window.questionTimer);
+                checkAnswer(null); //Autosubmit as incorrect when time runs out 
+            }
+        }, 1000); //Update every second  
     }
 
     function displayQuestion() {
@@ -247,12 +291,16 @@
             document.getElementById("options").innerHTML = shuffledOptions.map(option =>
                 `<button class="quiz-option-btn" onclick="checkAnswer('${option.value}')" type="button">${option.text}</button>`
             ).join("");
+
+            startQuestionTimer(); //Start countdown timer when question appears
         } else {
             checkQuizCompletion();
         }
     }
 
     function checkAnswer(userAnswer) {
+        clearInterval(window.questionTimer); //Stop countdown timer
+        
         //Make question and options invisible when display feedback
         document.getElementById("question-text").style.display = "none"; //Hide question when display feedback
         document.getElementById("options").style.display = "none"; //Hide options when display feedback
@@ -272,7 +320,7 @@
     function nextQuestion() {
         currentIndex++;
         document.getElementById("feedback").innerHTML = ""; //Clear previous feedback
-        
+
         //Make question and options visible again for the next question
         document.getElementById("question-text").style.display = "block";
         document.getElementById("options").style.display = "block";
@@ -288,14 +336,17 @@
         document.getElementById("question-text").innerHTML = "Quiz Complete!";
         document.getElementById("options").innerHTML = "";
 
+        let resultMessage = `You scored ${correctCount}/10! `;
+
         if (correctCount === questions.length) {
-            document.getElementById("question-text").innerHTML = "Congratulations! <br> You have completed Level 2 and earned your badge! <br> ฅ^•⩊•^ ฅ";
-            fetch('/complete_level2', {method: 'POST'});
+            resultMessage += "Congratulations! <br> You have completed Level 2 and earned your badge! <br> ฅ^•⩊•^ ฅ";
+            fetch('/complete_level2', { method: 'POST' });
             document.getElementById("claim-badge-box").style.display = "block"; //Show claim badge button
         } else {
-            document.getElementById("question-text").innerHTML = "This is your final challenge! <br> Get every answer right to complete your journey and earn your badge. <br> Give it another shot!  <br> /ᐠ╥⩊╥ᐟ\\";
+            resultMessage += "<br> This is your final challenge! <br> Get every answer right to complete your journey and earn your badge. <br> Give it another shot!  <br> /ᐠ╥⩊╥ᐟ\\";
             document.getElementById("restart-box").style.display = "block"; //Show restart buttons
         }
+        document.getElementById("question-text").innerHTML = resultMessage;
         document.getElementById("back-button-box").style.display = "block"; //Show back button
     }
 
