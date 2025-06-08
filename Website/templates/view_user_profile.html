@@ -412,7 +412,7 @@
       {% endif %}
       <div class="profile-info">
         <h2>{{ profile_owner.name }}</h2>
-        {% if profile_owner.privacy == "Private" and current_user.id != profile_owner.id %}
+        {% if profile_owner.privacy == "Private" and current_user.role != "admin" and current_user.id != profile_owner.id %}
           <h5>Not available to view</h5>
         {% else %}
           <h5>Status: {{ profile_owner.status }}</h5>
@@ -421,7 +421,7 @@
     </div>
  
     <div class="profile-details">
-      {% if profile_owner.privacy == "Private" and current_user.id != profile_owner.id %}
+      {% if profile_owner.privacy == "Private" and current_user.role != "admin" and current_user.id != profile_owner.id %}
         <h5 style="text-align: center;"><b>This account is private account🔒</b></h5>
       {% else %}
         <h5><b>Birthday:</b> {{ profile_owner.birthday if profile_owner.birthday else "-" }}</h5>
@@ -433,7 +433,7 @@
     
     <div class="badge-display">
       
-      {% if profile_owner.privacy == "Private" and current_user.id != profile_owner.id %}
+      {% if profile_owner.privacy == "Private" and current_user.role != "admin" and current_user.id != profile_owner.id %}
         <h5 style="font-weight: bold; font-size: 18px;">Achievements are not available to view.</h5>
       {% else %}
         <h3><b>Achievements:</b></h3>
