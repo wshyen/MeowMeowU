@@ -145,13 +145,16 @@ def relationship_feature():
     )    
 
 
+# Whole graph
 @relationship_bp.route('/graph', methods=['GET', 'POST'])
 def view_graph():
     conn = get_db_connection()
     cursor = conn.cursor()
 
     action = request.form.get('action')
+    cat_filter_name = request.form.get('cat_filter_name')
 
+# action for admin
     if action == 'edit':
         rel_id = request.form.get('rel_id')
         catA_id = request.form.get('catA_id')
@@ -178,9 +181,11 @@ def view_graph():
             conn.commit()
         return redirect(url_for('relationship.view_graph'))
 
-    cats = cursor.execute("SELECT id, name, gender, photo FROM profiles").fetchall()
 
+#view graph for normal user
+    cats = cursor.execute("SELECT id, name, gender, photo FROM profiles").fetchall()
     #all relationship 
+
     relations = cursor.execute("""
         SELECT cr.id, cr.catA_id, cr.catB_id, cr.relation_type, cr.direction,
             p1.name AS catA_name, p1.photo AS catA_photo,
@@ -188,8 +193,16 @@ def view_graph():
         FROM cat_relationship cr
         JOIN profiles p1 ON cr.catA_id = p1.id
         JOIN profiles p2 ON cr.catB_id = p2.id
-    """).fetchall()
+        WHERE p1.name = ? OR p2.name = ?
+    """, (cat_filter_name, cat_filter_name)).fetchall()
 
+    if len(relations) > 0:
+        graph_svg = generate_graph(relations)
+        no_relation_msg = ""
+    else:
+        graph_svg = ""
+        no_relation_msg = "No relationships found, start creating now!"
+    
     graph_svg = generate_graph(relations)
     cat_photos = {cat['name']: url_for('static', filename=f'uploads/{cat["photo"]}') for cat in cats}
 
@@ -199,5 +212,7 @@ def view_graph():
         profiles=cats,
         relations=relations,
         tree_img=graph_svg,
-        cat_photos=cat_photos
+        cat_photos=cat_photos,
+        cat_filter_name=cat_filter_name,
+        no_relation_msg=no_relation_msg
         )
