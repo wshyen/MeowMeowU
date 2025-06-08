@@ -604,20 +604,32 @@ def delete_post(post_id):
         flash("Post not found!", category="error")
         conn.close()
         return redirect(url_for("community.community_feature"))
-
-    #delete post from database
-    conn.execute('DELETE FROM post WHERE post_id = ?', (post_id,))
-    conn.commit()
+    
+    #delete all likes associated with the post
+    conn.execute('DELETE FROM likes WHERE post_id = ?', (post_id,))
 
     #delete all comments associated with the post
     conn.execute('DELETE FROM comment WHERE post_id = ?', (post_id,))
     conn.commit()
 
-    #remove media file if applicable
-    if post['media_url']:
-        file_path = os.path.join(os.path.dirname(__file__), 'static', post['media_url'])
-        if os.path.exists(file_path):
-            os.remove(file_path)
+    #delete all comment's like associated with the post
+    conn.execute('DELETE FROM comment_like WHERE post_id = ?', (post_id,))
+    
+    #delete post from database
+    conn.execute('DELETE FROM post WHERE post_id = ?', (post_id,))
+    conn.commit()
+
+
+
+    #remove all media file if applicable
+    media_files = post['media_url']
+    if media_files:
+        files = media_files.split(';')
+        for file_path in files:
+            filename = os.path.basename(file_path)
+            filepath = os.path.join(POSTS_FOLDER, filename)
+            if os.path.exists(filepath):
+                os.remove(filepath)     
 
     conn.close()
 
@@ -632,6 +644,7 @@ def delete_comment(id):
         child_comments = conn.execute('SELECT id FROM comment WHERE parent_id = ?', (comment_id,)).fetchall()
         for child in child_comments:
             delete_with_replies(child[0])
+        conn.execute('DELETE FROM comment_like WHERE comment_id = ?', (comment_id,))  
         conn.execute('DELETE FROM comment WHERE id = ?', (comment_id,))
     
     delete_with_replies(id)
