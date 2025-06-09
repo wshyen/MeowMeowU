@@ -429,20 +429,39 @@ def get_profile(profile_id):
     result = db.session.execute(query, {"profile_id": profile_id}).fetchone()
     return result
 
+def get_post_id_from_comment(comment_id):
+    query = text("SELECT post_id FROM comment WHERE id = :comment_id")
+    result = db.session.execute(query, {"comment_id": comment_id}).fetchone()
+    return result.post_id if result else None
+
+def get_user_profile(user_id):
+    query = text("""
+        SELECT id, name, profile_picture, cover_photo, status, birthday, mbti, hobby, bio, privacy
+        FROM user WHERE id = :user_id
+    """)
+    result = db.session.execute(query, {"user_id": user_id}).fetchone()
+    return result
+
 def validate_existence(table, item_id):
     column_map = {
         "post": "post_id",
         "story": "id",
         "comment": "id",
-        "profiles": "id"
+        "profiles": "id",
+        "user_profile": "id"
     }
 
     column = column_map.get(table)
     if not column:
         return False  #prevent unknown table access
+    
+    if table == "user_profile":
+        table = "user" #correctly map user profile reports to the user table
 
     query = text(f"SELECT EXISTS(SELECT 1 FROM {table} WHERE {column} = :item_id)")
-    return db.session.execute(query, {"item_id": item_id}).scalar()
+
+    with db.session() as session:
+        return session.execute(query, {"item_id": item_id}).scalar()
 
 @auth.route('/report/<report_type>/<int:item_id>', methods=['GET', 'POST'])
 def report_page(report_type, item_id):
@@ -452,7 +471,7 @@ def report_page(report_type, item_id):
 
     #ensure report type is valid (case-insensitive)
     report_type = report_type.lower()
-    if report_type not in ["post", "story", "comment", "profiles"]:
+    if report_type not in ["post", "story", "comment", "profiles", "user_profile"]:
         flash("Invalid report type!", category="error")
         return redirect(url_for('views.home'))
 
@@ -493,7 +512,7 @@ def submit_report():
         return redirect(url_for("auth.report_page", report_type=report_type, item_id=item_id))
 
     #validate report type
-    if report_type not in ["post", "story", "comment", "profiles"]:
+    if report_type not in ["post", "story", "comment", "profiles", "user_profile"]:
         flash("Invalid report type.", category="error")
         return redirect(url_for("views.home"))
 
@@ -511,19 +530,39 @@ def submit_report():
     story_id = None
     comment_id = None
     profile_id = None
+    user_profile_id = None
 
     if report_type == "post":
         post_id = item_id
+        post = get_post(post_id)
+        if post:
+            user_profile_id = post.user_id
     elif report_type == "story":
         story_id = item_id
+        story = Story.query.get(story_id)
+        if story:
+            user_profile_id = story.user_id
     elif report_type == "comment":
         comment_id = item_id
         post_id = get_post_id_from_comment(comment_id)
-        if not post_id:
-            flash("Unable to find the post for this comment.", category="error")
-            return redirect(url_for("views.home"))
+        comment = get_comment(comment_id)
+        if comment:
+            user_profile_id = comment.user_id
     elif report_type == "profiles":
         profile_id = item_id
+    elif report_type == "user_profile":
+        profile_owner = get_user_profile(item_id) #fetch profile owner
+    
+        if not profile_owner:
+            flash("User profile not found!", category="error")
+            return redirect(url_for("views.home"))
+
+        user_profile_id = profile_owner.id #assign the actual owner's ID
+
+        #prevent self-reporting only
+        if user_profile_id == current_user.id:
+            flash("You cannot report your own profile.", category="error")
+            return redirect(url_for("auth.view_user_profile", user_id=user_profile_id))
 
     #store report data
     new_report = Report(
@@ -532,6 +571,7 @@ def submit_report():
         story_id=story_id,
         comment_id=comment_id,
         profile_id=profile_id,
+        user_profile_id=user_profile_id,
         reason=other_reason if reason == "other" else reason,
         details=details,
     )
@@ -549,7 +589,9 @@ def submit_report():
     elif report_type == "comment":
         return redirect(url_for("community.post_detail", post_id=post_id, comment_id=comment_id))
     elif report_type == "profiles":
-        return redirect(url_for("search.single_profile", profile_id=profile_id))
+        return redirect(url_for("search.cat_result", profile_id=profile_id))
+    elif report_type == "user_profile":
+        return redirect(url_for("auth.view_user_profile", user_id=user_profile_id))
 
     return redirect(url_for("views.home"))
 
@@ -670,6 +712,54 @@ def delete_profile(profile_id):
 
     flash("Profile deleted successfully!", category="success")
     return redirect(url_for("auth.view_report", report_type="profiles", item_id=profile_id))
+
+@auth.route("/delete_bio/<int:user_id>", methods=["POST"])
+def delete_bio(user_id):
+    if not current_user.is_authenticated or current_user.role != 'admin':
+        flash("Unauthorized access!", category="error")
+        return redirect(url_for("views.home"))
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute("UPDATE user SET bio = NULL WHERE id = ?", (user_id,))
+    conn.commit()
+    conn.close()
+    
+    flash("Bio deleted successfully!", category="success")
+    return redirect(url_for("auth.view_user_profile", user_id=user_id))
+
+@auth.route("/delete_profile_picture/<int:user_id>", methods=["POST"])
+def delete_profile_picture(user_id):
+    if not current_user.is_authenticated or current_user.role != 'admin':
+        flash("Unauthorized access!", category="error")
+        return redirect(url_for("views.home"))
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("UPDATE user SET profile_picture = 'default_profilepic.png' WHERE id = ?", (user_id,))
+    conn.commit()
+    conn.close()
+
+    flash("Profile picture deleted successfully!", category="success")
+    return redirect(url_for("auth.view_user_profile", user_id=user_id))
+
+@auth.route("/delete_cover_photo/<int:user_id>", methods=["POST"])
+def delete_cover_photo(user_id):
+    if not current_user.is_authenticated or current_user.role != 'admin':
+        flash("Unauthorized access!", category="error")
+        return redirect(url_for("views.home"))
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("UPDATE user SET cover_photo = 'default_cover.png' WHERE id = ?", (user_id,))
+    conn.commit()
+    conn.close()
+
+    flash("Cover photo deleted successfully!", category="success")
+    return redirect(url_for("auth.view_user_profile", user_id=user_id))
 
 @auth.route('/view_post/<int:post_id>')
 def view_post(post_id):
