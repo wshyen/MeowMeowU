@@ -429,6 +429,19 @@ def get_profile(profile_id):
     result = db.session.execute(query, {"profile_id": profile_id}).fetchone()
     return result
 
+def get_post_id_from_comment(comment_id):
+    query = text("SELECT post_id FROM comment WHERE id = :comment_id")
+    result = db.session.execute(query, {"comment_id": comment_id}).fetchone()
+    return result.post_id if result else None
+
+def get_user_profile(user_id):
+    query = text("""
+        SELECT id, name, profile_picture, cover_photo, status, birthday, mbti, hobby, bio, privacy
+        FROM user WHERE id = :user_id
+    """)
+    result = db.session.execute(query, {"user_id": user_id}).fetchone()
+    return result
+
 def validate_existence(table, item_id):
     column_map = {
         "post": "post_id",
@@ -446,7 +459,9 @@ def validate_existence(table, item_id):
         table = "user" #correctly map user profile reports to the user table
 
     query = text(f"SELECT EXISTS(SELECT 1 FROM {table} WHERE {column} = :item_id)")
-    return db.session.execute(query, {"item_id": item_id}).scalar()
+
+    with db.session() as session:
+        return session.execute(query, {"item_id": item_id}).scalar()
 
 @auth.route('/report/<report_type>/<int:item_id>', methods=['GET', 'POST'])
 def report_page(report_type, item_id):
@@ -519,28 +534,35 @@ def submit_report():
 
     if report_type == "post":
         post_id = item_id
+        post = get_post(post_id)
+        if post:
+            user_profile_id = post.user_id
     elif report_type == "story":
         story_id = item_id
+        story = Story.query.get(story_id)
+        if story:
+            user_profile_id = story.user_id
     elif report_type == "comment":
         comment_id = item_id
         post_id = get_post_id_from_comment(comment_id)
-        if not post_id:
-            flash("Unable to find the post for this comment.", category="error")
-            return redirect(url_for("views.home"))
+        comment = get_comment(comment_id)
+        if comment:
+            user_profile_id = comment.user_id
     elif report_type == "profiles":
         profile_id = item_id
     elif report_type == "user_profile":
-        try:
-            item_id_int = int(item_id)
-        except (TypeError, ValueError):
-            flash("Invalid user ID.", category="error")
+        profile_owner = get_user_profile(item_id) #fetch profile owner
+    
+        if not profile_owner:
+            flash("User profile not found!", category="error")
             return redirect(url_for("views.home"))
 
-        if item_id_int == current_user.id:
-            flash("You cannot report yourself.", category="error")
-            return redirect(url_for("views.home"))
+        user_profile_id = profile_owner.id #assign the actual owner's ID
 
-        user_profile_id = item_id_int
+        #prevent self-reporting only
+        if user_profile_id == current_user.id:
+            flash("You cannot report your own profile.", category="error")
+            return redirect(url_for("auth.view_user_profile", user_id=user_profile_id))
 
     #store report data
     new_report = Report(
@@ -567,9 +589,9 @@ def submit_report():
     elif report_type == "comment":
         return redirect(url_for("community.post_detail", post_id=post_id, comment_id=comment_id))
     elif report_type == "profiles":
-        return redirect(url_for("search.single_profile", profile_id=profile_id))
+        return redirect(url_for("search.cat_result", profile_id=profile_id))
     elif report_type == "user_profile":
-        return redirect(url_for("auth.view_user_profile", user_profile_id))
+        return redirect(url_for("auth.view_user_profile", user_id=user_profile_id))
 
     return redirect(url_for("views.home"))
 

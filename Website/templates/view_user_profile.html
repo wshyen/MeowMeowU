@@ -394,7 +394,7 @@
             <span class="dots">...</span>
             <div class="menu">
                 {% if user.role == 'user' %}
-                    <a href="{{ url_for('auth.report_page', report_type='user_profile', item_id=user.id) }}">Report User</a>
+                    <a href="{{ url_for('auth.report_page', report_type='user_profile', item_id=profile_owner.id) }}">Report User</a>
                 {% elif user.role == 'admin' %}                    
                     <button type="submit" class="delete-btn">
                         Delete
