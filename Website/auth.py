@@ -700,6 +700,54 @@ def delete_profile(profile_id):
     flash("Profile deleted successfully!", category="success")
     return redirect(url_for("auth.view_report", report_type="profiles", item_id=profile_id))
 
+@auth.route("/delete_bio/<int:user_id>", methods=["POST"])
+def delete_bio(user_id):
+    if not current_user.is_authenticated or current_user.role != 'admin':
+        flash("Unauthorized access!", category="error")
+        return redirect(url_for("views.home"))
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute("UPDATE user SET bio = NULL WHERE id = ?", (user_id,))
+    conn.commit()
+    conn.close()
+    
+    flash("Bio deleted successfully!", category="success")
+    return redirect(url_for("auth.view_user_profile", user_id=user_id))
+
+@auth.route("/delete_profile_picture/<int:user_id>", methods=["POST"])
+def delete_profile_picture(user_id):
+    if not current_user.is_authenticated or current_user.role != 'admin':
+        flash("Unauthorized access!", category="error")
+        return redirect(url_for("views.home"))
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("UPDATE user SET profile_picture = 'default_profilepic.png' WHERE id = ?", (user_id,))
+    conn.commit()
+    conn.close()
+
+    flash("Profile picture deleted successfully!", category="success")
+    return redirect(url_for("auth.view_user_profile", user_id=user_id))
+
+@auth.route("/delete_cover_photo/<int:user_id>", methods=["POST"])
+def delete_cover_photo(user_id):
+    if not current_user.is_authenticated or current_user.role != 'admin':
+        flash("Unauthorized access!", category="error")
+        return redirect(url_for("views.home"))
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("UPDATE user SET cover_photo = 'default_cover.png' WHERE id = ?", (user_id,))
+    conn.commit()
+    conn.close()
+
+    flash("Cover photo deleted successfully!", category="success")
+    return redirect(url_for("auth.view_user_profile", user_id=user_id))
+
 @auth.route('/view_post/<int:post_id>')
 def view_post(post_id):
     conn = get_db_connection()

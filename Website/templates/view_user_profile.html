@@ -328,8 +328,8 @@
 
   .menu-container {
     position: absolute;
-    top: 5px;
-    right: 25px;
+    top: 3px;
+    right: 15px;
   }
 
   .menu {
@@ -343,7 +343,9 @@
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
     min-width: 90px;
     text-align: center;
+    width: 150px;
     transition: all 0.3s ease-in-out;
+    z-index: 10;
   }
 
   .menu a {
@@ -417,10 +419,16 @@
             <div class="menu">
                 {% if user.role == 'user' %}
                     <a href="{{ url_for('auth.report_page', report_type='user_profile', item_id=profile_owner.id) }}">Report User</a>
-                {% elif user.role == 'admin' %}                    
-                    <button type="submit" class="delete-btn">
-                        Delete
-                    </button>
+                {% elif user.role == 'admin' %}                
+                    <form action="{{ url_for('auth.delete_bio', user_id=profile_owner.id) }}" method="POST">
+                        <button type="submit" class="delete-btn">Delete Bio</button>
+                    </form>
+                    <form action="{{ url_for('auth.delete_profile_picture', user_id=profile_owner.id) }}" method="POST">
+                        <button type="submit" class="delete-btn">Delete Profile Picture</button>
+                    </form>
+                    <form action="{{ url_for('auth.delete_cover_photo', user_id=profile_owner.id) }}" method="POST">
+                        <button type="submit" class="delete-btn">Delete Cover Photo</button>
+                  </form>
                 {% endif %}
             </div>
         </div>
