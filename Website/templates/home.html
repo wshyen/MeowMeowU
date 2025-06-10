@@ -182,7 +182,7 @@
         text-decoration: underline;
         background: none;
     }
-    
+
     .main-content-row {
         display: flex;
         justify-content: space-around;
@@ -203,7 +203,7 @@
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
     }
 
-    .popular-post-container a, 
+    .popular-post-container a,
     .latest-stories-container a {
         font-size: 18px;
         margin-top: 10px;
@@ -233,8 +233,8 @@
     }
 
 
-    .popular-post-box img, 
-    .popular-post-box video, 
+    .popular-post-box img,
+    .popular-post-box video,
     .latest-story-box img {
         width: 100%;
         height: 180px;
@@ -263,7 +263,7 @@
         color: rgb(120, 100, 80);
     }
 
-    .popular-post-box img:hover, 
+    .popular-post-box img:hover,
     .popular-post-box video:hover,
     .latest-story-box img:hover {
         transform: scale(1.05);
@@ -294,8 +294,8 @@
     }
 
     #weekly-fact-container {
-        background-color: #ffe4c4; 
-        border: 2px solid #d2691e; 
+        background-color: #ffe4c4;
+        border: 2px solid #d2691e;
         border-radius: 12px;
         padding: 15px;
         text-align: center;
@@ -305,7 +305,7 @@
     }
 
     h3 {
-        color: #d2691e; 
+        color: #d2691e;
         font-weight: bold;
         font-family: 'Times New Roman', Times, serif;
         font-size: xx-large;
@@ -314,7 +314,7 @@
 
     p.weekly-fact {
         font-size: 18px;
-        color: #3e2f1c; 
+        color: #3e2f1c;
         font-family: 'Times New Roman', Times, serif;
     }
 </style>
@@ -365,7 +365,8 @@
 <hr>
 <div class="main-content-row">
     <div class="latest-stories-container">
-        <h2 style="font-weight: bold; color: rgb(78, 68, 57); font-family: Times New Roman; padding-bottom: 10px; text-align: center;">
+        <h2
+            style="font-weight: bold; color: rgb(78, 68, 57); font-family: Times New Roman; padding-bottom: 10px; text-align: center;">
             📖Latest Cat Stories</h2>
         <div class="latest-stories-grid">
             {% for story in stories %}
@@ -385,24 +386,25 @@
     </div>
 
     <div class="popular-post-container">
-        <h2 style="font-weight: bold; color: rgb(78, 68, 57); font-family: Times New Roman; padding-bottom: 10px; text-align: center;">
+        <h2
+            style="font-weight: bold; color: rgb(78, 68, 57); font-family: Times New Roman; padding-bottom: 10px; text-align: center;">
             ⭐ Most Liked Post</h2>
         <div class="popular-post-grid">
             <a href="{{ url_for('community.post_detail', post_id=popular_post.post_id) }}">
                 <div class="popular-post-box">
                     {% if popular_post.media_url %}
-                        {% set ext = popular_post.media_url .rsplit('.', 1)[1].lower() %}
-                        {% if ext in ['jpg', 'jpeg', 'png', 'gif'] %}
-                            <img src="{{ url_for('static', filename=popular_post.media_url) }}" alt="Image">
-                        {% elif ext in ['mp4', 'mov', 'avi'] %}
-                            <video controls>
-                                <source src="{{ url_for('static', filename=popular_post.media_url) }}" type="video/{{ ext }}">
-                            </video>
-                        {% endif %}
+                    {% set ext = popular_post.media_url .rsplit('.', 1)[1].lower() %}
+                    {% if ext in ['jpg', 'jpeg', 'png', 'gif'] %}
+                    <img src="{{ url_for('static', filename=popular_post.media_url) }}" alt="Image">
+                    {% elif ext in ['mp4', 'mov', 'avi'] %}
+                    <video controls>
+                        <source src="{{ url_for('static', filename=popular_post.media_url) }}" type="video/{{ ext }}">
+                    </video>
+                    {% endif %}
                     {% endif %}
                     <h3 class="popular-post-title">{{ popular_post.content }}</h3>
                 </div>
-            </a>    
+            </a>
         </div>
         <div class="view-post-link">
             <a href="{{ url_for('community.community_feature') }}">🧭Explore More Posts</a>
@@ -463,7 +465,7 @@
         fetch("https://catfact.ninja/fact") //Send request to API to get a new cat fact
             .then(response => response.json()) //API responds then converts the data into JSON 
             .then(data => { //Extracts the cat fact from API response 
-                if (data && data.fact) { 
+                if (data && data.fact) {
                     document.getElementById("weekly-fact").innerText = data.fact; //Makes sure the API returned a valid fact before using it
                     localStorage.setItem("weeklyFact", data.fact); // Stores the fact in browser memory (local storage) so users will see the same fact for a week
                     localStorage.setItem("factDate", new Date().getTime()); //ets the current date or time and save it to track when the fact was fetched
@@ -486,14 +488,25 @@
             let lastUpdated = new Date(parseInt(savedDate));
             let today = new Date(); //Get today's date and compare with the last update
 
-            if ((today - lastUpdated) / (1000 * 60 * 60 * 24 * 7) >= 1) {
-                fetchWeeklyFact(); //Fetch new fact after a week
+            //Get week number of last update and today
+            let lastWeek = lastUpdated.getFullYear() + "-" + getWeekNumber(lastUpdated);
+            let currentWeek = today.getFullYear() + "-" + getWeekNumber(today);
+
+            if (lastWeek !== currentWeek) {
+                fetchWeeklyFact(); //Fetch new fact when entering a new week
             } else {
                 document.getElementById("weekly-fact").innerText = savedFact; //Use stored fact
             }
         } else {
             fetchWeeklyFact(); //First-time fetch
         }
+    }
+
+    //Function to get the week number of a date
+    function getWeekNumber(date) {
+        let startOfYear = new Date(date.getFullYear(), 0, 1);
+        let daysSinceStart = Math.floor((date - startOfYear) / (1000 * 60 * 60 * 24));
+        return Math.ceil((daysSinceStart + startOfYear.getDay()) / 7);
     }
 
     window.onload = updateFact;
