@@ -200,6 +200,8 @@
     .cat-info {
         text-align: center;
         width: 120px;
+        font-weight: 600;
+        color: #6b4f2f;
     }
 
     .cat-info img {
@@ -209,11 +211,6 @@
         object-fit: cover;
         box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         margin-bottom: 8px;
-    }
-
-    .cat-info div {
-        font-weight: 600;
-        color: #6b4f2f;
     }
 
     .relation-type-arrow {
@@ -281,19 +278,16 @@
         height: auto;
     }
 
-    .button-container{
-        text-align: center; 
-        margin-top: 40px;
-    }
-
     .button {
+        display: block;
+        margin: 40px auto;
         padding: 12px 24px; 
-        margin-bottom: 20px; 
         font-size: 16px; 
         background-color: #dccbb7a5; 
         color: #6b4f2f; 
         border: none; 
         border-radius: 12px; 
+        transition: transform 0.8s ease;
         cursor: pointer;
     }
 
@@ -361,7 +355,7 @@
         font-size: 20px;
         font-weight: bold;
         cursor: pointer;
-        transition: transform 0.2s ease;
+        transition: transform 0.8s ease;
     }
 
 </style>
@@ -386,13 +380,9 @@
     {% endfor %}
 </div>
 
-<div class="button-container">
-    <a href="{{ url_for('catprofile.view_profiles') }}">
-        <button class="button">
-            View All Cats →
-        </button>
-    </a>
-</div>
+<button class="button" onclick="location.href='{{ url_for('catprofile.view_profiles') }}'">
+    View All Cats →
+</button>
 
 <hr>
 
@@ -461,10 +451,11 @@
                         <!-- Cat A -->
                         <div class="cat-info">
                             <img src="{{ url_for('static', filename='uploads/' + rel.catA_photo if rel.catA_photo else 'uploads/default.png') }}" alt="{{ rel.catA_name }}">
-                            <div>{{ rel.catA_name }}</div>
+                            {{ rel.catA_name }}
                         </div>
 
-                        <div class="relation-type-arrow"
+                        <!-- Relationship type & arrow -->
+                        <div class="relation-type-arrow">
                             <!-- Relationship -->
                             <div style="font-weight: bold; font-size: 18px; color: #94693e; white-space: nowrap; width: 70px; text-align: center;">
                                 {{ rel.relation_type }}
@@ -482,7 +473,7 @@
                         <!-- Cat B -->
                         <div class="cat-info">
                             <img src="{{ url_for('static', filename='uploads/' + rel.catB_photo if rel.catB_photo else 'uploads/default.png') }}" alt="{{ rel.catB_name }}">
-                            <div>{{ rel.catB_name }}</div>
+                            {{ rel.catB_name }}
                         </div>
 
                         <div class="action-buttons">
@@ -518,11 +509,9 @@
 </div>
 
 <div class="button-container">
-    <a href="{{ url_for('relationship.view_graph') }}">
-        <button class="button">
-            View Cat's Relationship →
-        </button>
-    </a>
+    <button class="button" onclick="location.href='{{ url_for('relationship.view_graph') }}'">
+        View All Cats →
+    </button>
 </div>
 </body>
 
