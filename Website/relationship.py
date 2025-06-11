@@ -1,5 +1,6 @@
 import os
 import sqlite3
+import random
 from flask import flash, Blueprint, g, render_template, request, redirect, url_for, current_app
 from flask_login import current_user
 from graphviz import Digraph
@@ -56,8 +57,8 @@ def generate_graph(relations, filename='cat_relationship_tree'):
     output_dir = os.path.join(current_app.static_folder, 'graphs')
     os.makedirs(output_dir, exist_ok=True)
     output_path = os.path.join(output_dir, filename)
-    print(f"Saving SVG to: {output_path}")
-    dot.render(output_path, format='svg', cleanup=True)
+    print(f"Saving SVG to: {output_path}")  # Add print to check file path
+    dot.render(output_path, format='svg', cleanup=False) 
 
     return url_for('static', filename=f'graphs/{filename}.svg')
 
@@ -67,6 +68,9 @@ def relationship_feature():
     conn = get_db_connection()
     cursor = conn.cursor()
 
+    all_cats = cursor.execute("SELECT id, name, gender, photo FROM profiles").fetchall()
+    random_cats = random.sample(all_cats,5,)
+        
     if request.method == 'POST':
         if not current_user.is_authenticated:
             flash("You must be logged in to add relationship!", category="error")
@@ -117,8 +121,6 @@ def relationship_feature():
                 conn.commit()
             return redirect(url_for('relationship.relationship_feature'))
 
-    cats = cursor.execute("SELECT id, name, gender, photo FROM profiles").fetchall()
-
     if current_user.is_authenticated:
         relations = cursor.execute("""
             SELECT cr.id, cr.catA_id, cr.catB_id, cr.relation_type, cr.direction,
@@ -133,15 +135,16 @@ def relationship_feature():
         relations = []
 
     graph_svg = generate_graph(relations)
-    cat_photos = {cat['name']: url_for('static', filename=f'uploads/{cat["photo"]}') for cat in cats}
+    cat_photos = {cat['name']: url_for('static', filename=f'uploads/{cat["photo"]}' if cat["photo"] else 'uploads/default.png') for cat in all_cats}
 
     return render_template(
         'relationship_manager.html',
         user=current_user,
-        profiles=cats,
+        random_cats=random_cats,
+        all_cats=all_cats,
         relations=relations,
         tree_img=graph_svg,
-        cat_photos=cat_photos
+        cat_photos=cat_photos,
     )    
 
 
@@ -183,7 +186,7 @@ def view_graph():
 
 
 #view graph for normal user
-    cats = cursor.execute("SELECT id, name, gender, photo FROM profiles").fetchall()
+    all_cats = cursor.execute("SELECT id, name, gender, photo FROM profiles").fetchall()
     #all relationship 
 
     relations = cursor.execute("""
@@ -204,12 +207,12 @@ def view_graph():
         no_relation_msg = "No relationships found, start creating now!"
     
     graph_svg = generate_graph(relations)
-    cat_photos = {cat['name']: url_for('static', filename=f'uploads/{cat["photo"]}') for cat in cats}
+    cat_photos = {cat['name']: url_for('static', filename=f'uploads/{cat["photo"]}') for cat in all_cats}
 
     return render_template(
         'relationship_viewer.html', 
         user=current_user, 
-        profiles=cats,
+        all_cats=all_cats,
         relations=relations,
         tree_img=graph_svg,
         cat_photos=cat_photos,
