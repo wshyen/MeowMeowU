@@ -222,8 +222,6 @@
         align-items: center;      
     }
 
-
-
     .arrow {
         font-size: 35px;  
         color: #94693e; 
@@ -281,6 +279,28 @@
     #cat-graph {
         max-width: 100%;
         height: auto;
+    }
+
+    .button-container{
+        text-align: center; 
+        margin-top: 40px;
+    }
+
+    .button {
+        padding: 12px 24px; 
+        margin-bottom: 20px; 
+        font-size: 16px; 
+        background-color: #dccbb7a5; 
+        color: #6b4f2f; 
+        border: none; 
+        border-radius: 12px; 
+        cursor: pointer;
+    }
+
+    .button:hover{
+        transform: scale(1.05);
+        background-color: #ebe1d8;
+        border-radius: 12px; 
     }
 
     .modal {
@@ -366,6 +386,14 @@
     {% endfor %}
 </div>
 
+<div class="button-container">
+    <a href="{{ url_for('catprofile.view_profiles') }}">
+        <button class="button">
+            View All Cats →
+        </button>
+    </a>
+</div>
+
 <hr>
 
 <h2>Add New Cat Relationship</h2>
@@ -411,10 +439,9 @@
     <label>Relationship Direction:<span style="color:red;">*</span></label>
         <input type="radio" name="direction" value="forward" required> A → B<br>
         <input type="radio" name="direction" value="both" required> A ↔ B<br>
-
         <button type="submit">Add Relationship</button>
 
-    </form>
+</form>
 
     <h3>Relationships You've Added:</h3>
     <ul>
@@ -485,73 +512,72 @@
 {% endif %}
     </ul>
 
-    <div id="editModal" class="modal hidden">
-        <div class="modal-content">
-            <h2>Edit Relationship</h2>
-            <form method="POST" class="edit-form">
-                <input type="hidden" name="action" value="edit">
-                <input type="hidden" name="rel_id" id="edit_rel_id">
-                
-                <label>Cat A:</label>
-                <select name="catA_id" id="edit_catA_id">
-                {% for cat in profiles %}
-                    <option value="{{ cat.id }}">{{ cat.name }}</option>
-                {% endfor %}
-                </select><br>
+<h2>Relationship Graph</h2>
+<div class="graph-container">
+    <object id="cat-graph" type="image/svg+xml" data="{{ tree_img }}" alt="Cat Relationship Tree"></object>
+</div>
 
-                <label>Cat B:</label>
-                <select name="catB_id" id="edit_catB_id">
-                {% for cat in profiles %}
-                    <option value="{{ cat.id }}">{{ cat.name }}</option>
-                {% endfor %}
-                </select><br>
-
-                <label>Relationship Type:
-                    <select name="relation_type" id="edit_relation_type" required onchange="checkOtherEdit(this)">
-                        <option value="Friend">Friend</option>
-                        <option value="Partner">Partner</option>
-                        <option value="Sibling">Sibling</option>
-                        <option value="Parent">Parent</option>
-                        <option value="Offspring">Offspring</option>
-                        <option value="Rival">Rival</option>
-                        <option value="Neighbouur">Neighbour</option>
-                        <option value="Other">Other (Specify)</option>
-                    </select>
-                </label>
-
-                <label id="edit_other_relation_label" style="display:none; margin-top:10px;">
-                    Please specify:
-                    <input type="text" name="other_relation" id="edit_other_relation_input" />
-                </label>
-
-                <label>Direction:</label>
-                <select name="direction" id="edit_direction">
-                <option value="both">↔ Both</option>
-                <option value="forward">→ Forward</option>
-                </select><br><br>
-
-                <button type="submit">Save Changes</button>
-                <button type="button" onclick="closeEditModal()">Cancel</button>
-            </form>
-        </div>
-    </div>
-
-    <h2>Relationship Graph</h2>
-    <div class="graph-container">
-        <object id="cat-graph" type="image/svg+xml" data="{{ tree_img }}" alt="Cat Relationship Tree"></object>
-    </div>
-
-    <div style="text-align: center; margin-top: 40px;">
-        <a href="{{ url_for('relationship.view_graph') }}">
-            <button style="padding: 12px 24px; margin-bottom: 20px; font-size: 16px; background-color: #dccbb7; color: #6b4f2f; border: none; border-radius: 12px; cursor: pointer;">
-                View Cat's Relationship →
-            </button>
-        </a>
-    </div>
+<div class="button-container">
+    <a href="{{ url_for('relationship.view_graph') }}">
+        <button class="button">
+            View Cat's Relationship →
+        </button>
+    </a>
+</div>
 </body>
 
-<script>
+<div id="editModal" class="modal hidden">
+    <div class="modal-content">
+        <h2>Edit Relationship</h2>
+        <form method="POST" class="edit-form">
+            <input type="hidden" name="action" value="edit">
+            <input type="hidden" name="rel_id" id="edit_rel_id">
+            
+            <label>Cat A:</label>
+            <select name="catA_id" id="edit_catA_id">
+            {% for cat in all_cats %}
+                <option value="{{ cat.id }}">{{ cat.name }}</option>
+            {% endfor %}
+            </select><br>
 
+            <label>Cat B:</label>
+            <select name="catB_id" id="edit_catB_id">
+            {% for cat in all_cats %}
+                <option value="{{ cat.id }}">{{ cat.name }}</option>
+            {% endfor %}
+            </select><br>
+
+            <label>Relationship Type:
+                <select name="relation_type" id="edit_relation_type" required onchange="checkOtherEdit(this)">
+                    <option value="Friend">Friend</option>
+                    <option value="Partner">Partner</option>
+                    <option value="Sibling">Sibling</option>
+                    <option value="Parent">Parent</option>
+                    <option value="Offspring">Offspring</option>
+                    <option value="Rival">Rival</option>
+                    <option value="Neighbouur">Neighbour</option>
+                    <option value="Other">Other (Specify)</option>
+                </select>
+            </label>
+
+            <label id="edit_other_relation_label" style="display:none; margin-top:10px;">
+                Please specify:
+                <input type="text" name="other_relation" id="edit_other_relation_input" />
+            </label>
+
+            <label>Direction:</label>
+            <select name="direction" id="edit_direction">
+            <option value="both">↔ Both</option>
+            <option value="forward">→ Forward</option>
+            </select><br><br>
+
+            <button type="submit">Save Changes</button>
+            <button type="button" onclick="closeEditModal()">Cancel</button>
+        </form>
+    </div>
+</div>
+
+<script>
 function checkOther(select) {
     const otherLabel = document.getElementById('other_relation_label');
     const otherInput = document.getElementById('other_relation');
