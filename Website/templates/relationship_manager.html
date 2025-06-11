@@ -43,6 +43,17 @@
         margin-bottom: 20px;
     }
 
+    .search-cat {
+        max-width: 20%;
+        margin: 40px auto;
+        background-color: #fffaf3;
+        border-radius: 15px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+        color: #6b4f2f;
+        font-weight: bold;
+        font-size: 18px;
+    }
+
     .cat-grid {
         display: flex;
         flex-wrap: wrap;
@@ -331,22 +342,22 @@
 
 <h1>Manage Cat Relationships</h1>
 
-<h2>All Cats</h2>
+<h2>Cats</h2>
 
 <div class="cat-grid">
-        {% for cat in profiles %}
-            <div class="cat-card">
-                <a href="/single_profile?name={{ cat.name | lower }}">
-                    {% if cat.photo %}
-                        <img class="profile-picture" src="{{ url_for('static', filename='uploads/' + cat['photo']) }}" alt="{{ cat['name'] }}">
-                    {% else %}
-                        <img class="profile-picture" src="{{ url_for('static', filename='uploads/default.png') }}" alt="Default Placeholder">
-                    {% endif %}
-                    <p><strong>Name: </strong>{{ cat.name }}</p>
-                    <p><strong>Gender: </strong>{{ cat.gender }}</p>
-                </a>    
-            </div>
-        {% endfor %}
+    {% for cat in random_cats %}
+        <div class="cat-card">
+            <a href="/single_profile?name={{ cat.name | lower }}">
+                {% if cat.photo %}
+                    <img class="profile-picture" src="{{ url_for('static', filename='uploads/' + cat['photo']) }}" alt="{{ cat['name'] }}">
+                {% else %}
+                    <img class="profile-picture" src="{{ url_for('static', filename='uploads/default.png') }}" alt="Default Placeholder">
+                {% endif %}
+                <p><strong>Name: </strong>{{ cat.name }}</p>
+                <p><strong>Gender: </strong>{{ cat.gender }}</p>
+            </a>    
+        </div>
+    {% endfor %}
 </div>
 
 <hr>
@@ -358,7 +369,7 @@
     <label>Cat A:
         <select name="catA_id" required>
             <option value="" disabled selected hidden>-- Please select --</option>
-            {% for cat in profiles %}
+            {% for cat in all_cats %}
                 <option value="{{ cat.id }}">{{ cat.name }}</option>
             {% endfor %}
         </select>
@@ -366,7 +377,7 @@
     <label>Cat B:
         <select name="catB_id" required>
             <option value="" disabled selected hidden>-- Please select --</option>
-            {% for cat in profiles %}
+            {% for cat in all_cats %}
                 <option value="{{ cat.id }}">{{ cat.name }}</option>
             {% endfor %}
         </select>
@@ -374,7 +385,7 @@
 
     <label>Relationship Type:
         <select name="relation_type" id="relation_type" required onchange="checkOther(this)">
-        <option value="" disabled selected hidden>-- Please select --</option>
+            <option value="" disabled selected hidden>-- Please select --</option>
             <option value="Friend">Friend</option>
             <option value="Partner">Partner</option>
             <option value="Sibling">Sibling</option>
@@ -533,6 +544,7 @@
 </body>
 
 <script>
+
 function checkOther(select) {
     const otherLabel = document.getElementById('other_relation_label');
     const otherInput = document.getElementById('other_relation');
