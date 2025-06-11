@@ -90,7 +90,7 @@
         
 </style>    
     
-<h1>SEARCH</h1>
+<h1>Search</h1>
   
 <form id="search-form" action="/search-feature" method="get">
     
@@ -98,8 +98,7 @@
 
         <div class="filter-bar">
             <label for="search_type">Search in:</label>
-            <select id="search_type" name="search_type" required>
-                <option value="" disabled selected hidden>-- Please select --</option>
+            <select id="search_type" name="search_type">
                 <option value="user">Users</option>
                 <option value="post">Community Posts</option>
                 <option value="cat">Cat Profiles</option>
@@ -151,10 +150,7 @@ const keywordInput = document.getElementById('name');
 
 function updateUI() {
     const val = searchTypeSelect.value;
-    if (val === '') {
-        catFilters.style.display = 'none';
-        keywordInput.placeholder = "Please select a search type first"; 
-    } else if (val === 'cat') {
+    if (val === 'cat') {
         catFilters.style.display = 'block';
         keywordInput.placeholder = "e.g., Tom, Doraemon";
     } else if (val === 'user') {
