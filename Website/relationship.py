@@ -157,7 +157,6 @@ def view_graph():
     action = request.form.get('action')
     cat_filter_name = request.form.get('cat_filter_name')
 
-# action for admin
     if action == 'edit':
         rel_id = request.form.get('rel_id')
         catA_id = request.form.get('catA_id')
@@ -185,7 +184,7 @@ def view_graph():
         return redirect(url_for('relationship.view_graph'))
 
 
-#view graph for normal user
+#view graph
     all_cats = cursor.execute("SELECT id, name, gender, photo FROM profiles").fetchall()
     #all relationship 
 
