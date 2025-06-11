@@ -91,6 +91,15 @@
         border: none;
     }
 
+    .admin-badge-btn:hover {
+        font-size: 20px;
+        background-color: #895b2d;
+        color: white;
+        border-radius: 5px;
+        transform: scale(1.05);
+        outline: none;
+    }
+
     .user-badge-card .locked {
         font-size: 20px;
         font-family: 'Times New Roman', Times, serif;
@@ -120,7 +129,7 @@
     }
 
     .claim-btn:focus {
-        outline: none; 
+        outline: none;
     }
 </style>
 <div style="padding: 20px;">
@@ -129,7 +138,8 @@
 
     {% set unlocked_badges = all_badges | selectattr("id", "in", user_badges_ids) | list %}
     {% set claimable_badges = all_badges | selectattr("id", "in", claimable_badge_ids) | list %}
-    {% set locked_badges = all_badges | rejectattr("id", "in", user_badges_ids) | rejectattr("id", "in", claimable_badge_ids) | list %}
+    {% set locked_badges = all_badges | rejectattr("id", "in", user_badges_ids) | rejectattr("id", "in",
+    claimable_badge_ids) | list %}
 
     <div class="user-badge-gallery">
         <!-- Unlocked Badges -->
@@ -145,7 +155,8 @@
         <!-- Claimable Badges -->
         {% for badge in claimable_badges %}
         <div class="user-badge-card">
-            <img src="{{ url_for('static', filename='badges/' ~ badge.icon) }}" style="filter: grayscale(100%); opacity: 0.5;">
+            <img src="{{ url_for('static', filename='badges/' ~ badge.icon) }}"
+                style="filter: grayscale(100%); opacity: 0.5;">
             <div><strong class="badge-name">{{ badge.name }}</strong></div>
             <div class="desc">{{ badge.description }}</div>
             <form method="post" action="{{ url_for('badge.claim_badge', badge_id=badge.id) }}">
@@ -157,7 +168,8 @@
         <!-- Locked Badges -->
         {% for badge in locked_badges %}
         <div class="user-badge-card">
-            <img src="{{ url_for('static', filename='badges/' ~ badge.icon) }}" style="filter: grayscale(100%); opacity: 0.5;">
+            <img src="{{ url_for('static', filename='badges/' ~ badge.icon) }}"
+                style="filter: grayscale(100%); opacity: 0.5;">
             <div><strong class="badge-name">{{ badge.name }}</strong></div>
             <div class="desc">{{ badge.description }}</div>
             <div class="locked">Locked</div>
@@ -186,13 +198,13 @@
             confetti({
                 particleCount: 100,
                 spread: 70,
-                origin: { y: 0.6 } 
+                origin: { y: 0.6 }
             });
 
             //Delay the form submission to allow confetti to show
             setTimeout(() => {
-                event.target.closest('form').submit(); 
-            }, 1000); 
+                event.target.closest('form').submit();
+            }, 1000);
         });
     });
 </script>
