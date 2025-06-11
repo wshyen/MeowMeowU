@@ -109,6 +109,27 @@
     border: 10px solid #f2eadf;
     border-radius: 10px;
   }
+
+  .badges-earned {
+    display: block;
+    margin: 40px auto;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-family: 'Times New Roman', Times, serif;
+    background-color: #dccbb7a5;
+    color: #6b4f2f;
+    border: none;
+    border-radius: 12px;
+    transition: transform 0.2s ease;
+    cursor: pointer;
+  }
+
+  .badges-earned:hover {
+    transform: scale(1.05);
+    background-color: #ebe1d8;
+    border-radius: 12px;
+    outline: none;
+  }
 </style>
 
 <div class="container mt-4">
@@ -141,7 +162,7 @@
         </div>
       </div>
     </div>
-    
+
     <h5 style="padding: 5px;"><b>Account Privacy:</b> {{ user.privacy }}</h5>
     <h5 style="padding: 5px;"><b>Email:</b> {{ user.email }}</h5>
     <h5 style="padding: 5px;"><b>Birthday:</b> {{ user.birthday if user.birthday else "-" }}</h5>
@@ -153,6 +174,10 @@
 
   </div>
 </div>
+
+<button class="badges-earned" onclick="location.href='{{ url_for('badge.badge_gallery') }}'">
+  View Badges Earned →
+</button>
 
 <div class="modal" id="imageModal" onclick="closeModal()">
   <img id="modalImage">
