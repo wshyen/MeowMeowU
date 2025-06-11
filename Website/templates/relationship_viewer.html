@@ -81,6 +81,8 @@
     .cat-info {
         text-align: center;
         width: 120px;
+        font-weight: 600;
+        color: #6b4f2f;
     }
 
     .cat-info img {
@@ -92,9 +94,16 @@
         margin-bottom: 8px;
     }
 
-    .cat-info div {
-        font-weight: 600;
-        color: #6b4f2f;
+    .relation-type-arrow {
+        display: flex;
+        flex-direction: column;  
+        align-items: center;      
+    }
+
+    .arrow {
+        font-size: 35px;  
+        color: #94693e; 
+        text-align: center;
     }
 
     .relationship-arrow {
@@ -269,27 +278,29 @@
                     <!-- Cat A -->
                     <div class="cat-info">
                         <img src="{{ url_for('static', filename='uploads/' + rel.catA_photo if rel.catA_photo else 'uploads/default.png') }}" alt="{{ rel.catA_name }}">
-                        <div>{{ rel.catA_name }}</div>
+                        {{ rel.catA_name }}
                     </div>
 
-                    <!-- Relationship -->
-                    <div style="font-weight: bold; font-size: 18px; color: #94693e; white-space: nowrap; width: 70px; text-align: center;">
-                        {{ rel.relation_type }}
-                    </div>
-
-                    <!-- Arrow -->
-                    <div class="relationship-arrow">
-                        {% if rel.direction == 'forward' %}
-                            &#8594;  <!-- Right arrow (→) -->
-                        {% elif rel.direction == 'both' %}
-                            &#8596;  <!-- Both sided arrow (↔) -->
-                        {% endif %}
+                    <!-- Relationship type & arrow -->
+                    <div class="relation-type-arrow">
+                        <!-- Relationship -->
+                        <div style="font-weight: bold; font-size: 18px; color: #94693e; white-space: nowrap; width: 70px; text-align: center;">
+                            {{ rel.relation_type }}
+                        </div>
+                        <!-- Arrow -->
+                        <div class="arrow">
+                            {% if rel.direction == 'forward' %}
+                                &#8594;  <!-- Right arrow (→) -->
+                            {% elif rel.direction == 'both' %}
+                                &#8596;  <!-- Both sided arrow (↔) -->
+                            {% endif %}
+                        </div>
                     </div>
 
                     <!-- Cat B -->
                     <div class="cat-info">
                         <img src="{{ url_for('static', filename='uploads/' + rel.catB_photo if rel.catB_photo else 'uploads/default.png') }}" alt="{{ rel.catB_name }}">
-                        <div>{{ rel.catB_name }}</div>
+                        {{ rel.catB_name }}
                     </div>
 
                     <div class="action-buttons">
