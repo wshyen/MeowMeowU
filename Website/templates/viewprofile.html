@@ -21,6 +21,26 @@
         padding-bottom: 40px;
     }
 
+    .button {
+        display: block;
+        margin: 40px auto;
+        padding: 12px 24px; 
+        font-size: 16px; 
+        font-family: 'Times New Roman', Times, serif;
+        background-color: #dccbb7a5; 
+        color: #6b4f2f; 
+        border: none; 
+        border-radius: 12px; 
+        transition: transform 0.2s ease;
+        cursor: pointer;
+    }
+
+    .button:hover{
+        transform: scale(1.05);
+        background-color: #ebe1d8;
+        border-radius: 12px; 
+    }
+
     .profile-picture {
         width: 150px;
         height: 150px;
@@ -170,6 +190,10 @@
 <!-- main content container -->
 <div class="page-container">
     <h1>Cat Profiles</h1>
+
+    <button class="button" onclick="location.href='{{ url_for('relationship.relationship_feature') }}'">
+        Add Relationship →
+    </button>
 
     <!-- container for profile cards -->
     <div class="profile-container">
