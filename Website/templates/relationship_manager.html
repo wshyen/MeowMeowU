@@ -180,7 +180,6 @@
         max-width: 700px;
         margin: 0 auto 80px auto;
         font-size: 18px;
-        line-height: 1.6;
         padding: 15px 160px 15px 20px;
         border-radius: 12px;        
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);        
@@ -217,11 +216,18 @@
         color: #6b4f2f;
     }
 
-    .relationship-arrow {
+    .relation-type-arrow {
+        display: flex;
+        flex-direction: column;  
+        align-items: center;      
+    }
+
+
+
+    .arrow {
         font-size: 35px;  
         color: #94693e; 
         text-align: center;
-        margin-top: 10px;
     }
 
     form.inline {
@@ -431,18 +437,19 @@
                             <div>{{ rel.catA_name }}</div>
                         </div>
 
-                        <!-- Relationship -->
-                        <div style="font-weight: bold; font-size: 18px; color: #94693e; white-space: nowrap; width: 70px; text-align: center;">
-                            {{ rel.relation_type }}
-                        </div>
-
-                        <!-- Arrow -->
-                        <div class="relationship-arrow">
-                            {% if rel.direction == 'forward' %}
-                                &#8594;  <!-- Right arrow (→) -->
-                            {% elif rel.direction == 'both' %}
-                                &#8596;  <!-- Both sided arrow (↔) -->
-                            {% endif %}
+                        <div class="relation-type-arrow"
+                            <!-- Relationship -->
+                            <div style="font-weight: bold; font-size: 18px; color: #94693e; white-space: nowrap; width: 70px; text-align: center;">
+                                {{ rel.relation_type }}
+                            </div>
+                            <!-- Arrow -->
+                            <div class="arrow">
+                                {% if rel.direction == 'forward' %}
+                                    &#8594;  <!-- Right arrow (→) -->
+                                {% elif rel.direction == 'both' %}
+                                    &#8596;  <!-- Both sided arrow (↔) -->
+                                {% endif %}
+                            </div>
                         </div>
 
                         <!-- Cat B -->
