@@ -78,7 +78,6 @@
         gap: 15px;
         /*Add spacing between profile cards*/
         justify-content: center;
-        /*Center-align profile cards*/
     }
 
     .actions {
@@ -88,7 +87,6 @@
         width: calc(100% - 20px);
         display: flex;
         justify-content: space-between;
-        /* Space between edit and delete button */
         align-items: center;
         padding: 0 10px;
         box-sizing: border-box;
@@ -109,11 +107,9 @@
 
     .action-btn:hover {
         text-decoration: none;
-        /* prevent underline on hover */
         color: white;
-        /* keep text white on hover */
         background-color: #7a5730;
-        /* optionally darken button on hover */
+        transform: scale(1.2);
     }
 
     .action-btn.delete {
@@ -123,9 +119,9 @@
 
     .action-btn.delete:hover {
         background-color: #cc0000;
-        /* darker red on hover */
         color: white;
         text-decoration: none;
+        transform: scale(1.2);
     }
 
     .empty-message {
@@ -177,7 +173,7 @@
 
     <!-- container for profile cards -->
     <div class="profile-container">
-        {% for profile in profiles %}
+        {% for profile in profiles | sort(attribute='name') %}
         {% if not profile.deleted %}
 
         <!-- profile card box -->
