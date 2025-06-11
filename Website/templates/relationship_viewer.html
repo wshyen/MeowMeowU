@@ -239,7 +239,7 @@
 <form method="POST" action="{{ url_for('relationship.view_graph') }}">
   <label for="cat_filter_name">Filter by Cat:</label>
   <select name="cat_filter_name" onchange="this.form.submit()">
-    {% for cat in profiles %}
+    {% for cat in all_cats %}
       <option value="{{ cat.name }}" {% if cat.name == cat_filter_name %}selected{% endif %}>
         {{ cat.name }}
       </option>
@@ -326,14 +326,14 @@
             
             <label>Cat A:</label>
             <select name="catA_id" id="edit_catA_id">
-            {% for cat in profiles %}
+            {% for cat in all_cats %}
                 <option value="{{ cat.id }}">{{ cat.name }}</option>
             {% endfor %}
             </select><br>
 
             <label>Cat B:</label>
             <select name="catB_id" id="edit_catB_id">
-            {% for cat in profiles %}
+            {% for cat in all_cats %}
                 <option value="{{ cat.id }}">{{ cat.name }}</option>
             {% endfor %}
             </select><br>
