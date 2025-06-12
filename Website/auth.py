@@ -9,7 +9,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy import text
 import os
 from datetime import datetime, timedelta
-from .community import get_post_id_from_comment, get_db_connection
+from .community import get_db_connection
 
 auth = Blueprint("auth", __name__) #a Blueprint for authentication routes, Blueprint is like a container for related routes and functions
 
