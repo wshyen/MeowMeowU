@@ -33,8 +33,7 @@
 
     p {
         color: #6b4f2f;
-        font-size: 20px;
-        white-space: normal;  
+        font-size: 20px; 
         max-width: 90%;     
         overflow-wrap: break-word;
     }
@@ -164,6 +163,12 @@
         align-items: center;
     }
 
+    .floor-number {
+        font-size: 20px;
+        margin-left: 10px;
+        color: #995f38;
+    }
+
     .comment-content {
         display: flex;
         flex-direction: column;
@@ -230,6 +235,12 @@
         height: 50px;
     }
 
+    .file-name-display {
+        margin-right: 10px;
+        color: #6b4f2f;
+        font-size: 14px;
+    }
+
     .file-upload-label {
         cursor: pointer;
         margin-right: 10px;
@@ -253,6 +264,8 @@
     .comment-form-container button:hover {
         background-color: #5a3e26;
     }
+
+    
 
     .back-button {
         display: block;
@@ -507,7 +520,7 @@
                     <img class="comment-profile-picture" src="{{ url_for('static', filename='Userprofile/' + (comment['profile_picture'] if comment['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
                 </a>
                 <p><strong>{{ comment['name'] }}</strong> commented at {{ comment['created_at'] }}</p>
-                <span class="floor-number" style="font-size: 20px; margin-left: 10px; color: #6b4f2f;">
+                <span class="floor-number">
                     #{{ comment['floor'] }}
                 </span>
 
@@ -597,7 +610,7 @@
     <form action="{{ url_for('community.add_comment', post_id=post['post_id']) }}" method="POST" enctype="multipart/form-data">
         <textarea id="comment-textarea" name="content" placeholder="Write a comment..."></textarea>
         <input type="hidden" id="parent-id" name="parent_id" value="">
-        <span id="file-name-display" style="margin-right: 10px; color: #6b4f2f; font-size: 14px;"></span>
+        <span id="file-name-display" class="file-name-display"></span>
         <label for="comment-media" class="file-upload-label">
             <img src="{{ url_for('static', filename='paperclip.png') }}" alt="Attach File" class="paperclip-icon">
         </label>

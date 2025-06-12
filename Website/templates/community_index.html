@@ -8,7 +8,6 @@
     html,body {
         margin: 0;
         padding: 0;
-        box-sizing: border-box;
         font-family: 'Times New Roman', Times, serif;
         background-color: #f2eadf;
         
@@ -36,9 +35,7 @@
     p {
         text-align: center;
         color: #6b4f2f;
-        font-size: 20px;
-        white-space: normal;  
-        max-width: 70%;     
+        font-size: 20px;   
         overflow-wrap: break-word;
     }
 
@@ -48,7 +45,6 @@
         text-decoration: none;
         font-style: italic;
     }
-
 
     .sort-container {
         text-align: center;
@@ -108,7 +104,7 @@
     }
 
     .post-body{
-        margin-left: 90px;
+        padding: 0 90px;
     }
 
     .post-content {
@@ -117,7 +113,7 @@
         -webkit-line-clamp: 5;
         -webkit-box-orient: vertical;
         overflow: hidden;
-        text-overflow: ellipsis;    
+        text-overflow: ellipsis; 
     }
 
     .media-grid {
