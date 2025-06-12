@@ -8,7 +8,7 @@
   body {
     background-color: #f2eadf;
     font-family: 'Times New Roman';
-    margin-bottom: 80px;
+    margin-bottom: 30px;
   }
 
   h2,
@@ -410,6 +410,26 @@
     background: #dccbb7;
     transform: scale(1.05);
   }
+
+  .back-button {
+    display: block;
+    margin: 30px auto;
+    padding: 10px 20px;
+    background-color: #dccbb7;
+    color: #6b4f2f;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+  }
+
+  .back-button:hover {
+    background-color: #d4bfae;
+    transform: scale(1.05);
+    box-shadow: 0px 8px 15px rgba(255, 163, 71, 0.2);
+  }
 </style>
 
 <h1 style="font-size: 40px; font-weight: bold; text-align: center; padding-top: 25px; color: #94693e;">
@@ -595,6 +615,12 @@
     {% endif %}
   </div>
 </div>
+
+{% if user.role == 'admin' %}
+<button class="back-button" onclick="history.back();">
+  Back
+</button>
+{% endif %}
 
 <div class="modal" id="imageModal" onclick="closeModal()">
   <span class="modal-close" onclick="closeModal()">&times;</span>
