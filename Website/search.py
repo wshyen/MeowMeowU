@@ -1,6 +1,6 @@
 import sqlite3
 import os
-from flask import Blueprint, render_template, request, flash, url_for, redirect
+from flask import Blueprint, render_template, request, url_for, redirect
 from flask_login import current_user
 
 search_bp = Blueprint('search', __name__, template_folder='templates', static_folder='static')
@@ -16,13 +16,12 @@ def get_db_connection():
 def search_feature():
     search_type = request.args.get('search_type', '')
     keyword = request.args.get('keyword', '')
-
-    if not search_type and not keyword:
-        return render_template('search_feature.html', user=current_user) 
-
     gender = request.args.get('gender', '')
     color = request.args.get('color', '')
     sort = request.args.get('sort', '')
+
+    if not search_type and not keyword:
+        return render_template('search_feature.html', user=current_user) 
 
     if search_type == 'user':
         return redirect(url_for('search.user_result', search_type="user", keyword=keyword))
