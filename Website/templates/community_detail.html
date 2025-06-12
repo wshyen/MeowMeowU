@@ -169,6 +169,20 @@
         color: #995f38;
     }
 
+    .admin-comment-action-button {
+        border: none; 
+        background: none; 
+        font-size: 18px;
+        color: #a58259; 
+        font-weight: bold; 
+        cursor: pointer;
+    }
+
+    .admin-comment-action-button:hover{
+        background-color: inherit;
+
+    }
+
     .comment-content {
         display: flex;
         flex-direction: column;
@@ -260,12 +274,6 @@
         border-radius: 5px;
         cursor: pointer;
     }
-
-    .comment-form-container button:hover {
-        background-color: #5a3e26;
-    }
-
-    
 
     .back-button {
         display: block;
@@ -526,7 +534,7 @@
 
                     {% if user.is_authenticated and user.role == 'admin' %}
                         <form action="{{ url_for('auth.delete_comment', id=comment['id']) }}" method="post" style="display:inline;">
-                            <button type="submit" class="comment-action-button" style="border: none; background: none; color: #a58259; font-weight: bold; cursor: pointer;">
+                            <button type="submit" class="admin-comment-action-button">
                                 Delete Comment
                             </button>
                         </form>

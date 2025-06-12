@@ -12,6 +12,7 @@ migrate = Migrate()
 def create_app(): #a function to create and configure the Flask app
     app = Flask(__name__) #create Flask app
     app.config['SECRET_KEY'] = "Hello"
+    app.config['DEBUG'] = True
     app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{DB_NAME}" #path to database
     
     db.init_app(app) #initialize the database with the Flask app
