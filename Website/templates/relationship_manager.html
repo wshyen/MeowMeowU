@@ -33,27 +33,6 @@
         margin-bottom: 20px;
     }
 
-    h3 {
-        font-weight: bold;
-        font-size: 25px;
-        color: #6b4f2f;
-        text-align: center;
-        font-style: italic;
-        margin-top: 50px;
-        margin-bottom: 20px;
-    }
-
-    .search-cat {
-        max-width: 20%;
-        margin: 40px auto;
-        background-color: #fffaf3;
-        border-radius: 15px;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-        color: #6b4f2f;
-        font-weight: bold;
-        font-size: 18px;
-    }
-
     .cat-grid {
         display: flex;
         flex-wrap: wrap;
@@ -270,12 +249,6 @@
         margin: 0 auto;
         max-width: 100%;
         padding: 1rem;
-        border-radius: 12px;
-    }
-
-    #cat-graph {
-        max-width: 100%;
-        height: auto;
     }
 
     .button {
@@ -358,12 +331,11 @@
         cursor: pointer;
         transition: transform 0.8s ease;
     }
-
 </style>
 
 <h1>Manage Cat Relationships</h1>
 
-<h2>Help These Cats Connect</h2>
+<h2>Help Connect These Cats</h2>
 
 <div class="cat-grid">
     {% for cat in random_cats %}
@@ -392,34 +364,35 @@
     <input type="hidden" name="action" value="add" />
 
     <label>Cat A:
-        <select name="catA_id" required>
-            <option value="" disabled selected hidden>-- Please select --</option>
-            {% for cat in all_cats %}
-                <option value="{{ cat.id }}">{{ cat.name }}</option>
-            {% endfor %}
-        </select>
+    <select name="catA_id" required>
+        <option value="" disabled selected hidden>-- Please select --</option>
+        {% for cat in all_cats %}
+            <option value="{{ cat.id }}">{{ cat.name }}</option>
+        {% endfor %}
+    </select>
     </label>
+    
     <label>Cat B:
-        <select name="catB_id" required>
-            <option value="" disabled selected hidden>-- Please select --</option>
-            {% for cat in all_cats %}
-                <option value="{{ cat.id }}">{{ cat.name }}</option>
-            {% endfor %}
-        </select>
+    <select name="catB_id" required>
+        <option value="" disabled selected hidden>-- Please select --</option>
+        {% for cat in all_cats %}
+            <option value="{{ cat.id }}">{{ cat.name }}</option>
+        {% endfor %}
+    </select>
     </label>
 
     <label>Relationship Type:
-        <select name="relation_type" id="relation_type" required onchange="checkOther(this)">
-            <option value="" disabled selected hidden>-- Please select --</option>
-            <option value="Friend">Friend</option>
-            <option value="Partner">Partner</option>
-            <option value="Sibling">Sibling</option>
-            <option value="Parent">Parent</option>
-            <option value="Offspring">Offspring</option>
-            <option value="Rival">Rival</option>
-            <option value="Neighbour">Neighbour</option>
-            <option value="Other">Other (Specify)</option>
-        </select>
+    <select name="relation_type" id="relation_type" required onchange="checkOther(this)">
+        <option value="" disabled selected hidden>-- Please select --</option>
+        <option value="Friend">Friend</option>
+        <option value="Partner">Partner</option>
+        <option value="Sibling">Sibling</option>
+        <option value="Parent">Parent</option>
+        <option value="Offspring">Offspring</option>
+        <option value="Rival">Rival</option>
+        <option value="Neighbour">Neighbour</option>
+        <option value="Other">Other (Specify)</option>
+    </select>
     </label>
 
     <label id="other_relation_label" style="display:none; margin-top:10px;">
@@ -431,68 +404,65 @@
         <input type="radio" name="direction" value="forward" required> A → B<br>
         <input type="radio" name="direction" value="both" required> A ↔ B<br>
         <button type="submit">Add Relationship</button>
-
 </form>
 
-    <h3>Relationships You've Added:</h3>
-    <ul>
-    {% if user.is_authenticated%}
-
-        {% if relations|length == 0 %}
-            <li class="relationship-item">
+<h2>Relationships You've Added:</h2>
+<ul>
+{% if user.is_authenticated%}
+    {% if relations|length == 0 %}
+        <li class="relationship-item">
+            <div class="relationship-content">
+                <p>You haven't added any relationships yet.</p>
+            </div>
+        </li>
+    {% else %}
+        {% for rel in relations %}
+            <li class= "relationship-item">
                 <div class="relationship-content">
-                    <p>You haven't added any relationships yet.</p>
+
+                    <!-- Cat A -->
+                    <div class="cat-info">
+                        <img src="{{ url_for('static', filename='uploads/' + rel.catA_photo if rel.catA_photo else 'uploads/default.png') }}" alt="{{ rel.catA_name }}">
+                        {{ rel.catA_name }}
+                    </div>
+
+                    <!-- Relationship type & arrow -->
+                    <div class="relation-type-arrow">
+                        <!-- Relationship -->
+                        <div style="font-weight: bold; font-size: 18px; color: #94693e; white-space: nowrap; width: 70px; text-align: center;">
+                            {{ rel.relation_type }}
+                        </div>
+                        <!-- Arrow -->
+                        <div class="arrow">
+                            {% if rel.direction == 'forward' %}
+                                &#8594;  <!-- Right arrow (→) -->
+                            {% elif rel.direction == 'both' %}
+                                &#8596;  <!-- Both sided arrow (↔) -->
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Cat B -->
+                    <div class="cat-info">
+                        <img src="{{ url_for('static', filename='uploads/' + rel.catB_photo if rel.catB_photo else 'uploads/default.png') }}" alt="{{ rel.catB_name }}">
+                        {{ rel.catB_name }}
+                    </div>
+
+                    <div class="action-buttons">
+                        <!-- Edit Button -->
+                        <button class="action-button" onclick="openEditModal('{{ rel.id }}', '{{ rel.catA_id }}', '{{ rel.catB_id }}', '{{ rel.relation_type|escapejs }}', '{{ rel.direction|escapejs }}')">
+                            Edit
+                        </button>
+
+                        <!-- Delete Button -->
+                        <form method="POST"  class="inline" action="{{ url_for('relationship.relationship_feature') }}" onsubmit="return confirm('Are you sure you want to delete this relationship?');" style="margin-left: 20px;">
+                            <input type="hidden" name="action" value="delete" />
+                            <input type="hidden" name="rel_id" value="{{ rel.id }}" />
+                            <button class = "action-button" type="submit">Delete</button>
+                        </form>
+                    </div>
                 </div>
             </li>
-        {% else %}
-            {% for rel in relations %}
-                <li class= "relationship-item">
-                    <div class="relationship-content">
-
-                        <!-- Cat A -->
-                        <div class="cat-info">
-                            <img src="{{ url_for('static', filename='uploads/' + rel.catA_photo if rel.catA_photo else 'uploads/default.png') }}" alt="{{ rel.catA_name }}">
-                            {{ rel.catA_name }}
-                        </div>
-
-                        <!-- Relationship type & arrow -->
-                        <div class="relation-type-arrow">
-                            <!-- Relationship -->
-                            <div style="font-weight: bold; font-size: 18px; color: #94693e; white-space: nowrap; width: 70px; text-align: center;">
-                                {{ rel.relation_type }}
-                            </div>
-                            <!-- Arrow -->
-                            <div class="arrow">
-                                {% if rel.direction == 'forward' %}
-                                    &#8594;  <!-- Right arrow (→) -->
-                                {% elif rel.direction == 'both' %}
-                                    &#8596;  <!-- Both sided arrow (↔) -->
-                                {% endif %}
-                            </div>
-                        </div>
-
-                        <!-- Cat B -->
-                        <div class="cat-info">
-                            <img src="{{ url_for('static', filename='uploads/' + rel.catB_photo if rel.catB_photo else 'uploads/default.png') }}" alt="{{ rel.catB_name }}">
-                            {{ rel.catB_name }}
-                        </div>
-
-                        <div class="action-buttons">
-                            <!-- Edit Button -->
-                            <button class = "action-button" onclick="openEditModal({{ rel.id }}, '{{ rel.catA_id }}', '{{ rel.catB_id }}', '{{ rel.relation_type }}', '{{ rel.direction }}')">
-                                Edit
-                            </button>
-
-                            <!-- Delete Button -->
-                            <form method="POST"  class="inline" action="{{ url_for('relationship.relationship_feature') }}" onsubmit="return confirm('Are you sure you want to delete this relationship?');" style="margin-left: 20px;">
-                                <input type="hidden" name="action" value="delete" />
-                                <input type="hidden" name="rel_id" value="{{ rel.id }}" />
-                                <button class = "action-button" type="submit">Delete</button>
-                            </form>
-                        </div>
-
-                    </div>
-                </li>
         {% endfor %}
     {% endif %}
 {% else %}
@@ -502,7 +472,7 @@
         </div>
     </li>
 {% endif %}
-    </ul>
+</ul>
 
 <h2>Relationship Graph</h2>
 <div class="graph-container">
@@ -514,6 +484,7 @@
         View All Cats →
     </button>
 </div>
+
 </body>
 
 <div id="editModal" class="modal hidden">
@@ -538,16 +509,16 @@
             </select><br>
 
             <label>Relationship Type:
-                <select name="relation_type" id="edit_relation_type" required onchange="checkOtherEdit(this)">
-                    <option value="Friend">Friend</option>
-                    <option value="Partner">Partner</option>
-                    <option value="Sibling">Sibling</option>
-                    <option value="Parent">Parent</option>
-                    <option value="Offspring">Offspring</option>
-                    <option value="Rival">Rival</option>
-                    <option value="Neighbouur">Neighbour</option>
-                    <option value="Other">Other (Specify)</option>
-                </select>
+            <select name="relation_type" id="edit_relation_type" required onchange="checkOtherEdit(this)">
+                <option value="Friend">Friend</option>
+                <option value="Partner">Partner</option>
+                <option value="Sibling">Sibling</option>
+                <option value="Parent">Parent</option>
+                <option value="Offspring">Offspring</option>
+                <option value="Rival">Rival</option>
+                <option value="Neighbouur">Neighbour</option>
+                <option value="Other">Other (Specify)</option>
+            </select>
             </label>
 
             <label id="edit_other_relation_label" style="display:none; margin-top:10px;">
@@ -557,8 +528,8 @@
 
             <label>Direction:</label>
             <select name="direction" id="edit_direction">
-            <option value="both">↔ Both</option>
-            <option value="forward">→ Forward</option>
+                <option value="both">↔ Both</option>
+                <option value="forward">→ Forward</option>
             </select><br><br>
 
             <button type="submit">Save Changes</button>
@@ -613,18 +584,18 @@ function closeEditModal() {
   document.getElementById('editModal').style.display = 'none';
 }
 
-const catPhotos = {{ cat_photos|tojson }};
+const catPhotos = {{ cat_photos|tojson }};   // Fetches the cat photos object and converts it to a JSON string for use in JavaScript
 document.addEventListener('DOMContentLoaded', function () {
-    const object = document.getElementById('cat-graph');
+    const object = document.getElementById('cat-graph');    // Get the SVG object element
     object.addEventListener('load', function () {
-        const svgDoc = object.contentDocument;
-        const nodes = svgDoc.querySelectorAll('text');
-        let clipId = 0;
+        const svgDoc = object.contentDocument;    // Access the SVG document inside the object element
+        const nodes = svgDoc.querySelectorAll('text');    // Select all text elementss in the SVG document
+        let clipId = 0;    // Initialize a counter for unique clip IDs
 
         nodes.forEach(node => {
-            if (node.textContent.trim() === '[PIC]') {
-                let texts = node.parentNode.querySelectorAll('text');
-                let nameNode = texts.length > 1 ? texts[1] : node;
+            if (node.textContent.trim() === '[PIC]') {    // Check if the text content is '[PIC]'
+                let texts = node.parentNode.querySelectorAll('text');    // Get all text elements within the same parent node
+                let nameNode = texts.length > 1 ? texts[1] : node;    // If there are multiple text elements, use the second one; otherwise, use the current node
                 let catName = nameNode.textContent.trim();
                 let imgUrl = catPhotos[catName];
                 if (!imgUrl) return;
@@ -641,7 +612,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const cy = y - gap - radius;
 
                 const thisClipId = 'catclip' + (clipId++);
-                const clipPath = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
+                const clipPath = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'clipPath');     
                 clipPath.setAttribute('id', thisClipId);
 
                 const circle = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'circle');
