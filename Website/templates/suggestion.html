@@ -1,41 +1,55 @@
-{% extends "base.html" %} 
+{% extends "base.html" %}
 
-{% block title %}Suggestion{% endblock %} 
+{% block title %}Suggestion{% endblock %}
 
 {% block content %}
 
 <style>
   body {
-      background-color: #f2eadf;
+    background-color: #f2eadf;
   }
 
   .list-group-item {
-      width: 700px;
-      border: 1px solid rgb(176, 148, 119);
-      border-radius: 10px;
-      margin-bottom: 10px;
-      font-family: 'Times New Roman', serif;
-      font-size: 16px;
-      padding: 15px;
-      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    width: 700px;
+    border: 1px solid rgb(176, 148, 119);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    font-family: 'Times New Roman', serif;
+    font-size: 16px;
+    padding: 15px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
   }
 
   textarea {
-      width: 700px;
-      height: 300px;
-      resize: none;
-      border: 1px solid rgb(176, 148, 119);
-      border-radius: 10px;
-      padding: 15px;
-      font-size: 16px;
-      font-family: 'Times New Roman', serif;
-      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    width: 700px;
+    height: 300px;
+    resize: none;
+    border: 1px solid rgb(176, 148, 119);
+    border-radius: 10px;
+    padding: 15px;
+    font-size: 16px;
+    font-family: 'Times New Roman', serif;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
   }
 
   p {
     text-align: center;
     font-family: 'Times New Roman';
     color: rgb(78, 68, 57);
+  }
+
+  h2 {
+    text-align: center;
+    font-family: 'Times New Roman', serif;
+    padding-top: 35px;
+    color: rgb(78, 68, 57);
+  }
+
+  h3 {
+    font-family: 'Times New Roman', serif;
+    color: rgb(78, 68, 57);
+    margin-bottom: 20px;
+    padding-top: 25px;
   }
 
   .suggestion-arrow {
@@ -72,59 +86,59 @@
     justify-content: center;
     align-items: center;
     margin-top: 30px;
-    margin-bottom: 50px; /* Adjusted bottom margin */
+    margin-bottom: 50px;
     gap: 20px;
   }
-
 </style>
 
-<h2 style="text-align: center; font-family: 'Times New Roman', serif; padding-top: 35px; color: rgb(78, 68, 57);"><b>Suggestion Box</b></h2>
+<h2><b>Suggestion Box</b></h2>
 <p>Feel free to give us suggestion!</p>
-  
+
 <form method="POST" style="display: flex; flex-direction: column; align-items: center; margin-bottom: 40px;">
 
-  <textarea 
-    name="note" 
-    id="note"></textarea>
+  <textarea name="note" id="note"></textarea>
 
   <br />
 
-  <button type="submit" class="btn btn-primary" style="font-family: 'Times New Roman';background-color: rgb(176, 148, 119);color: white;border: none;">
-    🐾Suggest!🐾</button>
+  <button type="submit" class="btn btn-primary"
+    style="font-family: 'Times New Roman';background-color: rgb(176, 148, 119);color: white;border: none;">
+    🐾Suggest!🐾
+  </button>
 
 </form>
 
 <hr style="width: 100%; margin: 20px auto; border: 1px solid rgb(148, 148, 148);">
 
 <div style="text-align: center; margin-top: 20px;">
-  <h3 style="font-family: 'Times New Roman', serif; color: rgb(78, 68, 57); margin-bottom: 20px;padding-top: 25px;"><b>History of Suggestions</b></h3>
+  <h3>
+    <b>History of Suggestions</b>
+  </h3>
 
   {% if current_note %}
   <div class="suggestion-box-wrapper">
 
     {% if index > 0 %}
-      <a href="{{ url_for('views.suggestion', index=index-1) }}" class="suggestion-arrow">&lt;</a>
+    <a href="{{ url_for('views.suggestion', index=index-1) }}" class="suggestion-arrow">&lt;</a>
     {% else %}
-      <span class="suggestion-arrow disabled">&lt;</span>
+    <span class="suggestion-arrow disabled">&lt;</span>
     {% endif %}
 
     <div class="suggestion-card">
       {{ current_note.data }}
     </div>
 
-    {% if index + 1 < total %}
-      <a href="{{ url_for('views.suggestion', index=index+1) }}" class="suggestion-arrow">&gt;</a>
-    {% else %}
+    {% if index + 1 < total %} <a href="{{ url_for('views.suggestion', index=index+1) }}" class="suggestion-arrow">
+      &gt;</a>
+      {% else %}
       <span class="suggestion-arrow disabled">&gt;</span>
-    {% endif %}
+      {% endif %}
 
   </div>
 
   {% else %}
-    <p>No suggestions yet.</p>
+  <p>No suggestions yet.</p>
   {% endif %}
-  
+
 </div>
 
 {% endblock %}
-  
