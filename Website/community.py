@@ -4,8 +4,6 @@ from datetime import datetime
 from flask import Blueprint, request,flash, redirect, render_template, url_for
 from flask_login import current_user
 from werkzeug.utils import secure_filename
-from sqlalchemy import text
-from . import db
 
 community_bp = Blueprint('community', __name__, template_folder='templates')
 
@@ -135,12 +133,6 @@ def post_detail(post_id):
 
     return render_template("community_detail.html", post=post, comments=comments, grouped_comments=grouped_comments, user=current_user)
 
-def get_post_id_from_comment(comment_id):
-    query = text("SELECT post_id FROM comment WHERE id = :id")
-    result = db.session.execute(query, {"id": comment_id}).fetchone()
-
-    return result[0] if result else None
-
 # Create Post
 @community_bp.route('/post/create', methods=['POST'])
 def create_post():
@@ -268,8 +260,6 @@ def edit_post(post_id):
         )
         conn.commit()
         
-    print("Request received:", request.form)
-    print("Edit post request received for post_id:", post_id)
     conn.close()
     return redirect(url_for('community.my_posts'))
 
@@ -388,7 +378,6 @@ def add_comment(post_id):
         filename = secure_filename(media.filename)
         media.save(os.path.join(COMMENTS_FOLDER, filename))
         media_url = f"comments/{filename}"
-        print("File saved to:", os.path.join(COMMENTS_FOLDER, filename))
     
     conn = get_db_connection()
 
