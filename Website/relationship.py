@@ -1,7 +1,7 @@
 import os
 import sqlite3
 import random
-from flask import flash, Blueprint, g, render_template, request, redirect, url_for, current_app
+from flask import flash, Blueprint, render_template, request, redirect, url_for, current_app
 from flask_login import current_user
 from graphviz import Digraph
 
@@ -16,9 +16,6 @@ def get_db_connection():
     return conn
 
 def generate_graph(relations, filename='cat_relationship_tree'):
-    from graphviz import Digraph
-    import os
-    from flask import current_app, url_for
 
     if not relations:
         return None
@@ -45,8 +42,8 @@ def generate_graph(relations, filename='cat_relationship_tree'):
                 added_nodes.add(cat_name)
 
         edge_attrs = {'label': rel['relation_type']}
-        direction = rel['direction']
 
+        direction = rel['direction']
         if direction == 'forward':   # Arrow points from A to B (A → B)
             edge_attrs['dir'] = 'forward'
             dot.edge(rel['catA_name'], rel['catB_name'], **edge_attrs) 
@@ -57,7 +54,6 @@ def generate_graph(relations, filename='cat_relationship_tree'):
     output_dir = os.path.join(current_app.static_folder, 'graphs')
     os.makedirs(output_dir, exist_ok=True)
     output_path = os.path.join(output_dir, filename)
-    print(f"Saving SVG to: {output_path}")  # Add print to check file path
     dot.render(output_path, format='svg', cleanup=False) 
 
     return url_for('static', filename=f'graphs/{filename}.svg')
@@ -86,6 +82,10 @@ def relationship_feature():
 
             if relation_type == 'Other' and other_relation and other_relation.strip():
                 relation_type = other_relation.strip()
+
+            if catA_id == catB_id:
+                flash("Cat A and Cat B cannot be the same!", category="error")
+                return redirect(url_for('relationship.relationship_feature'))
 
             if catA_id and catB_id and relation_type and catA_id != catB_id:
                 cursor.execute(
@@ -205,7 +205,6 @@ def view_graph():
         graph_svg = ""
         no_relation_msg = "No relationships found, start creating now!"
     
-    graph_svg = generate_graph(relations)
     cat_photos = {cat['name']: url_for('static', filename=f'uploads/{cat["photo"]}') for cat in all_cats}
 
     return render_template(
