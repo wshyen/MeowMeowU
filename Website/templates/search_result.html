@@ -127,11 +127,11 @@
 
     .post {
         width: 100%;
-        max-width: 1000px;
+        max-width: 900px;
         min-height: 200px;
         max-height: 300px;
         margin: 20px auto;
-        padding: 20px 20px 10px 20px;
+        padding: 20px;
         background-color: #ffffff;
         border-radius: 10px;
         overflow: hidden;
@@ -160,31 +160,54 @@
         line-height: 1.2; 
     }
 
+    .post-body{
+        margin: 0 90px;
+    }
+
     .post-content {
-        margin: 0 70px 0 90px;
-        max-width: 100%;
         text-align: left;    
-        white-space: normal; 
         display: -webkit-box;
         -webkit-line-clamp: 5;
         -webkit-box-orient: vertical;
         overflow: hidden;
         text-overflow: ellipsis; 
     }
+    .media-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 5px;
+        width: 100%;
+        max-width: 500px;
+        margin: 10px 0;
+    }
 
-    .media {
+    .media-item {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        overflow: hidden;
+        background: #f0f0f0;
+        position: relative;
+    }
+
+    .media-item img,
+    .media-item video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .more-overlay {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-color: rgba(0,0,0,0.5);
+        color: white;
+        font-size: 36px;
+        font-weight: bold;
         display: flex;
-        align-items: flex-start;
-        margin: 20px 90px;
+        align-items: center;
+        justify-content: center;
     }
-
-    .media img,
-    .media video {
-        width: 150px;
-        height: 150px;
-        object-fit: cover; 
-    }
-
 </style>
 
 {% if search_type == 'user' %}
@@ -215,25 +238,39 @@
     <div class="post-container">
         {% for post in posts %}
         <div class="post" onclick="window.location.href='/post/{{ post.post_id }}'">
-                <div class="post-info">
-                    <img class="profile-picture" src="{{ url_for('static', filename='Userprofile/' + (post['profile_picture'] if post['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
-                    <p><strong>{{ post['name'] }}</strong> posted at {{ post['created_at'] }}</p>
-                </div>
 
-            <p class="post-content">{{ post['content'] }}</p>
-
-            <div class="media">
-                {% if post['media_url'] %}
-                    {% set ext = post['media_url'].rsplit('.', 1)[1].lower() %}
-                    {% if ext in ['jpg', 'jpeg', 'png', 'gif'] %}
-                        <img src="{{ url_for('static', filename=post['media_url']) }}" alt="Image">
-                    {% elif ext in ['mp4', 'mov', 'avi'] %}
-                        <video controls>
-                            <source src="{{ url_for('static', filename=post['media_url']) }}" type="video/{{ ext }}">
-                        </video>
-                    {% endif %}
-                {% endif %}
+            <div class="post-info">
+                <img class="profile-picture" src="{{ url_for('static', filename='Userprofile/' + (post['profile_picture'] if post['profile_picture'] else 'default_profilepic.png')) }}" alt="Avatar">
+                <p><strong>{{ post['name'] }}</strong> posted at {{ post['created_at'] }}</p>
             </div>
+
+            <div class="post-body">
+                <p class="post-content">{{ post['content'] }}</p>
+                <div class="media-grid">
+                    {% if post['media_url'] %}
+                        {% set media_list = post['media_url'].split(';') %}
+                        {% set max_show = 3 %}
+                        {% set total = media_list | length %}
+                        {% for media_url in media_list[:max_show] %}
+                            {% set ext = media_url.rsplit('.', 1)[1].lower() %}
+                            <div class="media-item">
+                                {% if ext in ['jpg', 'jpeg', 'png', 'gif'] %}
+                                    <img src="{{ url_for('static', filename=media_url) }}" alt="Image">
+                                {% elif ext in ['mp4', 'mov', 'avi'] %}
+                                    <video controls>
+                                        <source src="{{ url_for('static', filename=media_url) }}" type="video/{{ ext }}">
+                                    </video>
+                                {% endif %}
+
+                                {% if loop.index == max_show and total > max_show %}
+                                    <div class="more-overlay">+{{ total - max_show }}</div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+
         </div>
         {% endfor %}
     </div>
@@ -241,7 +278,6 @@
   {% elif message %}
     <h2>{{ message }} {{keyword}} </h2>
   {% endif %}
-
 
 
 {% elif search_type == 'cat' %}
@@ -273,12 +309,11 @@
             </div>
         {% endfor %}
     </div>
-
     {% elif message %}
         <h2>{{ message }} {{ keyword}}</h2>
     {% endif %}
+    
 {% endif %}
-
 
 
 {% endblock %}
