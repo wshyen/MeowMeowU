@@ -450,7 +450,7 @@
 
                     <div class="action-buttons">
                         <!-- Edit Button -->
-                        <button class="action-button" onclick="openEditModal('{{ rel.id }}', '{{ rel.catA_id }}', '{{ rel.catB_id }}', '{{ rel.relation_type|escapejs }}', '{{ rel.direction|escapejs }}')">
+                        <button class = "action-button" onclick="openEditModal({{ rel.id }}, '{{ rel.catA_id }}', '{{ rel.catB_id }}', '{{ rel.relation_type }}', '{{ rel.direction }}')">
                             Edit
                         </button>
 
