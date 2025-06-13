@@ -335,6 +335,13 @@
     }
 
     function checkQuizCompletion() {
+        clearInterval(window.questionTimer); //Stop the timer
+
+        let timerElement = document.getElementById("timer-box");
+        if (timerElement) {
+            timerElement.style.display = "none"; //Hide timer from view
+        }
+
         document.getElementById("question-text").innerHTML = "Quiz Complete!";
         document.getElementById("options").innerHTML = "";
 
