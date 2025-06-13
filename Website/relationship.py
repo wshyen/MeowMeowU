@@ -154,37 +154,7 @@ def view_graph():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    action = request.form.get('action')
     cat_filter_name = request.form.get('cat_filter_name')
-
-    if action == 'edit':
-        rel_id = request.form.get('rel_id')
-        catA_id = request.form.get('catA_id')
-        catB_id = request.form.get('catB_id')
-        relation_type = request.form.get('relation_type')
-        other_relation = request.form.get('other_relation')
-        direction = request.form.get('direction')
-
-        if relation_type == 'Other' and other_relation and other_relation.strip():
-            relation_type = other_relation.strip()
-
-        if rel_id and catA_id and catB_id and relation_type and catA_id != catB_id:
-            cursor.execute(
-                "UPDATE cat_relationship SET catA_id=?, catB_id=?, relation_type=?, direction=? WHERE id=?",
-                (catA_id, catB_id, relation_type, direction, rel_id)
-            )
-            conn.commit()
-        return redirect(url_for('relationship.view_graph'))
-
-    elif action == 'delete':
-        rel_id = request.form.get('rel_id')
-        if rel_id:
-            cursor.execute("DELETE FROM cat_relationship WHERE id = ?", (rel_id,))
-            conn.commit()
-        return redirect(url_for('relationship.view_graph'))
-
-
-    #all relationship graph
     all_cats = cursor.execute("SELECT id, name, gender, photo FROM profiles ORDER BY name ASC").fetchall()
 
     relations = cursor.execute("""
@@ -205,6 +175,35 @@ def view_graph():
         no_relation_msg = "No relationships found, start creating now!"
     
     cat_photos = {cat['name']: url_for('static', filename=f'uploads/{cat["photo"]}') for cat in all_cats}
+
+#action for admin
+    action = request.form.get('action')
+
+    if action == 'edit':
+        rel_id = request.form.get('rel_id')
+        catA_id = request.form.get('catA_id')
+        catB_id = request.form.get('catB_id')
+        relation_type = request.form.get('relation_type')
+        other_relation = request.form.get('other_relation')
+        direction = request.form.get('direction')
+
+        if relation_type == 'Other' and other_relation and other_relation.strip():
+            relation_type = other_relation.strip()
+
+        if rel_id and catA_id and catB_id and relation_type and catA_id != catB_id:
+            cursor.execute(
+                "UPDATE cat_relationship SET catA_id=?, catB_id=?, relation_type=?, direction=? WHERE id=?",
+                (catA_id, catB_id, relation_type, direction, rel_id)
+            )
+            conn.commit()
+        return redirect(url_for('relationship.view_graph', cat_filter_name=cat_filter_name))
+
+    elif action == 'delete':
+        rel_id = request.form.get('rel_id')
+        if rel_id:
+            cursor.execute("DELETE FROM cat_relationship WHERE id = ?", (rel_id,))
+            conn.commit()
+        return redirect(url_for('relationship.view_graph', cat_filter_name=cat_filter_name))
 
     return render_template(
         'relationship_viewer.html', 
