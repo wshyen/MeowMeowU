@@ -64,7 +64,7 @@ def relationship_feature():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    all_cats = cursor.execute("SELECT id, name, gender, photo FROM profiles").fetchall()
+    all_cats = cursor.execute("SELECT id, name, gender, photo FROM profiles ORDER BY name ASC").fetchall()
     random_cats = random.sample(all_cats,5,)
         
     if request.method == 'POST':
@@ -184,9 +184,8 @@ def view_graph():
         return redirect(url_for('relationship.view_graph'))
 
 
-#view graph
-    all_cats = cursor.execute("SELECT id, name, gender, photo FROM profiles").fetchall()
-    #all relationship 
+    #all relationship graph
+    all_cats = cursor.execute("SELECT id, name, gender, photo FROM profiles ORDER BY name ASC").fetchall()
 
     relations = cursor.execute("""
         SELECT cr.id, cr.catA_id, cr.catB_id, cr.relation_type, cr.direction,
