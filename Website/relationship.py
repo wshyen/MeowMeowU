@@ -133,7 +133,7 @@ def relationship_feature():
             """, (catA_id, catB_id, relation_type, direction, catB_id, catA_id, relation_type, direction)).fetchone()[0]
 
             if existing_relation > 0:
-                flash("This relationship already exists!", category="error")
+                flash("Looks like someone else already added this relationship!", category="error")
                 return redirect(url_for('relationship.relationship_feature'))   
                      
             # Check if the relationship more than 30        
