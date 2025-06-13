@@ -65,14 +65,17 @@ def relationship_feature():
     cursor = conn.cursor()
 
     all_cats = cursor.execute("SELECT id, name, gender, photo FROM profiles ORDER BY name ASC").fetchall()
-    random_cats = random.sample(all_cats,5,)
+    if len(all_cats) >= 5:
+        random_cats = random.sample(all_cats, 5)
+    else:
+        random_cats = all_cats
         
     if request.method == 'POST':
         if not current_user.is_authenticated:
             flash("You must be logged in to add relationship!", category="error")
             return redirect(url_for('auth.login'))
+        
         action = request.form.get('action')
-
         if action == 'add':
             catA_id = request.form.get('catA_id')
             catB_id = request.form.get('catB_id')
@@ -154,7 +157,7 @@ def view_graph():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    cat_filter_name = request.form.get('cat_filter_name')
+    cat_filter_name = request.form.get('cat_filter_name', '')
     all_cats = cursor.execute("SELECT id, name, gender, photo FROM profiles ORDER BY name ASC").fetchall()
 
     relations = cursor.execute("""
@@ -178,7 +181,6 @@ def view_graph():
 
 #action for admin
     action = request.form.get('action')
-
     if action == 'edit':
         rel_id = request.form.get('rel_id')
         catA_id = request.form.get('catA_id')
